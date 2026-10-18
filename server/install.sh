@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# もしもラボ 投稿サーバーのインストール（ConoHa VPS で sudo bash install.sh）
+# もしもラボ 投稿サーバーのインストール（ConoHa VPS で sudo bash install.sh https://ドメイン/moshimo）
 # 何度実行しても大丈夫。/etc/moshimo.env が既にあれば上書きしない。
 set -euo pipefail
 if [ "$(id -u)" != 0 ]; then echo "sudo bash install.sh で実行して"; exit 1; fi
@@ -308,6 +308,7 @@ POST_TIMES=20:30
 MOSHIMO_EOF
   SECRET=$(head -c 32 /dev/urandom | base64 | tr -dc 'A-Za-z0-9' | head -c 40)
   sed -i "s#^HOOK_SECRET=.*#HOOK_SECRET=$SECRET#" /etc/moshimo.env
+  if [ -n "$1" ]; then sed -i "s#^BASE_URL=.*#BASE_URL=$1#" /etc/moshimo.env; fi
   chmod 600 /etc/moshimo.env
   echo
   echo "HOOK_SECRET（GitHubのSecretsにも同じ値を入れる）: $SECRET"
