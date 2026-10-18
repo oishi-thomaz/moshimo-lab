@@ -73,3 +73,7 @@ CHROME_PATH=<chromium> node tools/render.mjs --video NNNN --stills 0.5,2,5,10,16
 - scenes/field.js：田舎（花畑・果樹園・イチゴ畑・ビニールハウス・池と魚・森）。makeBug で ハチ / 蚊 / チョウ / 鳥、setFlowers・setFruit で花と実の量、setFieldEnv で day / dusk / night / gray
 - scenes/stage.js：データ用スタジオ。makeBar（ラベル付き3D棒グラフ。nameTop・headerY で文字を棒の上にそろえる）、makeCoins（硬貨の山）、makeCrowd（人の群れ）
 - scenes/hyrox.js：HYROX風のフィットネスレース会場（ランのレーン・8種目のエリア・ゴール）。makeAthlete（ランナー体型）、run（レーンを走る）、act(p, 種目番号, t, {slow})（SkiErg／スレッドプッシュ／プル／バーピーブロードジャンプ／ロー／ファーマーズ／ランジ／ウォールボールの動き）、setOthers（ほかの選手）
+- scenes/nursery.js：病院の新生児室（透明なベビーコット3列×3台・くるまれた赤ちゃん・看護師・新生児室の札・窓・時計）。COTS[i].baby、setBabies(i→0..1) で赤ちゃんの有無、nurse（makePerson）、setNurseryLight で day / night。天井は下向きの面だけなので高い位置からも撮れる
+- scenes/station.js：島式ホームの駅（架空の もしも台駅・2本の線路・屋根・発車標・駅名標・架線柱・まわりのビル）。makeTrain({cars, side, freight}) で通勤電車か機関車＋コンテナ車（setX・setDoors・setLights）、setBoard(rows, {stop:'運転見合わせ', blink}) で発車標、makeRiders(n, seed, 範囲) でホームの人（set(k, t, {look, board, side})）、makeQs で？吹き出し、setStationEnv で day / dusk / night
+- scenes/pets.js：ローポリの飼い猫と小物。makeCat({coat: orange / gray / white / black / calico})、catPose（stand / sit / loaf / sleep）、catWalk・catBreath（歩き・しっぽ）、makeBowl（setFood で量）、makeCatBed、makeToyBall
+- scenes/town.js：郊外の住宅街（十字の道と両側の一戸建て・街灯）。setTownEnv で day / dusk / night、setVacant(k, grow) で q<k の家を空き家に（窓の明かりが消え、壁と屋根がくすみ、庭に草）。HOUSES で家の一覧
