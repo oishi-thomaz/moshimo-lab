@@ -56,3 +56,9 @@ CHROME_PATH=<chromium> node tools/render.mjs --video NNNN --stills 0.5,2,5,10,16
 ## シーン一覧
 - city.js：街の交差点・歩道・コンビニ（もしもマート）・駐車場・夜景・俯瞰の街並み（店の明かりが順に灯る演出つき）
 - market.js：スーパー店内・レジの行列・棚の商品が減る演出
+- story.js：動画の共通進行（runStory で SHOTS・SUBS・META を渡すだけ。毎フレーム字幕以外のオーバーレイを消してからショットを呼ぶ）、endCard、look、countUp、hudTime、textSprite（文字の看板）、makeSparkles（消える瞬間の光の粒）
+- scenes/room.js：室内セット。setRoom({sets:[...]}) で bed（寝室・寝ている人・時計・スマホ）/ desk / living（ソファ・テレビ）/ kitchen / office / ward（病室）/ toilet / showa（畳・ちゃぶ台・ブラウン管・黒電話）を切り替え、setLight で day / evening / night / dark、setClock・setScreen で時計とテレビ画面
+- scenes/japan.js：日本地図の俯瞰（海・山・富士山）。ll(経度,緯度) で位置、setDots で人口の点を一斉に動かす、makeRing（波紋）、addPin、setMapEnv で day / dusk / night
+- scenes/earth.js：宇宙から見た地球（大陸・雲・夜の街明かり・大気・星・月）。latLon で地表の位置、faceLon でその経度を正面に、setEarthNight で夜側
+- scenes/field.js：田舎（花畑・果樹園・イチゴ畑・ビニールハウス・池と魚・森）。makeBug で ハチ / 蚊 / チョウ / 鳥、setFlowers・setFruit で花と実の量、setFieldEnv で day / dusk / night / gray
+- scenes/stage.js：データ用スタジオ。makeBar（ラベル付き3D棒グラフ）、makeCoins（硬貨の山）、makeCrowd（人の群れ）

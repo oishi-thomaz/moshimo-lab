@@ -49,7 +49,8 @@
   "mood": "mystery",
   "keywords": "蚊 絶滅 もしも 生き物 雑学",
   "virality": "S",
-  "no": 2
+  "no": 2,
+  "made": "0002"
  },
  {
   "cat": "お金・経済",
@@ -75,7 +76,8 @@
   "mood": "hopeful",
   "keywords": "消費税 消費税ゼロ 減税 家計 もしも",
   "virality": "S",
-  "no": 3
+  "no": 3,
+  "made": "0003"
  },
  {
   "cat": "体・健康",
