@@ -8,7 +8,7 @@ envex = (root / 'server/moshimo.env.example').read_text()
 nginx = (root / 'server/nginx-moshimo.conf').read_text()
 assert 'MOSHIMO_EOF' not in server
 script = f'''#!/usr/bin/env bash
-# もしもラボ 投稿サーバーのインストール（ConoHa VPS で sudo bash install.sh https://ドメイン/moshimo）
+# もしもラボ 投稿サーバーのインストール（ConoHa VPS で sudo bash install.sh https://ドメイン/moshimo [合言葉]）
 # 何度実行しても大丈夫。/etc/moshimo.env が既にあれば上書きしない。
 set -euo pipefail
 if [ "$(id -u)" != 0 ]; then echo "sudo bash install.sh で実行して"; exit 1; fi
@@ -34,9 +34,9 @@ sed -i "s#/usr/bin/node#$NODE_BIN#" /etc/systemd/system/moshimo.service
 if [ ! -f /etc/moshimo.env ]; then
 cat > /etc/moshimo.env <<'MOSHIMO_EOF'
 {envex}MOSHIMO_EOF
-  SECRET=$(head -c 32 /dev/urandom | base64 | tr -dc 'A-Za-z0-9' | head -c 40)
+  SECRET="${{2:-$(head -c 32 /dev/urandom | base64 | tr -dc 'A-Za-z0-9' | head -c 40)}}"
   sed -i "s#^HOOK_SECRET=.*#HOOK_SECRET=$SECRET#" /etc/moshimo.env
-  if [ -n "${1:-}" ]; then sed -i "s#^BASE_URL=.*#BASE_URL=$1#" /etc/moshimo.env; fi
+  if [ -n "${{1:-}}" ]; then sed -i "s#^BASE_URL=.*#BASE_URL=$1#" /etc/moshimo.env; fi
   chmod 600 /etc/moshimo.env
   echo
   echo "HOOK_SECRET（GitHubのSecretsにも同じ値を入れる）: $SECRET"
