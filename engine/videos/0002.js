@@ -50,7 +50,7 @@ const SUBS = [
   [43.6, 47.8, 'そのいちばん大きな<br>マラリアを運ぶのが蚊。'],
   [48.1, 52.6, '結果：マラリアだけで<br>年61万人が助かる計算に。'],
   [52.6, 55.4, '実は、蚊を減らす研究も<br>本当に進んでいる。'],
-  [55.6, 59.4, '今夜のプーンも、<br>その3,729種のひとつ。'],
+  [55.6, 59.4, '蚊は全部消えてほしい？<br>それとも残すべき？'],
 ];
 
 function bedroomNight(T) {
@@ -172,7 +172,8 @@ runStory({
     title: '世界中の蚊が絶滅したら？',
     titleHtml: '世界中の蚊が<br>絶滅したら？',
     mood: 'mystery', seed: 2, hits: [1.2, 48.1], risers: [1.2],
-    caption: 'もしも世界中の蚊3,729種が一瞬で絶滅したら？\nかゆみのない夏の夜、マラリアやデング熱、池の生き物たちはどうなるのか。WHOの最新データでシミュレーション。\n\n出典：WHO World Malaria Report 2025、WHO Weekly Epidemiological Record（デング熱 2024年）、WHO ファクトシート「Vector-borne diseases」、Mosquito Taxonomic Inventory（2024年11月）',
+    ask: '蚊は全部消えてほしい？それとも残すべき？',
+    caption: 'もしも世界中の蚊3,729種が一瞬で絶滅したら？\nかゆみのない夏の夜、マラリアやデング熱、池の生き物たちはどうなるのか。WHOの最新データでシミュレーション。\n\n蚊は全部消えてほしい？それとも残すべき？ コメントで教えて。\n\n出典：WHO World Malaria Report 2025、WHO Weekly Epidemiological Record（デング熱 2024年）、WHO ファクトシート「Vector-borne diseases」、Mosquito Taxonomic Inventory（2024年11月）',
     hashtags: ['もしもラボ', '蚊', '絶滅', '生き物', '雑学'],
     endStats: [['世界の蚊の種類', '3,729種', '2024年'], ['マラリアの患者数', '約2億8,200万人', '2024年'], ['マラリアの死者', '約61万人', '2024年'], ['デング熱の報告数', '約1,443万件', '2024年']],
     sources: '出典：WHO World Malaria Report 2025、WHO 週報（デング熱 2024年）、<br>WHO Vector-borne diseases、Mosquito Taxonomic Inventory',

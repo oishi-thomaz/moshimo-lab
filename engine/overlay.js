@@ -40,6 +40,7 @@ function setupCards(meta) {
   document.getElementById('title').innerHTML = hang(meta.titleHtml || meta.title || '');
   document.querySelector('#end .t').innerHTML = hang(meta.titleHtml || meta.title || '');
   document.querySelector('#end .s').innerHTML = hang((meta.endStats || []).map(([l, v, y]) => `${esc(l)}<b>${esc(v)}</b>${y ? '（' + esc(y) + '）' : ''}`).join('<br>'));
+  document.querySelector('#end .ask').innerHTML = meta.ask ? hang(esc(meta.ask)) + '<small>コメントで教えて</small>' : '';
   document.querySelector('#end .src').innerHTML = hang(meta.sources || '');
 }
 

@@ -35,10 +35,14 @@
   #flash{position:absolute;inset:0;background:#fff;opacity:0}
   /* まとめカード：上から順に積んで、項目の数が変わっても余白を自動でそろえる（下のインスタの文字エリアは空ける） */
   #end{position:absolute;inset:0;background:#07090d;opacity:0;color:#fff;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:150px 70px 360px;box-sizing:border-box}
+  #end>*{align-self:stretch}
   #end .t{font-size:80px;line-height:1.25}
   #end .s{margin-top:64px;font-size:34px;line-height:1.9;color:#cfd6df}
   #end .s b{color:#fff;font-weight:900;margin-left:16px}
-  #end .lg{margin-top:84px;display:flex;flex-direction:column;align-items:center;gap:18px}
+  #end .ask{margin-top:56px;font-size:42px;font-weight:700;line-height:1.4;color:#7ff0c8}
+  #end .ask:empty{display:none}
+  #end .ask small{display:block;margin-top:10px;font-size:28px;font-weight:400;color:#cfd6df;letter-spacing:2px}
+  #end .lg{margin-top:72px;display:flex;flex-direction:column;align-items:center;gap:18px}
   #end .lg .mk{width:150px;height:150px;border-radius:23.4%;box-shadow:0 0 0 2px rgba(255,255,255,.14),0 12px 40px rgba(33,199,178,.22)}
   #end .lg .nm{font-family:"M PLUS Rounded 1c",sans-serif;font-size:54px;font-weight:800;letter-spacing:8px;line-height:1}#end .lg .en{font-family:Inter,sans-serif;font-weight:600;font-size:20px;letter-spacing:12px;color:#8a94a3;margin-top:-4px}
   #end .src{margin-top:64px;font-size:24px;color:#8a94a3;line-height:1.6}
@@ -58,6 +62,7 @@
   <div id="end">
     <div class="t serif"></div>
     <div class="s sans"></div>
+    <div class="ask sans"></div>
     <div class="lg"><div class="mk"></div><div class="nm">もしもラボ</div><div class="en">MOSHIMO LAB</div></div>
     <div class="src sans"></div>
   </div>

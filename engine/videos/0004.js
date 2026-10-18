@@ -61,7 +61,7 @@ const SUBS = [
   [43.6, 47.8, '本当ではないことを、<br>信じ込み始める。'],
   [48.1, 52.6, '結果：72時間で、目にも耳にも<br>幻覚が出る状態になった。'],
   [52.6, 55.4, '実は日本の大人の約4割が、<br>6時間未満しか寝ていない。'],
-  [55.6, 59.4, '今夜は、ちゃんと寝よう。'],
+  [55.6, 59.4, 'あなたの最長の徹夜は、<br>何時間？'],
 ];
 
 function base(sets, light, opt) { setRoom({ sets }); setLight(light, opt); props.sleeper.visible = false; props.phone.visible = true; hallu(0, 0); zzz.set(0); hero.visible = true; }
@@ -159,7 +159,8 @@ runStory({
     title: '72時間ずっと寝なかったら？',
     titleHtml: '72時間ずっと<br>寝なかったら？',
     mood: 'tension', seed: 4, hits: [6.1, 30.1, 39.3, 48.1], risers: [39.3],
-    caption: 'もしも72時間ずっと寝なかったら、体と頭はどうなる？\n17時間でお酒を飲んだ人並み、48時間でないものが見え始める。睡眠不足と徹夜の研究データでシミュレーション。\n※まねしないでください\n\n出典：Williamson & Feyer（2000）Occupational and Environmental Medicine、Waters et al.（2018）Frontiers in Psychiatry、厚生労働省 令和元年国民健康・栄養調査',
+    ask: 'あなたの最長の徹夜は何時間？',
+    caption: 'もしも72時間ずっと寝なかったら、体と頭はどうなる？\n17時間でお酒を飲んだ人並み、48時間でないものが見え始める。睡眠不足と徹夜の研究データでシミュレーション。\n※まねしないでください\n\nあなたの最長の徹夜は何時間？ コメントで教えて。\n\n出典：Williamson & Feyer（2000）Occupational and Environmental Medicine、Waters et al.（2018）Frontiers in Psychiatry、厚生労働省 令和元年国民健康・栄養調査',
     hashtags: ['もしもラボ', '睡眠不足', '徹夜', '人体', '雑学'],
     endStats: [['起きて17〜19時間', '血中アルコール0.05%相当', '2000年'], ['反応の速さ', '最大50%遅い', '2000年'], ['3日目の幻覚', '目・耳・体の3種類', '2018年'], ['睡眠6時間未満', '男性37.5%・女性40.6%', '2019年']],
     sources: '出典：Williamson & Feyer（2000）、Waters et al.（2018）、<br>厚生労働省 令和元年国民健康・栄養調査',
