@@ -43,6 +43,7 @@
   - タイトル（冒頭だけ）：250〜480px、ロゴ：左上に固定
   - 主役（人・看板・グラフ）は 1050px より上に置く。看板やグラフが下にかぶるショットは、ショット関数の最初で lift(px) を呼ぶと絵全体が px だけ上にずれる（story.js。230〜460 くらい）
   - 下から20%と右端120pxはインスタのボタンがかぶるので重要な物を置かない
+- 文字のセンターぞろえは overlay.js の hang が自動でやる（行末の。、はぶら下げ、かっこ・？！は空きを詰める）。字幕・タイトル・数字ラベルは必ず SUBS / titleHtml / setTop / endStats 経由で出し、innerHTML を直接書かない
 - 字幕に +1分。のような経過時間を書かない（すぐ上のチップと二重になる）。時間はチップ（hudTime）だけで見せる
 - 字幕は1行14字くらいまで。長い文は `<br>` で2行に。カメラは主役がタイトル・字幕とかぶらない構図にする
 - META に入れるもの：id, title, titleHtml, mood（tension / mystery / calm / emotional / hopeful）, seed, hits（ドンと鳴らす秒）, risers, caption（検索されそうな言葉を自然に入れる。最後に出典）, hashtags（5個まで。1つ目は もしもラボ）, endStats, sources

@@ -10,6 +10,9 @@
   #stage{position:relative;width:1080px;height:1920px;overflow:hidden;background:#000}
   #gl{position:absolute;inset:0;width:1080px;height:1920px;display:block}
   .ov{position:absolute;left:0;right:0;pointer-events:none}
+  /* センターぞろえ（overlay.js の hang）：行末の。、はぶら下げ、かっこ・？！は空きの分だけ詰める */
+  .hp{display:inline-block;width:0;overflow:visible;white-space:nowrap}
+  .he{margin-right:-.5em}.hs{margin-left:-.5em}.hq{margin-right:-.28em}
   .serif{font-family:"Noto Serif CJK JP","Noto Serif JP",serif;font-weight:700}
   .sans{font-family:"Noto Sans CJK JP","Noto Sans JP",sans-serif}
   .shadow{text-shadow:0 0 18px rgba(0,0,0,.6),0 2px 6px rgba(0,0,0,.7),0 0 3px rgba(0,0,0,.5)}
@@ -20,7 +23,7 @@
   #logo .mk{width:54px;height:54px;filter:drop-shadow(0 3px 8px rgba(0,0,0,.4))}#logo .mk svg,#end .lg .mk svg{width:100%;height:100%;display:block}
   #logo .nm{font-family:"M PLUS Rounded 1c",sans-serif;font-size:34px;font-weight:800;letter-spacing:3px}
   #hud{top:1058px;display:flex;justify-content:center;color:#fff;opacity:0}
-  #hud .pill{display:flex;align-items:baseline;gap:18px;padding:8px 34px 12px;border-radius:999px;background:rgba(10,14,22,.62);box-shadow:0 0 0 2px rgba(255,255,255,.16)}
+  #hud .pill{display:flex;align-items:baseline;gap:16px}
   #hud .lab{font-size:30px;font-weight:700;letter-spacing:1px;opacity:.85}
   #hud .lab:empty{display:none}
   #hud .val{font-size:58px;line-height:1.1;font-variant-numeric:tabular-nums}
@@ -30,14 +33,15 @@
   #topstat .lab{font-size:30px;font-weight:700;letter-spacing:1px;opacity:.9;white-space:nowrap}
   #topstat .val{font-size:86px;font-weight:900;line-height:1.08;margin-top:4px;font-variant-numeric:tabular-nums}
   #flash{position:absolute;inset:0;background:#fff;opacity:0}
-  #end{position:absolute;inset:0;background:#07090d;opacity:0;color:#fff;text-align:center}
-  #end .t{position:absolute;top:470px;left:0;right:0;font-size:84px;line-height:1.25}
-  #end .s{position:absolute;top:740px;left:0;right:0;font-size:36px;line-height:1.85;color:#cfd6df}
-  #end .s b{color:#fff;font-weight:900;margin-left:18px}
-  #end .lg{position:absolute;top:1060px;left:0;right:0;display:flex;flex-direction:column;align-items:center;gap:22px}
-  #end .lg .mk{width:190px;height:190px;border-radius:23.4%;box-shadow:0 0 0 2px rgba(255,255,255,.14),0 12px 40px rgba(33,199,178,.22)}
-  #end .lg .nm{font-family:"M PLUS Rounded 1c",sans-serif;font-size:62px;font-weight:800;letter-spacing:8px;line-height:1}#end .lg .en{font-family:Inter,sans-serif;font-weight:600;font-size:22px;letter-spacing:12px;color:#8a94a3;margin-top:-6px}
-  #end .src{position:absolute;top:1540px;left:0;right:0;font-size:26px;color:#8a94a3;line-height:1.6}
+  /* まとめカード：上から順に積んで、項目の数が変わっても余白を自動でそろえる（下のインスタの文字エリアは空ける） */
+  #end{position:absolute;inset:0;background:#07090d;opacity:0;color:#fff;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:150px 70px 360px;box-sizing:border-box}
+  #end .t{font-size:80px;line-height:1.25}
+  #end .s{margin-top:64px;font-size:34px;line-height:1.9;color:#cfd6df}
+  #end .s b{color:#fff;font-weight:900;margin-left:16px}
+  #end .lg{margin-top:84px;display:flex;flex-direction:column;align-items:center;gap:18px}
+  #end .lg .mk{width:150px;height:150px;border-radius:23.4%;box-shadow:0 0 0 2px rgba(255,255,255,.14),0 12px 40px rgba(33,199,178,.22)}
+  #end .lg .nm{font-family:"M PLUS Rounded 1c",sans-serif;font-size:54px;font-weight:800;letter-spacing:8px;line-height:1}#end .lg .en{font-family:Inter,sans-serif;font-weight:600;font-size:20px;letter-spacing:12px;color:#8a94a3;margin-top:-4px}
+  #end .src{margin-top:64px;font-size:24px;color:#8a94a3;line-height:1.6}
 </style>
 </head>
 <body>
