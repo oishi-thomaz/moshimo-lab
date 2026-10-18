@@ -183,7 +183,7 @@ setClock('7:00');
   const wm = mat('#dfe7ea');
   const pan = new THREE.Mesh(new THREE.CylinderGeometry(0.28, 0.22, 0.42, 20), mat('#ffffff')); pan.position.set(0, 0.21, -3.0); pan.scale.z = 1.35; g.add(pan);
   const seat = new THREE.Mesh(new THREE.TorusGeometry(0.22, 0.05, 8, 24), mat('#f4f4f4')); seat.rotation.x = Math.PI / 2; seat.scale.y = 1.35; seat.position.set(0, 0.45, -2.95); g.add(seat);
-  const water = new THREE.Mesh(new THREE.CircleGeometry(0.17, 20), mat('#8fd0ee', { emissive: 0x2a6f8f, emissiveIntensity: 0.3 })); water.rotation.x = -Math.PI / 2; water.scale.y = 1.35; water.position.set(0, 0.38, -2.95); g.add(water); props.toiletWater = water;
+  const water = new THREE.Mesh(new THREE.CircleGeometry(0.17, 20), mat('#3f9be0', { emissive: 0x1a5f8f, emissiveIntensity: 0.3 })); water.rotation.x = -Math.PI / 2; water.scale.y = 1.35; water.position.set(0, 0.435, -2.95); g.add(water); props.toiletWater = water;
   const lid = box(0.5, 0.04, 0.12, mat('#f4f4f4')); lid.position.set(0, 0.75, -3.3); g.add(lid);
   const tank = box(0.6, 0.55, 0.22, mat('#ffffff')); tank.position.set(0, 0.75, -3.4); g.add(tank);
   const lever = new THREE.Group(); const lb = box(0.16, 0.035, 0.035, mat('#c0c6cc')); lb.position.x = 0.08; lever.add(lb); lever.position.set(0.22, 0.95, -3.28); g.add(lever); props.toiletLever = lever;
