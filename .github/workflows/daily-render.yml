@@ -86,14 +86,6 @@ jobs:
           git commit -m "rendered ${{ steps.pick.outputs.id }}"
           git push
 
-      - name: Keep a copy (3 days)
-        if: steps.pick.outputs.id != ''
-        uses: actions/upload-artifact@v4
-        with:
-          name: video-${{ steps.pick.outputs.id }}
-          path: out/${{ steps.pick.outputs.id }}*
-          retention-days: 3
-
       - name: Failure notice
         if: failure()
         run: |
