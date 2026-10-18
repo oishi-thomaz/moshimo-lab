@@ -25,13 +25,13 @@ const floor = new THREE.Mesh(new THREE.PlaneGeometry(200, 200), floorM); floor.r
 const disc = new THREE.Mesh(new THREE.CylinderGeometry(9, 9.4, 0.3, 48), mat('#26385e')); disc.position.y = 0.15; disc.receiveShadow = true; stage.add(disc);
 
 function makeLabel(text, opt = {}) { return textSprite(text, { size: 64, sx: 3.6, ...opt }); }
-function makeBar({ color = '#4fa3d1', w = 2, d = 2, label = '', x = 0, z = 0 } = {}) {
+function makeBar({ color = '#4fa3d1', w = 2, d = 2, label = '', x = 0, z = 0, nameTop = false, headerY = null } = {}) {
   const g = new THREE.Group(); g.position.set(x, 0.3, z); stage.add(g);
   const b = box(w, 1, d, mat(color)); b.geometry.translate(0, 0.5, 0); g.add(b);
   const cap = box(w * 1.02, 0.08, d * 1.02, mat('#ffffff', { transparent: true, opacity: 0.35 })); g.add(cap);
   let lab = null; if (label) { lab = makeLabel(label, { sx: 3.0, size: 60 }); lab.position.set(0, 0.9, d / 2 + 0.15); lab.renderOrder = 5; lab.material.depthTest = false; g.add(lab); }
   const val = makeLabel('', { sx: 3.4, size: 72, color: '#ffffff', stroke: 8 }); g.add(val);
-  function setH(h, valueText) { const hh = Math.max(0.001, h); b.scale.y = hh; b.visible = h > 0.002; cap.position.y = hh; cap.visible = b.visible; val.position.y = Math.max(hh + 0.9, lab ? 2.3 : 0); val.visible = !!valueText; if (valueText) val.userData.set(valueText); }
+  function setH(h, valueText) { const hh = Math.max(0.001, h); b.scale.y = hh; b.visible = h > 0.002; cap.position.y = hh; cap.visible = b.visible; val.position.y = nameTop ? hh + 0.9 : Math.max(hh + 0.9, lab ? 2.3 : 0); if (nameTop && lab) lab.position.y = hh + (valueText ? 1.75 : 0.9); if (headerY != null) { val.position.y = headerY - 0.3; if (lab) lab.position.y = headerY + 0.5; } val.visible = !!valueText; if (valueText) val.userData.set(valueText); }
   setH(1);
   return { g, bar: b, setH, label: lab, val, mat: b.material };
 }
