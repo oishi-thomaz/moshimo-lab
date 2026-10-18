@@ -1,0 +1,16 @@
+[Unit]
+Description=moshimo-lab posting server
+After=network-online.target
+
+[Service]
+EnvironmentFile=/etc/moshimo.env
+ExecStart=/usr/bin/node /opt/moshimo-lab/server/moshimo-server.mjs
+Restart=always
+RestartSec=5
+User=www-data
+Group=www-data
+StateDirectory=moshimo
+MemoryMax=200M
+
+[Install]
+WantedBy=multi-user.target

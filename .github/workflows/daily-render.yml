@@ -1,0 +1,101 @@
+name: daily-render
+
+# 毎日16:00（日本時間）に次の動画を書き出して VPS に送り、LINE で承認を待つ
+on:
+  schedule:
+    - cron: '0 7 * * *'
+  workflow_dispatch:
+    inputs:
+      id:
+        description: '書き出す動画の番号（空なら次の番号）'
+        required: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: daily-render
+  cancel-in-progress: false
+
+jobs:
+  render:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 150
+    env:
+      BASE: ${{ secrets.MOSHIMO_BASE_URL }}
+      SECRET: ${{ secrets.MOSHIMO_SECRET }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: System packages (ffmpeg, Japanese fonts)
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg fonts-noto-cjk
+          pip install --quiet numpy scipy
+
+      - name: Node packages
+        run: npm ci --no-audit --no-fund
+
+      - name: Pick video
+        id: pick
+        run: |
+          ID="${{ github.event.inputs.id }}"
+          if [ -z "$ID" ]; then ID=$(node tools/next.mjs); fi
+          echo "id=$ID" >> "$GITHUB_OUTPUT"
+          echo "left=$(cat /tmp/queue_left 2>/dev/null || echo 0)" >> "$GITHUB_OUTPUT"
+          echo "video: ${ID:-none}"
+
+      - name: Queue empty notice
+        if: steps.pick.outputs.id == ''
+        run: |
+          curl -fsS -X POST "$BASE/hook/notice" -H "X-Moshimo-Secret: $SECRET" -H 'content-type: application/json' \
+            -d '{"message":"台本のストックが切れた。次の台本ができるまで投稿は止まる。"}'
+
+      - name: Build video
+        if: steps.pick.outputs.id != ''
+        env:
+          CHROME_PATH: /usr/bin/google-chrome
+        run: bash tools/build.sh "${{ steps.pick.outputs.id }}"
+
+      - name: Upload to VPS and ask for approval
+        if: steps.pick.outputs.id != ''
+        run: |
+          ID="${{ steps.pick.outputs.id }}"
+          for f in "$ID.mp4" "$ID.json" "${ID}_cover.jpg"; do
+            curl -fsS --retry 3 -T "out/$f" -H "X-Moshimo-Secret: $SECRET" "$BASE/upload/$f"; echo
+          done
+          curl -fsS -X POST "$BASE/hook/new" -H "X-Moshimo-Secret: $SECRET" -H 'content-type: application/json' -d "{\"id\":\"$ID\"}"; echo
+          if [ "${{ steps.pick.outputs.left }}" -le 3 ]; then
+            curl -fsS -X POST "$BASE/hook/notice" -H "X-Moshimo-Secret: $SECRET" -H 'content-type: application/json' \
+              -d "{\"message\":\"台本のストックが残り${{ steps.pick.outputs.left }}本。\"}" || true
+          fi
+
+      - name: Record as rendered
+        if: steps.pick.outputs.id != '' && github.event.inputs.id == ''
+        run: |
+          mkdir -p state
+          echo "${{ steps.pick.outputs.id }}" >> state/rendered.txt
+          git config user.name "moshimo-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add state/rendered.txt
+          git commit -m "rendered ${{ steps.pick.outputs.id }}"
+          git push
+
+      - name: Keep a copy (3 days)
+        if: steps.pick.outputs.id != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: video-${{ steps.pick.outputs.id }}
+          path: out/${{ steps.pick.outputs.id }}*
+          retention-days: 3
+
+      - name: Failure notice
+        if: failure()
+        run: |
+          curl -fsS -X POST "$BASE/hook/notice" -H "X-Moshimo-Secret: $SECRET" -H 'content-type: application/json' \
+            -d "{\"message\":\"動画の書き出しに失敗した（${{ steps.pick.outputs.id }}）。Claudeに伝えて。\"}" || true
