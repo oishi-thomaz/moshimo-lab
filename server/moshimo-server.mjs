@@ -176,14 +176,24 @@ async function onLineWebhook(req, res) {
 }
 
 // ---------------- Instagram ----------------
-async function ig(method, p, params = {}) {
+// インスタ側の一時的なエラー（500番台・通信エラー）は待ってやり直す。GET は5回、POST は retries の回数まで
+async function ig(method, p, params = {}, retries = method === 'GET' ? 5 : 0) {
+  for (let k = 0; ; k++) {
+    try { return await igOnce(method, p, params); }
+    catch (e) {
+      if (k >= retries || !(e.status >= 500 || e.status === undefined)) throw e;
+      log('IG retry', p, String(e.message).slice(0, 120)); await sleep(20000 * (k + 1));
+    }
+  }
+}
+async function igOnce(method, p, params = {}) {
   const url = new URL(IG_API + p);
   const opt = { method, headers: { authorization: `Bearer ${state.igToken}` } };
   if (method === 'GET') Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, v));
   else { opt.headers['content-type'] = 'application/json'; opt.body = JSON.stringify(params); }
   const r = await fetch(url, opt);
   const j = await r.json().catch(() => ({}));
-  if (!r.ok || j.error) throw new Error(`IG ${p}: ${r.status} ${JSON.stringify(j.error || j)}`);
+  if (!r.ok || j.error) { const e = new Error(`IG ${p}: ${r.status} ${JSON.stringify(j.error || j)}`); e.status = r.status; throw e; }
   return j;
 }
 const sleep = ms => new Promise(r => setTimeout(r, ms));
@@ -193,11 +203,22 @@ async function publish(id) {
   it.status = 'publishing'; save();
   try {
     const caption = `${m.caption || ''}\n\n${(m.hashtags || []).slice(0, 5).map(h => '#' + h).join(' ')}`.trim();
-    const c = await ig('POST', `/${IG_USER_ID}/media`, { media_type: 'REELS', video_url: `${BASE_URL}/media/${id}.mp4`, caption, share_to_feed: true });
+    const c = await ig('POST', `/${IG_USER_ID}/media`, { media_type: 'REELS', video_url: `${BASE_URL}/media/${id}.mp4`, caption, share_to_feed: true }, 2);
     let status = 'IN_PROGRESS';
     for (let k = 0; k < 40 && status === 'IN_PROGRESS'; k++) { await sleep(15000); status = (await ig('GET', `/${c.id}`, { fields: 'status_code' })).status_code; }
     if (status !== 'FINISHED') throw new Error(`container status ${status}`);
-    const p = await ig('POST', `/${IG_USER_ID}/media_publish`, { creation_id: c.id });
+    // 公開：エラーでも実は公開済みのことがあるので、やり直す前にコンテナの状態（PUBLISHED）を確認して二重投稿を防ぐ
+    let p = null;
+    for (let k = 0; k < 3 && !p; k++) {
+      try { p = await ig('POST', `/${IG_USER_ID}/media_publish`, { creation_id: c.id }); }
+      catch (e) {
+        if (!(e.status >= 500 || e.status === undefined)) throw e;
+        await sleep(20000);
+        const st = await ig('GET', `/${c.id}`, { fields: 'status_code' }).catch(() => ({}));
+        if (st.status_code === 'PUBLISHED') { const list = await ig('GET', `/${IG_USER_ID}/media`, { fields: 'id', limit: 1 }); p = { id: list.data && list.data[0] && list.data[0].id }; }
+        else if (k === 2) throw e;
+      }
+    }
     const info = await ig('GET', `/${p.id}`, { fields: 'permalink' }).catch(() => ({}));
     Object.assign(it, { status: 'published', mediaId: p.id, permalink: info.permalink || '', publishedAt: Date.now() }); save();
     log('published', id, it.permalink);
