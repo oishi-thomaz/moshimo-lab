@@ -8,7 +8,7 @@
 2. 在庫が7本を下回っていたら、`plan/blueprint.json` を `no` の順に見て、まだ `made` が付いていないものから在庫が14本になるまで作る（1回のタスクで最低7本）
 3. 1本ごとに、下の手順で `engine/videos/NNNN.js` を作る（NNNN は blueprint の `no` を4桁にしたもの。例 no 2 → 0002）
 4. できた番号を `plan/queue.txt` の末尾に1行ずつ追加し、blueprint の該当行に `"made": "NNNN"` を付ける
-5. commit して `main` に push する（GitHub Actions が毎日16時に queue の順に書き出す）
+5. commit して `main` に push する（GitHub Actions が毎朝7時台に queue の順に書き出す）
 
 作れないお題（必要な絵が今のエンジンでは無理、確かな数字が見つからない など）は飛ばして、blueprint の行に `"skip": "理由"` を付けて次へ進む。
 

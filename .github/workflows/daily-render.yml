@@ -1,9 +1,9 @@
 name: daily-render
 
-# 毎日16:00（日本時間）に次の動画を書き出して VPS に送り、LINE で承認を待つ
+# 毎朝7:17（日本時間）に次の動画を書き出して VPS に送り、LINE で承認を待つ（GitHubの予約実行は遅れることがあるので、投稿の20:30まで余裕を持たせて朝に回す）
 on:
   schedule:
-    - cron: '0 7 * * *'
+    - cron: '17 22 * * *'
   workflow_dispatch:
     inputs:
       id:

@@ -43,6 +43,7 @@ const LINE_TOKEN = env.LINE_CHANNEL_TOKEN || '';
 const IG_USER_ID = env.IG_USER_ID || '';
 const IG_API = 'https://graph.instagram.com/v25.0';
 const POST_TIMES = (env.POST_TIMES || env.POST_TIME || '20:30').split(',').map(x => x.trim()).filter(Boolean).sort(); // 日本時間。例 12:00,20:30
+const REMIND_TIMES = (env.REMIND_TIMES || '12:00,18:00').split(',').map(x => x.trim()).filter(Boolean); // 承認待ちが残ってたら再通知する時刻（日本時間）
 const MAX_UPLOAD = 300 * 1024 * 1024;
 
 fs.mkdirSync(MEDIA, { recursive: true });
@@ -99,23 +100,27 @@ const push = (messages) => state.owner ? line('/v2/bot/message/push', { to: stat
 const reply = (token, messages) => line('/v2/bot/message/reply', { replyToken: token, messages: [].concat(messages) });
 const text = t => ({ type: 'text', text: t.slice(0, 4900) });
 
-function approvalMessages(id) {
+function buttons(id) {
   const m = meta(id);
   const title = (m.title || `動画 ${id}`).slice(0, 40);
+  return {
+    type: 'template', altText: `承認待ち ${id}`,
+    template: {
+      type: 'buttons', title, text: `承認すると ${fmt(nextSlot())} に投稿する`.slice(0, 60),
+      actions: [
+        { type: 'postback', label: '承認する', data: `approve:${id}`, displayText: `${id} を承認` },
+        { type: 'postback', label: '今すぐ投稿', data: `now:${id}`, displayText: `${id} を今すぐ投稿` },
+        { type: 'postback', label: '却下する', data: `reject:${id}`, displayText: `${id} を却下` },
+      ],
+    },
+  };
+}
+function approvalMessages(id) {
+  const m = meta(id);
   return [
     { type: 'video', originalContentUrl: `${BASE_URL}/media/${id}.mp4`, previewImageUrl: `${BASE_URL}/media/${id}_cover.jpg` },
     text(`【承認待ち】${id}\n${m.title || ''}\n\nキャプション：\n${m.caption || ''}\n\n${(m.hashtags || []).map(h => '#' + h).join(' ')}`),
-    {
-      type: 'template', altText: `承認待ち ${id}`,
-      template: {
-        type: 'buttons', title, text: `承認すると ${fmt(nextSlot())} に投稿する`.slice(0, 60),
-        actions: [
-          { type: 'postback', label: '承認する', data: `approve:${id}`, displayText: `${id} を承認` },
-          { type: 'postback', label: '今すぐ投稿', data: `now:${id}`, displayText: `${id} を今すぐ投稿` },
-          { type: 'postback', label: '却下する', data: `reject:${id}`, displayText: `${id} を却下` },
-        ],
-      },
-    },
+    buttons(id),
   ];
 }
 
@@ -199,12 +204,33 @@ async function refreshToken() {
   } catch (e) { log('token refresh failed', e); await push(text(`Instagramのトークン更新に失敗した。Claudeに伝えて：${String(e).slice(0, 300)}`)); }
 }
 
+// 承認待ちが残ってたら REMIND_TIMES に1回ずつ再通知（その時刻から15分以内のときだけ。再起動で連発しない）
+async function remind() {
+  const now = Date.now(), j = new Date(now + JST);
+  const day = `${j.getUTCFullYear()}-${j.getUTCMonth() + 1}-${j.getUTCDate()}`;
+  const day0 = Date.UTC(j.getUTCFullYear(), j.getUTCMonth(), j.getUTCDate()) - JST;
+  state.reminded = state.reminded || {};
+  for (const hm of REMIND_TIMES) {
+    const [hh, mm] = hm.split(':').map(Number);
+    const t = day0 + (hh * 60 + mm) * 60e3, key = `${day} ${hm}`;
+    if (now < t || now > t + 15 * 60e3 || state.reminded[key]) continue;
+    state.reminded[key] = 1;
+    for (const k of Object.keys(state.reminded)) if (!k.startsWith(day)) delete state.reminded[k];
+    save();
+    const pending = Object.entries(state.items).filter(([, it]) => it.status === 'pending').sort((a, b) => a[1].receivedAt - b[1].receivedAt);
+    if (!pending.length) continue;
+    const [id] = pending[0];
+    await push([text(`まだ承認待ちの動画がある（${id}${pending.length > 1 ? ` ほか${pending.length - 1}本` : ''}）。今承認すると ${fmt(nextSlot())} に投稿する。`), buttons(id)]);
+  }
+}
+
 let busy = false;
 setInterval(async () => {
   if (busy) return; busy = true;
   try {
     for (const [id, it] of Object.entries(state.items)) if (it.status === 'approved' && it.publishAt <= Date.now()) await publish(id);
     await refreshToken();
+    await remind().catch(e => log('remind failed', e));
   } finally { busy = false; }
 }, 30000);
 if (!state.igTokenAt && state.igToken) { state.igTokenAt = Date.now(); save(); }
@@ -305,6 +331,8 @@ IG_USER_ID=
 IG_TOKEN=
 # 投稿時刻（日本時間）。1日2本にするときは POST_TIMES=12:00,20:30
 POST_TIMES=20:30
+# 承認待ちが残ってたら再通知する時刻（日本時間）
+REMIND_TIMES=12:00,18:00
 MOSHIMO_EOF
   SECRET="${2:-$(head -c 32 /dev/urandom | base64 | tr -dc 'A-Za-z0-9' | head -c 40)}"
   sed -i "s#^HOOK_SECRET=.*#HOOK_SECRET=$SECRET#" /etc/moshimo.env

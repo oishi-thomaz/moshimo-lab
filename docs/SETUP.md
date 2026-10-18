@@ -4,9 +4,9 @@
 
 ```
 毎週  Claude が次の台本を作って GitHub に追加（engine/videos/NNNN.js と plan/queue.txt）
-毎日16:00  GitHub Actions が次の1本を書き出し → BGMを付ける → VPS に送る
+毎朝7:17  GitHub Actions が次の1本を書き出し → BGMを付ける → VPS に送る
        ↓
-VPS   LINE に「承認待ち」（動画・キャプション・ボタン）を送る
+VPS   LINE に「承認待ち」（動画・キャプション・ボタン）を送る。12:00 と 18:00 にまだ承認待ちなら再通知
        ↓  ゆうとが LINE で「承認する」を押す
 VPS   20:30 に Instagram へリールを投稿 → 投稿したURLを LINE に送る
 ```
