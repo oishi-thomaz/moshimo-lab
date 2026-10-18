@@ -71,3 +71,4 @@ CHROME_PATH=<chromium> node tools/render.mjs --video NNNN --stills 0.5,2,5,10,16
 - scenes/earth.js：宇宙から見た地球（大陸・雲・夜の街明かり・大気・星・月）。latLon で地表の位置、faceLon でその経度を正面に、setEarthNight で夜側
 - scenes/field.js：田舎（花畑・果樹園・イチゴ畑・ビニールハウス・池と魚・森）。makeBug で ハチ / 蚊 / チョウ / 鳥、setFlowers・setFruit で花と実の量、setFieldEnv で day / dusk / night / gray
 - scenes/stage.js：データ用スタジオ。makeBar（ラベル付き3D棒グラフ。nameTop・headerY で文字を棒の上にそろえる）、makeCoins（硬貨の山）、makeCrowd（人の群れ）
+- scenes/hyrox.js：HYROX風のフィットネスレース会場（ランのレーン・8種目のエリア・ゴール）。makeAthlete（ランナー体型）、run（レーンを走る）、act(p, 種目番号, t, {slow})（SkiErg／スレッドプッシュ／プル／バーピーブロードジャンプ／ロー／ファーマーズ／ランジ／ウォールボールの動き）、setOthers（ほかの選手）
