@@ -14,7 +14,7 @@ const cam = new THREE.PerspectiveCamera(55, 1080 / 1920, 0.05, 4000);
 function look(px, py, pz, tx, ty, tz, fov = 55) { cam.position.set(px, py, pz); cam.lookAt(tx, ty, tz); cam.fov = fov; cam.updateProjectionMatrix(); }
 
 // count-up helper for the top stat: u in shot seconds
-const countUp = (t, target, t0 = 0.3, dur = 1.4) => roll(clamp((t - t0) / dur), target);
+const countUp = (t, target, t0 = 0.3, dur = 1.4) => Math.round(roll(clamp((t - t0) / dur), target));
 const hudTime = (lab, op = 1) => setHud('経過時間', lab, op);
 const dimEl = () => document.getElementById('dim');
 
