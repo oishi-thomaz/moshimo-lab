@@ -3,7 +3,7 @@ import { rng, clamp, lerp, ease, easeOut, easeBack, fade, mat, comma } from '../
 import { field, setFieldEnv, makeBug, setFlowers, setFruit, setBlossom } from '../scenes/field.js';
 import { market, shelfItems, queues } from '../market.js';
 import { stage, makeBar } from '../scenes/stage.js';
-import { look, runStory, endCard, hudTime, countUp, makeSparkles, setTop, setHud, el } from '../story.js';
+import { lift, look, runStory, endCard, hudTime, countUp, makeSparkles, setTop, setHud, el } from '../story.js';
 
 // もしもミツバチが地球から消えたら？
 // 数字：日本の蜂群数 23万6千群・飼育戸数12,061戸（農林水産省 養蜂をめぐる情勢 令和7年3月、令和6年）
@@ -31,11 +31,11 @@ const SUBS = [
   [2.6, 6.0, '花から花へ。<br>いつもの春の畑。'],
   [6.2, 10.1, '日本で飼われている<br>ミツバチ23万6千群が消えた。'],
   [10.1, 14, '花粉を運ぶ者が、<br>いなくなった。'],
-  [14.2, 18.1, '+1か月。いちごが<br>実をつけない。'],
+  [14.2, 18.1, 'いちごが実をつけない。'],
   [18.1, 22, 'ハウスのいちごの約8割は、<br>ミツバチが受粉させていた。'],
-  [22.2, 26.1, '+半年。果物が<br>実らなくなっていく。'],
+  [22.2, 26.1, '果物が実らなくなっていく。'],
   [26.1, 30, '主な作物の4分の3以上が、<br>ハチなどの受粉に頼る。'],
-  [30.2, 34.6, '+1年。スーパーから<br>果物と野菜が減る。'],
+  [30.2, 34.6, 'スーパーから<br>果物と野菜が減る。'],
   [34.6, 39, '受粉に頼る作物は、<br>世界の生産量の35%。'],
   [39.2, 43.6, '日本の畑で、受粉の働きは<br>年約4,700億円分。'],
   [43.6, 47.8, 'そのうち、ミツバチの分が<br>約1,000億円。'],
@@ -97,6 +97,7 @@ function shot5(t, T) { // +1 year supermarket shelves thin out
   return market;
 }
 function shot6(t, T) { // value bars
+  lift(300);
   const g = easeOut(clamp(t / 1.4)), g2 = easeOut(clamp((t - 4.4) / 1.2));
   bars[0].setH(4700 / 1000 * 0.85 * g, comma(Math.round(4700 * g)) + '億円'); bars[1].setH(1000 / 1000 * 0.85 * g2, g2 > 0.01 ? comma(Math.round(1000 * g2)) + '億円' : '');
   bars[1].g.visible = true;

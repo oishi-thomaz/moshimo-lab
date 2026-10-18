@@ -4,7 +4,7 @@ import { market, shelfItems, queues } from '../market.js';
 import { city, cam as cityCam, setEnv, setStore, setStoreLights, updateCars, parked, setBurst, ghost, ghostScr, ghostFill } from '../city.js';
 import { space, earth, latLon, faceLon, setEarthNight } from '../scenes/earth.js';
 import { stage, makeCrowd } from '../scenes/stage.js';
-import { look, cam, runStory, endCard, hudTime, countUp, textSprite, setTop, setHud, el } from '../story.js';
+import { lift, look, cam, runStory, endCard, hudTime, countUp, textSprite, setTop, setHud, el } from '../story.js';
 
 // もしも1ドル300円になったら？（試算・投資助言ではありません）
 // 数字：1ドル 約164円（日本銀行 外国為替市況 2026年7月24日 163.66〜163.95円）→ 300円で約1.8倍（計算）
@@ -54,15 +54,15 @@ function cityBase(env) { setEnv(env, new THREE.Vector3(0, 0, 2)); setStore(1); s
 
 const SUBS = [
   [2.6, 6.0, 'いつものスーパー。<br>輸入品もたくさん並ぶ。'],
-  [6.2, 10.1, '+1日。1ドル約164円が、<br>300円に。'],
+  [6.2, 10.1, '1ドル約164円が、<br>300円に。'],
   [10.1, 14, 'ドルで買う物は、円で<br>約1.8倍の値段になる。'],
-  [14.2, 18.1, '+1週間。ガソリン代が<br>上がり始める。'],
+  [14.2, 18.1, 'ガソリン代が上がり始める。'],
   [18.1, 22, '原油はほぼ全部が輸入。<br>9割以上が中東から。'],
-  [22.2, 26.1, '+1か月。輸入の食べ物が<br>高くなる。'],
+  [22.2, 26.1, '輸入の食べ物が高くなる。'],
   [26.1, 30, 'カロリーで見ると、<br>6割以上が海外から。'],
-  [30.2, 34.6, '+3か月。電気代も<br>じわじわ上がる。'],
+  [30.2, 34.6, '電気代もじわじわ上がる。'],
   [34.6, 39, 'エネルギーの8割以上を、<br>海外に頼っている。'],
-  [39.2, 43.6, '+半年。外国人旅行者が<br>街にあふれる。'],
+  [39.2, 43.6, '外国人旅行者が街にあふれる。'],
   [43.6, 47.8, 'ドルを持つ人には、<br>日本は大バーゲン。'],
   [48.1, 52.6, '結果：輸入の食べ物と<br>エネルギーが軒並み値上がり。'],
   [52.6, 55.4, '実は1971年まで、<br>1ドルは360円だった。'],
@@ -75,6 +75,7 @@ function stageShot(v, color, t, cam0) {
   L(...cam0);
 }
 function shot0(t, T) { // hook: 164 -> 300
+  lift(230);
   const tv = 1.0; const v = t < tv ? 164 : lerp(164, 300, easeOut((t - tv) / 0.5));
   qs.forEach(({ q, p }) => { q.visible = t > tv + 0.4; q.position.set(p.position.x, 2.45, p.position.z); q.scale.setScalar(0.6 * easeBack(clamp((t - tv - 0.4) / 0.3))); });
   el.flash.style.opacity = t >= tv ? 0.4 * Math.max(0, 1 - (t - tv) / 0.3) : 0;
@@ -91,6 +92,7 @@ function shot1(t, T) { // everyday market
   return market;
 }
 function shot2(t, T) { // +1day board
+  lift(230);
   qs.forEach(({ q }) => q.visible = false);
   const v = lerp(164, 300, easeOut(clamp((t - 0.4) / 1.4)));
   const u = ease(t / 8);
@@ -132,12 +134,14 @@ function shot6(t, T) { // +half year tourists
   return city;
 }
 function shot7(t, T) { // result: board at 300, crowd
+  lift(230);
   const u = ease(t / 7.5);
   stageShot(300, '#ff6b6b', t, [0, lerp(5.15, 5.6, u), lerp(12, 15, u), 0, lerp(5.15, 5.4, u), -4, 50]);
   setTop('円で払う輸入品の値段（計算）', '約' + (countUp(t, 18, 0.2, 1.2) / 10).toFixed(1) + '倍', fade(t, 0.15, 7.5, 0.25), '#ff8a7a');
   return stage;
 }
 function shot8(t, T) { // loop: back to 164
+  lift(230);
   qs.forEach(({ q }) => q.visible = false);
   const u = ease(t / 4);
   stageShot(164, '#7ff0c8', t, [0, 5.15, lerp(12.8, 12.5, u), 0, 5.15, -4, 50]);

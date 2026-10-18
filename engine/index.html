@@ -14,17 +14,21 @@
   .sans{font-family:"Noto Sans CJK JP","Noto Sans JP",sans-serif}
   .shadow{text-shadow:0 0 18px rgba(0,0,0,.6),0 2px 6px rgba(0,0,0,.7),0 0 3px rgba(0,0,0,.5)}
   #title{top:250px;text-align:center;color:#fff;font-size:92px;line-height:1.22;letter-spacing:2px;opacity:0}
-  #topstat{top:150px;text-align:center;color:#fff;opacity:0}
-  #topstat .lab{font-size:34px;font-weight:700;letter-spacing:1px;opacity:.95}
-  #topstat .val{font-size:96px;font-weight:900;line-height:1.1;margin-top:6px;font-variant-numeric:tabular-nums}
-  #hud{top:560px;left:64px;right:auto;color:#fff}
-  #logo{display:flex;align-items:center;gap:14px;margin-bottom:22px}
-  #logo .mk{width:64px;height:64px;filter:drop-shadow(0 3px 8px rgba(0,0,0,.4))}#logo .mk svg,#end .lg .mk svg{width:100%;height:100%;display:block}
-  #logo .nm{font-family:"M PLUS Rounded 1c",sans-serif;font-size:40px;font-weight:800;letter-spacing:3px}
-  #hud .lab{font-size:38px;font-weight:700;letter-spacing:1px}
-  #hud .val{font-size:120px;line-height:1.05;font-variant-numeric:tabular-nums}
-  #hud .mono{font-family:"Noto Sans CJK JP",sans-serif;font-weight:400;font-size:118px;letter-spacing:2px}
-  #sub{top:1180px;text-align:center;color:#fff;font-size:64px;line-height:1.35;padding:0 60px;letter-spacing:1px}
+  /* 読む情報は画面中央の1列にまとめる：経過時間（字幕の上）→ 字幕 → 数字（字幕の下） */
+  #scrim{position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,rgba(8,12,20,0) 50%,rgba(8,12,20,.42) 57%,rgba(8,12,20,.46) 70%,rgba(8,12,20,.38) 79%,rgba(8,12,20,0) 85%)}
+  #logo{position:absolute;top:140px;left:56px;display:flex;align-items:center;gap:12px;color:#fff}
+  #logo .mk{width:54px;height:54px;filter:drop-shadow(0 3px 8px rgba(0,0,0,.4))}#logo .mk svg,#end .lg .mk svg{width:100%;height:100%;display:block}
+  #logo .nm{font-family:"M PLUS Rounded 1c",sans-serif;font-size:34px;font-weight:800;letter-spacing:3px}
+  #hud{top:1058px;display:flex;justify-content:center;color:#fff;opacity:0}
+  #hud .pill{display:flex;align-items:baseline;gap:18px;padding:8px 34px 12px;border-radius:999px;background:rgba(10,14,22,.62);box-shadow:0 0 0 2px rgba(255,255,255,.16)}
+  #hud .lab{font-size:30px;font-weight:700;letter-spacing:1px;opacity:.85}
+  #hud .lab:empty{display:none}
+  #hud .val{font-size:58px;line-height:1.1;font-variant-numeric:tabular-nums}
+  #hud .mono{font-family:"Noto Sans CJK JP",sans-serif;font-weight:400;font-size:56px;letter-spacing:2px}
+  #sub{top:1170px;text-align:center;color:#fff;font-size:64px;line-height:1.35;padding:0 60px;letter-spacing:1px}
+  #topstat{top:1372px;text-align:center;color:#fff;opacity:0;padding:0 70px}
+  #topstat .lab{font-size:30px;font-weight:700;letter-spacing:1px;opacity:.9;white-space:nowrap}
+  #topstat .val{font-size:86px;font-weight:900;line-height:1.08;margin-top:4px;font-variant-numeric:tabular-nums}
   #flash{position:absolute;inset:0;background:#fff;opacity:0}
   #end{position:absolute;inset:0;background:#07090d;opacity:0;color:#fff;text-align:center}
   #end .t{position:absolute;top:470px;left:0;right:0;font-size:84px;line-height:1.25}
@@ -40,15 +44,13 @@
 <div id="stage">
   <canvas id="gl" width="1080" height="1920"></canvas>
   <div id="flash"></div>
-  <div id="dim" style="position:absolute;inset:0;opacity:0;background:linear-gradient(180deg,rgba(20,26,36,.55) 0%,rgba(20,26,36,.15) 25%,rgba(20,26,36,.12) 50%,rgba(20,26,36,.5) 68%,rgba(20,26,36,.1) 85%)"></div>
+  <div id="dim" style="position:absolute;inset:0;opacity:0;background:linear-gradient(180deg,rgba(20,26,36,.35) 0%,rgba(20,26,36,.08) 22%,rgba(20,26,36,.08) 48%,rgba(20,26,36,.5) 60%,rgba(20,26,36,.5) 80%,rgba(20,26,36,.05) 88%)"></div>
+  <div id="scrim"></div>
   <div id="title" class="ov serif shadow"></div>
-  <div id="topstat" class="ov sans shadow"><div class="lab"></div><div class="val"></div></div>
-  <div id="hud" class="ov shadow">
-    <div id="logo"><div class="mk"></div><div class="nm">もしもラボ</div></div>
-    <div class="lab sans"></div>
-    <div class="val serif"></div>
-  </div>
+  <div id="logo" class="shadow"><div class="mk"></div><div class="nm">もしもラボ</div></div>
+  <div id="hud" class="ov shadow"><div class="pill"><div class="lab sans"></div><div class="val serif"></div></div></div>
   <div id="sub" class="ov serif shadow"></div>
+  <div id="topstat" class="ov sans shadow"><div class="lab"></div><div class="val"></div></div>
   <div id="end">
     <div class="t serif"></div>
     <div class="s sans"></div>

@@ -3,7 +3,7 @@ import { rng, clamp, lerp, ease, easeOut, easeBack, fade, mat, box, comma, rende
 import { room, setRoom, setLight, props } from '../scenes/room.js';
 import { japan, ll, CITY, setDots, setMapEnv, makeRing } from '../scenes/japan.js';
 import { stage, makeCrowd, makeLabel } from '../scenes/stage.js';
-import { look, runStory, endCard, hudTime, countUp, setTop, setHud, el } from '../story.js';
+import { lift, look, runStory, endCard, hudTime, countUp, setTop, setHud, el } from '../story.js';
 
 // もしも日本人全員が同時にトイレを流したら？
 // 数字：総人口 1億2,265万人（総務省 人口推計 2026年9月1日概算）
@@ -49,15 +49,15 @@ function flowDots(t, k, sewerShare = 1) { // dots drift toward the nearest plant
 
 const SUBS = [
   [2.6, 6.0, '家のトイレ。<br>毎日なにげなく流す水。'],
-  [6.2, 10.1, '+0秒。日本中で、<br>いっせいにジャー！'],
+  [6.2, 10.1, '日本中で、いっせいにジャー！'],
   [10.1, 14, '1億2,265万人が、<br>同時に流した。'],
-  [14.2, 18.1, '+1秒。今のトイレは、<br>少ないもので1回3.8L。'],
+  [14.2, 18.1, '今のトイレは、<br>少ないもので1回3.8L。'],
   [18.1, 22, '全員分で、<br>約47万m³（推計）。'],
-  [22.2, 26.1, '+1分。東京ドームで<br>くらべると…'],
+  [22.2, 26.1, '東京ドームでくらべると…'],
   [26.1, 30, '約0.4杯分。'],
-  [30.2, 34.6, '+5分。水は<br>下水処理場へ向かう。'],
+  [30.2, 34.6, '水は下水処理場へ向かう。'],
   [34.6, 39, 'それでも1日に流れる下水の<br>約1%ほど（推計）。'],
-  [39.2, 43.6, '+30分。下水道を使う人は<br>全体の82.2%。'],
+  [39.2, 43.6, '下水道を使う人は<br>全体の82.2%。'],
   [43.6, 47.8, 'ほかに、浄化槽なども<br>使われている。'],
   [48.1, 52.6, '結果：東京ドーム約0.4杯分が、<br>一気に下水へ流れた。'],
   [52.6, 55.4, '30年前の13Lトイレなら、<br>約1.3杯分だった。'],
@@ -101,6 +101,7 @@ function shot3(t, T) { // +1s map lights up blue
   return japan;
 }
 function shot4(t, T) { // +1min dome fills to 0.38
+  lift(260);
   fillDome(0.38 * easeOut(clamp((t - 0.5) / 4))); overflowRing.material.opacity = 0; domeLab.visible = true;
   const u = ease(t / 8);
   look(lerp(-3, 3, u), lerp(4.6, 4.2, u), lerp(21, 20, u), 0, 2.4, 0, 50);
@@ -125,6 +126,7 @@ function shot6(t, T) { // +30min sewer coverage
   return japan;
 }
 function shot7(t, T) { // result: dome at 0.38, then the 13L comparison overflows
+  lift(260);
   domeLab.visible = true;
   const k = t < 4.4 ? 0.38 : lerp(0.38, 1.0, easeOut(clamp((t - 4.4) / 1.4)));
   fillDome(k); overflowRing.material.opacity = t > 5.6 ? 0.7 * clamp((t - 5.6) / 0.4) : 0; overflowRing.scale.setScalar(1 + clamp((t - 5.6) / 1.5) * 0.4);

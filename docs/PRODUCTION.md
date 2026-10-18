@@ -26,7 +26,7 @@
 | 0〜2秒 | フック。0フレーム目からタイトル（titleHtml）と動いている映像。1.5秒以内に異変かカウントダウン |
 | 2〜6秒 | いつもの日常 |
 | 6〜48秒 | 経過時間（+1分、+1時間…）か規模で4〜5段階。各段階で上部に数字をカウントアップ表示 |
-| 48〜58秒 | 結果。最終状態の映像と決め手の数字。字幕は 結果：〜 で言い切る |
+| 48〜58秒 | 結果。最終状態の映像と決め手の数字。字幕は 結果：〜 で言い切る。消えた物が戻る・元通りになる展開は禁止 |
 | 58〜62秒 | まとめカード（endStats と sources）。最後のカットは冒頭に似せてループさせる |
 
 ほかの決めごとは `plan/RULES.md` を守る（避けるお題、実在ブランドの見た目禁止など）。
@@ -36,7 +36,14 @@
 - 共通部品：`engine/lib.js`（乱数、イージング、人物 makePerson / randPerson / walkAlong、空、？吹き出し）、`engine/city.js`（街・コンビニ・車・街灯・夜景、setEnv で dusk / night / dark）、`engine/market.js`（スーパー店内）、`engine/overlay.js`（字幕・上部の数字・左の経過時間・まとめカード）
 - 新しい場面（家の中、学校、宇宙、体の中、海、田んぼ など）は `engine/scenes/<名前>.js` に再利用できる形で作る（Scene を作って返す関数＋操作用の関数をexport）。1本専用の小物は動画ファイルの中でよい
 - 見た目の統一：ローポリ、フラットな色、人物は makePerson（目は2つの点。他アカウントのキャラに似せない）、ブランドロゴや実在の店の配色は使わない（店名は もしもマート のような架空名）
-- 文字の安全地帯（1080×1920）：上部の数字 150〜300px、タイトル 250〜480px、左の経過時間 560〜780px、字幕 1180〜1350px。下から20%と右端120pxはインスタのボタンがかぶるので重要な物を置かない
+- 画面の文字の配置（1080×1920・全動画共通。index.html で固定なので動画側で位置は変えない）：見る人の目線が上下に行き来しないよう、読む情報は中央の1列にまとめてある
+  - 経過時間などのチップ（setHud）：字幕のすぐ上 1058〜1140px
+  - 字幕（SUBS）：1170〜1350px
+  - 数字（setTop）：字幕のすぐ下 1372〜1510px
+  - タイトル（冒頭だけ）：250〜480px、ロゴ：左上に固定
+  - 主役（人・看板・グラフ）は 1050px より上に置く。看板やグラフが下にかぶるショットは、ショット関数の最初で lift(px) を呼ぶと絵全体が px だけ上にずれる（story.js。230〜460 くらい）
+  - 下から20%と右端120pxはインスタのボタンがかぶるので重要な物を置かない
+- 字幕に +1分。のような経過時間を書かない（すぐ上のチップと二重になる）。時間はチップ（hudTime）だけで見せる
 - 字幕は1行14字くらいまで。長い文は `<br>` で2行に。カメラは主役がタイトル・字幕とかぶらない構図にする
 - META に入れるもの：id, title, titleHtml, mood（tension / mystery / calm / emotional / hopeful）, seed, hits（ドンと鳴らす秒）, risers, caption（検索されそうな言葉を自然に入れる。最後に出典）, hashtags（5個まで。1つ目は もしもラボ）, endStats, sources
 
@@ -56,7 +63,7 @@ CHROME_PATH=<chromium> node tools/render.mjs --video NNNN --stills 0.5,2,5,10,16
 ## シーン一覧
 - city.js：街の交差点・歩道・コンビニ（もしもマート）・駐車場・夜景・俯瞰の街並み（店の明かりが順に灯る演出つき）。setEnv は day / dusk / night / dark
 - market.js：スーパー店内・レジの行列・棚の商品が減る演出
-- story.js：動画の共通進行（runStory で SHOTS・SUBS・META を渡すだけ。毎フレーム字幕以外のオーバーレイを消してからショットを呼ぶ）、endCard、look、countUp、hudTime、textSprite（文字の看板）、makeSparkles（消える瞬間の光の粒）
+- story.js：動画の共通進行（runStory で SHOTS・SUBS・META を渡すだけ。毎フレーム字幕以外のオーバーレイを消してからショットを呼ぶ）、lift（絵を上にずらす）、endCard、look、countUp、hudTime、textSprite（文字の看板）、makeSparkles（消える瞬間の光の粒）
 - scenes/room.js：室内セット。setRoom({sets:[...]}) で bed（寝室・寝ている人・時計・スマホ）/ desk / living（ソファ・テレビ）/ kitchen / office / ward（病室）/ toilet / showa（畳・ちゃぶ台・ブラウン管・黒電話）を切り替え、setLight で day / evening / night / dark、setClock・setScreen で時計とテレビ画面
 - scenes/japan.js：日本地図の俯瞰（海・山・富士山）。ll(経度,緯度) で位置、setDots で人口の点を一斉に動かす、makeRing（波紋）、addPin、setMapEnv で day / dusk / night
 - scenes/earth.js：宇宙から見た地球（大陸・雲・夜の街明かり・大気・星・月）。latLon で地表の位置、faceLon でその経度を正面に、setEarthNight で夜側

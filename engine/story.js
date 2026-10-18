@@ -11,6 +11,9 @@ import { setupCards, el, setSub, setTop, setHud, roll } from './overlay.js';
 // Every frame the overlay is reset (title/flash/top/hud hidden) before the shot runs,
 // so a shot only turns on what it needs.
 const cam = new THREE.PerspectiveCamera(55, 1080 / 1920, 0.05, 4000);
+// lift(px): 画面上の絵をpxだけ上にずらす（字幕まわりの文字と、看板・グラフなどの主役がかぶるショット用）
+let LIFT = 0;
+function lift(px) { LIFT = px; }
 function look(px, py, pz, tx, ty, tz, fov = 55) { cam.position.set(px, py, pz); cam.lookAt(tx, ty, tz); cam.fov = fov; cam.updateProjectionMatrix(); }
 
 // count-up helper for the top stat: u in shot seconds
@@ -28,10 +31,12 @@ function runStory({ shots, subs, meta, duration, camera = cam, dim = () => false
     const s = shots.find(x => T >= x.a && T < x.b) || shots[shots.length - 1];
     el.end.style.opacity = 0; el.title.style.opacity = 0; el.flash.style.opacity = 0;
     setTop('', '', 0); setHud('', '', 0);
+    LIFT = 0;
     dimEl().style.opacity = dim(s.f) ? 1 : 0;
     el.logo.style.visibility = 'visible';
     const scn = s.f(T - s.a, T);
     setSub(T, subs);
+    if (LIFT) camera.setViewOffset(1080, 1920, 0, LIFT, 1080, 1920); else if (camera.view && camera.view.enabled) camera.clearViewOffset();
     if (scn) renderer.render(scn, camera);
     else { renderer.setClearColor(0x07090d, 1); renderer.clear(); }
     return true;
@@ -84,4 +89,4 @@ function makeSparkles(n = 300, size = 0.25, color = 0xfff2c0) {
   return { points: pts, init, set, material: m };
 }
 
-export { makeSparkles, cam, look, countUp, hudTime, endCard, runStory, textSprite, setTop, setHud, el, comma, easeOut };
+export { makeSparkles, cam, lift, look, countUp, hudTime, endCard, runStory, textSprite, setTop, setHud, el, comma, easeOut };

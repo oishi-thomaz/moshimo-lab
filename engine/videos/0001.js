@@ -90,9 +90,9 @@ const SUBS = [
   [32.4, 37, 'コンビニは、<br>駆け込める場所でもあった。'],
   [37.2, 41, 'スーパーに行列。<br>棚が空になる。'],
   [41, 45, '年間12兆円分の買い物が、<br>行き場をなくした。'],
-  [45.2, 49.2, 'そして、<br>コンビニが戻ってきた。'],
-  [49.2, 53.5, '当たり前にあった、<br>56,054店の明かり。'],
-  [53.7, 59.8, 'それは毎日の、<br>約4,477万回の寄り道だった。'],
+  [45.2, 49.2, '夜になっても、<br>行く場所がない。'],
+  [49.3, 53.5, '結果：のべ約13億人が、<br>行き場をなくした。'],
+  [53.7, 59.8, 'あなたが今日寄った店も、<br>その56,054店のひとつ。'],
 ];
 // =====================================================
 // shots
@@ -207,31 +207,31 @@ function shot5(t, T) {
   return market;
 }
 function shot6(t, T) {
-  only(gReturn); resetCity(); setEnv('night', new THREE.Vector3(0, 0, 0)); updateCars(T, false);
-  const ta = 0.9;
-  const k = t < ta ? 0 : easeBack((t - ta) / 0.6);
-  setStore(clamp(k, 0, 1.2)); setStoreLights(t < ta ? 0 : clamp((t - ta - 0.3) / 0.4));
-  setBurst(t >= ta ? clamp(1 - (t - ta) / 0.8) * 0 : 0);
-  el.flash.style.opacity = t >= ta ? 0.5 * Math.max(0, 1 - (t - ta) / 0.4) : 0;
-  for (const r of returnPeds) walkAlong(r.p, r.pts, t);
+  // 結果：1か月後の夜。店のあった場所に、行き場をなくした人たちが立ち尽くす
+  only(gGather); resetCity(); parked[1].visible = false; setStore(0); setStoreLights(0); setEnv('night', new THREE.Vector3(0, 0, 2)); updateCars(T, false);
+  for (const g of gatherPeds) {
+    walkAlong(g.p, g.pts, g.t2 + 1);
+    g.p.rotation.y = Math.PI + Math.sin(g.ph) * 0.4;
+    g.p.userData.head.rotation.y = Math.sin(t * 1.1 + g.ph) * 0.5;
+    g.q.visible = true; g.q.position.set(g.p.position.x, 2.45 + Math.sin(t * 3 + g.ph) * 0.05, g.p.position.z);
+    g.q.scale.setScalar(0.6 * easeBack(clamp((t - 0.3 - (g.ph % 1) * 0.6) / 0.3)));
+  }
   const u = ease(t / 8.5);
-  look(0, 1.9 + u * 0.5, 16.4 - u * 1.6, 0, 2.4, -1, 60);
+  look(lerp(4.5, 2.8, u), lerp(5.2, 5.8, u), lerp(12.5, 13.2, u), -0.3, 0.2, 1.4, 50);
   hudTime('+1か月');
-  setTop('全国のコンビニ', comma(t < ta ? 0 : roll(clamp((t - ta) / 1.6), 56054)) + '店', fade(t, 0.15, 8.5, 0.25));
+  const v = roll(clamp((t - 0.4) / 2.6), 13);
+  setTop('行き場をなくした来店（1か月・推計）', 'のべ約' + Math.round(v) + '億人', fade(t, 0.15, 8.5, 0.25), t > 4.3 ? '#ff8a7a' : '#fff');
   return city;
 }
 function shot7(t, T) {
-  only(null); resetCity(); setStore(1); setStoreLights(1); setEnv('night', new THREE.Vector3(0, 0, 0)); updateCars(T, true);
+  // 冒頭と同じ俯瞰に戻る。ただし夜で、コンビニはないまま（ループ）
+  only(null); resetCity(); parked[1].visible = false; setStore(0); setStoreLights(0); setEnv('night', new THREE.Vector3(-6, 0, 2)); updateCars(T, true);
   el.flash.style.opacity = 0;
-  const u = ease(t / 6.5);
-  const R = lerp(0, 140, easeOut(t / 4.5));
-  for (const s of storeGlows) {
-    const a = clamp((R - s.d) / 12);
-    s.gm.emissiveIntensity = a; s.band.emissiveIntensity = a * 0.8; s.sp.material.opacity = a * 0.9;
-  }
-  look(lerp(10, 40, u), lerp(35, 150, u), lerp(40, 150, u), 0, 0, lerp(-5, -25, u), 55);
-  setHud('', '', 0);
-  setTop('1日あたりの来店', '約' + comma(roll(clamp((t - 0.3) / 1.6), 4477)) + '万回', fade(t, 0.15, 6.5, 0.25));
+  const ang = -0.5 + (6.5 - t) * 0.035 * 0.6;
+  const R = 22, cx = -7, cz = 6;
+  const h = lerp(52, 44, ease(t / 6.5));
+  look(cx + Math.sin(ang) * R, h, cz + Math.cos(ang) * R, cx, 0, cz - 1, 55);
+  setTop('全国のコンビニ（2025年末）', comma(roll(clamp((t - 0.3) / 1.6), 56054)) + '店', fade(t, 0.15, 6.5, 0.25));
   return city;
 }
 function shotEnd(t) {
@@ -251,18 +251,17 @@ window.renderAt = function (T) {
   setSub(T, SUBS);
   // logo visibility follows hud area; keep logo even when hud empty except end
   el.logo.style.visibility = 'visible';
-  if (s.f === shot7 || s.f === shotEnd) { el.hud.style.opacity = s.f === shot7 ? 1 : 0; el.hudLab.textContent = ''; el.hudVal.textContent = ''; }
   if (scn) renderer.render(scn, cam);
   return true;
 };
 window.META = {
   id: '0001',
   title: '日本中のコンビニが消えたら？',
-  mood: 'tension', seed: 3, hits: [8.5, 45.9], risers: [8.5],
+  mood: 'tension', seed: 3, hits: [8.5, 49.3], risers: [8.5, 49.3],
   caption: '日本中のコンビニ56,054店が一瞬で消えたら、私たちの暮らしはどうなる？\n1日約4,477万人が立ち寄る場所が消えたあとの1か月を、実際のデータでシミュレーション。\n\n出典：日本フランチャイズチェーン協会 コンビニエンスストア統計調査（2025年）、セブン銀行 月次ATM情報（2026年6月）、JFAセーフティステーション活動',
   hashtags: ['もしもラボ', 'もしもシリーズ', 'コンビニ', '雑学', 'シミュレーション'],
   titleHtml: '日本中のコンビニが<br>消えたら？',
-  endStats: [['全国のコンビニ店舗数', '56,054店', '2025年末'], ['1日あたりの来店客数', '約4,477万人', '2025年'], ['コンビニの年間売上高', '12兆583億円', '2025年'], ['駆け込みに対応した店舗', '6,000店以上', '2024年']],
+  endStats: [['全国のコンビニ店舗数', '56,054店', '2025年末'], ['1日あたりの来店客数', '約4,477万人', '2025年'], ['コンビニの年間売上高', '12兆583億円', '2025年'], ['駆け込みに対応した店舗', '6,000店以上', '2024年'], ['1か月で行き場をなくした来店', 'のべ約13億人', '推計']],
   sources: '出典：日本フランチャイズチェーン協会 コンビニエンスストア統計調査・<br>セーフティステーション活動、セブン銀行 月次ATM情報（2026年6月）',
 };
 setupCards(window.META);

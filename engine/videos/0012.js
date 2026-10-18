@@ -3,7 +3,7 @@ import { rng, clamp, lerp, ease, easeOut, easeBack, fade, mat, box, comma, randP
 import { city, cam as cityCam, setEnv, setStore, setStoreLights, updateCars, parked, setBurst, ghost, ghostScr, ghostFill, storeGlows } from '../city.js';
 import { market, queues, shelfItems } from '../market.js';
 import { room, setRoom, setLight, setClock, setScreen, props, lamp } from '../scenes/room.js';
-import { look, cam, runStory, endCard, hudTime, countUp, makeSparkles, textSprite, setTop, setHud, el } from '../story.js';
+import { lift, look, cam, runStory, endCard, hudTime, countUp, makeSparkles, textSprite, setTop, setHud, el } from '../story.js';
 
 // もしも世界からスマホが消えたら？
 // 数字：スマホを持つ人 78.9%（総務省 令和7年通信利用動向調査）
@@ -47,15 +47,15 @@ const fam = [];
 
 const SUBS = [
   [2.6, 6.0, 'いつもの街。<br>みんな下を向いている。'],
-  [6.2, 10.1, '+1分。世界中から、<br>スマホが消えた。'],
+  [6.2, 10.1, '世界中から、スマホが消えた。'],
   [10.1, 14, '持っていた人は、<br>日本で約8割。'],
-  [14.2, 18.1, '+1時間。待ち合わせが<br>できない。'],
+  [14.2, 18.1, '待ち合わせができない。'],
   [18.1, 22, 'ネットの時間は、<br>平日1日約3時間だった。'],
-  [22.2, 26.1, '+1日。スマホ決済も、<br>地図も、もうない。'],
+  [22.2, 26.1, 'スマホ決済も、<br>地図も、もうない。'],
   [26.1, 30, 'キャッシュレスは、<br>買い物の58%。'],
-  [30.2, 34.6, '+1週間。家族で<br>本を開く夜。'],
+  [30.2, 34.6, '家族で本を開く夜。'],
   [34.6, 39, '20代は平日1日、<br>約4時間半ネットを使っていた。'],
-  [39.2, 43.6, '+1か月。寝る前の<br>画面の光が消えた。'],
+  [39.2, 43.6, '寝る前の画面の光が消えた。'],
   [43.6, 47.8, '10代も、平日1日<br>約3時間48分。'],
   [48.1, 52.6, '結果：1年で約47日分の<br>時間が戻ってきた（推計）。'],
   [52.6, 55.4, 'でも、連絡とお金の手段も<br>いっしょに消えた。'],
@@ -101,6 +101,7 @@ function shot3(t, T) { // +1h waiting alone
   return city;
 }
 function shot4(t, T) { // +1day can't pay
+  lift(260);
   for (const q of queues) q.p.visible = false; for (const s of shelfItems) s.it.visible = true;
   phonePose(buyer, false); buyer.userData.head.rotation.y = Math.sin(t * 1.2) * 0.4; buyer.userData.arms[1].rotation.x = -0.4;
   payQ.visible = t > 1.5; payQ.position.set(buyer.position.x, 2.45, buyer.position.z); payQ.scale.setScalar(0.55 * easeBack(clamp((t - 1.5) / 0.3)));

@@ -3,7 +3,7 @@ import { rng, clamp, lerp, ease, easeOut, easeBack, fade, mat, box, comma, makeP
 import { market, queues, shelfItems } from '../market.js';
 import { room, setRoom, setLight, setScreen, props } from '../scenes/room.js';
 import { stage, makeBar, makeCoins, makeCrowd, makeLabel } from '../scenes/stage.js';
-import { look, runStory, endCard, hudTime, countUp, textSprite, setTop, setHud, el } from '../story.js';
+import { lift, look, runStory, endCard, hudTime, countUp, textSprite, setTop, setHud, el } from '../story.js';
 
 // もしも消費税が明日から0%になったら？
 // 数字：消費税収 26兆278億円・一般会計税収 84兆2,226億円・所得税 25兆2,565億円・法人税 21兆7,450億円（財務省 令和7年度決算）
@@ -40,13 +40,13 @@ function stageBars(k, cons) { bars.forEach((b, i) => { b.g.visible = true; const
 
 const SUBS = [
   [2.6, 6.0, 'いつものスーパー。<br>レシートには消費税10%。'],
-  [6.2, 10.1, '+1分。1,100円が<br>1,000円に。'],
+  [6.2, 10.1, '1,100円が<br>1,000円に。'],
   [10.1, 14, '毎月約31万円の買い物から<br>消費税が消えた。'],
   [14.2, 18.1, '高い物ほど得をする。<br>レジに長い行列。'],
   [18.1, 22, '2019年から続いた10%が、<br>ゼロに。'],
-  [22.2, 26.1, '+1か月。困ったのは<br>国の金庫だった。'],
+  [22.2, 26.1, '困ったのは国の金庫だった。'],
   [26.1, 30, '消費税は、国の税収の<br>約3割を占めていた。'],
-  [30.2, 34.6, '+1年。国に入るはずの<br>26兆円が消えた。'],
+  [30.2, 34.6, '国に入るはずの<br>26兆円が消えた。'],
   [34.6, 39, '所得税よりも、法人税よりも<br>大きな柱だった。'],
   [39.2, 43.6, '国民1人あたり<br>約21万円分の穴。'],
   [43.6, 47.8, 'さらに地方の分も、<br>年約6.9兆円。'],
@@ -56,6 +56,7 @@ const SUBS = [
 ];
 
 function shot0(t, T) { // hook: price flips 1,100 -> 1,000
+  lift(230);
   marketBase(false); const tv = 1.0;
   price.userData.set(t < tv ? '¥1,100' : '¥1,000'); price.scale.set(3.2 * (t >= tv ? 1 + 0.25 * Math.max(0, 1 - (t - tv) / 0.3) : 1), 1.0, 1);
   el.flash.style.opacity = t >= tv ? 0.55 * Math.max(0, 1 - (t - tv) / 0.3) : 0;
@@ -74,6 +75,7 @@ function shot1(t, T) { // everyday aisle (back to before)
   return market;
 }
 function shot2(t, T) { // +1min register
+  lift(230);
   marketBase(false); const tv = 0.6;
   price.userData.set(t < tv ? '¥1,100' : '¥1,000'); price.scale.set(3.2, 1, 1);
   cq.visible = t > 1; cq.position.set(customer.position.x, 2.45, customer.position.z); cq.scale.setScalar(0.6 * easeBack(clamp((t - 1) / 0.3)));
@@ -106,6 +108,7 @@ function shot4(t, T) { // +1month living room, news on TV
   return room;
 }
 function shot5(t, T) { // +1year bars: consumption tax collapses
+  lift(460);
   crowd.g.visible = false; coins.forEach(c => c.g.visible = false);
   const grow = easeOut(clamp(t / 1.4)); const cons = t < 4.4 ? 1 : 1 - easeOut((t - 4.4) / 1.2);
   stageBars(grow, cons);
@@ -127,6 +130,7 @@ function shot6(t, T) { // per person
   return stage;
 }
 function shot7(t, T) { // result
+  lift(460);
   crowd.g.visible = false; coins.forEach(c => c.g.visible = false);
   stageBars(1, 0); bars[2].mat.color.set('#ff6b6b');
   const u = ease(t / 7.5);
@@ -135,6 +139,7 @@ function shot7(t, T) { // result
   return stage;
 }
 function shot8(t, T) { // loop to the register
+  lift(230);
   marketBase(false); price.userData.set('¥1,100'); price.scale.set(3.2, 1, 1); cq.visible = false;
   const u = ease(t / 4);
   look(REG.x - 0.5, 4.5, lerp(10.9, 10.6, u), REG.x - 0.6, 4.4, REG.z - 0.4, 50);
