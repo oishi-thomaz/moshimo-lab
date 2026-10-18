@@ -29,6 +29,8 @@ jobs:
       SECRET: ${{ secrets.MOSHIMO_SECRET }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: main   # 待っている間に main が進んでも、最新の在庫と書き出し済みリストで選ぶ
 
       - uses: actions/setup-node@v4
         with:
@@ -93,7 +95,7 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add state/rendered.txt
           git commit -m "rendered ${{ steps.pick.outputs.id }}"
-          git push
+          git pull --rebase -q && git push
 
       - name: Failure notice
         if: failure()
