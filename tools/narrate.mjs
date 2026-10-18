@@ -110,7 +110,7 @@ for (const [i, L] of lines.entries()) {
   L.raw = path.join(work, `${String(i).padStart(2, '0')}_${h}.wav`);
   if (!fs.existsSync(L.raw)) {
     if (MOCK) execFileSync('ffmpeg', ['-v', 'error', '-y', '-f', 'lavfi', '-i', `sine=frequency=${300 + i * 40}:sample_rate=24000:duration=${(L.text.length * 0.14).toFixed(2)}`, '-ac', '1', L.raw]);
-    else { fs.writeFileSync(L.raw, await ttsRetry(L.text, L.style)); await sleep(1500); }
+    else { fs.writeFileSync(L.raw, await ttsRetry(L.text, L.style)); await sleep(6500); } // 無料枠は1分あたりの回数に上限があるので間をあける
   }
   // 前後の無音を削る
   L.wav = L.raw.replace('.wav', '_trim.wav');
