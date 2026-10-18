@@ -23,4 +23,16 @@ function setHud(lab, val, op, opts = {}) {
 }
 const roll = (u, target) => target * easeOut(u);
 
-export { $, el, lastSub, setSub, setTop, setHud, roll };
+// Fills the per-video text: the opening title, and the closing card (stats + sources).
+// meta.titleHtml: '日本中のコンビニが<br>消えたら？'
+// meta.endStats: [['全国のコンビニ店舗数', '56,054店', '2025年末'], ...]
+// meta.sources: '出典：...'（<br>可）
+function setupCards(meta) {
+  document.getElementById('title').innerHTML = meta.titleHtml || meta.title || '';
+  document.querySelector('#end .t').innerHTML = meta.titleHtml || meta.title || '';
+  const esc = s => String(s).replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+  document.querySelector('#end .s').innerHTML = (meta.endStats || []).map(([l, v, y]) => `${esc(l)}<b>${esc(v)}</b>${y ? '（' + esc(y) + '）' : ''}`).join('<br>');
+  document.querySelector('#end .src').innerHTML = meta.sources || '';
+}
+
+export { setupCards, $, el, lastSub, setSub, setTop, setHud, roll };

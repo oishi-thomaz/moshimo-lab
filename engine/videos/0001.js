@@ -3,7 +3,7 @@ import { LOGOS } from '../logos.js';
 import { W, H, RW, RH, canvas, renderer, rng, clamp, lerp, ease, easeOut, easeBack, fade, mat, box, comma, canvasTex, windowTextures, makeSky, SKIN, HAIR, SHIRT, PANTS, makePerson, poseWalk, randPerson, walkAlong, qTex, makeQ } from '../lib.js';
 import { RX0, RZ0, cam, city, ghost, ghostFill, ghostM, ghostScr, look, parked, setBurst, setEnv, setStore, setStoreLights, storeGlows, updateCars } from '../city.js';
 import { market, mLight, shelfItems, queues } from '../market.js';
-import { $, el, lastSub, setSub, setTop, setHud, roll } from '../overlay.js';
+import { setupCards, $, el, lastSub, setSub, setTop, setHud, roll } from '../overlay.js';
 
 // ---------- crowds ----------
 function group() { const g = new THREE.Group(); city.add(g); g.visible = false; return g; }
@@ -261,7 +261,11 @@ window.META = {
   mood: 'tension', seed: 3, hits: [8.5, 45.9], risers: [8.5],
   caption: '日本中のコンビニ56,054店が一瞬で消えたら、私たちの暮らしはどうなる？\n1日約4,477万人が立ち寄る場所が消えたあとの1か月を、実際のデータでシミュレーション。\n\n出典：日本フランチャイズチェーン協会 コンビニエンスストア統計調査（2025年）、セブン銀行 月次ATM情報（2026年6月）、JFAセーフティステーション活動',
   hashtags: ['もしもラボ', 'もしもシリーズ', 'コンビニ', '雑学', 'シミュレーション'],
+  titleHtml: '日本中のコンビニが<br>消えたら？',
+  endStats: [['全国のコンビニ店舗数', '56,054店', '2025年末'], ['1日あたりの来店客数', '約4,477万人', '2025年'], ['コンビニの年間売上高', '12兆583億円', '2025年'], ['駆け込みに対応した店舗', '6,000店以上', '2024年']],
+  sources: '出典：日本フランチャイズチェーン協会 コンビニエンスストア統計調査・<br>セーフティステーション活動、セブン銀行 月次ATM情報（2026年6月）',
 };
+setupCards(window.META);
 window.DURATION = DURATION;
 document.querySelectorAll('.mk').forEach((m, i) => { m.innerHTML = LOGOS.flask().replace(/id="(\w+)"/g, `id="$1${i}"`).replace(/url\(#(\w+)\)/g, `url(#$1${i})`); });
 Promise.all([document.fonts.load('800 40px "M PLUS Rounded 1c"', 'もしもラボ'), document.fonts.load('600 20px Inter', 'MOSHIMO LAB')]).then(() => document.fonts.ready).then(() => { window.renderAt(0); window.READY = true; });

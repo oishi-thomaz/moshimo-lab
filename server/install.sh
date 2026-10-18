@@ -42,7 +42,7 @@ const LINE_SECRET = env.LINE_CHANNEL_SECRET || '';
 const LINE_TOKEN = env.LINE_CHANNEL_TOKEN || '';
 const IG_USER_ID = env.IG_USER_ID || '';
 const IG_API = 'https://graph.instagram.com/v25.0';
-const POST_TIME = env.POST_TIME || '20:30';                        // 日本時間
+const POST_TIMES = (env.POST_TIMES || env.POST_TIME || '20:30').split(',').map(x => x.trim()).filter(Boolean).sort(); // 日本時間。例 12:00,20:30
 const MAX_UPLOAD = 300 * 1024 * 1024;
 
 fs.mkdirSync(MEDIA, { recursive: true });
@@ -57,14 +57,17 @@ const log = (...a) => console.log(new Date().toISOString(), ...a);
 // ---------------- time (JST) ----------------
 const JST = 9 * 3600e3;
 function nextSlot() {
-  const [hh, mm] = POST_TIME.split(':').map(Number);
-  const taken = new Set(Object.values(state.items).filter(i => i.status === 'approved' && i.publishAt).map(i => i.publishAt));
+  // 次に空いている投稿枠（POST_TIMES の各時刻 × 日付）。1枠1本
+  const taken = new Set(Object.values(state.items).filter(i => (i.status === 'approved' || i.status === 'publishing') && i.publishAt).map(i => i.publishAt));
   const now = Date.now();
   const j = new Date(now + JST);
-  let t = Date.UTC(j.getUTCFullYear(), j.getUTCMonth(), j.getUTCDate(), hh, mm) - JST;
-  if (t <= now + 5 * 60e3) t += 86400e3;
-  while (taken.has(t)) t += 86400e3;                                // 1日1本
-  return t;
+  const day0 = Date.UTC(j.getUTCFullYear(), j.getUTCMonth(), j.getUTCDate()) - JST;
+  for (let d = 0; d < 400; d++) for (const hm of POST_TIMES) {
+    const [hh, mm] = hm.split(':').map(Number);
+    const t = day0 + d * 86400e3 + (hh * 60 + mm) * 60e3;
+    if (t > now + 5 * 60e3 && !taken.has(t)) return t;
+  }
+  return now + 86400e3;
 }
 const fmt = t => { const d = new Date(t + JST); return `${d.getUTCMonth() + 1}/${d.getUTCDate()} ${String(d.getUTCHours()).padStart(2, '0')}:${String(d.getUTCMinutes()).padStart(2, '0')}`; };
 
@@ -300,8 +303,8 @@ LINE_OWNER_USER_ID=
 # Instagram（Instagramログインの長期トークンと、プロアカウントのユーザーID）
 IG_USER_ID=
 IG_TOKEN=
-# 投稿時刻（日本時間）
-POST_TIME=20:30
+# 投稿時刻（日本時間）。1日2本にするときは POST_TIMES=12:00,20:30
+POST_TIMES=20:30
 MOSHIMO_EOF
   SECRET=$(head -c 32 /dev/urandom | base64 | tr -dc 'A-Za-z0-9' | head -c 40)
   sed -i "s#^HOOK_SECRET=.*#HOOK_SECRET=$SECRET#" /etc/moshimo.env
