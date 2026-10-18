@@ -287,6 +287,7 @@ function updateCars(t, on = true) {
 const cam = new THREE.PerspectiveCamera(55, W / H, 0.1, 2000);
 const C = (h) => new THREE.Color(h);
 const ENV = {
+  day: { top: '#5c9fe0', bot: '#dff0fb', fog: '#d6e8f4', fn: 90, ff: 360, hs: '#ffffff', hg: '#5a606c', hi: 1.15, sc: '#fff4e0', si: 1.6, sp: [40, 60, 30], win: 0, bulb: 0, sl: 0 },
   dusk: { top: '#4f6fa8', bot: '#f4b98f', fog: '#d9b49c', fn: 70, ff: 320, hs: '#ffe2c8', hg: '#4a4f5c', hi: 1.15, sc: '#ffc89a', si: 1.5, sp: [60, 22, 30], win: 0.25, bulb: 1, sl: 1 },
   night: { top: '#040a1a', bot: '#1a2850', fog: '#0f1830', fn: 50, ff: 260, hs: '#7d92cc', hg: '#141822', hi: 0.55, sc: '#9fb4ff', si: 0.35, sp: [-40, 40, 20], win: 1.0, bulb: 1, sl: 1.6 },
   dark: { top: '#02050e', bot: '#0d1630', fog: '#080e1e', fn: 30, ff: 200, hs: '#5a6c9c', hg: '#0d1018', hi: 0.38, sc: '#8fa4e8', si: 0.25, sp: [-40, 40, 20], win: 0.45, bulb: 1, sl: 1.3 },
