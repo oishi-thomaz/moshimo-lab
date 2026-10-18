@@ -633,7 +633,8 @@
   "mood": "calm",
   "keywords": "一列 地球何周 人口 雑学 もしも",
   "virality": "S",
-  "no": 24
+  "no": 24,
+  "made": "0024"
  },
  {
   "cat": "体・健康",
@@ -658,7 +659,8 @@
   "mood": "hopeful",
   "keywords": "砂糖断ち シュガーデトックス 30日チャレンジ ダイエット 糖質",
   "virality": "S",
-  "no": 25
+  "no": 25,
+  "made": "0025"
  },
  {
   "cat": "地球・宇宙・自然",
@@ -684,7 +686,8 @@
   "mood": "tension",
   "keywords": "重力 もしも 無重力 地球 雑学",
   "virality": "S",
-  "no": 26
+  "no": 26,
+  "made": "0026"
  },
  {
   "cat": "生き物・動物",
@@ -709,7 +712,8 @@
   "mood": "emotional",
   "keywords": "犬 消えたら もしも いぬ 犬好き",
   "virality": "S",
-  "no": 27
+  "no": 27,
+  "made": "0027"
  },
  {
   "cat": "お金・経済",
@@ -734,7 +738,8 @@
   "mood": "hopeful",
   "keywords": "宝くじ 手取り 贈与税 高額当選 もしも",
   "virality": "S",
-  "no": 28
+  "no": 28,
+  "made": "0028"
  },
  {
   "cat": "日本の社会・人口・仕事",
@@ -759,7 +764,8 @@
   "mood": "tension",
   "keywords": "外国人労働者 人手不足 もしも 日本 社会問題",
   "virality": "S",
-  "no": 29
+  "no": 29,
+  "made": "0029"
  },
  {
   "cat": "身近なもの・インフラ",
@@ -785,7 +791,8 @@
   "mood": "mystery",
   "keywords": "宅配便 物流 2024年問題 もしも 雑学",
   "virality": "S",
-  "no": 30
+  "no": 30,
+  "made": "0030"
  },
  {
   "cat": "体・健康",
