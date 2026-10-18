@@ -41,7 +41,7 @@ function runStory({ shots, subs, meta, duration, camera = cam, dim = () => false
     else { renderer.setClearColor(0x07090d, 1); renderer.clear(); }
     return true;
   };
-  window.META = meta;
+  window.META = { ...meta, subs }; // subs はナレーション（tools/narrate.mjs）が使う
   window.DURATION = duration;
   setupCards(meta);
   document.querySelectorAll('.mk').forEach((m, i) => { m.innerHTML = LOGOS.flask().replace(/id="(\w+)"/g, `id="$1${i}"`).replace(/url\(#(\w+)\)/g, `url(#$1${i})`); });

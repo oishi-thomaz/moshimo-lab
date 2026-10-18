@@ -60,6 +60,7 @@ jobs:
         if: steps.pick.outputs.id != ''
         env:
           CHROME_PATH: /usr/bin/google-chrome
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: bash tools/build.sh "${{ steps.pick.outputs.id }}"
 
       - name: Upload to VPS and ask for approval
