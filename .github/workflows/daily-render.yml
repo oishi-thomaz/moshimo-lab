@@ -4,6 +4,9 @@ name: daily-render
 on:
   schedule:
     - cron: '17 22 * * *'
+    # 1日3本の期間（〜2026/10/28 投稿分）だけ使う追加の書き出し。期間を過ぎたら Pick video で何もしない
+    - cron: '47 22 * * *'
+    - cron: '17 23 * * *'
   workflow_dispatch:
     inputs:
       id:
@@ -45,13 +48,18 @@ jobs:
         id: pick
         run: |
           ID="${{ github.event.inputs.id }}"
+          SCHED="${{ github.event.schedule }}"
+          TODAY=$(TZ=Asia/Tokyo date +%Y%m%d)
+          if [ -n "$SCHED" ] && [ "$SCHED" != "17 22 * * *" ] && [ "$TODAY" -gt 20261028 ]; then
+            echo "1日3本の期間は終わったので追加分は書き出さない"; echo "id=" >> "$GITHUB_OUTPUT"; echo "skip=1" >> "$GITHUB_OUTPUT"; exit 0
+          fi
           if [ -z "$ID" ]; then ID=$(node tools/next.mjs); fi
           echo "id=$ID" >> "$GITHUB_OUTPUT"
           echo "left=$(cat /tmp/queue_left 2>/dev/null || echo 0)" >> "$GITHUB_OUTPUT"
           echo "video: ${ID:-none}"
 
       - name: Queue empty notice
-        if: steps.pick.outputs.id == ''
+        if: steps.pick.outputs.id == '' && steps.pick.outputs.skip != '1'
         run: |
           curl -fsS -X POST "$BASE/hook/notice" -H "X-Moshimo-Secret: $SECRET" -H 'content-type: application/json' \
             -d '{"message":"台本のストックが切れた。次の台本ができるまで投稿は止まる。"}'

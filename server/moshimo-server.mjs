@@ -39,13 +39,20 @@ const log = (...a) => console.log(new Date().toISOString(), ...a);
 
 // ---------------- time (JST) ----------------
 const JST = 9 * 3600e3;
+// 投稿時刻：LINE の「投稿時間 12:00,18:00,20:30 10/28まで」で期間つきに変えられる（期間が過ぎたら POST_TIMES に戻る）
+const hm2 = s => /^([01]?\d|2[0-3]):[0-5]\d$/.test(s);
+function postTimesOn(dayStart) { // dayStart: その日の0時（日本時間）のUTCミリ秒
+  const o = state.postTimes;
+  if (o && o.times && o.times.length && (!o.until || dayStart <= o.until)) return o.times;
+  return POST_TIMES;
+}
 function nextSlot() {
   // 次に空いている投稿枠（POST_TIMES の各時刻 × 日付）。1枠1本
   const taken = new Set(Object.values(state.items).filter(i => (i.status === 'approved' || i.status === 'publishing') && i.publishAt).map(i => i.publishAt));
   const now = Date.now();
   const j = new Date(now + JST);
   const day0 = Date.UTC(j.getUTCFullYear(), j.getUTCMonth(), j.getUTCDate()) - JST;
-  for (let d = 0; d < 400; d++) for (const hm of POST_TIMES) {
+  for (let d = 0; d < 400; d++) for (const hm of postTimesOn(day0 + d * 86400e3)) {
     const [hh, mm] = hm.split(':').map(Number);
     const t = day0 + d * 86400e3 + (hh * 60 + mm) * 60e3;
     if (t > now + 5 * 60e3 && !taken.has(t)) return t;
@@ -117,6 +124,29 @@ async function onPostback(ev) {
   if (act === 'retry') { it.status = 'approved'; it.publishAt = Date.now(); it.error = ''; save(); return reply(ev.replyToken, text(`${id} をもう一回投稿してみる`)); }
 }
 
+// 「投稿時間 12:00,18:00,20:30 10/28まで」「投稿時間 戻す」
+function setPostTimes(msg) {
+  const body = msg.replace(/^投稿時間/, '').trim();
+  if (/戻す|元に|リセット/.test(body)) { delete state.postTimes; save(); return `投稿時間を ${POST_TIMES.join('、')} に戻した`; }
+  const times = (body.match(/\d{1,2}:\d{2}/g) || []).map(x => x.padStart(5, '0')).filter(hm2).sort();
+  if (!times.length) return `今の投稿時間：${postTimesOn(Date.now()).join('、')}\n変えるときは 投稿時間 12:00,18:00,20:30 10/28まで のように送って`;
+  let until = 0; const m = body.match(/(\d{1,2})\/(\d{1,2})まで/);
+  if (m) { const j = new Date(Date.now() + JST); let y = j.getUTCFullYear(); if (Number(m[1]) < j.getUTCMonth() + 1) y++; until = Date.UTC(y, Number(m[1]) - 1, Number(m[2])) - JST; }
+  state.postTimes = { times, until }; save();
+  return `投稿時間を ${times.join('、')} にした${until ? `（${m[1]}/${m[2]}まで。そのあとは ${POST_TIMES.join('、')} に戻る）` : ''}`;
+}
+// 「予約 0002 21:30」：その動画をこの時刻に投稿（今日。過ぎていたら明日）
+function reserve(msg) {
+  const m = msg.match(/(\d{4})\D+(\d{1,2}:\d{2})/);
+  if (!m || !hm2(m[2])) return '予約 0002 21:30 のように送って';
+  const [, id, hm] = m; const it = state.items[id];
+  if (!it) return `${id} が見つからへん`;
+  if (it.status === 'published') return `${id} はもう投稿済み`;
+  const j = new Date(Date.now() + JST); const day0 = Date.UTC(j.getUTCFullYear(), j.getUTCMonth(), j.getUTCDate()) - JST;
+  const [hh, mm] = hm.split(':').map(Number); let t = day0 + (hh * 60 + mm) * 60e3; if (t < Date.now() + 60e3) t += 86400e3;
+  it.status = 'approved'; it.publishAt = t; save();
+  return `OK。${id} は ${fmt(t)} に投稿する`;
+}
 async function onLineWebhook(req, res) {
   const raw = await readBody(req);
   const sig = crypto.createHmac('sha256', LINE_SECRET).update(raw).digest('base64');
@@ -132,6 +162,12 @@ async function onLineWebhook(req, res) {
     }
     if (uid !== state.owner) continue;                               // 持ち主以外は無視
     if (ev.type === 'postback') await onPostback(ev);
+    else if (ev.type === 'message' && ev.message.type === 'text' && /^投稿時間/.test(ev.message.text.trim())) {
+      await reply(ev.replyToken, text(setPostTimes(ev.message.text.trim())));
+    }
+    else if (ev.type === 'message' && ev.message.type === 'text' && /^予約/.test(ev.message.text.trim())) {
+      await reply(ev.replyToken, text(reserve(ev.message.text.trim())));
+    }
     else if (ev.type === 'message' && ev.message.type === 'text' && /状態|ステータス/.test(ev.message.text)) {
       const rows = Object.entries(state.items).slice(-8).map(([id, i]) => `${id} ${i.status}${i.publishAt && i.status === 'approved' ? ' ' + fmt(i.publishAt) : ''}`);
       await reply(ev.replyToken, text(rows.length ? rows.join('\n') : 'まだ動画はない'));
