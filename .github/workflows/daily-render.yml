@@ -55,7 +55,8 @@ jobs:
           if [ -n "$SCHED" ] && [ "$SCHED" != "17 22 * * *" ] && [ "$TODAY" -gt 20261028 ]; then
             echo "1日3本の期間は終わったので追加分は書き出さない"; echo "id=" >> "$GITHUB_OUTPUT"; echo "skip=1" >> "$GITHUB_OUTPUT"; exit 0
           fi
-          if [ -z "$ID" ]; then ID=$(node tools/next.mjs); fi
+          NEXT=$(node tools/next.mjs)   # 在庫の残りも /tmp/queue_left に書く（番号指定のときも数える）
+          if [ -z "$ID" ]; then ID=$NEXT; fi
           echo "id=$ID" >> "$GITHUB_OUTPUT"
           echo "left=$(cat /tmp/queue_left 2>/dev/null || echo 0)" >> "$GITHUB_OUTPUT"
           echo "video: ${ID:-none}"
@@ -81,7 +82,7 @@ jobs:
             curl -fsS --retry 3 -T "out/$f" -H "X-Moshimo-Secret: $SECRET" "$BASE/upload/$f"; echo
           done
           curl -fsS -X POST "$BASE/hook/new" -H "X-Moshimo-Secret: $SECRET" -H 'content-type: application/json' -d "{\"id\":\"$ID\"}"; echo
-          if [ "${{ steps.pick.outputs.left }}" -le 3 ]; then
+          if [ -z "${{ github.event.inputs.id }}" ] && [ "${{ steps.pick.outputs.left }}" -le 3 ]; then
             curl -fsS -X POST "$BASE/hook/notice" -H "X-Moshimo-Secret: $SECRET" -H 'content-type: application/json' \
               -d "{\"message\":\"台本のストックが残り${{ steps.pick.outputs.left }}本。\"}" || true
           fi
