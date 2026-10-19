@@ -23,6 +23,7 @@ cat > /opt/moshimo-lab/server/moshimo-server.mjs <<'MOSHIMO_EOF'
 //  2. LINE に承認メッセージ（動画＋ボタン）を送る
 //  3. 承認されたら Instagram API でリールを予約時刻に投稿し、結果を LINE に送る
 //  4. Instagram の長期トークンを30日ごとに自動更新する
+//  5. 同じ動画を YouTube（ショート）にも同時に投稿する（LINE の YouTube設定 で接続したとき）
 //
 // 設定は環境変数（/etc/moshimo.env を systemd から読む）。項目は server/moshimo.env.example を参照。
 import http from 'node:http';
@@ -135,6 +136,8 @@ async function onPostback(ev) {
   const [act, id] = String(ev.postback.data).split(':');
   const it = state.items[id];
   if (!it) return reply(ev.replyToken, text(`${id} が見つからへん`));
+  if (act === 'ytskip') { it.yt = { ...(it.yt || {}), skipped: true }; save(); return reply(ev.replyToken, text(`${id} はYouTubeに上げへんことにした`)); }
+  if (act === 'ytretry') { it.yt = {}; save(); await reply(ev.replyToken, text(`${id} をYouTubeにもう一回上げてみる`)); return youtube(id); }
   if (it.status === 'published') return reply(ev.replyToken, text(`${id} はもう投稿済み：${it.permalink || ''}`));
   if (act === 'approve') { it.status = 'approved'; it.publishAt = nextSlot(); save(); return reply(ev.replyToken, text(`OK。${id} は ${fmt(it.publishAt)} に投稿する`)); }
   if (act === 'now') { it.status = 'approved'; it.publishAt = Date.now(); save(); return reply(ev.replyToken, text(`OK。${id} を今から投稿する`)); }
@@ -186,8 +189,12 @@ async function onLineWebhook(req, res) {
     else if (ev.type === 'message' && ev.message.type === 'text' && /^予約/.test(ev.message.text.trim())) {
       await reply(ev.replyToken, text(reserve(ev.message.text.trim())));
     }
+    else if (ev.type === 'message' && ev.message.type === 'text' && /^(youtube|ユーチューブ)/i.test(ev.message.text.trim())) {
+      await reply(ev.replyToken, text(ytCommand(ev.message.text.trim())));
+    }
     else if (ev.type === 'message' && ev.message.type === 'text' && /状態|ステータス/.test(ev.message.text)) {
-      const rows = Object.entries(state.items).slice(-8).map(([id, i]) => `${id} ${i.status}${i.publishAt && i.status === 'approved' ? ' ' + fmt(i.publishAt) : ''}`);
+      const yts = i => !state.yt?.refresh ? '' : i.yt?.videoId ? ' / YT済' : i.yt?.error ? ' / YT失敗' : i.ytAt ? ` / YT ${fmt(i.ytAt)}` : '';
+      const rows = Object.entries(state.items).slice(-10).map(([id, i]) => `${id} ${i.status}${i.publishAt && i.status === 'approved' ? ' ' + fmt(i.publishAt) : ''}${yts(i)}`);
       await reply(ev.replyToken, text(rows.length ? rows.join('\n') : 'まだ動画はない'));
     }
   }
@@ -241,11 +248,138 @@ async function publish(id) {
     Object.assign(it, { status: 'published', mediaId: p.id, permalink: info.permalink || '', publishedAt: Date.now() }); save();
     log('published', id, it.permalink);
     await push(text(`投稿した：${id} ${m.title || ''}\n${it.permalink || ''}`));
+    await youtube(id);
   } catch (e) {
     Object.assign(it, { status: 'error', error: String(e.message || e) }); save();
     log('publish error', id, e);
     await push([text(`投稿に失敗した：${id}\n${it.error}`.slice(0, 1000)),
       { type: 'template', altText: '再投稿', template: { type: 'confirm', text: `${id} をもう一回投稿する？`, actions: [{ type: 'postback', label: 'もう一回', data: `retry:${id}` }, { type: 'postback', label: 'やめる', data: `reject:${id}` }] } }]);
+    await youtube(id); // インスタが失敗しても YouTube は予定どおり出す
+  }
+}
+
+// ---------------- YouTube ----------------
+// 接続：LINE で「YouTube」→ 手順。「YouTube設定 クライアントID シークレット」→ 許可のリンクが届く → 開いて許可 → 接続完了
+// 投稿：インスタに投稿するのと同じタイミングで、同じ動画をショートとして公開。説明欄にキャプション、最初のコメントに質問を書く
+// 過去分：接続した時点でインスタに投稿済みの動画は、2日に分けて上げる（「YouTube 0031」で1本だけすぐ上げることもできる）
+const YT_SCOPE = 'https://www.googleapis.com/auth/youtube.upload https://www.googleapis.com/auth/youtube.force-ssl';
+const YT_TIMES = ['09:00', '11:00', '14:00', '16:00', '19:30', '22:30']; // 過去分を上げる時刻（インスタの投稿時刻とずらす）
+const ytRedirect = () => `${BASE_URL}/yt/callback`;
+let ytAccess = { token: '', exp: 0 };
+async function ytToken() {
+  if (ytAccess.token && Date.now() < ytAccess.exp - 60e3) return ytAccess.token;
+  const y = state.yt || {};
+  const r = await fetch('https://oauth2.googleapis.com/token', { method: 'POST', headers: { 'content-type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({ client_id: y.clientId, client_secret: y.clientSecret, refresh_token: y.refresh, grant_type: 'refresh_token' }) });
+  const j = await r.json().catch(() => ({}));
+  if (!j.access_token) { const e = new Error(`YouTubeのログインが切れた：${JSON.stringify(j).slice(0, 200)}`); e.auth = true; throw e; }
+  ytAccess = { token: j.access_token, exp: Date.now() + (j.expires_in || 3600) * 1000 };
+  return ytAccess.token;
+}
+async function yt(method, url, body, headers = {}) {
+  const r = await fetch(url, { method, headers: { authorization: `Bearer ${await ytToken()}`, ...headers }, body });
+  if (!r.ok) { const e = new Error(`YouTube ${r.status}: ${(await r.text()).slice(0, 300)}`); e.status = r.status; throw e; }
+  return r;
+}
+function ytAuthUrl() {
+  state.yt.oauthState = crypto.randomBytes(16).toString('hex'); save();
+  const q = new URLSearchParams({ client_id: state.yt.clientId, redirect_uri: ytRedirect(), response_type: 'code', scope: YT_SCOPE, access_type: 'offline', prompt: 'consent', state: state.yt.oauthState });
+  return `https://accounts.google.com/o/oauth2/v2/auth?${q}`;
+}
+function ytCommand(msg) {
+  const parts = msg.split(/\s+/).filter(Boolean);
+  const idArg = (msg.match(/(?:^|\s)(\d{4})(?:\s|$)/) || [])[1];
+  if (/設定/.test(msg)) {
+    const [cid, sec] = parts.slice(1).filter(x => !/設定/.test(x));
+    if (!cid || !sec || !/apps\.googleusercontent\.com$/.test(cid)) return 'YouTube設定 クライアントID シークレット の形で送って（間はスペース）';
+    state.yt = { ...(state.yt || {}), clientId: cid, clientSecret: sec, refresh: '' }; save();
+    return `次のリンクを開いて、もしもラボのチャンネルを持ってるGoogleアカウントで許可して。チャンネルを選ぶ画面が出たら、もしもラボのチャンネルを選ぶ。\n確認されていないアプリと出たら、詳細 → 移動 で進めてOK（自分で作ったアプリやから大丈夫）。\n\n${ytAuthUrl()}`;
+  }
+  if (idArg) {
+    if (!state.yt?.refresh) return 'まだYouTubeにつながってない。YouTube と送ると手順が出る';
+    if (!fs.existsSync(path.join(MEDIA, `${idArg}.mp4`))) return `${idArg} の動画ファイルがVPSにない`;
+    if (!state.items[idArg]) state.items[idArg] = { status: 'manual', receivedAt: Date.now() };
+    const it = state.items[idArg];
+    if (it.yt?.videoId) return `${idArg} はもうYouTubeに上げてある：https://youtube.com/shorts/${it.yt.videoId}`;
+    it.yt = {}; it.ytAt = Date.now(); save();
+    return `${idArg} を今からYouTubeに上げる`;
+  }
+  if (state.yt?.refresh) return `YouTubeは接続済み（${state.yt.channel || 'チャンネル'}）。インスタと同じタイミングで投稿してる。\n1本だけ上げたいときは YouTube 0031 のように送って`;
+  return `YouTubeの接続で使うリダイレクトURI：\n${ytRedirect()}\n\nGoogle Cloud でOAuthクライアントID（ウェブアプリケーション）を作るときに、承認済みのリダイレクトURIにこれを入れて。できたら このLINEに\nYouTube設定 クライアントID シークレット\nと送る`;
+}
+async function ytCallback(u, res) {
+  const html = t => send(res, 200, `<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width"><body style="font-family:sans-serif;padding:24px;font-size:18px">${t}</body>`, 'text/html; charset=utf-8');
+  const y = state.yt || {};
+  if (!y.clientId || !y.oauthState || !u.searchParams.get('code') || u.searchParams.get('state') !== y.oauthState) return html('リンクが古いか、まだ設定されてない。LINEで YouTube設定 からやり直して。');
+  const r = await fetch('https://oauth2.googleapis.com/token', { method: 'POST', headers: { 'content-type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({ code: u.searchParams.get('code'), client_id: y.clientId, client_secret: y.clientSecret, redirect_uri: ytRedirect(), grant_type: 'authorization_code' }) });
+  const j = await r.json().catch(() => ({}));
+  if (!j.refresh_token) { log('yt auth failed', j); return html('接続に失敗した。LINEで YouTube設定 からやり直して。'); }
+  state.yt.refresh = j.refresh_token; delete state.yt.oauthState; ytAccess = { token: j.access_token, exp: Date.now() + (j.expires_in || 3600) * 1000 }; save();
+  try { const c = await (await yt('GET', 'https://www.googleapis.com/youtube/v3/channels?part=snippet&mine=true')).json(); state.yt.channel = c.items?.[0]?.snippet?.title || ''; save(); } catch (e) { log('yt channel', e); }
+  const n = scheduleBackfill();
+  await push(text(`YouTubeにつながった（${state.yt.channel || 'チャンネル名は取れなかった'}）。これからはインスタと同時にYouTubeにも投稿する。${n ? `\nインスタに投稿済みの${n.count}本は ${n.from}〜${n.to} に2日に分けて上げる。` : ''}`));
+  return html(`YouTubeにつながった（${state.yt.channel || ''}）。LINEに戻ってOK。`);
+}
+// インスタに投稿済みでまだYouTubeにない動画を、YT_TIMES の時刻に2日に分けて並べる
+function scheduleBackfill() {
+  const ids = Object.entries(state.items).filter(([id, i]) => i.status === 'published' && !i.yt?.videoId && !i.ytAt && fs.existsSync(path.join(MEDIA, `${id}.mp4`)))
+    .sort((a, b) => (a[1].publishedAt || 0) - (b[1].publishedAt || 0)).map(([id]) => id);
+  if (!ids.length) return null;
+  const per = Math.ceil(ids.length / 2);
+  const now = Date.now(); const j = new Date(now + JST);
+  const day0 = Date.UTC(j.getUTCFullYear(), j.getUTCMonth(), j.getUTCDate()) - JST;
+  const daySlots = d => YT_TIMES.map(hm => { const [hh, mm] = hm.split(':').map(Number); return day0 + d * 86400e3 + (hh * 60 + mm) * 60e3; }).filter(t => t > now + 10 * 60e3);
+  let d = daySlots(0).length >= Math.min(per, 4) ? 0 : 1; // 今日の枠が少なければ明日から
+  const slots = [];
+  while (slots.length < ids.length && d < 10) {
+    const ds = daySlots(d); const take = Math.min(per, ids.length - slots.length);
+    // 1日の枠より本数が多いときは、枠の間に30分ずらして詰める
+    for (let k = 0; k < take; k++) slots.push(ds[k % ds.length] + Math.floor(k / ds.length) * 30 * 60e3);
+    d++;
+  }
+  ids.forEach((id, k) => { state.items[id].ytAt = slots[k]; });
+  save();
+  return { count: ids.length, from: fmt(slots[0]), to: fmt(slots[ids.length - 1]) };
+}
+function ytMeta(m) {
+  // タイトル：問いかけのタイトル（続きが気になる形）＋ショートの発見に効くタグ。100字以内
+  const title = `${m.ytTitle || m.title || 'もしもラボ'} #shorts #雑学`.slice(0, 100);
+  // 説明欄：1行目にコメントを呼ぶ質問、その下にキャプション（数字と出典）、最後にタグ（先頭3つがタイトルの上に出る）
+  const head = m.ask ? `${m.ask} コメントで教えて👇\n\n` : '';
+  const tagLine = [...new Set(['もしもラボ', 'shorts', ...(m.hashtags || [])])].slice(0, 8).map(h => '#' + h).join(' ');
+  const desc = `${head}${String(m.caption || '').replace(/[<>]/g, '')}\n\n${tagLine}`.slice(0, 4900);
+  const tags = [...new Set(['もしもラボ', ...(m.hashtags || []), 'もしも', '雑学', 'shorts'])].slice(0, 15);
+  return { title, desc, tags };
+}
+async function youtube(id) {
+  const it = state.items[id];
+  if (!it || !state.yt?.refresh || it.yt?.videoId || it.yt?.uploading || it.yt?.skipped) return;
+  const file = path.join(MEDIA, `${id}.mp4`);
+  if (!fs.existsSync(file)) { it.yt = { error: '動画ファイルがVPSにない' }; delete it.ytAt; save(); return push(text(`YouTubeに上げられへん：${id} の動画ファイルがない`)); }
+  const m = meta(id); const { title, desc, tags } = ytMeta(m);
+  it.yt = { uploading: true }; delete it.ytAt; save();
+  try {
+    const buf = fs.readFileSync(file);
+    let videoId = '';
+    for (let k = 0; k < 3 && !videoId; k++) {
+      try {
+        const init = await yt('POST', 'https://www.googleapis.com/upload/youtube/v3/videos?uploadType=resumable&part=snippet,status',
+          JSON.stringify({ snippet: { title, description: desc, tags, categoryId: '27', defaultLanguage: 'ja', defaultAudioLanguage: 'ja' }, status: { privacyStatus: 'public', selfDeclaredMadeForKids: false, embeddable: true } }),
+          { 'content-type': 'application/json; charset=UTF-8', 'x-upload-content-type': 'video/mp4', 'x-upload-content-length': String(buf.length) });
+        const up = await yt('PUT', init.headers.get('location'), buf, { 'content-type': 'video/mp4' });
+        videoId = (await up.json()).id;
+      } catch (e) { if (e.auth || !(e.status >= 500 || e.status === undefined) || k === 2) throw e; log('yt retry', id, e.message); await sleep(30000 * (k + 1)); }
+    }
+    it.yt = { videoId, at: Date.now() }; save();
+    log('youtube', id, videoId);
+    if (m.ask) await yt('POST', 'https://www.googleapis.com/youtube/v3/commentThreads?part=snippet', JSON.stringify({ snippet: { videoId, topLevelComment: { snippet: { textOriginal: `${m.ask} コメントで教えて！` } } } }), { 'content-type': 'application/json' }).catch(e => log('yt comment', e.message));
+    await push(text(`YouTubeにも投稿した：${id} ${m.title || ''}\nhttps://youtube.com/shorts/${videoId}`));
+  } catch (e) {
+    it.yt = { error: String(e.message || e).slice(0, 500) }; save();
+    log('youtube error', id, e);
+    await push([text(`YouTubeへの投稿に失敗した：${id}\n${it.yt.error}`),
+      { type: 'template', altText: 'YouTube再投稿', template: { type: 'confirm', text: `${id} をYouTubeにもう一回上げる？`, actions: [{ type: 'postback', label: 'もう一回', data: `ytretry:${id}` }, { type: 'postback', label: 'やめる', data: `ytskip:${id}` }] } }]);
   }
 }
 
@@ -286,11 +420,14 @@ setInterval(async () => {
   if (busy) return; busy = true;
   try {
     for (const [id, it] of Object.entries(state.items)) if (it.status === 'approved' && it.publishAt <= Date.now()) await publish(id);
+    for (const [id, it] of Object.entries(state.items)) if (it.ytAt && it.ytAt <= Date.now()) await youtube(id);
     await refreshToken();
     await remind().catch(e => log('remind failed', e));
   } finally { busy = false; }
 }, 30000);
 if (!state.igTokenAt && state.igToken) { state.igTokenAt = Date.now(); save(); }
+for (const it of Object.values(state.items)) if (it.yt?.uploading) { it.yt = {}; it.ytAt = Date.now() + 60e3; } // 再起動で途中になった YouTube 投稿はやり直す
+save();
 
 // ---------------- HTTP ----------------
 const TYPES = { '.mp4': 'video/mp4', '.json': 'application/json', '.jpg': 'image/jpeg' };
@@ -314,7 +451,7 @@ http.createServer(async (req, res) => {
   try {
     const u = new URL(req.url, 'http://x');
     const p = u.pathname.startsWith(PREFIX) ? u.pathname.slice(PREFIX.length) : u.pathname;
-    if (p === '/health') return send(res, 200, { ok: true, owner: !!state.owner, ig: !!state.igToken, items: Object.keys(state.items).length });
+    if (p === '/health') return send(res, 200, { ok: true, owner: !!state.owner, ig: !!state.igToken, yt: !!state.yt?.refresh, items: Object.keys(state.items).length });
     if ((req.method === 'GET' || req.method === 'HEAD') && p.startsWith('/media/')) return serveMedia(req, res, p.slice(7));
     if (req.method === 'PUT' && p.startsWith('/upload/')) {
       if (!authed(req)) return send(res, 401, { ok: false });
@@ -341,6 +478,7 @@ http.createServer(async (req, res) => {
       return send(res, 200, { ok: true });
     }
     if (req.method === 'POST' && p === '/line/webhook') return onLineWebhook(req, res);
+    if (req.method === 'GET' && p === '/yt/callback') return ytCallback(u, res);
     send(res, 404, { ok: false });
   } catch (e) {
     log('error', e);
