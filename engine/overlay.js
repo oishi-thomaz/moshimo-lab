@@ -22,6 +22,8 @@ function setSub(t, SUBS) {
   for (const [a, b, txt] of SUBS) if (t >= a && t < b) { s = txt; op = fade(t, a, b, 0.15); }
   if (s !== lastSub) { el.sub.innerHTML = s ? hang(s) : ''; lastSub = s; }
   el.sub.style.opacity = op;
+  // タイトルの後ろの暗い帯はタイトルと同じ濃さで出す（setSub は毎フレーム、ショットのあとに呼ばれる）
+  const ts = document.getElementById('tscrim'); if (ts) ts.style.opacity = el.title.style.opacity || 0;
 }
 let lastTopLab = null;
 function setTop(lab, val, op, color = '#fff') { if (lab !== lastTopLab) { el.topLab.innerHTML = hang(esc(lab)); lastTopLab = lab; } el.topVal.textContent = val; el.top.style.opacity = op; el.topVal.style.color = color; }

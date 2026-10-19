@@ -16,6 +16,8 @@
   .serif{font-family:"Noto Serif CJK JP","Noto Serif JP",serif;font-weight:700}
   .sans{font-family:"Noto Sans CJK JP","Noto Sans JP",sans-serif}
   .shadow{text-shadow:0 0 18px rgba(0,0,0,.6),0 2px 6px rgba(0,0,0,.7),0 0 3px rgba(0,0,0,.5)}
+  /* 表紙（最初のフレーム）でもタイトルがはっきり読めるよう、タイトルが出ている間だけ上部を暗くする */
+  #tscrim{position:absolute;left:0;right:0;top:0;height:720px;pointer-events:none;opacity:0;background:linear-gradient(180deg,rgba(6,9,16,.55) 0%,rgba(6,9,16,.78) 22%,rgba(6,9,16,.78) 62%,rgba(6,9,16,0) 100%)}
   #title{top:250px;text-align:center;color:#fff;font-size:92px;line-height:1.22;letter-spacing:2px;opacity:0}
   /* 読む情報は画面中央の1列にまとめる：経過時間（字幕の上）→ 字幕 → 数字（字幕の下） */
   #scrim{position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,rgba(8,12,20,0) 50%,rgba(8,12,20,.42) 57%,rgba(8,12,20,.46) 70%,rgba(8,12,20,.38) 79%,rgba(8,12,20,0) 85%)}
@@ -54,6 +56,7 @@
   <div id="flash"></div>
   <div id="dim" style="position:absolute;inset:0;opacity:0;background:linear-gradient(180deg,rgba(20,26,36,.35) 0%,rgba(20,26,36,.08) 22%,rgba(20,26,36,.08) 48%,rgba(20,26,36,.5) 60%,rgba(20,26,36,.5) 80%,rgba(20,26,36,.05) 88%)"></div>
   <div id="scrim"></div>
+  <div id="tscrim"></div>
   <div id="title" class="ov serif shadow"></div>
   <div id="logo" class="shadow"><div class="mk"></div><div class="nm">もしもラボ</div></div>
   <div id="hud" class="ov shadow"><div class="pill"><div class="lab sans"></div><div class="val serif"></div></div></div>
