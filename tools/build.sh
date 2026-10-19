@@ -10,9 +10,12 @@ MOOD=$(node -e "console.log(require('./out/$ID.json').mood||'tension')")
 SEED=$(node -e "console.log(require('./out/$ID.json').seed||1)")
 HITS=$(node -e "console.log((require('./out/$ID.json').hits||[]).join(','))")
 RISERS=$(node -e "console.log((require('./out/$ID.json').risers||[]).join(','))")
+IMPACTS=$(node -e "console.log((require('./out/$ID.json').impacts||[]).join(','))")
 DUR=$(node -e "console.log(require('./out/$ID.json').duration)")
 node tools/render.mjs --video "$ID" --out "out/${ID}_video.mp4"
-python3 tools/bgm.py --mood "$MOOD" --seed "$SEED" --duration "$DUR" --hits "$HITS" --risers "$RISERS" --out "out/${ID}_bgm.wav"
+python3 tools/bgm.py --mood "$MOOD" --seed "$SEED" --duration "$DUR" --hits "$HITS" --risers "$RISERS" --impacts "$IMPACTS" --sfx-out "out/${ID}_sfx.wav" --out "out/${ID}_bgm.wav"
+# 強調の効果音（META.impacts）が無いときは無音のトラック
+[ -f "out/${ID}_sfx.wav" ] || ffmpeg -v error -y -f lavfi -i anullsrc=r=44100:cl=stereo -t "$DUR" "out/${ID}_sfx.wav"
 # ナレーション（GEMINI_API_KEY があるときだけ。無ければBGMだけ）
 NARR=0
 if node tools/narrate.mjs --meta "out/$ID.json" --out "out/${ID}_narr.wav"; then NARR=1; else
@@ -20,15 +23,15 @@ if node tools/narrate.mjs --meta "out/$ID.json" --out "out/${ID}_narr.wav"; then
 fi
 if [ $NARR = 1 ]; then
   # 声が出ている間はBGMを下げる（サイドチェイン）。声とBGMを混ぜて -15 LUFS にそろえる
-  ffmpeg -v error -y -i "out/${ID}_video.mp4" -i "out/${ID}_bgm.wav" -i "out/${ID}_narr.wav" \
-    -filter_complex "[2:a]aformat=sample_rates=48000:channel_layouts=stereo,volume=1.6,asplit=2[v1][v2];[1:a]aformat=sample_rates=48000:channel_layouts=stereo,volume=0.55[b];[b][v1]sidechaincompress=threshold=0.015:ratio=8:attack=15:release=350[bd];[bd][v2]amix=inputs=2:normalize=0[m];[m]loudnorm=I=-15:TP=-1.5:LRA=9[a]" \
+  ffmpeg -v error -y -i "out/${ID}_video.mp4" -i "out/${ID}_bgm.wav" -i "out/${ID}_narr.wav" -i "out/${ID}_sfx.wav" \
+    -filter_complex "[2:a]aformat=sample_rates=48000:channel_layouts=stereo,volume=1.6,asplit=2[v1][v2];[1:a]aformat=sample_rates=48000:channel_layouts=stereo,volume=0.55[b];[b][v1]sidechaincompress=threshold=0.015:ratio=8:attack=15:release=350[bd];[3:a]aformat=sample_rates=48000:channel_layouts=stereo,volume=0.9[sx];[bd][v2][sx]amix=inputs=3:normalize=0[m];[m]loudnorm=I=-15:TP=-1.5:LRA=9[a]" \
     -map 0:v -map "[a]" -c:v copy -c:a aac -b:a 192k -ar 48000 -shortest -movflags +faststart "out/${ID}.mp4"
 else
-  ffmpeg -v error -y -i "out/${ID}_video.mp4" -i "out/${ID}_bgm.wav" \
-    -filter_complex "[1:a]loudnorm=I=-15:TP=-1.5:LRA=9[a]" -map 0:v -map "[a]" \
+  ffmpeg -v error -y -i "out/${ID}_video.mp4" -i "out/${ID}_bgm.wav" -i "out/${ID}_sfx.wav" \
+    -filter_complex "[1:a][2:a]amix=inputs=2:normalize=0[m];[m]loudnorm=I=-15:TP=-1.5:LRA=9[a]" -map 0:v -map "[a]" \
     -c:v copy -c:a aac -b:a 192k -ar 48000 -shortest -movflags +faststart "out/${ID}.mp4"
 fi
 # cover image for the approval message (first frame with the title)
 ffmpeg -v error -y -ss 1.2 -i "out/${ID}.mp4" -frames:v 1 -q:v 3 "out/${ID}_cover.jpg"
-rm -rf "out/${ID}_video.mp4" "out/${ID}_bgm.wav" "out/${ID}_narr.wav" "out/${ID}_narr"
+rm -rf "out/${ID}_video.mp4" "out/${ID}_bgm.wav" "out/${ID}_narr.wav" "out/${ID}_narr" "out/${ID}_sfx.wav"
 echo "built out/${ID}.mp4"

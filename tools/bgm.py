@@ -91,6 +91,20 @@ def riser(n, rng):
     return out * (t / t[-1]) ** 2
 
 
+def impact(rng):
+    """強調用の効果音（数字のドン！）：低いドロップ＋アタックのノイズ＋金属のキン。BGMとは別トラックで、ナレーションで下げない"""
+    n = int(2.4 * SR); t = np.arange(n) / SR
+    f = 30 + 110 * np.exp(-t * 5.0)
+    sub = np.sin(2 * np.pi * np.cumsum(f) / SR) * np.exp(-t * 2.2)
+    noise = rng.standard_normal(n) * np.exp(-t * 40)
+    sos = butter(2, [300 / (SR / 2), 5000 / (SR / 2)], btype='band', output='sos')
+    crack = sosfilt(sos, noise)
+    ring = sum(np.sin(2 * np.pi * fr * t + rng.random() * 6) * a for fr, a in [(2794, 0.5), (4186, 0.35), (5274, 0.25), (6645, 0.15)]) * np.exp(-t * 4.5)
+    sig = 0.9 * sub + 0.55 * crack + 0.22 * ring
+    sig[:int(0.004 * SR)] *= np.linspace(0, 1, int(0.004 * SR))
+    return sig / (np.abs(sig).max() or 1)
+
+
 def reverb(x, rng, seconds=2.6, mix=0.32):
     n = int(seconds * SR)
     t = np.arange(n) / SR
@@ -110,7 +124,7 @@ def place(buf, sig, start, gain=1.0, pan=0.0):
     buf[s:e, 1] += sig[:e - s] * gain * r
 
 
-def generate(mood, seed, duration, hits=(), risers=()):
+def generate(mood, seed, duration, hits=(), risers=(), impacts=()):
     M = MOODS[mood]
     rng = np.random.default_rng(seed)
     root = 45 + int(rng.integers(0, 12))       # A2..G#3
@@ -165,6 +179,13 @@ def generate(mood, seed, duration, hits=(), risers=()):
         ln = 1.6
         place(buf, riser(int(ln * SR), rng), max(0, rz - ln), 0.10)
 
+    # 強調の直前に一瞬だけ音楽を引く（ためを作る）
+    for im in impacts:
+        a, b = int(max(0, im - 0.35) * SR), int(min(duration, im + 0.6) * SR)
+        if b > a:
+            env = np.ones(b - a); k = int(0.35 * SR); env[:min(k, b - a)] = np.linspace(1, 0.25, min(k, b - a)); env[min(k, b - a):] = np.linspace(0.25, 1, b - a - min(k, b - a))
+            buf[a:b] *= env[:, None]
+
     # duck music around hits so they punch
     fade_in, fade_out = int(1.0 * SR), int(2.5 * SR)
     buf[:fade_in] *= np.linspace(0, 1, fade_in)[:, None]
@@ -189,8 +210,16 @@ if __name__ == '__main__':
     ap.add_argument('--duration', type=float, default=65)
     ap.add_argument('--hits', default='')
     ap.add_argument('--risers', default='')
+    ap.add_argument('--impacts', default='')
+    ap.add_argument('--sfx-out', default='')
     ap.add_argument('--out', default='bgm.wav')
     a = ap.parse_args()
     f = lambda s: [float(x) for x in s.split(',') if x.strip()]
-    write_wav(a.out, generate(a.mood, a.seed, a.duration, f(a.hits), f(a.risers)))
+    write_wav(a.out, generate(a.mood, a.seed, a.duration, f(a.hits), f(a.risers), f(a.impacts)))
+    if a.sfx_out and f(a.impacts):
+        rng = np.random.default_rng(a.seed + 99)
+        sfx = np.zeros((int(a.duration * SR) + SR, 2))
+        for im in f(a.impacts):
+            place(sfx, impact(rng), im, 0.9)
+        write_wav(a.sfx_out, sfx[:int(a.duration * SR)])
     print('wrote', a.out)
