@@ -13,8 +13,8 @@ import { lift, look, runStory, endCard, hudTime, countUp, textSprite, makeSparkl
 
 // ---------- market: register ----------
 const REG = new THREE.Vector3(-3.5, 0, 1);
-const price = textSprite('¥1,000', { w: 512, h: 160, size: 120, bg: '#0f1a2b', color: '#7ff0c8', sx: 3.2 }); price.position.set(REG.x, 3.9, REG.z - 0.2); market.add(price);
-const priceLab = textSprite('お会計', { w: 512, h: 96, size: 56, color: '#0f1a2b', bg: '#ffffff', sx: 2.6 }); priceLab.position.set(REG.x, 4.75, REG.z - 0.2); market.add(priceLab);
+const price = textSprite('¥1,000', { w: 512, h: 160, size: 120, bg: '#0f1a2b', color: '#7ff0c8', sx: 3.2 }); price.position.set(REG.x, 2.55, REG.z + 0.6); price.scale.set(2.2, 2.2 * 160 / 512, 1); market.add(price);
+const priceLab = textSprite('お会計', { w: 512, h: 96, size: 56, color: '#0f1a2b', bg: '#ffffff', sx: 2.6 }); priceLab.position.set(REG.x, 3.15, REG.z + 0.6); priceLab.scale.set(1.6, 1.6 * 96 / 512, 1); market.add(priceLab);
 const clerk = makePerson({ skin: SKIN[0], hair: HAIR[1], shirt: '#1fb3a1', pants: '#2b3346' }); clerk.position.set(REG.x - 1.0, 0, REG.z - 0.3); clerk.rotation.y = Math.PI / 2; market.add(clerk);
 const customer = makePerson({ skin: SKIN[2], hair: HAIR[3], shirt: '#e05a4f', pants: '#2b3346' }); customer.position.set(REG.x + 1.3, 0, REG.z + 0.2); customer.rotation.y = -Math.PI / 2 - 0.3; market.add(customer);
 const cq = makeQ(); market.add(cq);
@@ -22,15 +22,15 @@ const basket = box(0.6, 0.35, 0.4, mat('#e46a5b')); basket.position.set(REG.x, 1
 // お札と硬貨（カウンターの上と、客の手）
 const money = new THREE.Group(); market.add(money);
 {
-  const bill = (c) => box(0.34, 0.012, 0.16, mat(c));
-  for (let i = 0; i < 6; i++) { const b = bill(i % 2 ? '#c9b48a' : '#9fb59a'); b.position.set(REG.x - 0.35 + (i % 3) * 0.06, 1.39 + i * 0.013, REG.z - 0.05 + (i % 2) * 0.02); b.rotation.y = 0.2 * i; money.add(b); }
-  const coinG = new THREE.CylinderGeometry(0.05, 0.05, 0.015, 14);
-  for (let i = 0; i < 8; i++) { const c = new THREE.Mesh(coinG, mat(i % 3 ? '#d8b25a' : '#c7ccd2')); c.position.set(REG.x + 0.25 + (i % 4) * 0.07, 1.39 + Math.floor(i / 4) * 0.016, REG.z - 0.05); money.add(c); }
+  const bill = (c) => box(0.5, 0.014, 0.24, mat(c));
+  for (let i = 0; i < 7; i++) { const b = bill(i % 2 ? '#c9b48a' : '#9fb59a'); b.position.set(REG.x + 0.05 + (i % 3) * 0.03, 1.008 + i * 0.015, REG.z + 0.75 + (i % 2) * 0.03); b.rotation.y = 0.15 * i; money.add(b); }
+  const coinG = new THREE.CylinderGeometry(0.075, 0.075, 0.02, 16);
+  for (let i = 0; i < 10; i++) { const c = new THREE.Mesh(coinG, mat(i % 3 ? '#d8b25a' : '#c7ccd2')); c.position.set(REG.x - 0.2 + (i % 2) * 0.17, 1.01 + Math.floor(i / 2) * 0.021, REG.z + 1.25); money.add(c); }
 }
 const handBill = box(0.34, 0.012, 0.16, mat('#9fb59a')); customer.userData.arms[1].add(handBill); handBill.position.set(0, -0.68, 0.12); handBill.rotation.x = Math.PI / 2;
 const spark = makeSparkles(220, 0.12); market.add(spark.points);
-spark.init([[REG.x - 0.25, 1.42, REG.z - 0.05], [REG.x + 0.35, 1.42, REG.z - 0.05], [REG.x + 1.1, 1.25, REG.z + 0.35]], 0.4, 1.2);
-const payBoard = textSprite('お支払いできません', { w: 768, h: 128, size: 64, bg: '#ffffff', color: '#c0262d', sx: 3.2 }); payBoard.position.set(REG.x, 3.9, REG.z - 0.2); market.add(payBoard);
+spark.init([[REG.x + 0.08, 1.08, REG.z + 0.78], [REG.x - 0.12, 1.08, REG.z + 1.25], [REG.x + 1.1, 1.25, REG.z + 0.35]], 0.35, 1.2);
+const payBoard = textSprite('お支払いできません', { w: 768, h: 128, size: 64, bg: '#ffffff', color: '#c0262d', sx: 3.2 }); payBoard.position.set(REG.x, 2.55, REG.z + 0.6); payBoard.scale.set(2.6, 2.6 * 128 / 768, 1); market.add(payBoard);
 function marketBase({ queue = false, moneyOn = true, pay = false } = {}) {
   price.visible = !pay; priceLab.visible = true; payBoard.visible = pay; money.visible = moneyOn; handBill.visible = moneyOn;
   for (const q of queues) q.p.visible = queue;
@@ -67,7 +67,7 @@ function office(t, qs) {
 }
 
 const SUBS = [
-  [2.6, 6.0, 'いつものレジ。<br>お会計は1,000円。'],
+  [2.6, 6.0, '時間を少し戻そう。<br>いつものレジでお会計。'],
   [6.2, 10.1, 'お札も硬貨も、<br>一瞬で消えた。'],
   [10.1, 14, '日本中のお札と硬貨、<br>約119兆円分が。'],
   [14.2, 18.1, '電子マネーの残高も、<br>もう使えない。'],
@@ -83,24 +83,24 @@ const SUBS = [
   [55.6, 59.4, 'お金がなくなったら、<br>あなたは何と交換する？'],
 ];
 
-function regCam(t, d = 8) { const u = ease(t / d); look(REG.x + lerp(0.2, -0.3, u), 4.3, lerp(10.4, 9.6, u), REG.x - 0.4, 4.0, REG.z - 0.4, 50); }
-function shot0(t, T) { // hook: お会計の瞬間にお金が消える（カウントダウン）
-  lift(230); marketBase({ moneyOn: true }); el.title.style.opacity = 1; cq.visible = false;
-  const left = Math.max(0, 6.0 - T);
-  regCam(t + 0.5, 3);
-  setHud('お金が消えるまで', `0:${String(Math.floor(left)).padStart(2, '0')}.${String(Math.floor((left % 1) * 100)).padStart(2, '0')}`, 1, { mono: true });
+function regCam(t, d = 8) { const u = ease(t / d); look(REG.x + lerp(4.6, 4.1, u), lerp(2.7, 2.6, u), REG.z + lerp(6.2, 5.6, u), REG.x - 0.2, 2.15, REG.z + 0.6, 50); }
+function shot0(t, T) { // hook：お会計の瞬間、カウンターのお金が光って消える（1.2秒）
+  lift(160); const tv = 1.2;
+  marketBase({ moneyOn: t < tv }); priceLab.visible = false; spark.set(t >= tv ? clamp((t - tv) / 1.2) : 0); el.title.style.opacity = 1;
+  el.flash.style.opacity = t >= tv ? 0.6 * Math.max(0, 1 - (t - tv) / 0.3) : 0;
+  cq.visible = t > tv + 0.4; cq.position.set(customer.position.x, 2.45, customer.position.z); cq.scale.setScalar(0.6 * easeBack(clamp((t - tv - 0.4) / 0.3)));
+  regCam(t + 1, 4);
+  setHud('この世のお金', t < tv ? 'あり' : '0円', 1, { color: t < tv ? '#fff' : '#ff8a7a' });
   return market;
 }
-function shot1(t, T) { // いつものレジ（カウントダウン続く）
-  lift(230); marketBase({ moneyOn: true }); cq.visible = false;
+function shot1(t, T) { // 時間を戻して、いつものレジ
+  lift(160); marketBase({ moneyOn: true }); cq.visible = false;
   el.title.style.opacity = clamp(1 - t / 0.4);
-  regCam(t + 2.5, 6);
-  const left = Math.max(0, 6.0 - T);
-  setHud('お金が消えるまで', `0:${String(Math.floor(left)).padStart(2, '0')}.${String(Math.floor((left % 1) * 100)).padStart(2, '0')}`, 1, { mono: true });
+  regCam(t, 6);
   return market;
 }
 function shot2(t, T) { // +1分 消える
-  lift(230); const tv = 0.25;
+  lift(160); const tv = 0.25;
   marketBase({ moneyOn: t < tv }); spark.set(t >= tv ? clamp((t - tv) / 1.6) : 0);
   el.flash.style.opacity = t >= tv ? 0.6 * Math.max(0, 1 - (t - tv) / 0.35) : 0;
   cq.visible = t > 1.2; cq.position.set(customer.position.x, 2.45, customer.position.z); cq.scale.setScalar(0.6 * easeBack(clamp((t - 1.2) / 0.3)));
@@ -111,7 +111,7 @@ function shot2(t, T) { // +1分 消える
   return market;
 }
 function shot3(t, T) { // +1時間 電子マネーも使えない
-  lift(230); marketBase({ moneyOn: false, pay: true });
+  lift(160); marketBase({ moneyOn: false, pay: true });
   cq.visible = true; cq.position.set(customer.position.x, 2.45 + Math.sin(t * 3) * 0.05, customer.position.z); cq.scale.setScalar(0.6);
   customer.userData.arms[1].rotation.x = -1.1; customer.userData.head.rotation.y = Math.sin(t * 1.2) * 0.3;
   regCam(t, 8);
@@ -146,7 +146,7 @@ function shot5(t, T) { // +1週間 物々交換。でも合わない
   return stage;
 }
 function shot6(t, T) { // +1か月 給料が払えない
-  lift(200); tradeQ.forEach(q => q.visible = false);
+  lift(160); tradeQ.forEach(q => q.visible = false);
   office(t, true);
   const u = ease(t / 8.8);
   look(lerp(0.4, -0.2, u), 2.5, lerp(5.4, 4.9, u), 0, 2.1, -2.0, 55);
@@ -162,8 +162,8 @@ function shot7(t, T) { // 結果：レジの前に長い列。だれも払えな
   return market;
 }
 function shot8(t, T) { // ループ：冒頭のレジ。でもお金はないまま
-  lift(230); marketBase({ moneyOn: false }); queueQs(0, false); cq.visible = false;
-  regCam(t + 0.5, 3);
+  lift(160); marketBase({ moneyOn: false }); queueQs(0, false); cq.visible = false;
+  regCam(t + 1, 4);
   setHud('この世のお金', '0円', 1, { color: '#ff8a7a' });
   return market;
 }
@@ -179,7 +179,7 @@ runStory({
     id: '0031',
     title: 'この世からお金がなくなったら？',
     titleHtml: 'この世から<br>お金がなくなったら？',
-    mood: 'tension', seed: 31, hits: [6.25, 48.1], risers: [6.25, 48.1],
+    mood: 'tension', seed: 31, hits: [1.2, 6.25, 48.1], risers: [1.2, 48.1],
     ask: 'お金がなくなったら、あなたは何と交換する？',
     caption: 'もしもこの世からお金がなくなったら？\n日本中のお札と硬貨は約119兆円。電子マネーも、給料も、家賃の支払いも、物々交換でどこまで回る？公式データでシミュレーション。\n\nお金がなくなったら、あなたは何と交換する？ コメントで教えて。\n\n出典：日本銀行 マネタリーベースと日本銀行の取引（2026年9月末）、経済産業省 キャッシュレス決済比率（2025年）、総務省 家計調査（2025年）・労働力調査（2025年12月）、日本銀行 貨幣博物館',
     hashtags: ['もしもラボ', 'お金', '物々交換', 'キャッシュレス', '雑学'],
