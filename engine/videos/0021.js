@@ -82,9 +82,9 @@ const SUBS = [
   [34.6, 39, 'でも、そのお金では<br>買えないものがあった。'],
   [39.2, 43.6, '猫の飼い主の42.1%が、<br>毎日が楽しくなったと回答。'],
   [43.6, 47.8, '27.0%は、寂しさが<br>減ったと答えていた。'],
-  [48.1, 52.6, '結果：年約2.9兆円が消え、<br>497万世帯が家族を失った。'],
-  [52.6, 55.4, '困るのは猫じゃなく、<br>残された人間だった。'],
-  [55.6, 59.4, 'あなたは猫に<br>救われたこと、ある？'],
+  [48.1, 54.2, '結果：年約2.9兆円が消え、<br>497万世帯が家族を失った。'],
+  [54.3, 56.2, '困るのは、<br>残された人間だった。'],
+  [56.3, 59.4, 'あなたは猫に<br>救われたこと、ある？'],
 ];
 
 const cd = (left) => `0:${String(Math.floor(left)).padStart(2, '0')}.${String(Math.floor((left % 1) * 100)).padStart(2, '0')}`;
@@ -164,8 +164,8 @@ function shot7(t, T) { // result: the same living room, no cats
   livingDay('evening'); catsVisible(false); spark.set(0);
   lift(380); const u = ease(t / 7.5);
   look(lerp(0.0, 0.5, u), lerp(2.7, 2.9, u), lerp(6.6, 7.2, u), -1.3, 0.35, 1.7, 50);
-  if (t < 4.5) setTop('消える経済効果（年間・推計）', '約' + yen(countUp(t, OKU, 0.2, 1.2)), fade(t, 0.15, 4.5, 0.2), '#ffe08a');
-  else setTop('家族を失った世帯（推計）', '約497万世帯', fade(t, 4.5, 7.5, 0.2), '#ff9a3c');
+  if (t < 6.2) setTop('消える経済効果（年間・推計）', '約' + yen(countUp(t, OKU, 0.2, 1.2)), fade(t, 0.15, 6.2, 0.2), '#ffe08a');
+  else setTop('家族を失った世帯（推計）', '約497万世帯', fade(t, 6.2, 7.5, 0.2), '#ff9a3c');
   return room;
 }
 function shot8(t, T) { // loop: same framing as the hook, but the sofa is empty

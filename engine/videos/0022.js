@@ -132,9 +132,9 @@ const SUBS = [
   [34.6, 39, '配った額は、その<br>約100倍（推計）。'],
   [39.2, 43.6, '日本の家計が持つ<br>預金や株の合計は…'],
   [43.6, 47.8, '2,519兆円。それでも<br>配った額の約5分の1。'],
-  [48.1, 52.6, '結果：家計のお金は約5.9倍。<br>でもモノは1つも増えない。'],
-  [52.6, 55.4, '値段も同じだけ上がれば、<br>1億円は今の約1,700万円。'],
-  [55.6, 59.4, '1億円もらったら、<br>仕事つづける？'],
+  [48.1, 53.8, '結果：家計のお金は約5.9倍。<br>でもモノは1つも増えない。'],
+  [53.9, 56.1, '値段も同じだけ上がれば、<br>1億円は今の約1,700万円。'],
+  [56.2, 59.4, '1億円もらったら、<br>仕事つづける？'],
 ];
 
 function stageOnly() { phone.visible = false; btn.visible = false; crowd.g.visible = false; hideBars(); setBills('off'); }
@@ -223,8 +223,8 @@ function shot7(t, T) { // result: the payout dwarfs everything
   setBar(3, U3, easeOut(clamp((t - 0.8) / 2.0)));
   setBills('rain', t, { w: 14, d: 4, top: 14, cz: -4, n: Math.round(NB * clamp((t - 2.5) / 1.5)) });
   barCam(t, 7.5, 0.2, 0.6, 27, 28.5, 4.8, 400);
-  if (t < 4.5) setTop('家計のお金（配る前とくらべて・推計）', '約' + (countUp(t, 59, 0.9, 1.6) / 10).toFixed(1) + '倍', fade(t, 0.15, 4.5, 0.2), '#ff8a7a');
-  else setTop('1億円の今の価値（物価も同じだけ上がると・単純計算）', '約' + comma(10000 - countUp(t - 4.5, 8300, 0.1, 1.2)) + '万円', fade(t, 4.5, 7.5, 0.2), '#ffe08a');
+  if (t < 5.8) setTop('家計のお金（配る前とくらべて・推計）', '約' + (countUp(t, 59, 0.9, 1.6) / 10).toFixed(1) + '倍', fade(t, 0.15, 5.8, 0.2), '#ff8a7a');
+  else setTop('1億円の今の価値（物価も同じだけ上がると・単純計算）', '約' + comma(10000 - countUp(t - 5.8, 8300, 0.1, 1.2)) + '万円', fade(t, 5.8, 7.5, 0.2), '#ffe08a');
   return stage;
 }
 function shot8(t, T) { // loop: the pressed button, bills everywhere

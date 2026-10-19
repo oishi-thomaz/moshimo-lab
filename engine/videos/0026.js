@@ -135,9 +135,9 @@ const SUBS = [
   [34.6, 39, 'それでも公転の道から<br>ずれるのは約7.4cm。'],
   [39.2, 43.6, '月も5秒で、<br>約5.1km進む。'],
   [43.6, 47.8, '月の道からのずれは、<br>約3.4cm。'],
-  [48.1, 52.6, '結果：5秒で地面から<br>離れたのは約34cm。'],
-  [52.6, 55.4, '重力が戻ると、全員が<br>階段2段分から着地。'],
-  [55.6, 59.4, '5秒の無重力、<br>体験してみたい？'],
+  [48.1, 53.8, '結果：5秒で地面から<br>離れたのは約34cm。'],
+  [53.9, 56.1, '重力が戻ると、全員が<br>階段2段分から着地。'],
+  [56.2, 59.4, '5秒の無重力、<br>体験してみたい？'],
 ];
 
 const G0 = 1.2; // hook: gravity off
@@ -232,8 +232,8 @@ function shot7(t, T) { // result: gravity back at +5s, everyone lands from ~34cm
   lift(240); const u = ease(t / 7.5);
   look(CX + lerp(11, 12.5, u), lerp(5.2, 6.0, u), CZ + lerp(13, 14.5, u), CX + 1, 0.9, CZ + 1, 50);
   setHud(t < LAND ? '重力が戻るまで' : '重力', t < LAND ? cd(LAND - t) : '9.8', 1, { mono: t < LAND });
-  if (t < 4.5) setTop('5秒で地面から離れた距離（推計）', '約' + countUp(t, 34, 0.2, 1.2) + 'cm', fade(t, 0.15, 4.5, 0.2), '#ffd98a');
-  else setTop('重力が戻って着地する高さ（推計）', '階段約2段分', fade(t, 4.5, 7.5, 0.2), '#ff8a7a');
+  if (t < 5.8) setTop('5秒で地面から離れた距離（推計）', '約' + countUp(t, 34, 0.2, 1.2) + 'cm', fade(t, 0.15, 5.8, 0.2), '#ffd98a');
+  else setTop('重力が戻って着地する高さ（推計）', '階段約2段分', fade(t, 5.8, 7.5, 0.2), '#ff8a7a');
   return city;
 }
 function shot8(t, T) { // loop: same framing as the hook, everyone on the ground

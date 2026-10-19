@@ -59,9 +59,9 @@ const SUBS = [
   [34.6, 39, 'それでも1日に流れる下水の<br>約1%ほど（推計）。'],
   [39.2, 43.6, '下水道を使う人は<br>全体の82.2%。'],
   [43.6, 47.8, 'ほかに、浄化槽なども<br>使われている。'],
-  [48.1, 52.6, '結果：東京ドーム0.4杯分。<br>下水1日分の約1%で済んだ。'],
-  [52.6, 55.4, '30年前のトイレなら、<br>約3.4倍の水だった。'],
-  [55.6, 59.4, '東京ドーム0.4杯分、<br>多い？少ない？'],
+  [48.1, 53.8, '結果：東京ドーム0.4杯分。<br>下水1日分の約1%で済んだ。'],
+  [53.9, 56.1, '30年前のトイレなら、<br>約3.4倍の水だった。'],
+  [56.2, 59.4, '東京ドーム0.4杯分、<br>多い？少ない？'],
 ];
 
 const cd = (left) => `0:${String(Math.floor(left)).padStart(2, '0')}.${String(Math.floor((left % 1) * 100)).padStart(2, '0')}`;
@@ -132,8 +132,8 @@ function shot7(t, T) { // result: dome at 0.38, then the 13L comparison overflow
   fillDome(k); overflowRing.material.opacity = t > 5.6 ? 0.7 * clamp((t - 5.6) / 0.4) : 0; overflowRing.scale.setScalar(1 + clamp((t - 5.6) / 1.5) * 0.4);
   const u = ease(t / 7.5);
   look(lerp(3, 0, u), lerp(4.4, 6, u), lerp(20, 23, u), 0, 2.4, 0, 50);
-  if (t < 4.4) setTop('全員で1回流した水（推計）', '約' + countUp(t, 47, 0.2, 1.2) + '万m³', fade(t, 0.15, 4.4, 0.2));
-  else setTop('30年前の13Lトイレなら（推計）', '約' + countUp(t - 4.4, 159, 0.1, 1.0) + '万m³', fade(t, 4.4, 7.5, 0.2), '#7fd4ff');
+  if (t < 5.8) setTop('全員で1回流した水（推計）', '約' + countUp(t, 47, 0.2, 1.2) + '万m³', fade(t, 0.15, 5.8, 0.2));
+  else setTop('30年前の13Lトイレなら（推計）', '約' + countUp(t - 5.8, 159, 0.1, 1.0) + '万m³', fade(t, 5.8, 7.5, 0.2), '#7fd4ff');
   return stage;
 }
 function shot8(t, T) { // loop

@@ -149,9 +149,9 @@ const SUBS = [
   [34.6, 39, '約1.4kg（推計）<br>1kgの袋より多い。'],
   [39.2, 43.6, '砂糖を減らした<br>33人の研究では…'],
   [43.6, 47.8, '1か月で、減らした人の方が<br>プリンを甘く感じた。'],
-  [48.1, 52.6, '結果：約5,300kcal減。<br>脂肪約0.74kg分（推計）。'],
-  [52.6, 55.4, '1年続ければ、<br>脂肪約9kg分（推計）。'],
-  [55.6, 59.4, 'あなたが一番やめられない<br>甘いものは？'],
+  [48.1, 53.6, '結果：約5,300kcal減。<br>脂肪約0.74kg分（推計）。'],
+  [53.7, 55.9, '1年続ければ、<br>脂肪約9kg分（推計）。'],
+  [56.0, 59.4, 'あなたが一番やめられない<br>甘いものは？'],
 ];
 
 const cd = (left) => `0:${String(Math.floor(left)).padStart(2, '0')}.${String(Math.floor((left % 1) * 100 + 1e-6)).padStart(2, '0')}`;
@@ -235,8 +235,8 @@ function shot7(t, T) { // result: empty table, bag + heap
   const u = ease(t / 7.4);
   look(lerp(-0.5, -0.2, u), lerp(2.4, 2.2, u), lerp(3.6, 3.1, u), 0.0, 1.05, -1.9, 52);
   hudTime('+30日');
-  if (t < 4.5) setTop('30日・脂肪にすると（ほかで補わない場合・推計）', '約' + (countUp(t, 74, 0.2, 1.2) / 100).toFixed(2) + 'kg', fade(t, 0.15, 4.5, 0.2), GOLD);
-  else setTop('1年・脂肪にすると（ほかで補わない場合・推計）', '約' + (countUp(t - 4.5, 90, 0.1, 1.0) / 10).toFixed(1) + 'kg', fade(t, 4.5, 7.4, 0.2), RED);
+  if (t < 5.6) setTop('30日・脂肪にすると（ほかで補わない場合・推計）', '約' + (countUp(t, 74, 0.2, 1.2) / 100).toFixed(2) + 'kg', fade(t, 0.15, 5.6, 0.2), GOLD);
+  else setTop('1年・脂肪にすると（ほかで補わない場合・推計）', '約' + (countUp(t - 5.6, 90, 0.1, 1.0) / 10).toFixed(1) + 'kg', fade(t, 5.6, 7.4, 0.2), RED);
   return room;
 }
 function shot8(t, T) { // loop: same as hook, sweets gone
