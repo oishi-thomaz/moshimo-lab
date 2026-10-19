@@ -7,10 +7,14 @@ import { makeCat, catPose, catWalk, catBreath, makeBowl, makeCatBed, makeToyBall
 import { lift, look, runStory, endCard, hudTime, countUp, makeSparkles, setTop, setHud, el } from '../story.js';
 
 // もしも日本中の猫が消えたら？
-// 数字（すべて ペットフード協会「令和7年（2025年）全国犬猫飼育実態調査」 https://petfood.or.jp/data-chart/ ）
-//   猫の推計飼育頭数 8,847,225頭（約884.7万頭）・犬 6,820,317頭（約682万頭）（主要指標サマリー p.20-21, 25）
-//   猫の飼育世帯率 8.42%（約12軒に1軒）。単身世帯 24,495,604世帯×6.05% ＋ 2人以上世帯 34,460,096世帯×10.11% ≒ 約497万世帯（推計・このファイルで計算）
-//   猫1頭飼育者の1か月の支出総額（医療費等含む）9,998円、平均寿命 16.00歳、生涯必要経費 1,796,075円（猫 飼育・給餌実態と支出 p.78-79）
+// 流れ：猫が消える → 家族を失った家の数 → 消えるお金（経済） → 飼い主の財布は浮く → でも心の支えが消える → 結果（人間への影響を言い切る）
+// 数字
+//   ペットフード協会「令和7年（2025年）全国犬猫飼育実態調査」 https://petfood.or.jp/data-chart/
+//     猫の推計飼育頭数 8,847,225頭（約884.7万頭）（主要指標サマリー p.20-21, 25）
+//     猫の飼育世帯率 8.42%（約12軒に1軒）。単身世帯 24,495,604世帯×6.05% ＋ 2人以上世帯 34,460,096世帯×10.11% ≒ 約497万世帯（推計・このファイルで計算）
+//     猫1頭飼育者の1か月の支出総額（医療費等含む）9,998円（猫 飼育・給餌実態と支出 p.78-79）
+//     ペット飼育の効用 Q35（猫飼育者 n=967）：毎日の生活が楽しくなった 42.1%／心穏やかに過ごせる日が増えた 40.1%／寂しさを感じることが減った 27.0%（ペットの飼育効用 p.112）
+//   宮本勝浩 関西大学名誉教授の推定「2026年のネコノミクス（ネコの経済効果）」約2兆9,488億円（2026年2月発表）。1日あたり 29,488÷365 ≒ 約81億円（このファイルで計算）
 // 猫が消えたあとの生態系などの因果は確かな数字がないので扱わない。消えた猫は戻らない。
 
 // ---------- living room ----------
@@ -46,38 +50,41 @@ function houseDots(t) { // t: shot seconds
   });
 }
 
-// ---------- stage: cat vs dog bars ----------
-const HK = 5.4 / 884.7; // height per 万頭
-const barCat = makeBar({ color: '#ff9a3c', label: '猫（2025年）', x: -2.6, w: 2.4, d: 2.4 });
-const barDog = makeBar({ color: '#4fa3d1', label: '犬（2025年）', x: 2.6, w: 2.4, d: 2.4 });
-const barSpark = makeSparkles(260, 0.35); stage.add(barSpark.points);
-barSpark.init([[-2.6, 2, 0], [-2.6, 4, 0], [-2.6, 6, 0], [-2.6, 7.4, 0]], 2.2, 3);
-const barGroup = [barCat.g, barDog.g];
-// ---------- stage: coins (1 coin = 1万円, 16 stacks = 16 years) ----------
+// ---------- stage: coins (1 coin = 100億円, 295枚 ≒ 2兆9,488億円) ----------
 const STACKS = 16, PER = [];
-for (let i = 0; i < STACKS; i++) PER.push(i < 4 ? 12 : 11); // 合計180枚 ≒ 約180万円
+for (let i = 0; i < STACKS; i++) PER.push(i < 7 ? 19 : 18); // 7×19 + 9×18 = 295枚
 const CX = i => -4.03 + (i % 8) * 1.15, CZ = i => (i < 8 ? -1.1 : 1.1);
 const stacks = PER.map((n, i) => makeCoins(CX(i), CZ(i), n));
-const coinLab = makeLabel('1枚＝1万円', { sx: 3.2, size: 60, color: '#ffe08a' }); coinLab.position.set(0, 3.2, 0); stage.add(coinLab);
-const ageLab = makeLabel('', { sx: 3.0, size: 72 }); stage.add(ageLab);
-const coinGroup = [...stacks.map(s => s.g), coinLab, ageLab];
-function stageMode(m) { barGroup.forEach(g => { g.visible = m === 'bars'; }); coinGroup.forEach(g => { g.visible = m === 'coins'; }); }
+const coinLab = makeLabel('1枚＝100億円', { sx: 3.2, size: 60, color: '#ffe08a' }); coinLab.position.set(0, 4.3, -1.5); stage.add(coinLab);
+const coinSpark = makeSparkles(260, 0.3); stage.add(coinSpark.points);
+coinSpark.init([[-2.3, 1.4, 0], [2.3, 1.4, 0], [0, 2.2, 0], [-3.5, 0.8, 0], [3.5, 0.8, 0]], 2.4, 2.4);
+const coinGroup = [...stacks.map(s => s.g), coinLab, coinSpark.points];
+// ---------- stage: what cats gave their owners (Q35, 猫飼育者) ----------
+const HK = 5.4 / 42.1; // height per %
+const FEEL = [['毎日が楽しく', 42.1, '#ff9a3c'], ['心おだやかに', 40.1, '#ffc46b'], ['寂しさが減った', 27.0, '#ff8a7a']];
+const feelBars = FEEL.map(([label, , color], i) => makeBar({ color, label, x: -3.4 + i * 3.4, w: 2.2, d: 2.2 }));
+const feelSpark = makeSparkles(260, 0.35); stage.add(feelSpark.points);
+feelSpark.init([[-3.4, 2.5, 0], [0, 2.5, 0], [3.4, 2, 0], [-3.4, 4.5, 0], [0, 4.5, 0]], 2.0, 3);
+const feelGroup = [...feelBars.map(b => b.g), feelSpark.points];
+function stageMode(m) { coinGroup.forEach(g => { g.visible = m === 'coins'; }); feelGroup.forEach(g => { g.visible = m === 'feel'; }); }
+const OKU = 29488; // 億円
+const yen = v => { v = Math.round(v); return v >= 10000 ? `${Math.floor(v / 10000)}兆${comma(v % 10000)}億円` : `${comma(v)}億円`; };
 
 const SUBS = [
   [2.6, 6.0, 'いつもの休日。<br>猫はソファでひと休み。'],
   [6.2, 10.1, '日本中の猫が、<br>一瞬で消えた。'],
-  [10.1, 14, '飼われていた猫は、<br>約884万頭。'],
+  [10.1, 14, '家族だった猫、<br>約884万頭。'],
   [14.2, 18.1, '猫がいた家は、<br>約497万世帯（推計）。'],
-  [18.1, 22, 'だいたい、<br>12軒に1軒の家。'],
-  [22.2, 26.1, '実はペットの数は、<br>猫が1位だった。'],
-  [26.1, 30, '猫が消えて、1位は<br>犬の682万頭に。'],
-  [30.2, 34.6, 'エサの皿は、<br>手つかずのまま。'],
-  [34.6, 39, '猫1頭の家の出費は、<br>月に9,998円だった。'],
-  [39.2, 43.6, '猫の平均寿命は、<br>16.00歳。'],
-  [43.6, 47.8, '一生でかかるお金は、<br>約180万円。'],
-  [48.1, 52.6, '結果：猫884万頭が消え、<br>ペット1位は犬になった。'],
-  [52.6, 55.4, '空っぽの猫ベッドが、<br>約497万世帯（推計）に。'],
-  [55.6, 59.4, 'あなたは猫派？<br>それとも犬派？'],
+  [18.1, 22, '12軒に1軒の家から、<br>家族がいなくなった。'],
+  [22.2, 26.1, '猫が動かしていたお金は、<br>年に約2兆9,488億円。'],
+  [26.1, 30, 'エサ、病院、グッズ、旅行。<br>1日約81億円が消える。'],
+  [30.2, 34.6, '飼い主の出費は、<br>月9,998円浮く。'],
+  [34.6, 39, 'でも、そのお金では<br>買えないものがあった。'],
+  [39.2, 43.6, '猫の飼い主の42.1%が、<br>毎日が楽しくなったと回答。'],
+  [43.6, 47.8, '27.0%は、寂しさが<br>減ったと答えていた。'],
+  [48.1, 52.6, '結果：年約2.9兆円が消え、<br>497万世帯が家族を失った。'],
+  [52.6, 55.4, '困るのは猫じゃなく、<br>残された人間だった。'],
+  [55.6, 59.4, 'あなたは猫に<br>救われたこと、ある？'],
 ];
 
 const cd = (left) => `0:${String(Math.floor(left)).padStart(2, '0')}.${String(Math.floor((left % 1) * 100)).padStart(2, '0')}`;
@@ -115,17 +122,18 @@ function shot3(t, T) { // +1min: map of households, cat homes go dark
   setTop('猫を飼っていた世帯（2025年・推計）', '約' + countUp(t, 497) + '万世帯', fade(t, 0.15, 8, 0.25));
   return japan;
 }
-function shot4(t, T) { // +1day: cat bar collapses, dog becomes no.1
-  lift(300); stageMode('bars');
-  const k = 1 - easeOut(clamp((t - 1.0) / 1.4));
-  barCat.setH(884.7 * HK * k, k > 0.01 ? (884.7 * k).toFixed(1) + '万頭' : '0頭');
-  barDog.setH(682 * HK, '682万頭');
-  barSpark.set(clamp((t - 1.0) / 1.8));
+function shot4(t, T) { // +1day: the money cats moved — 295 coins appear, then vanish
+  lift(330); stageMode('coins');
+  const up = easeOut(clamp((t - 0.2) / 2.4));
+  const down = clamp((t - 4.2) / 2.2);
+  stacks.forEach((s, i) => { const n = PER[i]; const k = Math.round(n * up) - Math.round(n * clamp(down * 1.25 - (i % 8) * 0.03)); s.setN(Math.max(0, k)); });
+  coinSpark.set(clamp((t - 4.2) / 2.6));
+  coinLab.visible = down < 0.6;
   const u = ease(t / 8);
-  look(lerp(-1, 1, u), lerp(6.0, 5.6, u), lerp(20, 19, u), 0, 3.4, 0, 50);
+  look(lerp(-1.0, 0, u), lerp(8.0, 8.6, u), lerp(19.5, 20.5, u), 0, 1.6, 0, 50);
   hudTime('+1日');
-  if (t < 4.1) setTop('猫の飼育頭数（2025年）', (k * 884.7).toFixed(1) + '万頭', fade(t, 0.15, 4.1, 0.2), '#ffb46b');
-  else setTop('犬の飼育頭数（2025年）', countUp(t - 4.1, 682, 0.1, 1.2) + '万頭', fade(t, 4.1, 8, 0.2), '#7fd4ff');
+  if (t < 4.1) setTop('猫が動かすお金（年間・推計）', '約' + yen(countUp(t, OKU, 0.2, 2.4)), fade(t, 0.15, 4.1, 0.2), '#ffe08a');
+  else setTop('1日あたり（推計）', '約' + countUp(t - 4.1, 81, 0.1, 1.0) + '億円', fade(t, 4.1, 8, 0.2), '#ffb46b');
   return stage;
 }
 function shot5(t, T) { // +1week: untouched bowl, empty bed
@@ -136,27 +144,28 @@ function shot5(t, T) { // +1week: untouched bowl, empty bed
   setTop('猫1頭の家の1か月の出費（2025年）', comma(countUp(t, 9998)) + '円', fade(t, 0.15, 9.2, 0.25));
   return room;
 }
-function shot6(t, T) { // +1year: lifetime cost as coin stacks (1 coin = 1万円)
-  lift(330); stageMode('coins');
-  const years = 16 * easeOut(clamp((t - 0.3) / 3.6));
-  stacks.forEach((s, i) => { const k = clamp(years - i); s.setN(Math.round(PER[i] * k)); });
-  const yr = Math.min(16, Math.floor(years + 0.001));
-  ageLab.userData.set(yr + '歳'); ageLab.position.set(0, 2.75, -1.5);
-  ageLab.visible = yr > 0;
-  coinLab.position.set(0, 3.6, -1.5);
+function shot6(t, T) { // +1month: what cats gave their owners — bars rise, then drop away
+  lift(330); stageMode('feel');
+  const drop = easeOut(clamp((t - 7.0) / 1.2));
+  FEEL.forEach(([, v], i) => {
+    const k = easeOut(clamp((t - 0.3 - i * 0.35) / 1.4)) * (1 - drop);
+    feelBars[i].setH(v * HK * k, k > 0.02 && drop < 0.05 ? (v * Math.min(1, k)).toFixed(1) + '%' : '');
+    feelBars[i].label.visible = drop < 0.4;
+  });
+  feelSpark.set(clamp((t - 7.0) / 1.6));
   const u = ease(t / 8.8);
-  look(lerp(-1.0, 0, u), lerp(8.0, 8.5, u), lerp(19.5, 20.5, u), 0, 1.4, 0, 50);
-  hudTime('+1年');
-  if (t < 4.4) setTop('猫の平均寿命（2025年）', (countUp(t, 1600, 0.3, 3.6) / 100).toFixed(2) + '歳', fade(t, 0.15, 4.4, 0.2));
-  else setTop('猫1頭の一生の出費（2025年）', comma(countUp(t - 4.4, 1796075, 0.1, 1.4)) + '円', fade(t, 4.4, 8.8, 0.2), '#ffe08a');
+  look(lerp(-0.8, 0.8, u), lerp(6.2, 5.8, u), lerp(23, 22, u), 0, 3.0, 0, 50);
+  hudTime('+1か月');
+  if (t < 4.4) setTop('毎日の生活が楽しくなった（猫の飼い主）', (countUp(t, 421, 0.3, 1.4) / 10).toFixed(1) + '%', fade(t, 0.15, 4.4, 0.2), '#ffb46b');
+  else setTop('寂しさを感じることが減った（猫の飼い主）', (countUp(t - 4.4, 270, 0.1, 1.2) / 10).toFixed(1) + '%', fade(t, 4.4, 8.8, 0.2), '#ff8a7a');
   return stage;
 }
 function shot7(t, T) { // result: the same living room, no cats
   livingDay('evening'); catsVisible(false); spark.set(0);
   lift(380); const u = ease(t / 7.5);
   look(lerp(0.0, 0.5, u), lerp(2.7, 2.9, u), lerp(6.6, 7.2, u), -1.3, 0.35, 1.7, 50);
-  if (t < 4.5) setTop('消えた猫（2025年）', (countUp(t, 8847, 0.2, 1.2) / 10).toFixed(1) + '万頭', fade(t, 0.15, 4.5, 0.2));
-  else setTop('猫を飼っていた世帯（推計）', '約497万世帯', fade(t, 4.5, 7.5, 0.2));
+  if (t < 4.5) setTop('消える経済効果（年間・推計）', '約' + yen(countUp(t, OKU, 0.2, 1.2)), fade(t, 0.15, 4.5, 0.2), '#ffe08a');
+  else setTop('家族を失った世帯（推計）', '約497万世帯', fade(t, 4.5, 7.5, 0.2), '#ff9a3c');
   return room;
 }
 function shot8(t, T) { // loop: same framing as the hook, but the sofa is empty
@@ -178,12 +187,13 @@ runStory({
     id: '0021',
     title: '日本中の猫が消えたら？',
     titleHtml: '日本中の猫が<br>消えたら？',
-    mood: 'emotional', seed: 21, hits: [6.3, 48.1], risers: [6.0],
-    ask: 'あなたは猫派？犬派？',
-    narr: { '16.00歳': '16歳', '9,998円': '9998円' },
-    caption: 'もしも日本中の猫が一瞬で消えたら？\n日本で飼われている猫は約884.7万頭（2025年）。犬の682万頭より多く、ペットの数は猫が1位。猫がいた家は約497万世帯（推計）、だいたい12軒に1軒。猫1頭の家の出費は月9,998円、一生で約180万円。ペットフード協会の調査で計算してみた。\n\nあなたは猫派？犬派？ コメントで教えて。\n\n出典：一般社団法人ペットフード協会 令和7年（2025年）全国犬猫飼育実態調査',
-    hashtags: ['もしもラボ', '猫', '猫のいる暮らし', 'ペット', '雑学'],
-    endStats: [['日本の猫の数', '約884.7万頭', '2025年'], ['猫がいた世帯（推計）', '約497万世帯', '飼育率8.42%'], ['犬の数', '約682万頭', '2025年'], ['猫1頭の一生の出費', '約180万円', '平均寿命16.00歳']],
-    sources: '出典：一般社団法人ペットフード協会<br>令和7年（2025年）全国犬猫飼育実態調査',
+    mood: 'emotional', seed: 21, hits: [6.3, 48.1], risers: [6.0, 46.0],
+    impacts: [10.1, 22.2, 39.2, 48.1],
+    ask: 'あなたは猫に救われたこと、ある？',
+    narr: { '9,998円': '9998円', '2兆9,488億円': '2兆9488億円', '2.9兆円': '2.9兆円', '42.1%': '42.1パーセント', '27.0%': '27パーセント' },
+    caption: 'もしも日本中の猫が一瞬で消えたら？\n\n消える猫は約884.7万頭（2025年）。猫がいた家は約497万世帯（推計）、だいたい12軒に1軒の家から家族がいなくなる。\n\n猫が動かしていたお金（ネコノミクス）は年に約2兆9,488億円（推計）。エサ、病院、グッズ、猫目当ての旅行。1日あたり約81億円の売上が消える。\n\n飼い主の出費は月9,998円浮く。でも猫の飼い主の42.1%は「毎日の生活が楽しくなった」、27.0%は「寂しさを感じることが減った」と答えていた。\n\n結果：年約2.9兆円が消え、497万世帯が家族を失う。困るのは猫じゃなく、残された人間だった。\n\nあなたは猫に救われたこと、ある？ コメントで教えて。\n\n出典：一般社団法人ペットフード協会 令和7年（2025年）全国犬猫飼育実態調査、宮本勝浩 関西大学名誉教授「2026年のネコノミクス」推定（2026年2月）',
+    hashtags: ['もしもラボ', '猫', '猫のいる暮らし', 'ネコノミクス', '雑学'],
+    endStats: [['消えた猫', '約884.7万頭', '2025年'], ['家族を失った世帯（推計）', '約497万世帯', '約12軒に1軒'], ['消える経済効果（推計）', '年約2兆9,488億円', '1日約81億円'], ['毎日が楽しくなった', '42.1%', '猫の飼い主の回答']],
+    sources: '出典：ペットフード協会 2025年全国犬猫飼育実態調査、<br>宮本勝浩 関西大学名誉教授「2026年のネコノミクス」推定',
   },
 });
