@@ -11,6 +11,11 @@ import { lift, look, runStory, endCard, hudTime, countUp, makeSparkles, textSpri
 //       ギンリョウソウの種をモリチャバネゴキブリが食べて運ぶ：種は長さ0.3mm、フンから出た種の生存率52.0%（果実から直接 49.3%）、
 //       食べてから3〜10時間でフンに（熊本大学 プレスリリース 2017年7月27日／Uehara & Sugiura, Botanical Journal of the Linnean Society 2017）
 
+//       追加（2026/10/19 ゆうとの依頼でメリット・デメリット・生態系・数を入れた）：
+//       メリット：ゴキブリのアレルゲンは米国都市部の子どものぜんそくの主な原因（NIEHS／Inner-City Asthma Study 937人、J Allergy Clin Immunol 2005）
+//       生態系：多くは腐った有機物を食べ、フンで窒素を土に返す。鳥やネズミなど小型哺乳類のエサ。卵に寄生するハチは「ほぼ確実に絶滅」。
+//       ネズミが減ると、それを食べる猫・コヨーテ・爬虫類・ワシなども影響（Kambhampati, テキサス大学タイラー校／Live Science）
+//       世界の総数：信頼できる科学的な推計はない（ネット上の数字は出典なし）→ 動画では「数えた研究はない」と正直に出す
 // ---------- roach (low-poly) ----------
 const roachBody = mat('#6b3b22'), roachDark = mat('#3a2216'), roachLeg = mat('#4a2c1a');
 function makeRoach() {
@@ -139,17 +144,17 @@ function showTiles(k, labels) { tiles.forEach((m, i) => { const u = clamp((k * 1
 const SUBS = [
   [2.6, 6.0, '時間を少し戻そう。<br>いつもの夜の台所。'],
   [6.2, 10.1, '家のゴキブリが、<br>一斉に消えた。'],
-  [10.1, 14, '台所は、<br>すっかり平和に。'],
+  [10.1, 14, 'メリット：ぜんそくの原因と、<br>菌の運び屋が消えた。'],
   [14.2, 18.1, 'でも消えたのは、<br>家の中だけじゃない。'],
-  [18.1, 22, '森や草地のゴキブリも、<br>ぜんぶ消えた。'],
-  [22.2, 26.1, '家に入ってくる種類は、<br>1%にも満たない。'],
+  [18.1, 22, '世界に何匹いたのか、<br>数えた研究はまだない。'],
+  [22.2, 26.1, '種類で見ると、家に入るのは<br>1%にも満たない。'],
   [26.1, 30, 'ほとんどは、<br>森で暮らしていた。'],
-  [30.2, 34.6, 'シロアリと同じように、<br>森の物質循環を支える一員。'],
-  [34.6, 39, '白い花ギンリョウソウ。<br>その種を運ぶのもゴキブリ。'],
-  [39.2, 43.6, '実を食べて、<br>フンと一緒に種をまく。'],
-  [43.6, 47.8, 'フンから出た種の<br>半分以上が生きていた。'],
-  [48.1, 52.6, '結果：消えたゴキブリの<br>99%以上は森の住人だった。'],
-  [52.6, 55.4, '台所の平和と引きかえに、<br>森の種まき係が1つ減った。'],
+  [30.2, 34.6, '落ち葉や死がいを食べて、<br>土に栄養を返していた。'],
+  [34.6, 39, 'デメリット：鳥やネズミの<br>エサが減った。'],
+  [39.2, 43.6, '卵に寄生するハチは、<br>ほぼ確実に絶滅。'],
+  [43.6, 47.8, 'ネズミが減り、それを食べる<br>ヘビやワシも減る。'],
+  [48.1, 52.6, '結果：台所は平和に。でも森は<br>栄養が回りにくくなった。'],
+  [52.6, 55.4, 'ゴキブリは、森の<br>そうじ係でもあった。'],
   [55.6, 59.4, 'ゴキブリ絶滅ボタン、<br>押す？押さない？'],
 ];
 
@@ -171,17 +176,17 @@ function shot0(t, T) { // hook: red button, countdown, press at 1.4 -> roaches v
   return room;
 }
 function shot1(t, T) { // everyday: night kitchen with roaches, cook startled
-  lift(270);
+  lift(60);
   kitchen('night'); cook.visible = true; setHand(0); setButton(0); btnLab.visible = false; btnCap.visible = btnBase.visible = false; kitSpark.set(0);
   kitRoaches(t + 2, true);
   cook.userData.arms[1].rotation.x = -1.2 - Math.sin(t * 6) * 0.15; cook.userData.arms[0].rotation.x = -0.8;
   const u = ease(t / 3.5);
-  look(lerp(-1.3, -1.0, u), lerp(2.4, 2.3, u), lerp(2.6, 2.2, u), 0.0, 0.2, -2.0, 55);
+  look(lerp(-1.6, -1.3, u), lerp(2.3, 2.2, u), lerp(3.4, 3.0, u), 0.0, 0.8, -2.0, 55);
   el.title.style.opacity = clamp(1 - (t - 0.3) / 0.5);
   return room;
 }
 function shot2(t, T) { // +1s kitchen roaches vanish
-  lift(270);
+  lift(60);
   kitchen('night'); cook.visible = true; setHand(0); setButton(1); btnCap.visible = btnBase.visible = false; btnLab.visible = false;
   const tv = 0.6;
   kitRoaches(t + 5, t < tv);
@@ -191,9 +196,9 @@ function shot2(t, T) { // +1s kitchen roaches vanish
   cook.userData.arms[0].rotation.x = t < tv ? -0.8 : lerp(-0.8, 0, clamp((t - 2) / 1));
   el.flash.style.opacity = t >= tv ? 0.4 * Math.max(0, 1 - (t - tv) / 0.3) : 0;
   const u = ease(t / 8);
-  look(lerp(-1.0, -0.6, u), lerp(2.3, 2.4, u), lerp(2.2, 2.6, u), 0.0, 0.2, -2.0, 55);
+  look(lerp(-1.3, -0.9, u), lerp(2.2, 2.3, u), lerp(3.0, 3.4, u), 0.0, 0.8, -2.0, 55);
   hudTime('+1秒');
-  setTop('日本で記録されたゴキブリ（2025年）', '約' + countUp(t, 65) + '種', fade(t, 0.15, 8, 0.25));
+  setTop('ぜんそくの子どもの調査（米国・2005年）', countUp(t, 937, 4.0, 1.2) + '人', fade(t, 3.95, 8, 0.25));
   return room;
 }
 function shot3(t, T) { // +1min forest roaches vanish
@@ -222,24 +227,21 @@ function shot4(t, T) { // +1h 100 tiles
 function shot5(t, T) { // +1day forest: material cycle + ghost plants
   lift(380);
   woodsEnv('day'); forestRoaches(0, false); forestSpark.set(0); showPellets(0); ghosts.forEach(g => g.fruit.visible = false);
-  ghostLab.visible = t > 4.4; ghostLab.material.opacity = clamp((t - 4.4) / 0.4);
+  ghostLab.visible = false;
   const u = ease(t / 9.2);
   look(...wp(lerp(3.2, 2.4, u), lerp(2.6, 1.9, u), lerp(5.0, 3.6, u)), ...wp(lerp(0.2, 0.8, u), lerp(0.3, 0.45, u), lerp(-0.6, 0.0, u)), 50);
   hudTime('+1日');
-  setTop('ギンリョウソウの種の長さ（2017年発表）', (countUp(t, 3, 0.3, 1.2) / 10).toFixed(1) + 'mm', fade(t, 0.15, 9.2, 0.25));
+  setTop('世界のゴキブリ（2025年）', comma(4000) + '種以上', fade(t, 0.15, 9.2, 0.25));
   return field;
 }
-function shot6(t, T) { // +1month seed dispersal memory (roaches eat fruit -> pellets) shown faintly as before, now empty
+function shot6(t, T) { // +1か月：ゴキブリのいない森。食べる側も減る
   lift(380);
-  woodsEnv('day'); forestSpark.set(0); ghostLab.visible = false;
-  ghosts.forEach(g => g.fruit.visible = true);
-  const past = t < 4.4; // first half: how it used to be (roaches gather at fruit), second: pellets with living seeds
-  forestRoaches(t, past, past ? clamp(t / 0.7) : 0);
-  showPellets(past ? clamp((t - 1.5) / 2.5) : 1, past ? 0 : 0.85 * clamp((t - 4.6) / 0.4));
+  woodsEnv('dusk'); forestRoaches(0, false); forestSpark.set(0); showPellets(0); ghostLab.visible = false;
+  ghosts.forEach(g => g.fruit.visible = false);
   const u = ease(t / 8.8);
-  look(...wp(lerp(2.6, -0.5, u), lerp(2.0, 4.2, u), lerp(3.4, 6.5, u)), ...wp(lerp(0.9, 0.2, u), 0.2, lerp(0.2, -0.3, u)), 50);
+  look(...wp(lerp(2.6, -0.5, u), lerp(2.0, 3.6, u), lerp(3.4, 6.0, u)), ...wp(lerp(0.9, 0.2, u), 0.2, lerp(0.2, -0.3, u)), 50);
   hudTime('+1か月');
-  setTop('フンから出た種の生存率（2017年発表）', (countUp(t, 520, 0.3, 1.6) / 10).toFixed(1) + '%', fade(t, 0.15, 8.8, 0.25), '#7ff0c8');
+  setTop('卵に寄生するハチ（専門家の見解）', 'ほぼ確実に絶滅', fade(t, 0.15, 8.8, 0.25), '#ff8a7a');
   return field;
 }
 function shot7(t, T) { // result: empty forest at dusk, fruits uneaten, no pellets
@@ -248,7 +250,7 @@ function shot7(t, T) { // result: empty forest at dusk, fruits uneaten, no pelle
   ghosts.forEach(g => g.fruit.visible = true);
   const u = ease(t / 7.5);
   look(...wp(lerp(0.5, -1.0, u), lerp(2.6, 4.2, u), lerp(5.0, 7.5, u)), ...wp(0.6, 0.3, -0.2), 50);
-  setTop('消えたゴキブリのうち 森や草地などの種類（2025年）', countUp(t, 99, 0.2, 1.3) + '%以上', fade(t, 0.15, 7.5, 0.25), '#7ff0c8');
+  setTop('家に入らない、森や草地などの種類（2025年）', countUp(t, 99, 0.2, 1.3) + '%以上', fade(t, 0.15, 7.5, 0.25), '#7ff0c8');
   return field;
 }
 function shot8(t, T) { // loop: same kitchen button, already pressed, no roaches
@@ -275,9 +277,9 @@ runStory({
     mood: 'tension', seed: 501, hits: [1.4, 48.1], risers: [6.0],
     narr: { '99%以上': 'きゅうじゅうきゅうパーセント以上', '1%': 'いちパーセント' },
     ask: 'ゴキブリ絶滅ボタン、押す？押さない？',
-    caption: 'もしも世界中のゴキブリが一瞬で絶滅したら？\n台所は平和になる。でも世界に4,000種以上いるゴキブリのうち、家に入ってくるのは1%にも満たない。森ではギンリョウソウの種を運ぶ役までしていた。博物館と大学の研究で調べてみた。\n\nゴキブリ絶滅ボタン、押す？押さない？ コメントで教えて。\n\n出典：鹿児島県立博物館「鹿児島の自然だより」第231号（2025年）、熊本大学 プレスリリース（2017年）・Uehara & Sugiura, Botanical Journal of the Linnean Society（2017年）',
+    caption: 'もしも世界中のゴキブリが一瞬で絶滅したら？\nメリット：家の中から、子どものぜんそくの大きな原因と菌の運び屋が消える。\nデメリット：鳥やネズミのエサが減り、卵に寄生するハチはほぼ確実に絶滅。ネズミを食べるヘビやワシにも影響が広がる。\n世界に4,000種以上いるけど、家に入ってくるのは1%にも満たない。ほとんどは森で落ち葉や死がいを食べて、土に栄養を返す役。世界に何匹いるかは、ちゃんと数えた研究はまだない。\n結果、台所は平和になるけど、森は栄養が回りにくくなる。\n\nゴキブリ絶滅ボタン、押す？押さない？ コメントで教えて。\n\n出典：鹿児島県立博物館「鹿児島の自然だより」第231号（2025年）、NIEHS／Inner-City Asthma Study（2005年）、Live Science「What If There Were No Cockroaches?」（テキサス大学タイラー校 Kambhampati 教授）',
     hashtags: ['もしもラボ', 'ゴキブリ', '絶滅', '生き物', '雑学'],
-    endStats: [['世界のゴキブリ', '4,000種以上', '2025年'], ['家に入ってくる種類', '1%未満', '2025年'], ['日本で記録された種類', '約65種', '2025年'], ['フンから出た種の生存率', '52.0%', '2017年発表']],
-    sources: '出典：鹿児島県立博物館「鹿児島の自然だより」第231号、<br>熊本大学 プレスリリース（2017年）、Botanical Journal of the Linnean Society',
+    endStats: [['世界のゴキブリ', '4,000種以上', '2025年'], ['家に入ってくる種類', '1%未満', '2025年'], ['世界に何匹いるか', '数えた研究はまだない', ''], ['ぜんそくの子どもの調査', '937人', '米国・2005年'], ['卵に寄生するハチ', 'ほぼ確実に絶滅', '専門家の見解']],
+    sources: '出典：鹿児島県立博物館（2025年）、NIEHS（2005年）、<br>Live Science（テキサス大学タイラー校 Kambhampati 教授）',
   },
 });
