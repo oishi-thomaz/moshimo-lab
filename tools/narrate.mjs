@@ -15,7 +15,8 @@ const args = Object.fromEntries(process.argv.slice(2).reduce((a, x, i, arr) => (
 const KEY = process.env.GEMINI_API_KEY || '';
 const MOCK = process.env.MOCK_TTS === '1';
 if (!KEY && !MOCK) { console.log('narrate: GEMINI_API_KEY が無いのでナレーションなし'); process.exit(2); }
-const MODEL = process.env.TTS_MODEL || 'gemini-3.8-flash-tts';
+let MODEL = process.env.TTS_MODEL || 'gemini-3.8-flash-tts';
+const FALLBACK = ['gemini-3.8-flash-lite-tts']; // 1日の上限に当たったら、別枠のこのモデルで最初から作り直す
 const VOICE = process.env.TTS_VOICE || 'Charon';
 const meta = JSON.parse(fs.readFileSync(args.meta, 'utf8'));
 const DUR = Number(meta.duration);
@@ -93,10 +94,12 @@ async function tts(text, style) {
     return buf.slice(0, 4).toString() === 'RIFF' ? buf : wavFromPcm(buf);
   }
 }
+const isDaily = e => e.status === 429 && /per day|requests per day|PerDay/i.test(e.message);
 async function ttsRetry(text, style) {
   for (let k = 0; ; k++) {
     try { return await tts(text, style); }
     catch (e) {
+      if (isDaily(e)) throw e; // 1日の上限：待っても無駄なので上へ
       if (k >= 5 || !(e.status === 429 || e.status >= 500)) throw e;
       const w = 15000 * (k + 1); console.log(`  retry in ${w / 1000}s (${e.message.slice(0, 80)})`); await sleep(w);
     }
@@ -104,21 +107,32 @@ async function ttsRetry(text, style) {
 }
 const dur = f => Number(execFileSync('ffprobe', ['-v', 'error', '-show_entries', 'format=duration', '-of', 'csv=p=0', f]).toString().trim());
 
+async function makeAll() {
 for (const [i, L] of lines.entries()) {
-  if (!L.text) continue;
-  const h = crypto.createHash('md5').update([MODEL, VOICE, L.style, L.text, MOCK].join('|')).digest('hex').slice(0, 10);
-  L.raw = path.join(work, `${String(i).padStart(2, '0')}_${h}.wav`);
-  if (!fs.existsSync(L.raw)) {
-    if (MOCK) execFileSync('ffmpeg', ['-v', 'error', '-y', '-f', 'lavfi', '-i', `sine=frequency=${300 + i * 40}:sample_rate=24000:duration=${(L.text.length * 0.14).toFixed(2)}`, '-ac', '1', L.raw]);
-    else { fs.writeFileSync(L.raw, await ttsRetry(L.text, L.style)); await sleep(6500); } // 無料枠は1分あたりの回数に上限があるので間をあける
+    if (!L.text) continue;
+    const h = crypto.createHash('md5').update([MODEL, VOICE, L.style, L.text, MOCK].join('|')).digest('hex').slice(0, 10);
+    L.raw = path.join(work, `${String(i).padStart(2, '0')}_${h}.wav`);
+    if (!fs.existsSync(L.raw)) {
+      if (MOCK) execFileSync('ffmpeg', ['-v', 'error', '-y', '-f', 'lavfi', '-i', `sine=frequency=${300 + i * 40}:sample_rate=24000:duration=${(L.text.length * 0.14).toFixed(2)}`, '-ac', '1', L.raw]);
+      else { fs.writeFileSync(L.raw, await ttsRetry(L.text, L.style)); await sleep(6500); } // 無料枠は1分あたりの回数に上限があるので間をあける
+    }
+    // 前後の無音を削る
+    L.wav = L.raw.replace('.wav', '_trim.wav');
+    execFileSync('ffmpeg', ['-v', 'error', '-y', '-i', L.raw, '-af', 'silenceremove=start_periods=1:start_threshold=-45dB,areverse,silenceremove=start_periods=1:start_threshold=-45dB,areverse', '-ar', '48000', '-ac', '1', L.wav]);
+    L.len = dur(L.wav);
+    console.log(`${L.t.toFixed(1)}s  ${L.len.toFixed(2)}s  ${L.text}`);
   }
-  // 前後の無音を削る
-  L.wav = L.raw.replace('.wav', '_trim.wav');
-  execFileSync('ffmpeg', ['-v', 'error', '-y', '-i', L.raw, '-af', 'silenceremove=start_periods=1:start_threshold=-45dB,areverse,silenceremove=start_periods=1:start_threshold=-45dB,areverse', '-ar', '48000', '-ac', '1', L.wav]);
-  L.len = dur(L.wav);
-  console.log(`${L.t.toFixed(1)}s  ${L.len.toFixed(2)}s  ${L.text}`);
+  
+  }
+for (;;) {
+  try { await makeAll(); break; }
+  catch (e) {
+    if (!isDaily(e)) throw e;
+    const next = FALLBACK.shift();
+    if (!next || MOCK) { console.log('narrate: 今日の上限に達したのでナレーションなしで作る'); process.exit(2); }
+    console.log(`narrate: ${MODEL} が今日の上限。${next} で作り直す`); MODEL = next;
+  }
 }
-
 // ---------- 時間に合わせて並べる ----------
 let prevEnd = 0; const parts = [];
 for (const L of lines) {

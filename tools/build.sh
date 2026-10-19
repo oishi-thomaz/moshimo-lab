@@ -16,7 +16,7 @@ python3 tools/bgm.py --mood "$MOOD" --seed "$SEED" --duration "$DUR" --hits "$HI
 # ナレーション（GEMINI_API_KEY があるときだけ。無ければBGMだけ）
 NARR=0
 if node tools/narrate.mjs --meta "out/$ID.json" --out "out/${ID}_narr.wav"; then NARR=1; else
-  rc=$?; if [ $rc -ne 2 ]; then echo "narration failed ($rc)"; exit $rc; fi
+  rc=$?; if [ $rc -ne 2 ]; then echo "::warning::ナレーションの作成に失敗したので、ナレーションなしで作る ($rc)"; fi
 fi
 if [ $NARR = 1 ]; then
   # 声が出ている間はBGMを下げる（サイドチェイン）。声とBGMを混ぜて -15 LUFS にそろえる
