@@ -14,6 +14,9 @@ import { lift, look, runStory, endCard, hudTime, countUp, makeSparkles, setTop, 
 //   12軒に1軒 = 1 ÷ 8.50% ≒ 11.8（推計・このファイルで計算）
 //   身体障害者補助犬の実働頭数（令和8年4月現在）：盲導犬 744頭・介助犬 54頭・聴導犬 51頭 → 合計 849頭（計算）
 //     （厚生労働省 社会・援護局障害保健福祉部「身体障害者補助犬実働頭数（都道府県別）」 https://www.mhlw.go.jp/content/12200000/001717895.pdf ）
+//   犬を飼っている高齢者は、飼育経験がない人に比べ要介護認知症の発症リスクが48%低い（オッズ比0.52、95%CI 0.27–0.98）。自宅在住高齢者11,224名を7.5年追跡
+//     （国立環境研究所・東京都健康長寿医療センター研究所・東京大学、International Journal of Environmental Research and Public Health 2026年7月、プレスリリース 2026年8月18日 https://digitalpr.jp/r/141370 ）
+// 流れ：犬が消える → 家の数 → 補助犬の利用者が支えを失う → 高齢の飼い主の認知症の守りが消える → 結果（人への影響を言い切る）
 // 犬が消えたあとの因果（ネズミ・防犯など）は確かな数字がないので扱わない。消えた犬は戻らない。
 
 const ORANGE = '#ffb46b', GREEN = '#7ff0c8';
@@ -119,20 +122,14 @@ const barHear = makeBar({ color: '#7ff0c8', label: '聴導犬', x: 2.7, w: 1.8, 
 const helpBars = [barGuide, barServ, barHear];
 const barSpark = makeSparkles(300, 0.3); stage.add(barSpark.points);
 barSpark.init([[-2.7, 1, 0], [-2.7, 2.5, 0], [-2.7, 4, 0], [0, 0.6, 0], [2.7, 0.6, 0]], 1.6, 2.5);
-// ---------- stage: household rate by year ----------
-const YEARS = [2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025];
-const RATE = [12.85, 12.10, 11.73, 11.64, 11.12, 10.80, 10.82, 10.26, 9.78, 9.69, 9.10, 8.76, 8.50];
-const HR = 4.6 / 12.85;
-const rateBars = YEARS.map((y, i) => makeBar({ color: '#5f7fb0', x: -4.6 + i * 0.62, w: 0.48, d: 0.48 }));
-const nowBar = makeBar({ color: '#ffb46b', x: -4.6 + 13 * 0.62 + 0.35, w: 0.48, d: 0.48 });
-const lab2013 = makeLabel('2013年', { sx: 1.8, size: 60 }); stage.add(lab2013);
-const lab2025 = makeLabel('2025年', { sx: 1.8, size: 60 }); stage.add(lab2025);
-const labNow = makeLabel('消えた後', { sx: 1.7, size: 60, color: '#ffb46b' }); stage.add(labNow);
-const v2013 = makeLabel('12.85%', { sx: 2.2, size: 72, stroke: 8 }); stage.add(v2013);
-const v2025 = makeLabel('8.50%', { sx: 2.0, size: 72, stroke: 8 }); stage.add(v2025);
-const vNow = makeLabel('0%', { sx: 1.7, size: 80, stroke: 8, color: '#ffb46b' }); stage.add(vNow);
-const rateGroup = [...rateBars.map(b => b.g), nowBar.g, lab2013, lab2025, labNow, v2013, v2025, vNow];
-function stageMode(m) { helpBars.forEach(b => { b.g.visible = m === 'help'; }); rateGroup.forEach(g => { g.visible = m === 'rate'; }); if (m !== 'help') barSpark.set(0); }
+// ---------- stage: dementia risk, older adults (never owned = 100 → dog owners 52) ----------
+const HD = 4.6 / 100;
+const barNever = makeBar({ color: '#8a96ab', label: '飼ったことがない', x: -2.0, w: 2.2, d: 2.2, nameTop: true });
+const barOwner = makeBar({ color: '#ffb46b', label: '犬を飼っている', x: 2.0, w: 2.2, d: 2.2, nameTop: true });
+const riskSpark = makeSparkles(260, 0.3); stage.add(riskSpark.points);
+riskSpark.init([[2.0, 2.6, 0], [2.0, 3.6, 0], [2.0, 4.4, 0]], 1.4, 2);
+const riskGroup = [barNever.g, barOwner.g, riskSpark.points];
+function stageMode(m) { helpBars.forEach(b => { b.g.visible = m === 'help'; }); riskGroup.forEach(g => { g.visible = m === 'risk'; }); if (m !== 'help') barSpark.set(0); }
 
 const SUBS = [
   [2.6, 6.0, '時間を少し戻そう。<br>いつもの朝の散歩。'],
@@ -141,14 +138,14 @@ const SUBS = [
   [14.2, 18.1, '犬がいた家は、<br>全体の8.50%。'],
   [18.1, 22, 'だいたい、<br>12軒に1軒（推計）'],
   [22.2, 26.1, '盲導犬と歩いていた人が、<br>交差点で立ち止まる。'],
-  [26.1, 30, '全国の盲導犬は、<br>744頭だった。'],
-  [30.2, 34.6, '介助犬は54頭、<br>聴導犬は51頭。'],
-  [34.6, 39, '体の不自由な人を支える<br>補助犬が、849頭。'],
-  [39.2, 43.6, '犬を飼う家は、2013年の<br>12.85%から減っていた。'],
-  [43.6, 47.8, 'それが一晩で、<br>0%になった。'],
-  [48.1, 52.6, '結果：日本だけで682万頭、<br>補助犬849頭が消えた。'],
+  [26.1, 30, '盲導犬は744頭。<br>744人が、歩く目を失った。'],
+  [30.2, 34.6, '介助犬54頭、聴導犬51頭。<br>手と耳の代わりも消えた。'],
+  [34.6, 39, '849人が、<br>毎日の支えを失った。'],
+  [39.2, 43.6, '犬を飼う高齢者は、<br>認知症のリスクが48%低い。'],
+  [43.6, 47.8, 'その守りも、<br>犬といっしょに消えた。'],
+  [48.1, 52.6, '結果：補助犬849頭の支えと、<br>認知症の守りが消えた。'],
   [52.6, 55.4, '散歩道には、<br>首輪だけが残った。'],
-  [55.6, 59.4, '犬を飼ったこと、<br>ある？ない？'],
+  [55.6, 59.4, 'あなたの家に犬、<br>いる？いた？'],
 ];
 
 const TV0 = 1.2; // the dog vanishes in the hook
@@ -215,24 +212,21 @@ function shot5(t, T) { // +1day: assistance dogs as bars, then they vanish
   else setTop('補助犬の合計（2026年4月）', countUp(t - 4.4, 849, 0.1, 1.2) + '頭', fade(t, 4.4, 9.2, 0.2), '#ffe08a');
   return stage;
 }
-function shot6(t, T) { // +1week: household rate by year, then 0%
-  lift(230); stageMode('rate');
-  const g = easeOut(clamp((t - 0.2) / 2.2));
-  rateBars.forEach((b, i) => { b.setH(RATE[i] * HR * clamp(g * 13 - i * 0.6), ''); });
-  const zero = t > 4.4; const nk = zero ? 1 - easeOut(clamp((t - 4.6) / 1.0)) : 1;
-  nowBar.setH(zero ? 8.5 * HR * nk : 0.001, '');
-  nowBar.g.visible = zero;
-  const xs = i => -4.6 + i * 0.62;
-  lab2013.position.set(xs(0) + 0.2, -0.1, 1.2); lab2025.position.set(xs(12) - 0.4, -0.1, 1.2); labNow.position.set(xs(13) + 0.4, 1.5, 0.4);
-  lab2013.material.depthTest = false; lab2025.material.depthTest = false; labNow.material.depthTest = false;
-  v2013.position.set(xs(0) + 0.3, 12.85 * HR + 0.8, 0); v2013.visible = g > 0.3;
-  v2025.position.set(xs(12) - 0.4, 8.5 * HR + 0.8, 0); v2025.visible = g > 0.95;
-  vNow.position.set(xs(13) + 0.4, 0.75, 0.4); vNow.visible = t > 5.4; labNow.visible = zero;
+function shot6(t, T) { // +1month: dementia risk — dog owners 48% lower, then the gap closes as the dogs are gone
+  lift(200); stageMode('risk');
+  const g = easeOut(clamp((t - 0.2) / 1.6));
+  const lose = easeOut(clamp((t - 5.6) / 1.6));
+  barNever.setH(100 * HD * g, g > 0.05 ? '100' : '');
+  const v = 52 + 48 * lose;
+  barOwner.setH(v * HD * g, g > 0.05 ? (lose > 0.02 ? '' : String(Math.round(52 * g))) : '');
+  const ol = lose > 0.5 ? '犬が消えたあと' : '犬を飼っている';
+  if (barOwner.label.userData.cur !== ol) { barOwner.label.userData.set(ol); barOwner.label.userData.cur = ol; }
+  riskSpark.set(clamp((t - 5.6) / 1.8));
   const u = ease(t / 8.8);
-  look(lerp(-0.2, 0.2, u), lerp(4.6, 4.4, u), lerp(21, 20.5, u), 0.1, 2.3, 0, 50);
-  hudTime('+1週間');
-  if (t < 4.4) setTop('犬を飼う世帯の割合（2013年→2025年）', ((1285 - countUp(t, 435, 0.4, 2.2)) / 100).toFixed(2) + '%', fade(t, 0.15, 4.4, 0.2));
-  else setTop('犬が消えた後の世帯飼育率', '0%', fade(t, 4.4, 8.8, 0.2), ORANGE);
+  look(lerp(-0.5, 0.5, u), lerp(5.0, 4.8, u), lerp(19, 18.5, u), 0, 2.6, 0, 50);
+  hudTime('+1か月');
+  if (t < 4.4) setTop('要介護認知症のリスク（犬を飼う高齢者）', countUp(t, 48, 0.3, 1.2) + '%低い', fade(t, 0.15, 4.4, 0.2), ORANGE);
+  else setTop('犬が消えたあと（推計）', '48%の差が0に', fade(t, 4.4, 8.8, 0.2), ORANGE);
   return stage;
 }
 function shot7(t, T) { // result: evening, owner with the limp leash, empty doghouse, collar on the path
@@ -241,8 +235,8 @@ function shot7(t, T) { // result: evening, owner with the limp leash, empty dogh
   const u = ease(t / 7.5);
   lift(150);
   look(lerp(0.4, 0.7, u), lerp(2.6, 2.8, u), lerp(6.4, 6.0, u), 4.6, 1.1, 12.0, 50);
-  if (t < 4.4) setTop('日本で消えた飼い犬（2025年）', '約' + countUp(t, 682, 0.2, 1.2) + '万頭', fade(t, 0.15, 4.4, 0.2));
-  else setTop('消えた補助犬（2026年4月）', countUp(t - 4.4, 849, 0.1, 1.0) + '頭', fade(t, 4.4, 7.5, 0.2), '#ffe08a');
+  if (t < 4.4) setTop('支えを失った補助犬の利用者（推計）', '約' + countUp(t, 849, 0.2, 1.2) + '人', fade(t, 0.15, 4.4, 0.2), '#ffe08a');
+  else setTop('認知症リスクの差（犬を飼う高齢者）', '48%低かった', fade(t, 4.4, 7.5, 0.2), ORANGE);
   return town;
 }
 function shot8(t, T) { // loop: hook framing, the dog is gone
@@ -263,12 +257,13 @@ runStory({
     id: '0027',
     title: '世界から犬が全部消えたら？',
     titleHtml: '世界から犬が<br>全部消えたら？',
-    mood: 'emotional', seed: 27, hits: [1.2, 6.6, 48.1], risers: [6.0],
-    ask: '犬を飼ったこと、ある？ない？',
-    narr: { '12軒に1軒（推計）': '12軒に1軒', '12.85%': '12.85パーセント', '8.50%': '8.5パーセント', '0%': 'ゼロパーセント' },
-    caption: 'もしも世界から犬が一瞬で全部消えたら？\n日本の飼い犬だけで約682万頭（2025年）。犬を飼う家は8.50%、だいたい12軒に1軒（推計）。2013年の12.85%から減り続けていた。体の不自由な人を支える補助犬も、盲導犬744頭・介助犬54頭・聴導犬51頭の849頭（2026年4月）。公的な統計と業界調査で見てみた。\n\n犬を飼ったこと、ある？ない？ コメントで教えて。\n\n出典：一般社団法人ペットフード協会 令和7年（2025年）全国犬猫飼育実態調査、厚生労働省 身体障害者補助犬実働頭数（令和8年4月現在）',
+    mood: 'emotional', seed: 27, hits: [1.2, 6.6, 48.1], risers: [6.0, 46.0],
+    impacts: [10.1, 26.1, 39.2, 48.1],
+    ask: 'あなたの家に犬、いる？いた？',
+    narr: { '12軒に1軒（推計）': '12軒に1軒', '12.85%': '12.85パーセント', '8.50%': '8.5パーセント', '0%': 'ゼロパーセント', '48%': '48パーセント' },
+    caption: 'もしも世界から犬が一瞬で全部消えたら？\n\n日本の飼い犬だけで約682万頭（2025年）。犬がいた家は8.50%、だいたい12軒に1軒（推計）。\n\n盲導犬744頭・介助犬54頭・聴導犬51頭、あわせて849頭の補助犬も消える（2026年4月）。目や手や耳の代わりに毎日を支えていた相棒が、一晩でいなくなる。\n\nさらに、犬を飼っている高齢者は、飼ったことがない人より要介護の認知症になるリスクが48%低いという研究も（約1万1,200人を7.5年追跡・2026年発表）。\n\n結果：補助犬849頭の支えと、高齢の飼い主の認知症の守りが消えた。散歩道には首輪だけが残る。\n\nあなたの家に犬、いる？いた？ コメントで教えて。\n\n出典：一般社団法人ペットフード協会 令和7年（2025年）全国犬猫飼育実態調査、厚生労働省 身体障害者補助犬実働頭数（令和8年4月現在）、国立環境研究所・東京都健康長寿医療センター研究所ほか International Journal of Environmental Research and Public Health（2026年）',
     hashtags: ['もしもラボ', '犬', '犬のいる暮らし', '盲導犬', '雑学'],
-    endStats: [['日本の飼い犬', '約682万頭', '2025年'], ['犬を飼う世帯の割合', '8.50%', '2025年'], ['盲導犬', '744頭', '2026年4月'], ['補助犬の合計', '849頭', '2026年4月']],
-    sources: '出典：ペットフード協会 全国犬猫飼育実態調査（2025年）、<br>厚生労働省 身体障害者補助犬実働頭数（2026年4月現在）',
+    endStats: [['日本の飼い犬', '約682万頭', '2025年'], ['犬がいた世帯', '8.50%', '約12軒に1軒'], ['消えた補助犬', '849頭', '盲導犬744頭ほか'], ['犬を飼う高齢者の認知症リスク', '48%低い', '2026年発表']],
+    sources: '出典：ペットフード協会 全国犬猫飼育実態調査（2025年）、<br>厚生労働省 身体障害者補助犬実働頭数（2026年4月現在）、<br>国立環境研究所ほか IJERPH（2026年）',
   },
 });

@@ -82,3 +82,10 @@ CHROME_PATH=<chromium> node tools/render.mjs --video NNNN --stills 0.5,2,5,10,16
 - scenes/dog.js：ローポリの飼い犬と小物。makeDog({kind: shiba / lab / small, coat})、dogPose（stand / sit / lie）、dogWalk・dogIdle、neckPos・handPos（リードの両端）、makeLeash（たるむリード）、makeCollar・dropCollar、makeDogHouse、makeHarness（盲導犬の白いハーネス）
 - scenes/factory.js：お弁当工場（白い壁・天井照明・2本のベルトコンベア・お弁当トレー・白衣/帽子/マスクの作業員）。LINES（各ラインの workers / trays）、setLine(dist, {pack, t})、setWorkers(fn)（持ち場が空くとおかずが欠ける）、setFactoryLight で day / dim、factorySign（タイトルと重なるときは隠す）、makeWorker(r)
 - scenes/delivery.js：宅配の玄関先（一戸建ての玄関・ステップ・表札・植木鉢・道路・向かいの家）と架空の配送車。makeVan（文字なし、setDoor・setHazard）、makeCourier、carryPose、makeParcel、makePile(scene,{cols,rows,layers})（setN）、canopy（タイトルにかかる構図では隠す）、setPorchEnv で day / dusk / night
+
+## 着地は人への影響で言い切る（2026/10/20 ゆうとの指摘・最重要）
+- 結果は「何がいくつ消えた」で終わらせない。それで人間の暮らし・お金・体・心がどう変わったかを数字で言い切る（例：蚊の回＝マラリアだけで年61万人が助かる）。
+- 流れは 何が起きた → 人数・世帯 → お金 → 体や心や生活 → 結果（人への影響）。途中の数字も全部この結論につながる順に並べる。
+- 見た人が納得して、だれかに教えたくなる一文になっているかを毎回チェック。数だけ・比較だけで終わる台本は作り直し。
+- 推計や単純計算で言い切るときは、画面のチップとキャプションに（推計）（単純計算）と条件を書く。
+- 最後の質問も、結論とつながる問いにする（関係のない好き嫌いの二択にしない）。
