@@ -6,6 +6,7 @@
 //  3. 承認されたら Instagram API でリールを予約時刻に投稿し、結果を LINE に送る
 //  4. Instagram の長期トークンを30日ごとに自動更新する
 //  5. 同じ動画を YouTube（ショート）にも同時に投稿する（LINE の YouTube設定 で接続したとき）
+//  6. インスタ・YouTube・TikTok の数字を毎時記録し、急に伸びたら LINE に知らせる。毎朝の解析の日報を預かって LINE に送る
 //
 // 設定は環境変数（/etc/moshimo.env を systemd から読む）。項目は server/moshimo.env.example を参照。
 import http from 'node:http';
@@ -150,6 +151,19 @@ function reserve(msg) {
   it.status = 'approved'; it.publishAt = t; save();
   return `OK。${id} は ${fmt(t)} に投稿する`;
 }
+// 「インスタトークン 〜」：解析の権限を足して作り直したトークンに差し替える
+async function setIgToken(msg) {
+  const tok = msg.replace(/^インスタトークン/, '').trim();
+  if (tok.length < 50) return 'インスタトークン の後ろにスペースを空けてトークンを貼って送って';
+  const old = state.igToken; state.igToken = tok;
+  try { await igOnce('GET', `/${IG_USER_ID}`, { fields: 'username' }); }
+  catch (e) { state.igToken = old; return `このトークンは使えへんかった（元のままにした）：${errMsg(e).slice(0, 200)}`; }
+  state.igTokenAt = Date.now(); state.an.igIns = 'unknown'; state.an.igInsCheck = 0; save();
+  let ins = '';
+  try { await igOnce('GET', `/${IG_USER_ID}/insights`, { metric: 'reach', period: 'day', metric_type: 'total_value' }); ins = '再生数や保存数（インサイト）も取れる。'; }
+  catch (e) { ins = isPermErr(e) ? 'ただ、インサイトの権限（instagram_business_manage_insights）が入ってない。アプリの権限に足してからトークンを作り直して' : `インサイトの確認でエラー：${errMsg(e).slice(0, 150)}`; }
+  return `インスタのトークンを差し替えた。${ins}`;
+}
 async function onLineWebhook(req, res) {
   const raw = await readBody(req);
   const sig = crypto.createHmac('sha256', LINE_SECRET).update(raw).digest('base64');
@@ -173,6 +187,18 @@ async function onLineWebhook(req, res) {
     }
     else if (ev.type === 'message' && ev.message.type === 'text' && /^(youtube|ユーチューブ)/i.test(ev.message.text.trim())) {
       await reply(ev.replyToken, text(ytCommand(ev.message.text.trim())));
+    }
+    else if (ev.type === 'message' && ev.message.type === 'text' && /^(tiktok|ティックトック)/i.test(ev.message.text.trim())) {
+      await reply(ev.replyToken, text(ttCommand(ev.message.text.trim())));
+    }
+    else if (ev.type === 'message' && ev.message.type === 'text' && /^インスタトークン/.test(ev.message.text.trim())) {
+      await reply(ev.replyToken, text(await setIgToken(ev.message.text.trim())));
+    }
+    else if (ev.type === 'message' && ev.message.type === 'text' && /^解析設定/.test(ev.message.text.trim())) {
+      await reply(ev.replyToken, [text('GitHub の moshimo-analytics → Settings → Secrets and variables → Actions → New repository secret\n名前：MOSHIMO_AN\n値：次の吹き出しの1行をそのまま貼る'), text(`${BASE_URL} ${state.an.key}`)]);
+    }
+    else if (ev.type === 'message' && ev.message.type === 'text' && /^(解析|数字)$/.test(ev.message.text.trim())) {
+      await reply(ev.replyToken, text(anSummary()));
     }
     else if (ev.type === 'message' && ev.message.type === 'text' && /状態|ステータス/.test(ev.message.text)) {
       const yts = i => !state.yt?.refresh ? '' : i.yt?.videoId ? ' / YT済' : i.yt?.error ? ' / YT失敗' : i.ytAt ? ` / YT ${fmt(i.ytAt)}` : '';
@@ -244,7 +270,7 @@ async function publish(id) {
 // 接続：LINE で「YouTube」→ 手順。「YouTube設定 クライアントID シークレット」→ 許可のリンクが届く → 開いて許可 → 接続完了
 // 投稿：インスタに投稿するのと同じタイミングで、同じ動画をショートとして公開。説明欄にキャプション、最初のコメントに質問を書く
 // 過去分：接続した時点でインスタに投稿済みの動画は、2日に分けて上げる（「YouTube 0031」で1本だけすぐ上げることもできる）
-const YT_SCOPE = 'https://www.googleapis.com/auth/youtube.upload https://www.googleapis.com/auth/youtube.force-ssl';
+const YT_SCOPE = 'https://www.googleapis.com/auth/youtube.upload https://www.googleapis.com/auth/youtube.force-ssl https://www.googleapis.com/auth/yt-analytics.readonly'; // 最後のは解析用（視聴維持率など）
 const YT_TIMES = ['09:00', '11:00', '14:00', '16:00', '19:30', '22:30']; // 過去分を上げる時刻（インスタの投稿時刻とずらす）
 const ytRedirect = () => `${BASE_URL}/yt/callback`;
 let ytAccess = { token: '', exp: 0 };
@@ -271,6 +297,10 @@ function ytAuthUrl() {
 function ytCommand(msg) {
   const parts = msg.split(/\s+/).filter(Boolean);
   const idArg = (msg.match(/(?:^|\s)(\d{4})(?:\s|$)/) || [])[1];
+  if (/再接続/.test(msg)) {
+    if (!state.yt?.clientId) return 'まだYouTubeの設定がない。YouTube と送ると手順が出る';
+    return `解析用の権限（視聴維持率・登録者の増減）を足すために、もう一回許可して。Google Cloud で YouTube Analytics API を有効にしてから開いてな。\n今の投稿はそのまま続く。\n\n${ytAuthUrl()}`;
+  }
   if (/設定/.test(msg)) {
     const [cid, sec] = parts.slice(1).filter(x => !/設定/.test(x));
     if (!cid || !sec || !/apps\.googleusercontent\.com$/.test(cid)) return 'YouTube設定 クライアントID シークレット の形で送って（間はスペース）';
@@ -297,7 +327,7 @@ async function ytCallback(u, res) {
     body: new URLSearchParams({ code: u.searchParams.get('code'), client_id: y.clientId, client_secret: y.clientSecret, redirect_uri: ytRedirect(), grant_type: 'authorization_code' }) });
   const j = await r.json().catch(() => ({}));
   if (!j.refresh_token) { log('yt auth failed', j); return html('接続に失敗した。LINEで YouTube設定 からやり直して。'); }
-  state.yt.refresh = j.refresh_token; delete state.yt.oauthState; ytAccess = { token: j.access_token, exp: Date.now() + (j.expires_in || 3600) * 1000 }; save();
+  state.yt.refresh = j.refresh_token; state.yt.scopeV2 = /yt-analytics/.test(j.scope || YT_SCOPE); delete state.yt.oauthState; ytAccess = { token: j.access_token, exp: Date.now() + (j.expires_in || 3600) * 1000 }; save();
   try { const c = await (await yt('GET', 'https://www.googleapis.com/youtube/v3/channels?part=snippet&mine=true')).json(); state.yt.channel = c.items?.[0]?.snippet?.title || ''; save(); } catch (e) { log('yt channel', e); }
   const n = scheduleBackfill();
   await push(text(`YouTubeにつながった（${state.yt.channel || 'チャンネル名は取れなかった'}）。これからはインスタと同時にYouTubeにも投稿する。${n ? `\nインスタに投稿済みの${n.count}本は ${n.from}〜${n.to} に2日に分けて上げる。` : ''}`));
@@ -397,6 +427,302 @@ async function remind() {
   }
 }
 
+// ---------------- 解析（3媒体の数字を1時間ごとに記録） ----------------
+// インスタ・YouTube・TikTok のフォロワーと動画ごとの再生などを毎時5分に取って metrics.jsonl に1行ずつ貯める。
+// 急に伸びた動画はすぐ LINE に知らせる。毎朝の解析（Claude）は非公開リポジトリの GitHub Actions 経由で
+// /an/export を取りに来て、日報を /an/report で預ける（指定の時刻に LINE へ送る）。
+const MET_FILE = path.join(DATA, 'metrics.jsonl');
+const TT_USER = (env.TT_USERNAME || 'moshimo__lab').replace(/^@/, '');
+const TT_SCOPE = 'user.info.basic,user.info.stats,video.list';
+state.an = state.an || {};
+if (!state.an.key) state.an.key = crypto.randomBytes(24).toString('hex');
+const ymd = t => new Date(t + JST).toISOString().slice(0, 10);
+const jstHour = t => new Date(t + JST).getUTCHours();
+const dayStart = t => { const j = new Date(t + JST); return Date.UTC(j.getUTCFullYear(), j.getUTCMonth(), j.getUTCDate()) - JST; };
+const num = v => (v === undefined || v === null || v === '' || isNaN(Number(v)) ? null : Number(v));
+const isPermErr = e => /\(#10\)|\(#200\)|permission|OAuthException|"code":190|"code":10,|"code":200/i.test(String(e && e.message));
+const errMsg = e => String((e && e.message) || e).slice(0, 300);
+async function timed(p, ms = 60000) { return Promise.race([p, sleep(ms).then(() => { throw new Error('timeout'); })]); }
+
+// --- Instagram ---
+const IG_MEDIA_METRICS = ['views', 'reach', 'likes', 'comments', 'shares', 'saved', 'total_interactions', 'ig_reels_avg_watch_time', 'ig_reels_video_view_total_time', 'reels_skip_rate'];
+const insVal = d => (d ? (d.values && d.values[0] ? d.values[0].value : d.total_value ? d.total_value.value : null) : null);
+async function igMediaInsights(id) {
+  try {
+    const j = await igOnce('GET', `/${id}/insights`, { metric: IG_MEDIA_METRICS.join(',') });
+    return Object.fromEntries((j.data || []).map(d => [d.name, insVal(d)]));
+  } catch (e) {
+    if (isPermErr(e) && !/metric/i.test(e.message)) throw e;
+    // 開発中の指標がまとめて取るとエラーになることがあるので、1つずつ取り直す
+    const out = {};
+    for (const m of IG_MEDIA_METRICS) {
+      try { const j = await igOnce('GET', `/${id}/insights`, { metric: m }); if (j.data && j.data[0]) out[m] = insVal(j.data[0]); } catch (e2) { if (isPermErr(e2) && !/metric/i.test(e2.message)) throw e2; }
+    }
+    return out;
+  }
+}
+async function collectIG(now) {
+  if (!state.igToken || !IG_USER_ID) return { error: 'インスタ未設定' };
+  const out = { media: {} };
+  const me = await igOnce('GET', `/${IG_USER_ID}`, { fields: 'username,followers_count,follows_count,media_count' });
+  Object.assign(out, { followers: num(me.followers_count), follows: num(me.follows_count), posts: num(me.media_count) });
+  const list = await igOnce('GET', `/${IG_USER_ID}/media`, { fields: 'id,caption,timestamp,permalink,like_count,comments_count,media_product_type', limit: 50 });
+  const ourIds = Object.fromEntries(Object.entries(state.items).filter(([, i]) => i.mediaId).map(([id, i]) => [i.mediaId, id]));
+  let insightsOk = state.an.igIns !== 'no_permission' || now - (state.an.igInsCheck || 0) > 6 * 3600e3; // 権限なしでも6時間ごとに再確認
+  state.an.igInsCheck = now;
+  for (const m of list.data || []) {
+    const t = Date.parse(m.timestamp);
+    const rec = { t, id: ourIds[m.id] || null, likes: num(m.like_count), comments: num(m.comments_count), type: m.media_product_type || '', cap: String(m.caption || '').split('\n')[0].slice(0, 40) };
+    // 2週間以内の投稿は毎時、それより古いものは6時間ごとに中身の数字（再生・保存・シェア・視聴時間）も取る
+    if (insightsOk && (now - t < 14 * 86400e3 || jstHour(now) % 6 === 5)) {
+      try { Object.assign(rec, await igMediaInsights(m.id)); state.an.igIns = 'ok'; }
+      catch (e) { if (isPermErr(e)) { state.an.igIns = 'no_permission'; insightsOk = false; } else rec.insErr = errMsg(e).slice(0, 120); }
+    }
+    out.media[m.id] = rec;
+  }
+  out.insights = state.an.igIns || 'unknown';
+  return out;
+}
+// アカウント全体の1日分（インスタの集計は最大48時間遅れるので、前日と前々日を毎朝取り直す）
+const IG_ACCT_METRICS = ['views', 'reach', 'accounts_engaged', 'total_interactions', 'likes', 'comments', 'shares', 'saves', 'follows_and_unfollows', 'profile_links_taps'];
+async function igAccountDay(d0) {
+  const p = { metric_type: 'total_value', period: 'day', since: Math.floor(d0 / 1000), until: Math.floor((d0 + 86400e3) / 1000) - 1 };
+  const out = {};
+  try {
+    const j = await igOnce('GET', `/${IG_USER_ID}/insights`, { ...p, metric: IG_ACCT_METRICS.join(',') });
+    for (const d of j.data || []) out[d.name] = insVal(d);
+  } catch (e) {
+    if (isPermErr(e) && !/metric/i.test(e.message)) throw e;
+    for (const m of IG_ACCT_METRICS) { try { const j = await igOnce('GET', `/${IG_USER_ID}/insights`, { ...p, metric: m }); if (j.data && j.data[0]) out[m] = insVal(j.data[0]); } catch {} }
+  }
+  return out;
+}
+
+// --- YouTube ---
+const ytJson = async (url) => (await yt('GET', url)).json();
+async function collectYT() {
+  if (!state.yt || !state.yt.refresh) return { error: 'YouTube未接続' };
+  const ch = await ytJson('https://www.googleapis.com/youtube/v3/channels?part=statistics,contentDetails&mine=true');
+  const c = ch.items && ch.items[0];
+  if (!c) return { error: 'チャンネルが見つからない' };
+  const out = { subs: num(c.statistics.subscriberCount), views: num(c.statistics.viewCount), videos: num(c.statistics.videoCount), media: {} };
+  const upl = c.contentDetails && c.contentDetails.relatedPlaylists && c.contentDetails.relatedPlaylists.uploads;
+  if (!upl) return out;
+  const pl = await ytJson(`https://www.googleapis.com/youtube/v3/playlistItems?part=contentDetails&maxResults=50&playlistId=${upl}`);
+  const ids = (pl.items || []).map(i => i.contentDetails.videoId).filter(Boolean);
+  if (!ids.length) return out;
+  const vs = await ytJson(`https://www.googleapis.com/youtube/v3/videos?part=statistics,snippet,status&id=${ids.join(',')}`);
+  const ourIds = Object.fromEntries(Object.entries(state.items).filter(([, i]) => i.yt && i.yt.videoId).map(([id, i]) => [i.yt.videoId, id]));
+  for (const v of vs.items || []) {
+    if (v.status && v.status.privacyStatus !== 'public') continue;
+    out.media[v.id] = { t: Date.parse(v.snippet.publishedAt), id: ourIds[v.id] || null, views: num(v.statistics.viewCount), likes: num(v.statistics.likeCount), comments: num(v.statistics.commentCount), cap: String(v.snippet.title || '').slice(0, 40) };
+  }
+  return out;
+}
+// YouTube アナリティクス（視聴維持率・登録者の増減。2〜3日遅れて確定する）
+async function ytAnalytics() {
+  const end = ymd(Date.now() - 86400e3), start = ymd(Date.now() - 28 * 86400e3), start7 = ymd(Date.now() - 7 * 86400e3);
+  const base = `https://youtubeanalytics.googleapis.com/v2/reports?ids=channel==MINE&endDate=${end}`;
+  const rows = j => (j.rows || []).map(r => Object.fromEntries((j.columnHeaders || []).map((h, k) => [h.name, r[k]])));
+  const days = rows(await ytJson(`${base}&startDate=${start}&dimensions=day&metrics=views,estimatedMinutesWatched,averageViewDuration,averageViewPercentage,subscribersGained,subscribersLost,likes,comments,shares`));
+  const videos = rows(await ytJson(`${base}&startDate=${start7}&dimensions=video&sort=-views&maxResults=25&metrics=views,averageViewDuration,averageViewPercentage,subscribersGained,likes,comments,shares`));
+  return { days, videos7d: videos, at: Date.now() };
+}
+
+// --- TikTok ---
+// 接続：LINE で「TikTok」→ 手順。「TikTok設定 クライアントキー シークレット」→ 許可のリンク → 開いて許可 → 接続完了
+// 接続していない間は、公開プロフィールのページからフォロワー数・いいね数・投稿数だけ取る（取れないこともある）
+const ttRedirect = () => `${BASE_URL}/tt/callback`;
+let ttAccess = { token: '', exp: 0 };
+async function ttTokenReq(params) {
+  const r = await fetch('https://open.tiktokapis.com/v2/oauth/token/', { method: 'POST', headers: { 'content-type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({ client_key: state.tt.clientKey, client_secret: state.tt.clientSecret, ...params }) });
+  return r.json().catch(() => ({}));
+}
+async function ttToken() {
+  if (ttAccess.token && Date.now() < ttAccess.exp - 60e3) return ttAccess.token;
+  const j = await ttTokenReq({ grant_type: 'refresh_token', refresh_token: state.tt.refresh });
+  if (!j.access_token) { const e = new Error(`TikTokのログインが切れた：${JSON.stringify(j).slice(0, 200)}`); e.auth = true; throw e; }
+  ttAccess = { token: j.access_token, exp: Date.now() + (j.expires_in || 86400) * 1000 };
+  if (j.refresh_token && j.refresh_token !== state.tt.refresh) { state.tt.refresh = j.refresh_token; save(); }
+  return ttAccess.token;
+}
+async function ttApi(method, url, body) {
+  const r = await fetch(url, { method, headers: { authorization: `Bearer ${await ttToken()}`, 'content-type': 'application/json' }, body: body ? JSON.stringify(body) : undefined });
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok || (j.error && j.error.code && j.error.code !== 'ok')) throw new Error(`TikTok ${r.status}: ${JSON.stringify(j.error || j).slice(0, 200)}`);
+  return j.data || {};
+}
+async function collectTT() {
+  if (state.tt && state.tt.refresh) {
+    const u = (await ttApi('GET', 'https://open.tiktokapis.com/v2/user/info/?fields=open_id,display_name,follower_count,following_count,likes_count,video_count')).user || {};
+    const out = { src: 'api', followers: num(u.follower_count), follows: num(u.following_count), hearts: num(u.likes_count), videos: num(u.video_count), media: {} };
+    let cursor = 0;
+    for (let page = 0; page < 3; page++) {
+      const d = await ttApi('POST', 'https://open.tiktokapis.com/v2/video/list/?fields=id,title,video_description,create_time,view_count,like_count,comment_count,share_count,duration', { max_count: 20, ...(cursor ? { cursor } : {}) });
+      for (const v of d.videos || []) out.media[v.id] = { t: num(v.create_time) * 1000, id: null, views: num(v.view_count), likes: num(v.like_count), comments: num(v.comment_count), shares: num(v.share_count), dur: num(v.duration), cap: String(v.title || v.video_description || '').split('\n')[0].slice(0, 40) };
+      if (!d.has_more || !d.cursor) break; cursor = d.cursor;
+    }
+    return out;
+  }
+  const r = await fetch(`https://www.tiktok.com/@${TT_USER}`, { headers: { 'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Safari/537.36', 'accept-language': 'ja,en;q=0.8' } });
+  const html = await r.text();
+  const m = html.match(/<script id="__UNIVERSAL_DATA_FOR_REHYDRATION__"[^>]*>([\s\S]*?)<\/script>/);
+  if (!m) return { src: 'public', error: `プロフィールが読めない（${r.status}）` };
+  const ui = ((JSON.parse(m[1]).__DEFAULT_SCOPE__ || {})['webapp.user-detail'] || {}).userInfo;
+  const s = ui && (ui.statsV2 || ui.stats);
+  if (!s) return { src: 'public', error: 'プロフィールの数字が見つからない' };
+  return { src: 'public', followers: num(s.followerCount), follows: num(s.followingCount), hearts: num(s.heartCount || s.heart), videos: num(s.videoCount) };
+}
+function ttCommand(msg) {
+  const parts = msg.split(/\s+/).filter(Boolean);
+  if (/設定/.test(msg)) {
+    const [key, sec] = parts.slice(1).filter(x => !/設定/.test(x));
+    if (!key || !sec) return 'TikTok設定 クライアントキー シークレット の形で送って（間はスペース）';
+    state.tt = { ...(state.tt || {}), clientKey: key, clientSecret: sec, refresh: '', oauthState: crypto.randomBytes(16).toString('hex') }; save();
+    const q = new URLSearchParams({ client_key: key, scope: TT_SCOPE, response_type: 'code', redirect_uri: ttRedirect(), state: state.tt.oauthState });
+    return `次のリンクを開いて、もしもラボのTikTokアカウント（@${TT_USER}）でログインして許可して。\n\nhttps://www.tiktok.com/v2/auth/authorize/?${q}`;
+  }
+  if (state.tt && state.tt.refresh) return `TikTokは接続済み（${state.tt.name || TT_USER}）。動画ごとの再生数まで取ってる`;
+  return `TikTokの接続で使うリダイレクトURI：\n${ttRedirect()}\n\nTikTok for Developers でアプリを作るときに Login Kit のリダイレクトURIにこれを入れて。できたら このLINEに\nTikTok設定 クライアントキー シークレット\nと送る`;
+}
+async function ttCallback(u, res) {
+  const html = t => send(res, 200, `<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width"><body style="font-family:sans-serif;padding:24px;font-size:18px">${t}</body>`, 'text/html; charset=utf-8');
+  const t = state.tt || {};
+  if (!t.clientKey || !t.oauthState || !u.searchParams.get('code') || u.searchParams.get('state') !== t.oauthState) return html('リンクが古いか、まだ設定されてない。LINEで TikTok設定 からやり直して。');
+  const j = await ttTokenReq({ code: u.searchParams.get('code'), grant_type: 'authorization_code', redirect_uri: ttRedirect() });
+  if (!j.refresh_token) { log('tt auth failed', j); return html(`接続に失敗した（${String(j.error_description || j.error || '').slice(0, 100)}）。LINEで TikTok設定 からやり直して。`); }
+  state.tt.refresh = j.refresh_token; delete state.tt.oauthState; ttAccess = { token: j.access_token, exp: Date.now() + (j.expires_in || 86400) * 1000 }; save();
+  try { const d = await ttApi('GET', 'https://open.tiktokapis.com/v2/user/info/?fields=display_name,follower_count'); state.tt.name = (d.user && d.user.display_name) || ''; save(); } catch (e) { log('tt user', e.message); }
+  await push(text(`TikTokにつながった（${state.tt.name || TT_USER}）。これからは動画ごとの再生数も毎時取る。`));
+  return html('TikTokにつながった。LINEに戻ってOK。');
+}
+
+// --- 毎時の記録とバズ検知 ---
+async function lineQuota() {
+  if (!LINE_TOKEN) return null;
+  const get = async p => (await fetch('https://api.line.me' + p, { headers: { authorization: `Bearer ${LINE_TOKEN}` } })).json().catch(() => ({}));
+  const [q, c] = await Promise.all([get('/v2/bot/message/quota'), get('/v2/bot/message/quota/consumption')]);
+  return { type: q.type || '', limit: q.value == null ? null : q.value, used: c.totalUsage == null ? null : c.totalUsage };
+}
+const PLAT = { ig: 'インスタ', yt: 'YouTube', tt: 'TikTok' };
+const viewsOf = r => (r ? (r.views != null ? r.views : null) : null);
+const median = a => { const s = a.filter(x => x > 0).sort((x, y) => x - y); return s.length ? s[Math.floor(s.length / 2)] : 0; };
+const kfmt = n => (n == null ? '-' : n >= 10000 ? `${(n / 10000).toFixed(n >= 100000 ? 0 : 1)}万` : n.toLocaleString('ja-JP'));
+function titleOf(p, mid, r) { const id = r && r.id; return id ? `${id} ${(meta(id).title || r.cap || '').slice(0, 24)}` : (r && r.cap) || mid; }
+async function detectBuzz(snap) {
+  const prev = state.an.prev; const now = snap.t;
+  const cur = { t: now, v: {}, f: {} };
+  for (const p of ['ig', 'yt', 'tt']) {
+    const s = snap[p] || {};
+    cur.f[p] = s.followers != null ? s.followers : s.subs != null ? s.subs : null;
+    cur.v[p] = Object.fromEntries(Object.entries(s.media || {}).map(([k, r]) => [k, viewsOf(r)]).filter(([, v]) => v != null));
+  }
+  // 前回の数字がない動画（取れなかった時間など）は前回の値を引き継ぐ
+  if (prev) for (const p of ['ig', 'yt', 'tt']) { for (const [k, v] of Object.entries(prev.v[p] || {})) if (cur.v[p][k] == null && snap[p] && !snap[p].error) cur.v[p][k] = v; if (cur.f[p] == null) cur.f[p] = prev.f[p]; }
+  state.an.prev = cur;
+  if (!prev || now - prev.t > 3 * 3600e3) return;
+  const hrs = (now - prev.t) / 3600e3;
+  const g = state.an.gains = state.an.gains || { ig: [], yt: [], tt: [], fig: [], fyt: [], ftt: [] };
+  const alerts = []; state.an.alerted = state.an.alerted || {};
+  const once = (key, ms) => { if (state.an.alerted[key] && now - state.an.alerted[key] < ms) return false; state.an.alerted[key] = now; return true; };
+  for (const p of ['ig', 'yt', 'tt']) {
+    const s = snap[p] || {}; const base = median(g[p]);
+    for (const [k, v] of Object.entries(cur.v[p])) {
+      const pv = prev.v[p][k]; if (pv == null) continue;
+      const gain = Math.round((v - pv) / hrs);
+      if (gain > 0) g[p].push(gain);
+      if (gain >= Math.max(300, base * 6) && once(`v:${p}:${k}`, 12 * 3600e3)) alerts.push({ t: now, p, k, kind: 'velocity', gain, base, total: v, title: titleOf(p, k, s.media && s.media[k]) });
+      for (const ms of [10000, 30000, 100000, 300000, 1000000, 3000000]) if (pv < ms && v >= ms && once(`m:${p}:${k}:${ms}`, 365 * 86400e3)) alerts.push({ t: now, p, k, kind: 'milestone', ms, total: v, title: titleOf(p, k, s.media && s.media[k]) });
+    }
+    const f0 = prev.f[p], f1 = cur.f[p];
+    if (f0 != null && f1 != null) {
+      const fg = Math.round((f1 - f0) / hrs); const fb = median(g['f' + p]);
+      if (fg > 0) g['f' + p].push(fg);
+      if (fg >= Math.max(30, fb * 6) && once(`f:${p}`, 6 * 3600e3)) alerts.push({ t: now, p, kind: 'followers', gain: fg, base: fb, total: f1 });
+    }
+  }
+  for (const k of Object.keys(g)) g[k] = g[k].slice(-400);
+  for (const [k, t] of Object.entries(state.an.alerted)) if (now - t > 30 * 86400e3 && !k.startsWith('m:')) delete state.an.alerted[k];
+  if (!alerts.length) return;
+  state.an.alerts = [...(state.an.alerts || []), ...alerts].slice(-100); save();
+  const lines = alerts.map(a => a.kind === 'velocity' ? `${PLAT[a.p]}：${a.title}\n直近1時間で +${kfmt(a.gain)}再生${a.base ? `（いつもの約${Math.round(a.gain / a.base)}倍）` : ''} 累計${kfmt(a.total)}`
+    : a.kind === 'milestone' ? `${PLAT[a.p]}：${a.title}\n累計${kfmt(a.ms)}再生を超えた（今 ${kfmt(a.total)}）`
+    : `${PLAT[a.p]}：フォロワーが直近1時間で +${a.gain}（今 ${kfmt(a.total)}）`);
+  await push(text(`【伸びてる】\n${lines.join('\n\n')}\n\n次の手は解析のときにClaudeが打つ`));
+}
+let collecting = false;
+async function collect() {
+  if (collecting) return; collecting = true;
+  const now = Date.now(); const snap = { t: now };
+  try {
+    for (const [p, f] of [['ig', () => collectIG(now)], ['yt', collectYT], ['tt', collectTT]]) {
+      try { snap[p] = await timed(f(), 240000); }
+      catch (e) { snap[p] = { error: errMsg(e) }; log('collect', p, errMsg(e)); }
+    }
+    // 1日1回（5時台）：インスタのアカウント全体の数字・YouTubeアナリティクス・LINEの送信数
+    const today = ymd(now);
+    if (jstHour(now) >= 5 && state.an.dailyDone !== today) {
+      state.an.dailyDone = today;
+      if (state.igToken && IG_USER_ID) {
+        state.an.igDays = state.an.igDays || {};
+        for (const back of [1, 2]) { const d0 = dayStart(now) - back * 86400e3; try { state.an.igDays[ymd(d0)] = await timed(igAccountDay(d0)); } catch (e) { state.an.igDays[ymd(d0)] = { error: errMsg(e) }; } }
+        for (const k of Object.keys(state.an.igDays).sort().slice(0, -60)) delete state.an.igDays[k];
+      }
+      if (state.yt && state.yt.refresh) { try { state.an.ytA = await timed(ytAnalytics()); state.an.ytAerr = ''; } catch (e) { state.an.ytAerr = errMsg(e); } }
+      try { state.an.line = await lineQuota(); } catch {}
+    }
+    fs.appendFileSync(MET_FILE, JSON.stringify(snap) + '\n');
+    state.an.last = now; save();
+    await detectBuzz(snap).catch(e => log('buzz', e));
+    // 45日より古い記録は消す（月1回くらい）
+    if (fs.statSync(MET_FILE).size > 40e6) {
+      const keep = fs.readFileSync(MET_FILE, 'utf8').split('\n').filter(l => { try { return JSON.parse(l).t > now - 45 * 86400e3; } catch { return false; } });
+      fs.writeFileSync(MET_FILE, keep.join('\n') + '\n');
+    }
+  } finally { collecting = false; }
+}
+function readSnaps(since) {
+  if (!fs.existsSync(MET_FILE)) return [];
+  return fs.readFileSync(MET_FILE, 'utf8').split('\n').filter(Boolean).map(l => { try { return JSON.parse(l); } catch { return null; } }).filter(s => s && s.t >= since);
+}
+function exportData(hours) {
+  const now = Date.now();
+  const items = Object.fromEntries(Object.entries(state.items).map(([id, i]) => { const m = meta(id); return [id, { status: i.status, title: m.title || '', ask: m.ask || '', hashtags: m.hashtags || [], mediaId: i.mediaId || '', permalink: i.permalink || '', publishedAt: i.publishedAt || 0, publishAt: i.publishAt || 0, yt: i.yt && i.yt.videoId ? i.yt.videoId : '' }]; }));
+  return {
+    now, items, snaps: readSnaps(now - hours * 3600e3),
+    igDays: state.an.igDays || {}, ytAnalytics: state.an.ytA || null, ytAnalyticsError: state.an.ytAerr || '',
+    alerts: (state.an.alerts || []).filter(a => a.t > now - 7 * 86400e3), line: state.an.line || null,
+    flags: { igInsights: state.an.igIns || 'unknown', yt: !!(state.yt && state.yt.refresh), ytScope: !!(state.yt && state.yt.scopeV2), tt: state.tt && state.tt.refresh ? 'api' : 'public' },
+    postTimesToday: postTimesOn(dayStart(now)), postTimesDefault: POST_TIMES, postTimesOverride: state.postTimes || null,
+  };
+}
+// 日報を預かって指定の時刻に送る（1回の送信で吹き出し最大5つ。LINEの通数は1通）
+function splitLine(msg) {
+  const out = []; let cur = '';
+  for (const para of String(msg).split(/\n(?=【)|\n\n/)) { const add = (cur ? cur + '\n\n' : '') + para; if (add.length > 4800 && cur) { out.push(cur); cur = para; } else cur = add; }
+  if (cur) out.push(cur);
+  return out.slice(0, 5).map(t => text(t));
+}
+async function flushOutbox() {
+  const box = state.an.outbox || []; if (!box.length) return;
+  const due = box.filter(r => r.at <= Date.now()); if (!due.length) return;
+  state.an.outbox = box.filter(r => r.at > Date.now()); save();
+  for (const r of due) await push(splitLine(r.message));
+}
+function anSummary() {
+  const s = readSnaps(Date.now() - 26 * 3600e3); if (!s.length) return 'まだ数字が貯まってない（毎時5分に取ってる）';
+  const last = s[s.length - 1], first = s[0];
+  const f = (x, k) => (x && x[k] != null ? x[k] : null);
+  const d = (a, b) => (a == null || b == null ? '' : `（${a - b >= 0 ? '+' : ''}${a - b}）`);
+  const sumV = x => Object.values((x && x.media) || {}).reduce((a, r) => a + (r.views || 0), 0);
+  const rows = [['ig', 'followers', 'インスタ'], ['yt', 'subs', 'YouTube'], ['tt', 'followers', 'TikTok']].map(([p, k, name]) => {
+    const L = last[p] || {}; if (L.error) return `${name}：${L.error}`;
+    return `${name}：${kfmt(f(L, k))}${d(f(L, k), f(first[p], k))} 再生累計 ${kfmt(sumV(L))}${first.t < last.t ? `（+${kfmt(sumV(L) - sumV(first[p]))}）` : ''}`;
+  });
+  return `${fmt(first.t)}→${fmt(last.t)} の動き\n${rows.join('\n')}${state.an.igIns === 'no_permission' ? '\n※インスタの再生数は権限が足りなくて取れてない' : ''}`;
+}
+
 let busy = false;
 setInterval(async () => {
   if (busy) return; busy = true;
@@ -405,7 +731,11 @@ setInterval(async () => {
     for (const [id, it] of Object.entries(state.items)) if (it.ytAt && it.ytAt <= Date.now()) await youtube(id);
     await refreshToken();
     await remind().catch(e => log('remind failed', e));
+    await flushOutbox().catch(e => log('outbox failed', e));
   } finally { busy = false; }
+  // 毎時5分に3媒体の数字を取る（投稿の処理とは別に動かす）
+  const now = Date.now(), hourKey = Math.floor(now / 3600e3);
+  if (new Date(now).getUTCMinutes() >= 5 && state.an.hourKey !== hourKey) { state.an.hourKey = hourKey; collect().catch(e => log('collect failed', e)); }
 }, 30000);
 if (!state.igTokenAt && state.igToken) { state.igTokenAt = Date.now(); save(); }
 for (const it of Object.values(state.items)) if (it.yt?.uploading) { it.yt = {}; it.ytAt = Date.now() + 60e3; } // 再起動で途中になった YouTube 投稿はやり直す
@@ -461,6 +791,27 @@ http.createServer(async (req, res) => {
     }
     if (req.method === 'POST' && p === '/line/webhook') return onLineWebhook(req, res);
     if (req.method === 'GET' && p === '/yt/callback') return ytCallback(u, res);
+    if (req.method === 'GET' && p === '/tt/callback') return ttCallback(u, res);
+    if (p.startsWith('/an/')) {
+      const got = Buffer.from(String(req.headers['x-an-key'] || u.searchParams.get('key') || '')), want = Buffer.from(state.an.key);
+      if (got.length !== want.length || !crypto.timingSafeEqual(got, want)) return send(res, 401, { ok: false });
+      if (req.method === 'GET' && p === '/an/export') return send(res, 200, exportData(Math.min(24 * 45, Number(u.searchParams.get('hours')) || 30)));
+      if (req.method === 'POST' && p === '/an/collect') { await collect(); return send(res, 200, { ok: true, last: state.an.last }); }
+      const body = JSON.parse((await readBody(req)).toString('utf8') || '{}');
+      if (req.method === 'POST' && p === '/an/report') {
+        if (!body.message) return send(res, 400, { ok: false, error: 'message' });
+        const at = Number(body.at) || 0;
+        if (at > Date.now() + 60e3) { state.an.outbox = [...(state.an.outbox || []), { at, message: String(body.message) }]; save(); return send(res, 200, { ok: true, scheduled: fmt(at) }); }
+        await push(splitLine(body.message)); return send(res, 200, { ok: true, sent: true });
+      }
+      if (req.method === 'POST' && p === '/an/control') {
+        const out = {};
+        if (body.postTimes) out.postTimes = setPostTimes(`投稿時間 ${body.postTimes}`);
+        if (body.notice) { await push(text(String(body.notice))); out.notice = true; }
+        return send(res, 200, { ok: true, ...out });
+      }
+      return send(res, 404, { ok: false });
+    }
     send(res, 404, { ok: false });
   } catch (e) {
     log('error', e);

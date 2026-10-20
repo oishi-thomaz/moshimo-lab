@@ -100,3 +100,21 @@ LINE で「状態」と送ると、直近の動画の状態が返ってくる。
 9. LINEに YouTubeにつながった と届けば完了。インスタに投稿済みの動画は2日に分けて自動で上げる
 
 LINEのコマンド：YouTube（状態）／YouTube 0031（その1本をすぐ上げる）。失敗したときは LINE に もう一回 のボタンが出る。
+
+## 解析（3媒体の数字を毎日見て日報を出す）
+
+VPS が毎時5分にインスタ・YouTube・TikTok の数字を記録して、急に伸びた動画があればすぐ LINE に知らせる。毎朝6時台に Claude の定期タスクが数字を解析して、在庫の順番やキャプションを直したり、バズに乗る続編を作ったりする。日報は毎朝8:00に LINE に届く。数字と日報は非公開リポジトリ oishi-thomaz/moshimo-analytics に貯まる。
+
+1. VPSを最新にする（install.sh を貼り直して `sudo bash install.sh`。設定はそのまま残る）
+2. GitHub で非公開リポジトリ moshimo-analytics を作る（中身は空でOK）
+3. LINEで 解析設定 と送る → 届いた1行を moshimo-analytics の Settings → Secrets and variables → Actions に 名前 MOSHIMO_AN で登録
+4. インスタの再生数・保存数を取る権限：developers.facebook.com のアプリ → Instagram → API setup with Instagram business login → 権限に instagram_business_manage_insights を足す → Generate token でトークンを作り直す → LINEで インスタトークン （スペース）トークン と送る
+5. YouTube の視聴維持率など：Google Cloud の APIとサービス → ライブラリ → YouTube Analytics API を有効にする → LINEで YouTube再接続 と送る → リンクを開いて許可（まだYouTubeをつないでいないときは、上の YouTube の手順でつなげば一緒に入る）
+6. TikTok の動画ごとの再生数（つなぐまではフォロワー数などだけ取る）：
+   1. https://developers.tiktok.com でログインしてアプリを作る
+   2. LINEで TikTok と送る → リダイレクトURIが届く
+   3. アプリに Login Kit を追加（Web）して、リダイレクトURIに 2 のURIを入れる。スコープは user.info.basic・user.info.stats・video.list
+   4. Sandbox を作って、Target users にもしもラボのTikTokアカウントを追加する
+   5. Sandbox の Client key と Client secret を LINE で TikTok設定 クライアントキー シークレット と送る → 届いたリンクを開いて許可
+
+LINEのコマンド：解析（直近24時間の数字）／解析設定／インスタトークン ○○／YouTube再接続／TikTok／TikTok設定 ○○ ○○
