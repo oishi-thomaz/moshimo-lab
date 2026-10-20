@@ -12,8 +12,9 @@ HITS=$(node -e "console.log((require('./out/$ID.json').hits||[]).join(','))")
 RISERS=$(node -e "console.log((require('./out/$ID.json').risers||[]).join(','))")
 IMPACTS=$(node -e "console.log((require('./out/$ID.json').impacts||[]).join(','))")
 DUR=$(node -e "console.log(require('./out/$ID.json').duration)")
+SFX=$(node -e "console.log((require('./out/$ID.json').sfx||[]).map(x=>x.join(':')).join(','))")
 node tools/render.mjs --video "$ID" --out "out/${ID}_video.mp4"
-python3 tools/bgm.py --mood "$MOOD" --seed "$SEED" --duration "$DUR" --hits "$HITS" --risers "$RISERS" --impacts "$IMPACTS" --sfx-out "out/${ID}_sfx.wav" --out "out/${ID}_bgm.wav"
+python3 tools/bgm.py --mood "$MOOD" --seed "$SEED" --duration "$DUR" --hits "$HITS" --risers "$RISERS" --impacts "$IMPACTS" --sfx "$SFX" --sfx-out "out/${ID}_sfx.wav" --out "out/${ID}_bgm.wav"
 # 強調の効果音（META.impacts）が無いときは無音のトラック
 [ -f "out/${ID}_sfx.wav" ] || ffmpeg -v error -y -f lavfi -i anullsrc=r=44100:cl=stereo -t "$DUR" "out/${ID}_sfx.wav"
 # ナレーション（GEMINI_API_KEY があるときだけ。無ければBGMだけ）

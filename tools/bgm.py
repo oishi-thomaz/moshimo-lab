@@ -105,6 +105,113 @@ def impact(rng):
     return sig / (np.abs(sig).max() or 1)
 
 
+# ---------- 場面の効果音（META.sfx = [[秒, 種類, 値], ...]）。強調の効果音と同じトラックに入れる ----------
+def _env(n, a=0.005, d=0.3):
+    t = np.arange(n) / SR
+    e = np.exp(-t / d)
+    k = int(a * SR)
+    if k: e[:k] *= np.linspace(0, 1, k)
+    return e
+
+
+def _band(x, lo, hi, order=2):
+    sos = butter(order, [lo / (SR / 2), min(hi, SR / 2 - 100) / (SR / 2)], btype='band', output='sos')
+    return sosfilt(sos, x)
+
+
+def sfx_poof(rng):
+    """消える音：ふわっと空気が抜けるノイズ＋上がっていくキラキラ"""
+    n = int(1.4 * SR); t = np.arange(n) / SR
+    air = _band(rng.standard_normal(n), 900, 7000) * _env(n, 0.01, 0.18)
+    sw = np.sin(2 * np.pi * np.cumsum(400 + 1800 * (t / t[-1]) ** 0.6) / SR) * _env(n, 0.005, 0.12) * 0.35
+    ch = sum(np.sin(2 * np.pi * f * t + rng.random() * 6) * np.exp(-(t - d0).clip(0) * 6) * (t > d0) for f, d0 in [(1568, 0.05), (2093, 0.11), (2637, 0.17), (3136, 0.23)]) * 0.18
+    sig = air * 0.8 + sw + ch
+    return sig / (np.abs(sig).max() or 1)
+
+
+def sfx_whoosh(rng):
+    n = int(0.9 * SR); t = np.arange(n) / SR
+    nz = rng.standard_normal(n); out = np.zeros(n); seg = SR // 40
+    for i in range(0, n, seg):
+        c = 250 + 3500 * np.sin(np.pi * i / n) ** 2
+        out[i:i + seg] = _band(nz[i:i + seg + 800], max(80, c * 0.5), c * 1.5)[:len(out[i:i + seg])]
+    sig = out * np.sin(np.pi * t / t[-1]) ** 2
+    return sig / (np.abs(sig).max() or 1)
+
+
+def sfx_meter(rng, level=0.5):
+    """メーターが上がる音：レベルに合わせて高く・長く上がるスイープ＋最後にピン（高いほど不穏）"""
+    dur = 0.35 + 1.3 * level; n = int((dur + 0.9) * SR); t = np.arange(n) / SR
+    f0 = 180; f1 = 180 * 2 ** (0.4 + 2.2 * level)
+    f = np.where(t < dur, f0 + (f1 - f0) * (t / dur) ** 1.5, f1)
+    ph = 2 * np.pi * np.cumsum(f) / SR
+    tone = (np.sin(ph) + 0.35 * np.sin(2 * ph) + 0.2 * np.sin(3 * ph)) * np.where(t < dur, 0.4 + 0.6 * t / dur, np.exp(-(t - dur) * 8))
+    ping_f = f1 * (1.0 if level < 0.6 else 1.06)
+    ping = (np.sin(2 * np.pi * ping_f * t) + 0.5 * np.sin(2 * np.pi * ping_f * 2.01 * t)) * np.exp(-(t - dur).clip(0) * 5) * (t > dur)
+    sig = tone * 0.5 + ping * (0.5 + 0.4 * level)
+    return sig / (np.abs(sig).max() or 1)
+
+
+def sfx_alarm(rng):
+    n = int(2.0 * SR); t = np.arange(n) / SR
+    f = np.where((t * 4).astype(int) % 2 == 0, 880, 622)
+    sq = np.sign(np.sin(2 * np.pi * np.cumsum(f) / SR))
+    sig = lowpass_np(sq, 3500) * np.clip(1 - (t - 1.6).clip(0) * 2.5, 0, 1)
+    return sig / (np.abs(sig).max() or 1)
+
+
+def lowpass_np(x, c):
+    sos = butter(2, c / (SR / 2), output='sos'); return sosfilt(sos, x)
+
+
+def sfx_bubble(rng):
+    n = int(1.6 * SR); out = np.zeros(n)
+    for k in range(9):
+        s0 = int(rng.random() * 1.2 * SR); m = int(0.12 * SR); t = np.arange(m) / SR
+        f = (300 + rng.random() * 500) * (1 + 3 * t / t[-1])
+        b = np.sin(2 * np.pi * np.cumsum(f) / SR) * np.exp(-t * 30)
+        out[s0:s0 + m] += b[:len(out[s0:s0 + m])] * (0.5 + rng.random() * 0.5)
+    return out / (np.abs(out).max() or 1)
+
+
+def sfx_buzz(rng):
+    n = int(1.1 * SR); t = np.arange(n) / SR
+    f = 230 + 12 * np.sin(2 * np.pi * 6 * t)
+    saw = 2 * ((np.cumsum(f) / SR) % 1) - 1
+    sig = lowpass_np(saw, 2200) * (0.6 + 0.4 * np.sin(2 * np.pi * 21 * t)) * np.sin(np.pi * t / t[-1])
+    return sig / (np.abs(sig).max() or 1)
+
+
+def sfx_caw(rng):
+    """カラスの声っぽい「カァ」2回（合成）"""
+    out = np.zeros(int(1.1 * SR))
+    for s0 in (0.0, 0.5):
+        n = int(0.32 * SR); t = np.arange(n) / SR
+        f = 520 - 120 * t / t[-1]
+        saw = 2 * ((np.cumsum(f) / SR) % 1) - 1
+        v = _band(saw + 0.3 * rng.standard_normal(n), 700, 2600) * np.sin(np.pi * t / t[-1]) ** 0.6
+        i = int(s0 * SR); out[i:i + n] += v
+    return out / (np.abs(out).max() or 1)
+
+
+def sfx_skitter(rng):
+    n = int(0.9 * SR); out = np.zeros(n)
+    for k in range(40):
+        i = int(rng.random() * 0.8 * SR); m = int(0.008 * SR)
+        out[i:i + m] += _band(rng.standard_normal(m), 2500, 9000)[:len(out[i:i + m])] * (0.4 + rng.random() * 0.6)
+    return out / (np.abs(out).max() or 1)
+
+
+def sfx_drone(rng):
+    n = int(4.0 * SR); t = np.arange(n) / SR
+    sig = (np.sin(2 * np.pi * 55 * t) + 0.6 * np.sin(2 * np.pi * 58.3 * t) + 0.3 * np.sin(2 * np.pi * 110.5 * t)) * np.sin(np.pi * t / t[-1]) ** 0.7
+    return sig / (np.abs(sig).max() or 1)
+
+
+SFX = {'poof': (sfx_poof, 0.7), 'whoosh': (sfx_whoosh, 0.45), 'meter': (sfx_meter, 0.55), 'alarm': (sfx_alarm, 0.22), 'bubble': (sfx_bubble, 0.35),
+       'buzz': (sfx_buzz, 0.3), 'caw': (sfx_caw, 0.4), 'skitter': (sfx_skitter, 0.35), 'drone': (sfx_drone, 0.55)}
+
+
 def reverb(x, rng, seconds=2.6, mix=0.32):
     n = int(seconds * SR)
     t = np.arange(n) / SR
@@ -212,14 +319,22 @@ if __name__ == '__main__':
     ap.add_argument('--risers', default='')
     ap.add_argument('--impacts', default='')
     ap.add_argument('--sfx-out', default='')
+    ap.add_argument('--sfx', default='', help='秒:種類[:値],... 例 7.0:poof,18.8:meter:0.04')
     ap.add_argument('--out', default='bgm.wav')
     a = ap.parse_args()
     f = lambda s: [float(x) for x in s.split(',') if x.strip()]
     write_wav(a.out, generate(a.mood, a.seed, a.duration, f(a.hits), f(a.risers), f(a.impacts)))
-    if a.sfx_out and f(a.impacts):
+    cues = [c.split(':') for c in a.sfx.split(',') if c.strip()]
+    if a.sfx_out and (f(a.impacts) or cues):
         rng = np.random.default_rng(a.seed + 99)
-        sfx = np.zeros((int(a.duration * SR) + SR, 2))
+        sfx = np.zeros((int(a.duration * SR) + 5 * SR, 2))
         for im in f(a.impacts):
             place(sfx, impact(rng), im, 0.9)
-        write_wav(a.sfx_out, sfx[:int(a.duration * SR)])
+        for c in cues:
+            fn, gain = SFX[c[1]]
+            sig = fn(rng, float(c[2])) if len(c) > 2 else fn(rng)
+            if c[1] == 'meter' and len(c) > 2: gain *= 0.55 + 0.6 * float(c[2])
+            place(sfx, sig, float(c[0]), gain, pan=float(rng.uniform(-0.25, 0.25)))
+        sfx = reverb(sfx, rng, seconds=1.2, mix=0.18)
+        write_wav(a.sfx_out, np.clip(sfx[:int(a.duration * SR)], -1, 1))
     print('wrote', a.out)
