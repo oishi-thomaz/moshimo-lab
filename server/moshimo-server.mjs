@@ -531,7 +531,7 @@ async function ytAnalytics() {
 
 // --- TikTok ---
 // 接続：LINE で「TikTok」→ 手順。「TikTok設定 クライアントキー シークレット」→ 許可のリンク → 開いて許可 → 接続完了
-// 接続していない間は、公開プロフィールのページからフォロワー数・いいね数・投稿数だけ取る（取れないこともある）
+// 接続していない間は、プロフィールの埋め込み用ページからフォロワー数と動画ごとの再生数を取る
 const ttRedirect = () => `${BASE_URL}/tt/callback`;
 let ttAccess = { token: '', exp: 0 };
 async function ttTokenReq(params) {
@@ -565,14 +565,21 @@ async function collectTT() {
     }
     return out;
   }
-  const r = await fetch(`https://www.tiktok.com/@${TT_USER}`, { headers: { 'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Safari/537.36', 'accept-language': 'ja,en;q=0.8' } });
+  // 公式APIは法人の審査が要るので、プロフィールの埋め込み用ページ（公開）から読む。動画ごとの再生数とフォロワー数が取れる（大きい数は丸められている）
+  return ttEmbed();
+}
+async function ttEmbed() {
+  const r = await fetch(`https://www.tiktok.com/embed/@${TT_USER}`, { headers: { 'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Safari/537.36', 'accept-language': 'ja,en;q=0.8' } });
   const html = await r.text();
-  const m = html.match(/<script id="__UNIVERSAL_DATA_FOR_REHYDRATION__"[^>]*>([\s\S]*?)<\/script>/);
-  if (!m) return { src: 'public', error: `プロフィールが読めない（${r.status}）` };
-  const ui = ((JSON.parse(m[1]).__DEFAULT_SCOPE__ || {})['webapp.user-detail'] || {}).userInfo;
-  const s = ui && (ui.statsV2 || ui.stats);
-  if (!s) return { src: 'public', error: 'プロフィールの数字が見つからない' };
-  return { src: 'public', followers: num(s.followerCount), follows: num(s.followingCount), hearts: num(s.heartCount || s.heart), videos: num(s.videoCount) };
+  const m = html.match(/<script id="__FRONTITY_CONNECT_STATE__"[^>]*>([\s\S]*?)<\/script>/);
+  if (!m) return { src: 'embed', error: `埋め込みページが読めない（${r.status}）` };
+  const vids = []; let u = null;
+  const walk = o => { if (!o || typeof o !== 'object') return; if (o.id && /^\d{15,}$/.test(String(o.id)) && o.playCount != null) vids.push(o); if (o.followerCount != null && o.uniqueId) u = o; for (const v of Object.values(o)) walk(v); };
+  walk(JSON.parse(m[1]));
+  if (!u && !vids.length) return { src: 'embed', error: '埋め込みページに数字がない' };
+  const out = { src: 'embed', followers: u ? num(u.followerCount) : null, follows: u ? num(u.followingCount) : null, hearts: u ? num(u.heartCount) : null, media: {} };
+  for (const v of vids) if (!v.privateItem) out.media[v.id] = { t: Number(BigInt(v.id) >> 32n) * 1000, id: null, views: num(v.playCount), cap: String(v.desc || '').split('\n')[0].slice(0, 40) };
+  return out;
 }
 function ttCommand(msg) {
   const parts = msg.split(/\s+/).filter(Boolean);
@@ -693,7 +700,7 @@ function exportData(hours) {
     now, items, snaps: readSnaps(now - hours * 3600e3),
     igDays: state.an.igDays || {}, ytAnalytics: state.an.ytA || null, ytAnalyticsError: state.an.ytAerr || '',
     alerts: (state.an.alerts || []).filter(a => a.t > now - 7 * 86400e3), line: state.an.line || null,
-    flags: { igInsights: state.an.igIns || 'unknown', yt: !!(state.yt && state.yt.refresh), ytScope: !!(state.yt && state.yt.scopeV2), tt: state.tt && state.tt.refresh ? 'api' : 'public' },
+    flags: { igInsights: state.an.igIns || 'unknown', yt: !!(state.yt && state.yt.refresh), ytScope: !!(state.yt && state.yt.scopeV2), tt: state.tt && state.tt.refresh ? 'api' : 'embed' },
     postTimesToday: postTimesOn(dayStart(now)), postTimesDefault: POST_TIMES, postTimesOverride: state.postTimes || null,
   };
 }
