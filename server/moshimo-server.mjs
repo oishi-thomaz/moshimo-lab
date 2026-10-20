@@ -86,32 +86,63 @@ async function line(pathname, body) {
   if (!LINE_TOKEN) return log('LINE token missing');
   const r = await fetch('https://api.line.me' + pathname, { method: 'POST', headers: { 'content-type': 'application/json', authorization: `Bearer ${LINE_TOKEN}` }, body: JSON.stringify(body) });
   if (!r.ok) log('LINE error', r.status, await r.text());
+  return r.ok;
 }
 const push = (messages) => state.owner ? line('/v2/bot/message/push', { to: state.owner, messages: [].concat(messages) }) : log('no LINE owner yet');
 const reply = (token, messages) => line('/v2/bot/message/reply', { replyToken: token, messages: [].concat(messages) });
 const text = t => ({ type: 'text', text: t.slice(0, 4900) });
 
-function buttons(id) {
+// 承認カード（LINE の Flex Message）。表紙・タイトル・長さ・投稿予定・質問・主な数字・ボタンを1枚にまとめる
+const mmss = sec => `${Math.floor(sec / 60)}:${String(Math.round(sec % 60)).padStart(2, '0')}`;
+function card(id, head = '承認待ち') {
   const m = meta(id);
-  const title = (m.title || `動画 ${id}`).slice(0, 40);
+  const title = m.title || `動画 ${id}`;
+  const len = m.duration ? mmss(Math.max(0, Number(m.duration) - 5)) : '';
+  const where = state.yt?.refresh ? 'インスタ＋YouTube' : 'インスタ';
+  const row = (k, v, color = '#111111') => ({ type: 'box', layout: 'horizontal', spacing: 'md', contents: [
+    { type: 'text', text: String(k).slice(0, 40), size: 'sm', color: '#888888', flex: 5, wrap: true },
+    { type: 'text', text: String(v).slice(0, 40), size: 'sm', color, weight: 'bold', flex: 4, align: 'end', wrap: true }] });
+  const stats = (m.endStats || []).slice(0, 5).map(([k, v]) => row(k, v));
+  const body = [
+    { type: 'text', text: `${head}・${id}`, size: 'xs', color: '#1DB446', weight: 'bold' },
+    { type: 'text', text: title, size: 'lg', weight: 'bold', wrap: true, margin: 'sm' },
+    { type: 'box', layout: 'vertical', margin: 'lg', spacing: 'sm', contents: [
+      row('長さ', len || '—'), row('投稿先', where), row('承認すると', fmt(nextSlot()), '#1DB446')] },
+  ];
+  if (m.ask) body.push({ type: 'separator', margin: 'lg' }, { type: 'text', text: '最後の質問', size: 'xs', color: '#888888', margin: 'lg' }, { type: 'text', text: m.ask, size: 'md', weight: 'bold', wrap: true, margin: 'xs' });
+  if (stats.length) body.push({ type: 'separator', margin: 'lg' }, { type: 'text', text: '動画の数字', size: 'xs', color: '#888888', margin: 'lg' }, { type: 'box', layout: 'vertical', spacing: 'sm', margin: 'sm', contents: stats });
   return {
-    type: 'template', altText: `承認待ち ${id}`,
-    template: {
-      type: 'buttons', title, text: `承認すると ${fmt(nextSlot())} に投稿する`.slice(0, 60),
-      actions: [
-        { type: 'postback', label: '承認する', data: `approve:${id}`, displayText: `${id} を承認` },
-        { type: 'postback', label: '今すぐ投稿', data: `now:${id}`, displayText: `${id} を今すぐ投稿` },
-        { type: 'postback', label: '却下する', data: `reject:${id}`, displayText: `${id} を却下` },
-      ],
+    type: 'flex', altText: `${head} ${id} ${title}`.slice(0, 380),
+    contents: {
+      type: 'bubble', size: 'mega',
+      hero: { type: 'image', url: `${BASE_URL}/media/${id}_cover.jpg`, size: 'full', aspectRatio: '4:5', aspectMode: 'cover', action: { type: 'uri', uri: `${BASE_URL}/media/${id}.mp4` } },
+      body: { type: 'box', layout: 'vertical', contents: body },
+      footer: { type: 'box', layout: 'vertical', spacing: 'sm', contents: [
+        { type: 'button', style: 'primary', color: '#1DB446', height: 'sm', action: { type: 'postback', label: '承認する', data: `approve:${id}`, displayText: `${id} を承認` } },
+        { type: 'box', layout: 'horizontal', spacing: 'sm', contents: [
+          { type: 'button', style: 'secondary', height: 'sm', action: { type: 'postback', label: '今すぐ投稿', data: `now:${id}`, displayText: `${id} を今すぐ投稿` } },
+          { type: 'button', style: 'secondary', height: 'sm', action: { type: 'postback', label: '却下する', data: `reject:${id}`, displayText: `${id} を却下` } }] },
+        { type: 'button', style: 'link', height: 'sm', action: { type: 'postback', label: 'キャプションを見る', data: `cap:${id}`, displayText: `${id} のキャプション` } }] },
     },
   };
 }
-function approvalMessages(id) {
+const buttons = id => card(id);
+function captionText(id) { const m = meta(id); return `${m.caption || ''}\n\n${(m.hashtags || []).map(h => '#' + h).join(' ')}`.trim(); }
+// カードが LINE に弾かれたときの予備（前と同じ文字＋ボタン）
+function plainApproval(id) {
   const m = meta(id);
+  return [text(`【承認待ち】${id}\n${m.title || ''}\n\n${captionText(id)}`.slice(0, 4900)),
+    { type: 'template', altText: `承認待ち ${id}`, template: { type: 'buttons', title: (m.title || `動画 ${id}`).slice(0, 40), text: `承認すると ${fmt(nextSlot())} に投稿する`.slice(0, 60),
+      actions: [{ type: 'postback', label: '承認する', data: `approve:${id}` }, { type: 'postback', label: '今すぐ投稿', data: `now:${id}` }, { type: 'postback', label: '却下する', data: `reject:${id}` }] } }];
+}
+async function pushApproval(id) {
+  const ok = await push(approvalMessages(id));
+  if (ok === false) { log('flex card rejected, sending plain'); await push([approvalMessages(id)[0], ...plainApproval(id)]); }
+}
+function approvalMessages(id) {
   return [
     { type: 'video', originalContentUrl: `${BASE_URL}/media/${id}.mp4`, previewImageUrl: `${BASE_URL}/media/${id}_cover.jpg` },
-    text(`【承認待ち】${id}\n${m.title || ''}\n\nキャプション：\n${m.caption || ''}\n\n${(m.hashtags || []).map(h => '#' + h).join(' ')}`),
-    buttons(id),
+    card(id),
   ];
 }
 
@@ -119,6 +150,7 @@ async function onPostback(ev) {
   const [act, id] = String(ev.postback.data).split(':');
   const it = state.items[id];
   if (!it) return reply(ev.replyToken, text(`${id} が見つからへん`));
+  if (act === 'cap') return reply(ev.replyToken, text(captionText(id) || 'キャプションがない'));
   if (act === 'ytskip') { it.yt = { ...(it.yt || {}), skipped: true }; save(); return reply(ev.replyToken, text(`${id} はYouTubeに上げへんことにした`)); }
   if (act === 'ytretry') { it.yt = {}; save(); await reply(ev.replyToken, text(`${id} をYouTubeにもう一回上げてみる`)); return youtube(id); }
   if (it.status === 'published') return reply(ev.replyToken, text(`${id} はもう投稿済み：${it.permalink || ''}`));
@@ -423,7 +455,7 @@ async function remind() {
     const pending = Object.entries(state.items).filter(([, it]) => it.status === 'pending').sort((a, b) => a[1].receivedAt - b[1].receivedAt);
     if (!pending.length) continue;
     const [id] = pending[0];
-    await push([text(`まだ承認待ちの動画がある（${id}${pending.length > 1 ? ` ほか${pending.length - 1}本` : ''}）。今承認すると ${fmt(nextSlot())} に投稿する。`), buttons(id)]);
+    await push([text(`まだ承認待ちの動画がある（${id}${pending.length > 1 ? ` ほか${pending.length - 1}本` : ''}）`), card(id, 'まだ承認待ち')]);
   }
 }
 
@@ -861,7 +893,7 @@ http.createServer(async (req, res) => {
       const prev = state.items[id];
       if (prev && prev.status === 'published') return send(res, 409, { ok: false, error: 'already published' });
       state.items[id] = { status: 'pending', receivedAt: Date.now() }; save();
-      await push(approvalMessages(id));
+      await pushApproval(id);
       return send(res, 200, { ok: true });
     }
     if (req.method === 'POST' && p === '/hook/notice') {
