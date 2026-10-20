@@ -5,7 +5,7 @@
 ## 毎週やること
 
 1. `plan/queue.txt` と `state/rendered.txt` を見て、まだ書き出されていない在庫が何本あるか数える
-2. 在庫が7本を下回っていたら（1日3本投稿の期間 2026/10/28 までは21本を下回っていたら21本になるまで）、`plan/blueprint.json` を `no` の順に見て、まだ `made` が付いていないものから在庫が14本になるまで作る（1回のタスクで最低7本）
+2. 在庫が21本を下回っていたら（1日3本投稿をずっと続けるので、1週間分の21本を常に持つ）、`plan/blueprint.json` を `no` の順に見て、まだ `made` が付いていないものから在庫が28本になるまで作る（1回のタスクで最低7本）
 3. 1本ごとに、下の手順で `engine/videos/NNNN.js` を作る（NNNN は blueprint の `no` を4桁にしたもの。例 no 2 → 0002）
 4. できた番号を `plan/queue.txt` の末尾に1行ずつ追加し、blueprint の該当行に `"made": "NNNN"` を付ける
 5. commit して `main` に push する（GitHub Actions が毎朝7時台に queue の順に書き出す）

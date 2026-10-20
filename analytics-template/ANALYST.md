@@ -60,7 +60,7 @@ notes/insights.md               分かったこと・試していることの記
 1. 在庫の順番を変える：moshimo-lab の plan/queue.txt で、まだ書き出していない番号（state/rendered.txt にないもの）の並びを変える。番号は消さない。バズのときは同じジャンル・同じ切り口の回を前に出す。通常時は同じジャンルが3本続かないようにする。
 2. まだ書き出していない回のキャプション・ハッシュタグ・最後の質問・YouTube用タイトルを直す：engine/videos/NNNN.js の META の caption / hashtags / ask / ytTitle。ハッシュタグは5個まで、1つ目は必ず もしもラボ。質問は字幕の最後の一言・まとめカードと同じ文にそろえる（SUBS の最後の字幕も合わせて直す）。数字や出典は変えない。
 3. 続編・関連の回を作る（バズのとき）：伸びた回の何が刺さったか（お題・フックの型・結果の一文・質問）を考えて、波に乗れる回を1〜2本作る。作り方は moshimo-lab の docs/PRODUCTION.md と plan/RULES.md に完全に従う（数字は一次資料で確認、静止画13枚を全部目で見て確認、120点の状態で commit）。番号は engine/videos にまだない 0036 以降の空き番号を使い、META に hookType（H1〜H6）と cat（blueprint のカテゴリ名）も入れる。できたら plan/queue.txt の先頭に入れる。
-4. 投稿時間を変える：同じ時間帯で6本以上の結果が出ていて、はっきり差があるときだけ。reports/outbox/control-YYYY-MM-DD.json に {"postTimes": "12:00,18:00,20:30 10/28まで"} の形で書いて `node tools/run.mjs control <ファイル>`。2026/10/28 までは1日3本の期間なので、本数は3本のまま時間だけ動かす。
+4. 投稿時間を変える：同じ時間帯で6本以上の結果が出ていて、はっきり差があるときだけ。reports/outbox/control-YYYY-MM-DD.json に {"postTimes": "12:00,18:00,20:30"} の形で書いて `node tools/run.mjs control <ファイル>`。1日3本はゆうとの決定（2026/10/20〜ずっと）なので、本数は3本のまま時間だけ動かす。
 5. 企画の方針を育てる：2週間以上の数字で確かになったことは、moshimo-lab の plan/RULES.md の最後に 解析で分かったこと として追記してよい（毎週の台本担当が読む）。1回だけの結果は insights に仮説として書くまでにする。
 6. blueprint の未制作の行の並びは変えない。伸びそうなお題を前に出したいときは queue と insights で扱う（毎週の台本担当は blueprint の no 順に作るので、作ってほしいお題があるときは blueprint のその行に "priority": "解析：理由" を付けてよい）。
 
