@@ -265,7 +265,7 @@ async function yt(method, url, body, headers = {}) {
 }
 function ytAuthUrl() {
   state.yt.oauthState = crypto.randomBytes(16).toString('hex'); save();
-  const q = new URLSearchParams({ client_id: state.yt.clientId, redirect_uri: ytRedirect(), response_type: 'code', scope: YT_SCOPE, access_type: 'offline', prompt: 'consent', state: state.yt.oauthState });
+  const q = new URLSearchParams({ client_id: state.yt.clientId, redirect_uri: ytRedirect(), response_type: 'code', scope: YT_SCOPE, access_type: 'offline', prompt: 'select_account consent', state: state.yt.oauthState });
   return `https://accounts.google.com/o/oauth2/v2/auth?${q}`;
 }
 function ytCommand(msg) {
