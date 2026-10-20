@@ -20,8 +20,10 @@ const FALLBACK = ['gemini-3.8-flash-lite-tts']; // 1日の上限に当たった�
 const VOICE = process.env.TTS_VOICE || 'Charon';
 const meta = JSON.parse(fs.readFileSync(args.meta, 'utf8'));
 const DUR = Number(meta.duration);
-const work = path.join(path.dirname(args.out), `${meta.id}_narr`);
+// 作った声はここに残して使い回す（GitHub Actions のキャッシュで次の書き出しにも引き継ぐ）。30日使ってない声は消す
+const work = process.env.NARR_CACHE || path.join(path.dirname(args.out), '..', 'cache', 'narr');
 fs.mkdirSync(work, { recursive: true });
+for (const f of fs.readdirSync(work)) { try { const st = fs.statSync(path.join(work, f)); if (Date.now() - st.atimeMs > 30 * 86400e3 && Date.now() - st.mtimeMs > 30 * 86400e3) fs.rmSync(path.join(work, f)); } catch {} }
 
 // ---------- 読む文を作る ----------
 const READ = [
@@ -110,14 +112,15 @@ const dur = f => Number(execFileSync('ffprobe', ['-v', 'error', '-show_entries',
 async function makeAll() {
 for (const [i, L] of lines.entries()) {
     if (!L.text) continue;
-    const h = crypto.createHash('md5').update([MODEL, VOICE, L.style, L.text, MOCK].join('|')).digest('hex').slice(0, 10);
-    L.raw = path.join(work, `${String(i).padStart(2, '0')}_${h}.wav`);
+    const h = crypto.createHash('md5').update([MODEL, VOICE, L.style, L.text, MOCK].join('|')).digest('hex').slice(0, 16);
+    L.raw = path.join(work, `${h}.wav`);
+    if (fs.existsSync(L.raw)) { const now = new Date(); fs.utimesSync(L.raw, now, now); }
     if (!fs.existsSync(L.raw)) {
       if (MOCK) execFileSync('ffmpeg', ['-v', 'error', '-y', '-f', 'lavfi', '-i', `sine=frequency=${300 + i * 40}:sample_rate=24000:duration=${(L.text.length * 0.14).toFixed(2)}`, '-ac', '1', L.raw]);
       else { fs.writeFileSync(L.raw, await ttsRetry(L.text, L.style)); await sleep(6500); } // 無料枠は1分あたりの回数に上限があるので間をあける
     }
     // 前後の無音を削る
-    L.wav = L.raw.replace('.wav', '_trim.wav');
+    L.wav = path.join(path.dirname(args.out), `${meta.id}_${String(i).padStart(2, '0')}_trim.wav`);
     execFileSync('ffmpeg', ['-v', 'error', '-y', '-i', L.raw, '-af', 'silenceremove=start_periods=1:start_threshold=-45dB,areverse,silenceremove=start_periods=1:start_threshold=-45dB,areverse', '-ar', '48000', '-ac', '1', L.wav]);
     L.len = dur(L.wav);
     console.log(`${L.t.toFixed(1)}s  ${L.len.toFixed(2)}s  ${L.text}`);
@@ -128,6 +131,7 @@ for (;;) {
   try { await makeAll(); break; }
   catch (e) {
     if (!isDaily(e)) throw e;
+    console.log(`narrate: 1日の上限エラー（${MODEL}）: ${String(e.message).slice(0, 400)}`);
     const next = FALLBACK.shift();
     if (!next || MOCK) { console.log('narrate: 今日の上限に達したのでナレーションなしで作る'); process.exit(2); }
     console.log(`narrate: ${MODEL} が今日の上限。${next} で作り直す`); MODEL = next;

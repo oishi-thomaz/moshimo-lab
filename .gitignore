@@ -3,3 +3,4 @@ out/
 *.wav
 .env
 __pycache__/
+cache/

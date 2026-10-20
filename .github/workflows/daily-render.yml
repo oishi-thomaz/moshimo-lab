@@ -63,6 +63,15 @@ jobs:
           curl -fsS -X POST "$BASE/hook/notice" -H "X-Moshimo-Secret: $SECRET" -H 'content-type: application/json' \
             -d '{"message":"台本のストックが切れた。次の台本ができるまで投稿は止まる。"}'
 
+      # ナレーションの声を使い回す（同じセリフ・同じ声なら作り直さない。書き出し直しでAPIの回数を使わない）
+      - name: Narration cache
+        if: steps.pick.outputs.id != ''
+        uses: actions/cache@v4
+        with:
+          path: cache/narr
+          key: narr-${{ github.run_id }}
+          restore-keys: narr-
+
       - name: Build video
         if: steps.pick.outputs.id != ''
         env:

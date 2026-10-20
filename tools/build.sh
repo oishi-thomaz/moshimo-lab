@@ -33,5 +33,5 @@ else
 fi
 # cover image for the approval message (first frame with the title)
 ffmpeg -v error -y -ss 1.2 -i "out/${ID}.mp4" -frames:v 1 -q:v 3 "out/${ID}_cover.jpg"
-rm -rf "out/${ID}_video.mp4" "out/${ID}_bgm.wav" "out/${ID}_narr.wav" "out/${ID}_narr" "out/${ID}_sfx.wav"
+rm -rf "out/${ID}_video.mp4" "out/${ID}_bgm.wav" "out/${ID}_narr.wav" "out/${ID}_narr" "out/${ID}_sfx.wav" out/${ID}_*_trim.wav
 echo "built out/${ID}.mp4"
