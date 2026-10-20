@@ -1,0 +1,46 @@
+name: vps
+
+# VPS（もしもラボの投稿サーバー）とのやりとり。毎朝の解析タスク（Claude）が tools/run.mjs から手動実行する
+#  collect : VPS に貯まっている毎時の数字を取ってきて data/ に保存して commit
+#  report  : 日報（file の JSON {message, at}）を VPS に預ける。at の時刻に LINE へ届く
+#  control : 投稿時間の変更など（file の JSON {postTimes, notice}）
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'collect / report / control'
+        required: true
+        default: collect
+      file:
+        description: 'report / control で送る JSON ファイル（このリポジトリ内のパス）'
+        required: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: vps
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Talk to VPS
+        env:
+          MOSHIMO_AN: ${{ secrets.MOSHIMO_AN }}
+        run: node tools/vps.mjs "${{ inputs.action }}" "${{ inputs.file }}"
+      - name: Save data
+        if: inputs.action == 'collect'
+        run: |
+          git config user.name "moshimo-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data
+          git diff --cached --quiet && exit 0
+          git commit -qm "data $(TZ=Asia/Tokyo date +%Y-%m-%dT%H:%M)"
+          for i in 1 2 3; do git pull --rebase -q && git push -q && break; sleep 5; done
