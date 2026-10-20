@@ -35,6 +35,12 @@ jobs:
         env:
           MOSHIMO_AN: ${{ secrets.MOSHIMO_AN }}
         run: node tools/vps.mjs "${{ inputs.action }}" "${{ inputs.file }}"
+      # TikTok は公式APIに法人の審査が要るので、公開の埋め込み用ページから読む（VPS の取得の予備。失敗しても他は続ける）
+      - name: TikTok (public embed)
+        if: inputs.action == 'collect'
+        continue-on-error: true
+        timeout-minutes: 3
+        run: node tools/tiktok.mjs moshimo__lab
       - name: Save data
         if: inputs.action == 'collect'
         run: |

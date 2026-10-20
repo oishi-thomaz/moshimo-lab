@@ -578,7 +578,7 @@ async function ttEmbed() {
   walk(JSON.parse(m[1]));
   if (!u && !vids.length) return { src: 'embed', error: '埋め込みページに数字がない' };
   const out = { src: 'embed', followers: u ? num(u.followerCount) : null, follows: u ? num(u.followingCount) : null, hearts: u ? num(u.heartCount) : null, media: {} };
-  for (const v of vids) if (!v.privateItem) out.media[v.id] = { t: Number(BigInt(v.id) >> 32n) * 1000, id: null, views: num(v.playCount), cap: String(v.desc || '').split('\n')[0].slice(0, 40) };
+  for (const v of vids) if (!v.privateItem) out.media[v.id] = { t: Number(BigInt(v.id) >> 32n) * 1000, id: null, views: num(v.playCount), cap: String(v.desc || '').split('\n').join(' ').slice(0, 160) };
   return out;
 }
 function ttCommand(msg) {

@@ -24,7 +24,11 @@ const readLines = f => (fs.existsSync(f) ? fs.readFileSync(f, 'utf8').split('\n'
 
 // ---------- データ ----------
 const snapDir = 'data/snaps';
-const snaps = (fs.existsSync(snapDir) ? fs.readdirSync(snapDir).filter(f => f.endsWith('.jsonl')).sort() : []).flatMap(f => readLines(path.join(snapDir, f))).sort((a, b) => a.t - b.t);
+const vpsSnaps = (fs.existsSync(snapDir) ? fs.readdirSync(snapDir).filter(f => f.endsWith('.jsonl')).sort() : []).flatMap(f => readLines(path.join(snapDir, f))).sort((a, b) => a.t - b.t);
+// TikTok は VPS の毎時の記録に加えて、collect のときに Actions から取った分（data/tiktok）も混ぜる
+const ttDir = 'data/tiktok';
+const ttSnaps = (fs.existsSync(ttDir) ? fs.readdirSync(ttDir).filter(f => f.endsWith('.jsonl')).sort() : []).flatMap(f => readLines(path.join(ttDir, f))).filter(s => !s.error).map(s => ({ t: s.t, tt: s }));
+const snaps = [...vpsSnaps, ...ttSnaps].sort((a, b) => a.t - b.t);
 const st = readJson('data/state.json', {});
 const igDays = readJson('data/ig-days.json', {});
 const ytDays = readJson('data/yt-days.json', {});
@@ -61,13 +65,22 @@ const acctAt = (p, time) => { let v = null; for (const [t, f] of acct[p]) { if (
 const firstT = snaps[0].t;
 
 // ---------- 動画の番号をそろえる（TikTok は手動投稿なのでタイトルで照合） ----------
-const norm = s => String(s || '').replace(/#\S+/g, '').replace(/[\s　？?！!、。,.「」『』…・〜~]/g, '').toLowerCase();
-const titles = Object.entries(items).map(([id, i]) => [id, norm(i.title)]).filter(([, t]) => t.length >= 4);
+const norm = s => String(s || '').replace(/[\s　？?！!、。,.「」『』…・〜~🦟🪳😳👇]/g, '').toLowerCase();
+const bigrams = s => { const t = norm(s).replace(/^もしも/, ''); const b = new Set(); for (let i = 0; i < t.length - 1; i++) b.add(t.slice(i, i + 2)); return b; };
+const cands = Object.entries(items).map(([id, i]) => ({ id, bg: bigrams(i.title), tags: (i.hashtags || []).filter(h => !/もしもラボ|^もしも$|雑学|shorts/i.test(h)).map(h => norm(h)) })).filter(c => c.bg.size >= 3);
+// TikTok は手動投稿でキャプションの書き方が違うので、タイトルの2文字の重なりとハッシュタグの一致で一番近い回に寄せる
+const matchCache = {};
 const idOf = (p, k) => {
   const r = lastRec[p][k] || {}; if (r.id) return r.id;
-  const c = norm(r.cap); if (c.length < 4) return null;
-  const hit = titles.find(([, t]) => c.includes(t.slice(0, Math.min(t.length, 10))) || t.includes(c.slice(0, Math.min(c.length, 10))));
-  return hit ? hit[0] : null;
+  if (k in matchCache) return matchCache[k];
+  const text = norm(r.cap); const head = bigrams(String(r.cap || '').split('#')[0].slice(0, 60));
+  let best = null, bestScore = 0;
+  for (const c of cands) {
+    let inter = 0; for (const g of c.bg) if (head.has(g)) inter++;
+    const score = inter / c.bg.size + c.tags.filter(t => t.length >= 2 && text.includes(t)).length * 0.3;
+    if (score > bestScore) { bestScore = score; best = c.id; }
+  }
+  return (matchCache[k] = bestScore >= 0.45 ? best : null);
 };
 // blueprint にない番号（0031〜など個別に作った回）は、動画ファイルの META.hookType / META.cat があればそれを使う
 const fileMeta = {};
@@ -132,7 +145,7 @@ const trend = Object.fromEntries(Object.keys(PLATS).map(p => [p, trends(p)]));
 const upcoming = queue.filter(id => !rendered.has(id) && fs.existsSync(path.join(LAB, `engine/videos/${id}.js`)));
 const ttMatched = new Set(Object.keys(series.tt).map(k => idOf('tt', k)).filter(Boolean));
 const ttTodo = Object.entries(items).filter(([, i]) => i.status === 'published').sort((a, b) => (a[1].publishedAt || 0) - (b[1].publishedAt || 0)).map(([id]) => id).filter(id => !ttMatched.has(id));
-const latest = snaps.at(-1);
+const latest = vpsSnaps.at(-1) || {};
 const errors = Object.keys(PLATS).map(p => latest[p] && latest[p].error ? `${PLATS[p]}：${latest[p].error}` : '').filter(Boolean);
 const alerts24 = (st.alerts || []).filter(a => a.t > T - D);
 
@@ -145,7 +158,7 @@ out.push('## 接続の状態');
 const f = st.flags || {};
 out.push(`- インスタ：${f.igInsights === 'ok' ? '再生・保存・視聴時間まで取れてる' : f.igInsights === 'no_permission' ? 'インサイト権限なし（再生数が取れない。いいねで代用）' : '確認中'}`);
 out.push(`- YouTube：${f.yt ? (f.ytScope ? '接続済み（アナリティクスも可）' : '接続済み（アナリティクス権限なし。LINEで YouTube再接続 が必要）') : '未接続'}${st.ytAnalyticsError ? ` ／アナリティクスのエラー：${st.ytAnalyticsError.slice(0, 120)}` : ''}`);
-out.push(`- TikTok：${f.tt === 'api' ? 'API接続済み（動画ごとの再生まで）' : '公開ページから（フォロワー・いいね・投稿数だけ）'}`);
+out.push(`- TikTok：${f.tt === 'api' ? 'API接続済み（動画ごとの再生・いいね・コメント・シェアまで）' : '公開の埋め込みページから（フォロワーと動画ごとの再生だけ。1万以上は丸めた数）'}`);
 if (st.line) out.push(`- LINEの送信数：今月 ${n(st.line.used)} / ${st.line.limit == null ? '上限なし' : n(st.line.limit)}`);
 if (errors.length) out.push(`- 直近の取得エラー：${errors.join(' ／ ')}`);
 out.push('');
@@ -193,8 +206,7 @@ out.push(`## これから書き出す在庫（${upcoming.length}本・上から�
 for (const id of upcoming.slice(0, 15)) { const b = { ...metaOf(id), ...(bp[id] || {}) }; out.push(`- ${id} ${b.title || ''}（${b.hook_type || '-'} ／ ${b.cat || '-'} ／ ${b.virality || '-'}）`); }
 out.push('');
 out.push(`投稿時間：今日 ${(st.postTimesToday || []).join('、')}（通常 ${(st.postTimesDefault || []).join('、')}）`);
-if (f.tt === 'api') out.push(`TikTok にまだ上がってない投稿済み動画（古い順）：${ttTodo.join('、') || 'なし'}`);
-else out.push(`TikTok に上がってるかは公開ページからは判定できない（API接続後に出る）。インスタ投稿済み：${ttTodo.slice(-6).join('、')}`);
+out.push(`TikTok にまだ上がってないインスタ投稿済みの動画（古い順。タイトルで照合しているので漏れがあり得る）：${ttTodo.join('、') || 'なし'}`);
 
 const date = ymd(T);
 fs.writeFileSync(`analysis/${date}.md`, out.join('\n') + '\n');
