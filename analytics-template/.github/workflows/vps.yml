@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
     inputs:
       action:
-        description: 'collect / report / control'
+        description: 'collect / report / control / media'
         required: true
         default: collect
       file:
@@ -50,3 +50,15 @@ jobs:
           git diff --cached --quiet && exit 0
           git commit -qm "data $(TZ=Asia/Tokyo date +%Y-%m-%dT%H:%M)"
           for i in 1 2 3; do git pull --rebase -q && git push -q && break; sleep 5; done
+      # media：VPS の動画を一時ブランチ media-tmp に置く（TikTok への予約投稿の準備用。使ったらブランチは消す）
+      - name: Fetch media
+        if: inputs.action == 'media'
+        env:
+          MOSHIMO_AN: ${{ secrets.MOSHIMO_AN }}
+        run: |
+          BASE=$(echo "$MOSHIMO_AN" | awk '{print $1}')
+          git config user.name "moshimo-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -q --orphan media-tmp && git rm -rfq . && mkdir -p media
+          for id in $(echo "${{ inputs.file }}" | tr ',' ' '); do curl -fsS -o "media/$id.mp4" "$BASE/media/$id.mp4"; ls -la "media/$id.mp4"; done
+          git add media && git commit -qm "media ${{ inputs.file }}" && git push -qf origin media-tmp

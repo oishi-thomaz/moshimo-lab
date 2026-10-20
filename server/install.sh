@@ -596,7 +596,7 @@ async function ttEmbed() {
   walk(JSON.parse(m[1]));
   if (!u && !vids.length) return { src: 'embed', error: '埋め込みページに数字がない' };
   const out = { src: 'embed', followers: u ? num(u.followerCount) : null, follows: u ? num(u.followingCount) : null, hearts: u ? num(u.heartCount) : null, media: {} };
-  for (const v of vids) if (!v.privateItem) out.media[v.id] = { t: Number(BigInt(v.id) >> 32n) * 1000, id: null, views: num(v.playCount), cap: String(v.desc || '').split('\n').join(' ').slice(0, 160) };
+  for (const v of vids) if (!v.privateItem) out.media[v.id] = { t: Number(BigInt(v.id) >> 32n) * 1000, id: null, views: num(v.playCount), cap: String(v.desc || '').split('\n').join(' ').slice(0, 300) };
   return out;
 }
 function ttCommand(msg) {
@@ -634,7 +634,81 @@ const PLAT = { ig: 'インスタ', yt: 'YouTube', tt: 'TikTok' };
 const viewsOf = r => (r ? (r.views != null ? r.views : null) : null);
 const median = a => { const s = a.filter(x => x > 0).sort((x, y) => x - y); return s.length ? s[Math.floor(s.length / 2)] : 0; };
 const kfmt = n => (n == null ? '-' : n >= 10000 ? `${(n / 10000).toFixed(n >= 100000 ? 0 : 1)}万` : n.toLocaleString('ja-JP'));
-function titleOf(p, mid, r) { const id = r && r.id; return id ? `${id} ${(meta(id).title || r.cap || '').slice(0, 24)}` : (r && r.cap) || mid; }
+// 通知に出すのは短いタイトルだけ。TikTok は手動投稿で番号がないので、キャプションとタイトル・ハッシュタグの重なりで回を当てる
+const bigr = s => { const t = String(s || '').replace(/#\S+/g, '').replace(/[\s　？?！!、。,.「」『』…・〜~]/g, '').replace(/^もしも/, ''); const b = new Set(); for (let i = 0; i < t.length - 1; i++) b.add(t.slice(i, i + 2)); return b; };
+const GENERIC_TAGS = /^(もしもラボ|もしも|雑学|shorts|もしもシリーズ|シミュレーション)$/;
+function titleOf(p, mid, r) {
+  let id = r && r.id;
+  if (!id && r && r.cap) {
+    const head = bigr(String(r.cap).split('#')[0].slice(0, 80)); let best = null, bs = 0;
+    const freq = {}; for (const iid of Object.keys(state.items)) for (const h of new Set(meta(iid).hashtags || [])) freq[h] = (freq[h] || 0) + 1;
+    for (const iid of Object.keys(state.items)) {
+      const m = meta(iid); const tb = bigr(m.title); if (tb.size < 3) continue;
+      let n = 0; for (const g of tb) if (head.has(g)) n++;
+      const sc = n / tb.size + (m.hashtags || []).filter(h => !GENERIC_TAGS.test(h) && freq[h] === 1 && String(r.cap).includes('#' + h)).length * 0.5; // その回にしかないタグが入っていれば強い手がかり
+      if (sc > bs) { bs = sc; best = iid; }
+    }
+    if (bs >= 0.45) id = best;
+  }
+  if (id && meta(id).title) return meta(id).title.replace(/^もしも/, '');
+  return String((r && r.cap) || mid).split(/[…？?！!。\n#]/)[0].replace(/^もしも/, '').slice(0, 24);
+}
+// ---- LINE の見やすいカード（Flex Message） ----
+const PCOL = { ig: '#D6246E', yt: '#E52D27', tt: '#111111' };
+const tag = (label, color) => ({ type: 'box', layout: 'vertical', flex: 0, width: '64px', backgroundColor: color, cornerRadius: '4px', paddingAll: '3px', contents: [{ type: 'text', text: label, size: 'xxs', color: '#ffffff', align: 'center', weight: 'bold' }] });
+const nz = (v, d = '-') => { const t = String(v ?? '').trim(); return t || d; };
+const deltaColor = v => (/^\+/.test(String(v)) ? '#0A7D3C' : /^[-−▲]/.test(String(v)) ? '#C62828' : '#666666');
+function bubble(title, subtitle, bodyContents, foot) {
+  const b = { type: 'bubble', size: 'mega',
+    header: { type: 'box', layout: 'vertical', backgroundColor: '#1F2937', paddingAll: '14px', contents: [{ type: 'text', text: title, color: '#ffffff', weight: 'bold', size: 'lg', wrap: true }, ...(subtitle ? [{ type: 'text', text: subtitle, color: '#CBD5E1', size: 'xs', wrap: true }] : [])] },
+    body: { type: 'box', layout: 'vertical', paddingAll: '14px', spacing: 'md', contents: bodyContents } };
+  if (foot) b.footer = { type: 'box', layout: 'vertical', paddingAll: '10px', contents: [{ type: 'text', text: foot, size: 'xxs', color: '#999999', align: 'center', wrap: true }] };
+  return b;
+}
+function flexAlert(alerts, now) {
+  const rows = [];
+  alerts.slice(0, 12).forEach((a, i) => {
+    if (i) rows.push({ type: 'separator' });
+    const value = a.kind === 'followers' ? `+${a.gain}人/時` : a.kind === 'milestone' ? `${kfmt(a.ms)}突破` : `+${kfmt(a.gain)}/時`;
+    const main = a.kind === 'followers' ? 'フォロワー' : a.title;
+    const sub = a.kind === 'followers' ? `今 ${kfmt(a.total)}人` : `累計 ${kfmt(a.total)}再生${a.kind === 'velocity' && a.base ? `・いつもの${Math.round(a.gain / a.base)}倍` : ''}`;
+    rows.push({ type: 'box', layout: 'vertical', spacing: 'xs', contents: [
+      { type: 'box', layout: 'horizontal', alignItems: 'center', contents: [tag(PLAT[a.p], PCOL[a.p]), { type: 'text', text: value, weight: 'bold', size: 'md', color: '#0A7D3C', align: 'end' }] },
+      { type: 'text', text: nz(main), size: 'sm', weight: 'bold', wrap: true, color: '#111111' },
+      { type: 'text', text: sub, size: 'xs', color: '#888888' }] });
+  });
+  return { type: 'flex', altText: `伸びてる：${alerts.map(a => a.kind === 'followers' ? `${PLAT[a.p]}フォロワー` : a.title).join('、')}`.slice(0, 390), contents: bubble('📈 伸びてる', `${fmt(now)} 時点・直近1時間`, rows, '次の手は解析のときにClaudeが打つ') };
+}
+// 日報カード：{ title, subtitle, sections: [{ head, rows: [{ label, value, delta, sub, tag }] } | { head, text } | { head, items: [..] }], foot }
+const TAGC = { インスタ: PCOL.ig, YouTube: PCOL.yt, TikTok: PCOL.tt };
+function flexReport(card) {
+  const secs = [];
+  (card.sections || []).slice(0, 12).forEach((sec, i) => {
+    if (i) secs.push({ type: 'separator' });
+    const c = sec.head ? [{ type: 'text', text: nz(sec.head), size: 'xs', color: '#6B7280', weight: 'bold' }] : [];
+    for (const r of (sec.rows || []).slice(0, 12)) {
+      const left = r.tag ? [tag(nz(r.tag), TAGC[r.tag] || '#4B5563'), { type: 'text', text: nz(r.label), size: 'sm', wrap: true, flex: 5, margin: 'sm', color: '#111111' }]
+        : [{ type: 'text', text: nz(r.label), size: 'sm', wrap: true, flex: 5, color: '#111111' }];
+      c.push({ type: 'box', layout: 'horizontal', alignItems: 'center', contents: [...left,
+        { type: 'text', text: nz(r.value), size: 'sm', weight: 'bold', align: 'end', flex: 3, color: '#111111' },
+        ...(r.delta != null && r.delta !== '' ? [{ type: 'text', text: String(r.delta), size: 'xs', align: 'end', flex: 2, color: deltaColor(r.delta) }] : [])] });
+      if (r.sub) c.push({ type: 'text', text: String(r.sub), size: 'xxs', color: '#888888', wrap: true });
+    }
+    if (sec.text) c.push({ type: 'text', text: String(sec.text).slice(0, 1500), size: 'sm', wrap: true, color: '#111111' });
+    for (const it of (sec.items || []).slice(0, 10)) c.push({ type: 'text', text: `・${it}`.slice(0, 600), size: 'sm', wrap: true, color: '#111111' });
+    if (c.length) secs.push({ type: 'box', layout: 'vertical', spacing: 'sm', contents: c }); else if (secs.length) secs.pop();
+  });
+  return { type: 'flex', altText: String(card.title || '日報').slice(0, 390), contents: bubble(nz(card.title, '日報'), card.subtitle ? String(card.subtitle) : '', secs.length ? secs : [{ type: 'text', text: '-', size: 'sm' }], card.foot ? String(card.foot) : '') };
+}
+async function pushReport(r) {
+  if (r.card) { try { await pushChecked(flexReport(r.card)); return; } catch (e) { log('flex report failed', e.message); } }
+  await push(splitLine(r.message || (r.card && JSON.stringify(r.card)) || ''));
+}
+async function pushChecked(msg) {
+  if (!state.owner || !LINE_TOKEN) throw new Error('no owner/token');
+  const res = await fetch('https://api.line.me/v2/bot/message/push', { method: 'POST', headers: { 'content-type': 'application/json', authorization: `Bearer ${LINE_TOKEN}` }, body: JSON.stringify({ to: state.owner, messages: [].concat(msg) }) });
+  if (!res.ok) throw new Error(`LINE ${res.status} ${(await res.text()).slice(0, 300)}`);
+}
 async function detectBuzz(snap) {
   const prev = state.an.prev; const now = snap.t;
   const cur = { t: now, v: {}, f: {} };
@@ -671,10 +745,10 @@ async function detectBuzz(snap) {
   for (const [k, t] of Object.entries(state.an.alerted)) if (now - t > 30 * 86400e3 && !k.startsWith('m:')) delete state.an.alerted[k];
   if (!alerts.length) return;
   state.an.alerts = [...(state.an.alerts || []), ...alerts].slice(-100); save();
-  const lines = alerts.map(a => a.kind === 'velocity' ? `${PLAT[a.p]}：${a.title}\n直近1時間で +${kfmt(a.gain)}再生${a.base ? `（いつもの約${Math.round(a.gain / a.base)}倍）` : ''} 累計${kfmt(a.total)}`
-    : a.kind === 'milestone' ? `${PLAT[a.p]}：${a.title}\n累計${kfmt(a.ms)}再生を超えた（今 ${kfmt(a.total)}）`
-    : `${PLAT[a.p]}：フォロワーが直近1時間で +${a.gain}（今 ${kfmt(a.total)}）`);
-  await push(text(`【伸びてる】\n${lines.join('\n\n')}\n\n次の手は解析のときにClaudeが打つ`));
+  // 伸びが大きい順。同じ動画の 勢い と 節目 は1行にまとめる
+  const seen = new Set(); const list = alerts.sort((x, y) => (y.gain || 0) - (x.gain || 0)).filter(a => { const k = `${a.p}:${a.k || 'f'}`; if (seen.has(k)) return false; seen.add(k); return true; });
+  try { await pushChecked(flexAlert(list, now)); }
+  catch (e) { log('flex alert failed', e.message); await push(text(`【伸びてる】\n${list.map(a => a.kind === 'followers' ? `${PLAT[a.p]} フォロワー +${a.gain}/時（今 ${kfmt(a.total)}）` : `${PLAT[a.p]} ${a.title} +${kfmt(a.gain || 0)}/時（累計 ${kfmt(a.total)}）`).join('\n')}`)); }
 }
 let collecting = false;
 async function collect() {
@@ -733,7 +807,7 @@ async function flushOutbox() {
   const box = state.an.outbox || []; if (!box.length) return;
   const due = box.filter(r => r.at <= Date.now()); if (!due.length) return;
   state.an.outbox = box.filter(r => r.at > Date.now()); save();
-  for (const r of due) await push(splitLine(r.message));
+  for (const r of due) await pushReport(r);
 }
 function anSummary() {
   const s = readSnaps(Date.now() - 26 * 3600e3); if (!s.length) return 'まだ数字が貯まってない（毎時5分に取ってる）';
@@ -824,15 +898,21 @@ http.createServer(async (req, res) => {
       if (req.method === 'POST' && p === '/an/collect') { await collect(); return send(res, 200, { ok: true, last: state.an.last }); }
       const body = JSON.parse((await readBody(req)).toString('utf8') || '{}');
       if (req.method === 'POST' && p === '/an/report') {
-        if (!body.message) return send(res, 400, { ok: false, error: 'message' });
-        const at = Number(body.at) || 0;
-        if (at > Date.now() + 60e3) { state.an.outbox = [...(state.an.outbox || []), { at, message: String(body.message) }]; save(); return send(res, 200, { ok: true, scheduled: fmt(at) }); }
-        await push(splitLine(body.message)); return send(res, 200, { ok: true, sent: true });
+        if (!body.message && !body.card) return send(res, 400, { ok: false, error: 'message or card' });
+        const at = Number(body.at) || 0; const r = { at, message: body.message ? String(body.message) : '', card: body.card || null };
+        if (at > Date.now() + 60e3) { state.an.outbox = [...(state.an.outbox || []), r]; save(); return send(res, 200, { ok: true, scheduled: fmt(at) }); }
+        await pushReport(r); return send(res, 200, { ok: true, sent: true });
       }
       if (req.method === 'POST' && p === '/an/control') {
         const out = {};
         if (body.postTimes) out.postTimes = setPostTimes(`投稿時間 ${body.postTimes}`);
         if (body.notice) { await push(text(String(body.notice))); out.notice = true; }
+        if (body.validate) { // LINE に送らずにカードの形が正しいかだけ確かめる
+          const sample = [flexAlert([{ p: 'tt', kind: 'velocity', gain: 12000, base: 800, total: 29000, title: 'ゴキブリが絶滅したら？' }, { p: 'tt', kind: 'followers', gain: 100, total: 21000 }], Date.now())];
+          if (body.card) sample.push(flexReport(body.card));
+          const vr = await fetch('https://api.line.me/v2/bot/message/validate/push', { method: 'POST', headers: { 'content-type': 'application/json', authorization: `Bearer ${LINE_TOKEN}` }, body: JSON.stringify({ messages: sample }) });
+          out.validate = `${vr.status} ${(await vr.text()).slice(0, 500)}`;
+        }
         return send(res, 200, { ok: true, ...out });
       }
       return send(res, 404, { ok: false });

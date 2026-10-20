@@ -39,6 +39,8 @@ if (action === 'collect') {
   merge('data/ig-days.json', Object.fromEntries(Object.entries(ex.igDays || {}).filter(([, v]) => !v.error)));
   if (ex.ytAnalytics) merge('data/yt-days.json', Object.fromEntries((ex.ytAnalytics.days || []).map(d => [d.day, d])));
   console.log(`snaps +${added}（${hours}時間分を確認）flags ${JSON.stringify(ex.flags)}`);
+} else if (action === 'media') {
+  console.log('media は次のステップで取る');
 } else if (action === 'report' || action === 'control') {
   if (!file || !fs.existsSync(file)) throw new Error(`file がない：${file}`);
   const body = JSON.parse(fs.readFileSync(file, 'utf8'));
