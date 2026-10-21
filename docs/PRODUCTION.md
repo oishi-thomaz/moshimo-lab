@@ -83,6 +83,15 @@ CHROME_PATH=<chromium> node tools/render.mjs --video NNNN --stills 0.5,2,5,10,16
 - scenes/dog.js：ローポリの飼い犬と小物。makeDog({kind: shiba / lab / small, coat})、dogPose（stand / sit / lie）、dogWalk・dogIdle、neckPos・handPos（リードの両端）、makeLeash（たるむリード）、makeCollar・dropCollar、makeDogHouse、makeHarness（盲導犬の白いハーネス）
 - scenes/factory.js：お弁当工場（白い壁・天井照明・2本のベルトコンベア・お弁当トレー・白衣/帽子/マスクの作業員）。LINES（各ラインの workers / trays）、setLine(dist, {pack, t})、setWorkers(fn)（持ち場が空くとおかずが欠ける）、setFactoryLight で day / dim、factorySign（タイトルと重なるときは隠す）、makeWorker(r)
 - scenes/delivery.js：宅配の玄関先（一戸建ての玄関・ステップ・表札・植木鉢・道路・向かいの家）と架空の配送車。makeVan（文字なし、setDoor・setHazard）、makeCourier、carryPose、makeParcel、makePile(scene,{cols,rows,layers})（setN）、canopy（タイトルにかかる構図では隠す）、setPorchEnv で day / dusk / night
+- scenes/spider.js：クモと虫の部品（どのシーンにも足せる）。makeSpider（.userData.anim）、makeWeb({r, spokes, rings})（ローカルxy平面に張る巣。userData.set(k) で出方0..1、shake(t)）、makeFly（flap）、makeSwarm(n, seed, 範囲)（InstancedMesh の虫の群れ。set(数, t) でふらふら飛ぶ）
+- scenes/mouselab.js：研究室（白い壁・実験台・マウスのケージ6個・棚のフラスコ・顕微鏡・白衣の研究者 researcher）。makeRodent({kind: rat / mouse, coat}) でローポリのネズミ（.userData.anim(t, moving)）、setMice(k, t) でケージのマウスの割合、setLabLight で day / night
+- scenes/crowdfield.js：見渡すかぎりの平原に人がぎっしり立つ「人の四角」（1m²に2人）。setCrowd(m²) で正方形の面積、setPeopleN(side) で近くの人形、setScale(s) で km 規模（1未満で模様を消して平均色）、makePatch(color).userData.setSize(m) で地面の正方形、crowdSky はカメラ位置に動かす、setCrowdEnv で day / dusk
+- scenes/bear.js：ローポリのツキノワグマと小物。makeBear()（+x 向き、userData.anim(t,{walk,head})、userData.stand(k) で後ろ足で立つ）、addMountains(scene,{z,color,snow}) で遠くの山並み、makeGarbage()（ゴミ置き場、scatter(k) で袋が散らばる）、makeBearSign(textSprite, 文字)（黄色い注意看板）
+- scenes/bank.js：架空の もしも銀行 の支店（ATMコーナー・入口・歩道・道路）。setBankEnv で day / dusk / night、setATM(i, ok / empty / off) でATM画面、makeQueue(n, seed).set(k, t, {look, qsOn, arrive}) で歩道に伸びるATMの行列、setShutter(k)、makeBills(n)（架空の紙幣色の札束）、bankSign（タイトルと重なる構図では隠す）
+- scenes/highway.js：片側3車線の高速道路（中央分離帯・ガードレール・架空の案内標識 もしも台）と道ばたの物流倉庫。makeTruck({kind: box / tanker / flat / garbage})（前が +x、キャブの運転手が見える。setDriver・setHazard・roll）、makeHwCar、LANES・laneX(t, speed, off, dir) で流れる車、WAREHOUSE・DOCKS（積み下ろし口8つ）、makeCratePile(n, seed) の setN で段ボールの山、setHighwayEnv で day / dusk / night
+- scenes/deerpark.js：古都の公園（芝生・松・石灯籠・朱色の鳥居・前の道路と横断歩道・向かいの低い建物）とローポリの鹿。makeDeer({kind: buck / doe / fawn})、deerWalk・deerGraze・deerBow（おじぎ）、makeHerd(max, seed, 範囲) で数千頭の群れ（setN(n)、clear(cx,cz,r) で手前だけ空ける）、setLawn(k) で芝生→土、makeCar（setBrake）、makeSenbei、setParkEnv で day / dusk
+- scenes/farm.js：日本の農村（田んぼ3×2枚・キャベツ畑・農家の家と納屋・山・電柱）。setRice(grow, gold) で稲、setVeg(k) でキャベツ、setWeeds(k) で耕作放棄（雑草が伸びて田の水が泥色に）、makeFarmer(r)（麦わら帽子の農家）と farmerWork(p, t) で腰をかがめた作業、makeTractor（架空色、userData.spin）、setFarmEnv で day / dusk / gray
+- scenes/grocer.js：スーパーの青果・卵・お米売り場（野菜の平台・卵の冷蔵ケース・米袋の山・吊り看板 やさい / たまご / お米）。setStock({veg, egg, rice}) で残る量、setSoldOut({...}) で品切れの札、tagsOn で国産の値札、setGrocerLight で day / dim
 
 ## 着地は人への影響で言い切る（2026/10/20 ゆうとの指摘・最重要）
 - 結果は「何がいくつ消えた」で終わらせない。それで人間の暮らし・お金・体・心がどう変わったかを数字で言い切る（例：蚊の回＝マラリアだけで年61万人が助かる）。
