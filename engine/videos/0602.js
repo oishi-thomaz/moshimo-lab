@@ -75,11 +75,11 @@ function makeHouse(w, h, d, wall, roofC) { const g = new THREE.Group(); const b 
 const omoya = makeHouse(3.2, 1.8, 2.4, '#d8cbb0', '#6b4f3a'); omoya.position.set(-2.2, 0.3, 0);
 const hanare = makeHouse(1.8, 1.2, 1.6, '#f2d48a', '#b8442f'); hanare.position.set(2.4, 0.3, 0.4);
 const okayu = makeLabel('母屋：おかゆ', { sx: 2.4, size: 60, bg: 'rgba(20,24,34,.85)' }); okayu.position.set(-2.2, 4.0, 0); stage.add(okayu);
-const sukiyaki = makeLabel('離れ：すき焼き', { sx: 2.6, size: 60, bg: 'rgba(180,60,40,.9)' }); sukiyaki.position.set(2.4, 3.0, 0.4); stage.add(sukiyaki);
+const sukiyaki = makeLabel('離れ：すき焼き', { sx: 2.6, size: 60, bg: 'rgba(180,60,40,.9)' }); sukiyaki.position.set(2.2, 3.0, 0.4); stage.add(sukiyaki);
 const glow = new THREE.PointLight(0xffb060, 0, 6, 1.5); glow.position.set(2.4, 1.2, 1.6); stage.add(glow);
 // ---------- surplus coins ----------
 const SPILE = []; for (let i = 0; i < 9; i++) SPILE.push(makeCoins(-2.0 + (i % 3) * 1.15, -0.8 + Math.floor(i / 3) * 1.1, 18));
-const surplusLab = makeLabel('使わずに残ったお金', { sx: 3.2, size: 60, color: GOLD, stroke: 6 }); surplusLab.position.set(0.2, 3.4, 0); stage.add(surplusLab);
+const surplusLab = makeLabel('使わずに残ったお金', { sx: 3.8, size: 60, w: 768, h: 128, color: GOLD, stroke: 6 }); surplusLab.position.set(-0.85, 3.4, 0); stage.add(surplusLab);
 // ---------- double counting bar ----------
 const HD = 5.2 / 429.5;
 const dNet = makeBar({ color: '#c0483c', x: 0, w: 2.4, d: 2.4 });
@@ -137,14 +137,14 @@ function shotTwo(t, T) {
   lift(280); mode('two');
   const g = easeOut(clamp((t - 0.3) / 1.6));
   bGen.setH(115.5 * HB * g, g > 0.05 ? (115.5 * g).toFixed(1) + '兆' : ''); bSp.setH(429.5 * HB * g, g > 0.05 ? (429.5 * g).toFixed(1) + '兆' : '');
-  const u = ease(t / 8); look(lerp(-0.4, 0.4, u), lerp(4.6, 4.4, u), lerp(14.5, 13.8, u), 0, 2.8, 0, 50);
+  const u = ease(t / 8); look(lerp(-0.3, 0.3, u), lerp(4.4, 4.2, u), lerp(17, 16.4, u), 0, 3.2, 0, 50);
   if (t < 4.1) setTop('特別会計の歳出総額（2025年度予算）', countUp(t, 4295, 0.3, 1.6) / 10 + '兆円', fade(t, 0.15, 4.1, 0.2), RED);
   else setTop('一般会計（115.5兆円）とくらべると', '約3.7倍', fade(t, 4.1, 8, 0.2), GOLD);
   return stage;
 }
 function yearN(t) { // bars grow in step with the subtitles: 2000 at 4.2s, 2006 by 8.2s, 2025 by 12.2s
-  if (t < 3.6) return 0;
-  if (t < 6.0) return 1.2 * easeOut((t - 3.6) / 2.4);
+  if (t < 2.0) return 0;
+  if (t < 6.0) return 1.2 * easeOut((t - 2.0) / 4.0);
   if (t < 9.6) return 1.2 + 5.8 * ((t - 6.0) / 3.6);
   return Math.min(26, 7 + 19 * easeOut(clamp((t - 9.6) / 3.0)));
 }
@@ -180,7 +180,7 @@ function shotBooks(t, T) {
   lift(240); mode('books');
   const k = easeOut(clamp((t - 0.4) / 2)); books.children.forEach((b, i) => { b.visible = i < 90 * k; });
   crowd.people.forEach((p, i) => { p.visible = i < 60 * clamp((t - 2.5) / 2); });
-  const u = ease(t / 12); look(lerp(-1, 1, u), lerp(4.4, 4.0, u), lerp(10, 9, u), 0, 1.0, 0, 50);
+  const u = ease(clamp((t - 2.2) / 3)); look(lerp(-2.3, 0.6, u), lerp(3.0, 4.4, u), lerp(6.5, 14, u), lerp(-2.3, 0.9, u), lerp(0.9, 1.3, u), lerp(-0.6, 0, u), 50);
   if (t < 4.2) setTop('使い道で問題になった例', '3つ', fade(t, 0.15, 4.2, 0.2));
   else if (t < 8.2) setTop('監修料を受け取った社会保険庁の職員', countUp(t - 4.2, 606, 0.1, 1.2) + '人', fade(t, 4.2, 8.2, 0.2), RED);
   else setTop('受け取った監修料（1999〜2003年度・厚労省）', '約' + (countUp(t - 8.2, 49, 0.1, 1.0) / 10) + '億円', fade(t, 8.2, 12, 0.2), RED);
@@ -203,14 +203,14 @@ function shotTheater(t, T) {
 function shotHouses(t, T) {
   lift(240); mode('houses');
   glow.intensity = 5 + Math.sin(T * 6) * 1.5;
-  const u = ease(t / 4); look(lerp(0, 0.4, u), lerp(3.8, 3.6, u), lerp(13.5, 12.8, u), 0.1, 1.8, 0, 50);
+  const u = ease(t / 4); look(lerp(0, 0.3, u), lerp(4.0, 3.8, u), lerp(18, 17.3, u), 0.1, 1.9, 0, 50);
   setTop('塩川正十郎 元財務大臣の例え', 'おかゆ と すき焼き', fade(t, 0.15, 4, 0.2), GOLD);
   return stage;
 }
 function shotSurplus(t, T) {
   lift(240); mode('surplus');
   const k = easeOut(clamp((t - 0.2) / 2)); SPILE.forEach((s, i) => s.setN(Math.round(18 * clamp(k * 1.4 - i * 0.04))));
-  const u = ease(t / 4); look(lerp(-0.5, 0.5, u), lerp(5.0, 4.8, u), lerp(11.5, 10.8, u), 0, 1.6, 0, 50);
+  const u = ease(t / 4); look(lerp(-1.1, -0.6, u), lerp(5.4, 5.2, u), lerp(14.5, 13.8, u), -0.85, 1.8, 0, 50);
   setTop('2025年度の剰余金（決算・国債整理基金を除く）', countUp(t, 162, 0.2, 1.4) / 10 + '兆円', fade(t, 0.15, 4, 0.2), GOLD);
   return stage;
 }
