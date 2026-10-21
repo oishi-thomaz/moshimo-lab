@@ -91,7 +91,7 @@ const GROUPS = { wallets: [wGen, wSp, ...accTiles], two: [bGen.g, bSp.g], years:
 function mode(m) { for (const k in GROUPS) GROUPS[k].forEach(o => { o.visible = k === m; }); spot.intensity = m === 'theater' ? 60 : 0; glow.intensity = m === 'houses' ? 6 : 0; }
 
 const SUBS = [
-  [3.0, 6.5, '国の財布は、<br>実は2つある。'],
+  [4.2, 6.5, '国の財布は、<br>実は2つある。'],
   [6.6, 10.5, '税金で回す一般会計と、<br>目的別の特別会計。'],
   [10.6, 14.4, '特別会計は、年金や<br>国債の返済など14個。'],
   [14.6, 18.5, '2025年度予算で、<br>429.5兆円。'],
