@@ -208,7 +208,17 @@ def sfx_drone(rng):
     return sig / (np.abs(sig).max() or 1)
 
 
-SFX = {'poof': (sfx_poof, 0.7), 'whoosh': (sfx_whoosh, 0.45), 'meter': (sfx_meter, 0.55), 'alarm': (sfx_alarm, 0.22), 'bubble': (sfx_bubble, 0.35),
+def sfx_howl(rng):
+    """オオカミの遠吠え（合成）：ゆっくり上がって伸びて下がる声"""
+    n = int(2.4 * SR); t = np.arange(n) / SR; u = t / t[-1]
+    f = 380 + 330 * np.sin(np.pi * np.clip(u * 1.2, 0, 1)) ** 0.8 + 6 * np.sin(2 * np.pi * 5.5 * t)
+    ph = 2 * np.pi * np.cumsum(f) / SR
+    v = (np.sin(ph) + 0.3 * np.sin(2 * ph) + 0.12 * np.sin(3 * ph)) * np.sin(np.pi * u) ** 0.7
+    v = v + 0.04 * _band(rng.standard_normal(n), 800, 3000) * np.sin(np.pi * u)
+    return v / (np.abs(v).max() or 1)
+
+
+SFX = {'howl': (sfx_howl, 0.28), 'poof': (sfx_poof, 0.7), 'whoosh': (sfx_whoosh, 0.45), 'meter': (sfx_meter, 0.55), 'alarm': (sfx_alarm, 0.22), 'bubble': (sfx_bubble, 0.35),
        'buzz': (sfx_buzz, 0.3), 'caw': (sfx_caw, 0.4), 'skitter': (sfx_skitter, 0.35), 'drone': (sfx_drone, 0.55)}
 
 
