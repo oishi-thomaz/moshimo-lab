@@ -233,6 +233,7 @@ runStory({
   shots, subs: SUBS, duration: 64.5,
   meta: {
     id: '0040',
+    series: 'お財布のもしも',
     title: 'ふるさと納税がなくなったら？',
     titleHtml: 'ふるさと納税が<br>なくなったら？',
     mood: 'emotional', seed: 40, hits: [1.4, 48.1], risers: [6.0], impacts: [10.6, 26.6, 44.0, 48.4],

@@ -163,6 +163,7 @@ runStory({
   shots, subs: SUBS, duration: 64.5,
   meta: {
     id: '0032',
+    series: '人体の限界',
     title: '1日30分睡眠で生活したら？',
     titleHtml: '1日30分睡眠で<br>生活したら？',
     mood: 'tension', seed: 32, hits: [1.0, 30.2, 48.1], risers: [1.0, 39.2],

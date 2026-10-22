@@ -194,6 +194,7 @@ runStory({
   shots, subs: SUBS, duration: 64.5,
   meta: {
     id: '0024',
+    series: '日本人全員で',
     title: '日本人1億2千万人が一列に並んだら？',
     titleHtml: '日本人1億2千万人が<br>一列に並んだら？',
     mood: 'calm', seed: 24, hits: [10.1, 39.1, 48.1], risers: [30.1],

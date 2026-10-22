@@ -241,6 +241,7 @@ runStory({
   shots, subs: SUBS, duration: 124.5,
   meta: {
     id: '0035',
+    series: 'ヤバい順',
     title: '1つ消えたら、人類が一番ヤバい生き物はどれ？',
     titleHtml: '<span style="font-size:.84em">1つ消えたら、人類が</span><br>一番ヤバい生き物は？',
     mood: 'mystery', seed: 35, hits: [83.4, 108.1], risers: [83.2, 107.8],

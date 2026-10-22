@@ -39,10 +39,14 @@ const roll = (u, target) => target * easeOut(u);
 // meta.endStats: [['全国のコンビニ店舗数', '56,054店', '2025年末'], ...]
 // meta.sources: '出典：...'（<br>可）
 function setupCards(meta) {
-  document.getElementById('title').innerHTML = hang(meta.titleHtml || meta.title || '');
+  // meta.series：柱シリーズ名（plan/STRATEGY.md）。表紙にバッジ、まとめカードにフォローの一言を出す
+  const badge = meta.series ? `<div class="badge sans">${esc(meta.series)}シリーズ</div>` : '';
+  document.getElementById('title').innerHTML = badge + hang(meta.titleHtml || meta.title || '');
   document.querySelector('#end .t').innerHTML = hang(meta.titleHtml || meta.title || '');
   document.querySelector('#end .s').innerHTML = hang((meta.endStats || []).map(([l, v, y]) => `${esc(l)}<b>${esc(v)}</b>${y ? '（' + esc(y) + '）' : ''}`).join('<br>'));
   document.querySelector('#end .ask').innerHTML = meta.ask ? hang(esc(meta.ask)) + '<small>コメントで教えて</small>' : '';
+  const nx = document.querySelector('#end .nx');
+  if (nx) nx.innerHTML = meta.series ? `${esc(meta.series)}シリーズは続く<small>フォローして次の回を待ってて</small>` : '';
   document.querySelector('#end .src').innerHTML = hang(meta.sources || '');
 }
 

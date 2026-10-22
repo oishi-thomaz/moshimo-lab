@@ -157,6 +157,7 @@ runStory({
   shots, subs: SUBS, duration: 64.5, camera: cityCam, dim: f => f === shot1 || f === shot4,
   meta: {
     id: '0008',
+    series: 'お財布のもしも',
     title: '1ドル300円になったら？',
     titleHtml: '1ドル300円に<br>なったら？',
     mood: 'tension', seed: 9, hits: [1.0, 48.1], risers: [1.0],

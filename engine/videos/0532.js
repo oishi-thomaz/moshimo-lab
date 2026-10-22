@@ -187,6 +187,7 @@ runStory({
   shots, subs: SUBS, duration: 64.5,
   meta: {
     id: '0532',
+    series: '日本人全員で',
     title: '全人類が1か所に立ったら？',
     titleHtml: '全人類が<br>1か所に立ったら？',
     mood: 'mystery', seed: 532, hits: [1.5, 48.1], risers: [22.0], impacts: [26.3, 43.8],

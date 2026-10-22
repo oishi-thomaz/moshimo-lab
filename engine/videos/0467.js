@@ -239,6 +239,7 @@ runStory({
   shots, subs: SUBS, duration: 64.5,
   meta: {
     id: '0467',
+    series: '絶滅ボタン',
     title: '世界中のネズミが消えたら？',
     titleHtml: '世界中のネズミが<br>消えたら？',
     mood: 'mystery', seed: 467, hits: [1.2, 48.1], risers: [6.0], impacts: [22.6, 35.0],

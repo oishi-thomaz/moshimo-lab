@@ -162,6 +162,7 @@ runStory({
   shots, subs: SUBS, duration: 64.5,
   meta: {
     id: '0534',
+    series: 'お財布のもしも',
     title: '全員が同時に預金を下ろしに行ったら？',
     titleHtml: '全員が同時に<br>預金を下ろしたら？',
     hookType: 'H1', cat: 'お金・経済',

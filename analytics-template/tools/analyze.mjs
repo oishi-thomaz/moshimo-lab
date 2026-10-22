@@ -67,7 +67,7 @@ const firstT = snaps[0].t;
 // ---------- 動画の番号をそろえる（TikTok は手動投稿なのでタイトルで照合） ----------
 const norm = s => String(s || '').replace(/[\s　？?！!、。,.「」『』…・〜~🦟🪳😳👇]/g, '').toLowerCase();
 const bigrams = s => { const t = norm(s).replace(/^もしも/, ''); const b = new Set(); for (let i = 0; i < t.length - 1; i++) b.add(t.slice(i, i + 2)); return b; };
-const cands = Object.entries(items).map(([id, i]) => ({ id, bg: bigrams(i.title), tags: (i.hashtags || []).filter(h => !/もしもラボ|^もしも$|雑学|shorts/i.test(h)).map(h => norm(h)) })).filter(c => c.bg.size >= 3);
+const cands = Object.entries(items).map(([id, i]) => ({ id, pub: i.publishedAt || i.publishAt || 0, bg: bigrams(i.title), tags: (i.hashtags || []).filter(h => !/もしもラボ|^もしも$|雑学|shorts/i.test(h)).map(h => norm(h)) })).filter(c => c.bg.size >= 3);
 // TikTok は手動投稿でキャプションの書き方が違うので、タイトルの2文字の重なりとハッシュタグの一致で一番近い回に寄せる
 const matchCache = {};
 const idOf = (p, k) => {
@@ -76,6 +76,8 @@ const idOf = (p, k) => {
   const text = norm(r.cap); const head = bigrams(String(r.cap || '').split('#')[0].slice(0, 60));
   let best = null, bestScore = 0;
   for (const c of cands) {
+    // インスタ・YouTube に出る24時間以上前の TikTok 投稿は、その回ではない（10/21 ゴキブリが 0601 人間が消えたら に寄った件）
+    if (c.pub && created[p][k] && created[p][k] < c.pub - 24 * H) continue;
     let inter = 0; for (const g of c.bg) if (head.has(g)) inter++;
     const score = inter / c.bg.size + c.tags.filter(t => t.length >= 2 && text.includes(t)).length * 0.3;
     if (score > bestScore) { bestScore = score; best = c.id; }
@@ -84,8 +86,8 @@ const idOf = (p, k) => {
 };
 // blueprint にない番号（0031〜など個別に作った回）は、動画ファイルの META.hookType / META.cat があればそれを使う
 const fileMeta = {};
-const metaOf = id => { if (!(id in fileMeta)) { let m = {}; try { const src = fs.readFileSync(path.join(LAB, `engine/videos/${id}.js`), 'utf8'); const g = k => (src.match(new RegExp(`${k}:\\s*'([^']*)'`)) || [])[1]; m = { title: g('title'), hook_type: g('hookType'), cat: g('cat'), mood: g('mood') }; } catch {} fileMeta[id] = m; } return fileMeta[id]; };
-const info = id => { const b = { ...metaOf(id), ...Object.fromEntries(Object.entries(bp[id] || {}).filter(([, v]) => v)) }; const i = items[id] || {}; return { title: i.title || b.title || '', hook: b.hook_type || '', cat: b.cat || '', mood: b.mood || '', virality: b.virality || '', slot: i.publishedAt ? hm(i.publishedAt) : '' }; };
+const metaOf = id => { if (!(id in fileMeta)) { let m = {}; try { const src = fs.readFileSync(path.join(LAB, `engine/videos/${id}.js`), 'utf8'); const g = k => (src.match(new RegExp(`${k}:\\s*'([^']*)'`)) || [])[1]; m = { title: g('title'), hook_type: g('hookType'), cat: g('cat'), mood: g('mood'), series: g('series') }; } catch {} fileMeta[id] = m; } return fileMeta[id]; };
+const info = id => { const b = { ...metaOf(id), ...Object.fromEntries(Object.entries(bp[id] || {}).filter(([, v]) => v)) }; const i = items[id] || {}; return { title: i.title || b.title || '', hook: b.hook_type || '', cat: b.cat || '', mood: b.mood || '', series: b.series || '', virality: b.virality || '', slot: i.publishedAt ? hm(i.publishedAt) : '' }; };
 
 // ---------- 窓ごとの集計 ----------
 function windowStats(p, from, to) {
@@ -136,8 +138,8 @@ function trends(p) {
   const rows = details[p].filter(d => d.id && d.ageH != null && d.ageH >= 24).map(d => ({ ...d, v24: d.curve && d.curve[24] != null ? d.curve[24] : d.views ?? d.likes }));
   const by = key => { const g = {}; for (const r of rows) { const k2 = r[key] || '不明'; (g[k2] = g[k2] || []).push(r.v24); } return Object.entries(g).map(([k2, a]) => ({ key: k2, n: a.length, med: med(a), avg: avg(a) })).sort((x, y) => (y.med || 0) - (x.med || 0)); };
   const i2 = id => info(id);
-  rows.forEach(r => { const x = i2(r.id); r.mood = x.mood; });
-  return { n: rows.length, hook: by('hook'), cat: by('cat'), slot: by('slot'), mood: by('mood') };
+  rows.forEach(r => { const x = i2(r.id); r.mood = x.mood; r.series = x.series || '（シリーズ外）'; });
+  return { n: rows.length, series: by('series'), hook: by('hook'), cat: by('cat'), slot: by('slot'), mood: by('mood') };
 }
 const trend = Object.fromEntries(Object.keys(PLATS).map(p => [p, trends(p)]));
 
@@ -182,7 +184,7 @@ out.push('## 傾向（投稿から24時間の再生の中央値。本数が少�
 for (const p of Object.keys(PLATS)) {
   const t = trend[p]; if (!t.n) continue;
   out.push(`### ${PLATS[p]}（${t.n}本）`);
-  for (const [name, list] of [['フックの型', t.hook], ['ジャンル', t.cat], ['投稿時間', t.slot], ['ムード', t.mood]]) out.push(`- ${name}：${list.map(x => `${x.key} ${n(x.med)}（${x.n}本）`).join('、')}`);
+  for (const [name, list] of [['柱シリーズ', t.series], ['フックの型', t.hook], ['ジャンル', t.cat], ['投稿時間', t.slot], ['ムード', t.mood]]) out.push(`- ${name}：${list.map(x => `${x.key} ${n(x.med)}（${x.n}本）`).join('、')}`);
 }
 out.push('');
 const igd = Object.entries(igDays).sort().slice(-7);
@@ -203,7 +205,7 @@ if (ytd.length) {
 }
 if (alerts24.length) { out.push('## 24時間以内の急上昇の通知'); for (const a of alerts24) out.push(`- ${md(a.t)} ${PLATS[a.p]} ${a.title || ''} ${a.kind} +${n(a.gain)} 累計${n(a.total)}`); out.push(''); }
 out.push(`## これから書き出す在庫（${upcoming.length}本・上から順）`);
-for (const id of upcoming.slice(0, 15)) { const b = { ...metaOf(id), ...(bp[id] || {}) }; out.push(`- ${id} ${b.title || ''}（${b.hook_type || '-'} ／ ${b.cat || '-'} ／ ${b.virality || '-'}）`); }
+for (const id of upcoming.slice(0, 15)) { const b = { ...metaOf(id), ...(bp[id] || {}) }; out.push(`- ${id} ${b.title || ''}（${b.series || '挑戦'} ／ ${b.hook_type || '-'} ／ ${b.cat || '-'} ／ ${b.virality || '-'}）`); }
 out.push('');
 out.push(`投稿時間：今日 ${(st.postTimesToday || []).join('、')}（通常 ${(st.postTimesDefault || []).join('、')}）`);
 out.push(`TikTok にまだ上がってないインスタ投稿済みの動画（古い順。タイトルで照合しているので漏れがあり得る）：${ttTodo.join('、') || 'なし'}`);
