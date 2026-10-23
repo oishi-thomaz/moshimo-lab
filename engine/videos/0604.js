@@ -1,22 +1,27 @@
 import * as THREE from 'three';
-import { clamp, lerp, ease, easeOut, easeBack, fade, mat, box } from '../lib.js';
+import { clamp, lerp, ease, easeOut, easeBack, fade, mat, box, makePerson } from '../lib.js';
 import { stage, makeBar, makeCoins, makeCrowd, makeLabel } from '../scenes/stage.js';
 import { lift, look, runStory, endCard, countUp, makeSparkles, setTop, el } from '../story.js';
 
-// もしも中国と日本が合併したら？（数字で比べるだけ。どちらかを良い悪いとは言わない）
-// 数字
+// もしも中国と日本が合併したら？（数字と制度で比べるだけ。どちらが良い悪いとは言わない）
+// 人口・面積
 //   中国の総人口：14億489万人（2025年末・中国国家統計局 2026年1月19日発表）
-//   日本の総人口：1億2,265万人（2026年9月1日概算値・総務省統計局 人口推計）
-//     → 合計 15億2,754万人。日本の割合 8.03% ≒ 8%
-//   インドの人口：約14億6,000万人（2025年・国連 世界人口推計2024）→ 合計はインドを上回る
-//   面積：中国 約960万km²（中国政府）、日本 約37.8万km²（国土地理院）→ 日本は合計の約3.8%
-//   名目GDP（2025年・IMF 2026年10月版）：米国30.86兆ドル、中国19.63兆ドル、日本4.45兆ドル → 合計24.08兆ドル
-//   1人あたり名目GDP（2025年・IMF 2026年10月版）：日本36,119ドル、中国13,970ドル
-//     → 合併後の平均 24.08兆÷15億2,754万 ≒ 15,764ドル ≒ 約1.6万ドル（日本の約44%）
-//   軍事費（2025年・SIPRI 2026年4月）：米国9,540億ドル、中国3,360億ドル（推定）、日本622億ドル → 合計3,982億ドル（米国の約42%）
-//   パリ五輪2024：米国 金40・計126、中国 金40・計91、日本 金20・計45 → 合計 金60・計136
-//   時差：中国は全土で1つの標準時（UTC+8）、日本はUTC+9
-//   中国ではグレート・ファイアウォールでInstagram、YouTube、LINE、Google、Xなどがつながらない
+//   日本の総人口：1億2,265万人（2026年9月1日概算値・総務省統計局 人口推計）→ 合計15億2,754万人、日本の割合8.03%
+//   インド：約14億6,000万人（2025年・国連 世界人口推計2024）
+//   面積：中国 約960万km²、日本 約37.8万km² → 日本は約3.8%
+// 日本列島の扱い（2つの型を並べるだけ）
+//   中国の省レベルの区分：省・自治区・直轄市・特別行政区
+//   広東省の常住人口：1億2,859万人（2025年末・広東省統計 / 第一財経 2026年3月）→ 日本（1億2,265万人）は広東省に次ぐ規模
+//   香港（特別行政区）：基本法により独自の法律・通貨（香港ドル）を維持
+// 省になった場合のルールの違い（中国の法律）
+//   右側通行：道路交通安全法 第35条（日本は道路交通法で左側通行）
+//   結婚できる年齢：民法典で男22歳・女20歳（日本は男女とも18歳）
+//   お酒：未成年者（18歳未満）への販売禁止（未成年人保護法 第59条）／日本は20歳未満の飲酒禁止
+//   国の議会の代表：全国人民代表大会の代表は下の段階の人民代表大会が選ぶ間接選挙（選挙法 第2条）。有権者が直接選ぶのは県・郷レベルまで
+//   ネット：グレート・ファイアウォールでInstagram、YouTube、LINE、Google、Xなどがつながらない
+// 治安：殺人の発生率（10万人あたり）日本0.2（2017年・犯罪白書/UNODC）、中国0.5（2020年・世界銀行/UNODC）
+// 時差：中国は全土で1つの標準時（UTC+8）、日本はUTC+9
+// 1人あたり名目GDP（2025年・IMF 2026年10月版）：日本36,119ドル、中国13,970ドル。合併後の平均 24.08兆÷15億2,754万 ≒ 15,764ドル（日本の約44%）
 
 const GOLD = '#ffe08a', RED = '#ff8a7a', GREEN = '#7ff0c8', BLUE = '#7fd4ff', PINK = '#ff7ab8';
 const CN = '#d9534f', JP = '#f2f2f2', MIX = '#b46ad9', US = '#4f8fd9';
@@ -74,10 +79,30 @@ const bigPhone = new THREE.Group(); stage.add(bigPhone);
 bigPhone.position.set(0, 3.0, 0);
 // ---------- name ----------
 const nameQ = makeLabel('国の名前：？？？', { sx: 4.4, size: 72, color: GOLD, stroke: 8, w: 768, h: 128 }); stage.add(nameQ);
+// ---------- status tags ----------
+const tagProv = makeLabel('省？', { sx: 2.0, size: 90, color: '#ffffff', bg: 'rgba(217,83,79,.92)', w: 384 }); stage.add(tagProv);
+const tagSar = makeLabel('特別行政区？', { sx: 3.4, size: 70, color: '#ffffff', bg: 'rgba(80,120,200,.92)', w: 768, h: 128 }); stage.add(tagSar);
+const keepLab = makeLabel('法律もお金も 今のまま', { sx: 4.4, size: 60, color: GREEN, stroke: 8, w: 1024, h: 128 }); stage.add(keepLab);
+// ---------- road ----------
+const road = new THREE.Group(); stage.add(road);
+{ const r = box(4.0, 0.06, 16, mat('#2b2f38')); r.position.y = 0.33; road.add(r);
+  for (let i = 0; i < 8; i++) { const d = box(0.12, 0.07, 1.0, mat('#f2f2f2')); d.position.set(0, 0.35, -7 + i * 2); road.add(d); } }
+const car = new THREE.Group(); road.add(car);
+{ const b = box(1.1, 0.5, 2.0, mat('#e04848')); b.position.y = 0.65; car.add(b); const c = box(0.9, 0.4, 1.0, mat('#c9d6e8')); c.position.set(0, 1.08, -0.1); car.add(c); }
+const sideLab = makeLabel('左側通行', { sx: 2.6, size: 76, stroke: 8, w: 512 }); stage.add(sideLab);
+// ---------- marriage / alcohol / vote ----------
+const groom = makePerson({ skin: '#f1c7a3', hair: '#222', shirt: '#2d3446', pants: '#2d3446', tie: true }); groom.position.set(-0.6, 0.3, 0); stage.add(groom);
+const bride = makePerson({ skin: '#f3cfb0', hair: '#3a2a1a', shirt: '#ffffff', pants: '#ffffff', long: true, skirt: true }); bride.position.set(0.6, 0.3, 0); stage.add(bride);
+const ageLab = makeLabel('', { sx: 3.6, size: 70, color: GOLD, stroke: 8, w: 768, h: 128 }); stage.add(ageLab);
+const bottle = new THREE.Group(); stage.add(bottle);
+{ const b = box(0.7, 1.6, 0.7, mat('#3a7a3a', { transparent: true, opacity: 0.9 })); b.position.y = 1.1; bottle.add(b); const n = box(0.28, 0.6, 0.28, mat('#3a7a3a')); n.position.y = 2.2; bottle.add(n); const l = box(0.72, 0.5, 0.72, mat('#f2e6c8')); l.position.y = 1.1; bottle.add(l); }
+const ballot = new THREE.Group(); stage.add(ballot);
+{ const b = box(1.6, 1.4, 1.2, mat('#d8dde6')); b.position.y = 1.0; ballot.add(b); const s = box(0.8, 0.05, 0.12, mat('#222')); s.position.y = 1.73; ballot.add(s); const p = box(0.6, 0.8, 0.02, mat('#ffffff')); p.position.set(0, 2.2, 0); ballot.add(p); ballot.userData.paper = p; }
+const voteLab = makeLabel('国の代表は 間接選挙', { sx: 4.4, size: 64, color: RED, stroke: 8, w: 1024, h: 128 }); stage.add(voteLab);
 
 const GROUPS = {
-  land: [cnTile, jpTile, cnName, jpName, areaLab], crowd: [crowd.g, crowdLab, popLab], bars: [B.a.g, B.b.g, B.c.g, stackJP],
-  clocks: [clkJ, clkC, clkLabJ, clkLabC], apps: appTiles, phone: [bigPhone], name: [nameQ],
+  land: [cnTile, jpTile, cnName, jpName, areaLab], tags: [tagProv, tagSar, keepLab], crowd: [crowd.g, crowdLab, popLab], bars: [B.a.g, B.b.g, B.c.g, stackJP],
+  clocks: [clkJ, clkC, clkLabJ, clkLabC], apps: appTiles, phone: [bigPhone], name: [nameQ], road: [road, sideLab], couple: [groom, bride], age: [ageLab], bottle: [bottle], vote: [ballot, voteLab],
 };
 function mode(...ms) { for (const k in GROUPS) GROUPS[k].forEach(o => { o.visible = ms.includes(k); }); mergeSpark.set(0); }
 function pop(s, t0, t, sx, sy) { const k = easeBack(clamp((t - t0) / 0.5)); s.scale.set(sx * k, sy * k, 1); s.visible = k > 0.01; }
@@ -85,23 +110,24 @@ function pop(s, t0, t, sx, sy) { const k = easeBack(clamp((t - t0) / 0.5)); s.sc
 const SUBS = [
   [4.2, 8.0, '人口は、中国が約14億人。<br>日本が約1.2億人。'],
   [8.1, 12.0, '合わせて約15.3億人。<br>インドを抜いて世界1位。'],
-  [12.1, 16.0, 'そのうち日本人は、<br>たったの8%。'],
-  [16.1, 20.0, '100人の会議なら、<br>日本人は8人だけ。'],
-  [20.1, 24.0, '面積は、日本が<br>全体の約3.8%。'],
-  [24.1, 28.0, 'GDPは合計24.1兆ドル。<br>アメリカは30.9兆。'],
-  [28.1, 32.0, '合併しても、<br>アメリカには届かない。'],
-  [32.1, 36.0, '1人あたりGDPは、<br>日本3.6万ドル、中国1.4万。'],
-  [36.1, 40.0, '合併後の平均は1.6万ドル。<br>日本の半分以下。'],
-  [40.1, 44.0, '軍事費は合わせて<br>3,982億ドル。'],
-  [44.1, 48.0, 'それでもアメリカの<br>約4割。'],
-  [48.1, 52.0, 'パリ五輪の金メダルは、<br>合わせて60個。'],
-  [52.1, 56.0, 'アメリカの40個を抜いて、<br>世界1位。'],
-  [56.1, 60.0, '時差の1時間も消える。<br>中国は国じゅう同じ時間。'],
-  [60.1, 64.0, 'もし中国のネットのルールに<br>合わせたら…'],
-  [64.1, 68.0, 'インスタもYouTubeも、<br>LINEもGoogleも使えない。'],
-  [68.1, 76.0, '結果：人口も金メダルも世界一。<br>でも日本人は100人中8人。'],
-  [76.1, 78.7, 'そしてこの動画も、<br>中国では見られない。'],
-  [78.8, 82.2, '合併したら、<br>国の名前どうする？'],
+  [12.1, 16.0, '日本人は100人中、<br>たったの8人。'],
+  [16.1, 20.0, '面積は、日本が<br>全体の約3.8%。'],
+  [20.1, 24.0, 'じゃあ日本列島は、<br>どういう扱いになる？'],
+  [24.1, 28.0, '省になるなら、人口は<br>広東省に次ぐ2番目。'],
+  [28.1, 32.0, '香港のような特別行政区なら、<br>法律もお金も今のまま。'],
+  [32.1, 36.0, '省になった場合、<br>暮らしのルールが変わる。'],
+  [36.1, 40.0, '車は左側通行から、<br>右側通行に。'],
+  [40.1, 44.0, '結婚できる年齢は、18歳から<br>男22歳・女20歳に。'],
+  [44.1, 48.0, 'お酒を買えるのは、<br>20歳から18歳に。'],
+  [48.1, 52.0, '国の議会の代表は、<br>直接選べなくなる。'],
+  [52.1, 56.0, 'インスタもYouTubeも、<br>LINEもGoogleもつながらない。'],
+  [56.1, 60.0, '治安は、殺人の発生率が<br>日本0.2、中国0.5。'],
+  [60.1, 64.0, 'どちらも世界で<br>トップクラスに低い。'],
+  [64.1, 68.0, '時差の1時間も消える。<br>中国は国じゅう同じ時間。'],
+  [68.1, 72.0, '1人あたりGDPの平均は、<br>日本の半分以下に。'],
+  [72.1, 80.2, '結果：日本人は100人中8人。<br>車も結婚もネットも変わる。'],
+  [80.3, 82.9, 'そしてこの動画も、<br>中国では見られない。'],
+  [83.0, 86.6, '合併したら、<br>国の名前どうする？'],
 ];
 
 // ---------- shots ----------
@@ -118,17 +144,16 @@ function shot0(t, T) { lift(300); landScene(t, clamp((t - 1.2) / 2.2)); if (t > 
 function shotPop(t, T) {
   lift(240); mode('crowd');
   const hi = t > 8.0; rings.forEach((r, j) => { r.visible = hi && t > 8.2 + j * 0.1; r.scale.setScalar(1 + Math.sin(T * 6) * 0.08); });
-  crowd.people.forEach((p, i) => { const isJ = JP8.includes(i); p.position.y = isJ && hi ? Math.abs(Math.sin(T * 5 + i)) * 0.15 : 0; });
+  crowd.people.forEach((p, i) => { p.position.y = JP8.includes(i) && hi ? Math.abs(Math.sin(T * 5 + i)) * 0.15 : 0; });
   popLab.position.set(0, 3.7, 0);
   if (t < 3.9) { popLab.userData.set('14億489万 ＋ 1億2,265万'); pop(popLab, 0.2, t, 4.6, 0.77); }
   else if (t < 7.9) { popLab.userData.set('合計 15億2,754万人'); pop(popLab, 4.0, t, 4.6, 0.77); }
   else popLab.visible = false;
-  crowdLab.position.set(0, 3.6, 1.0); crowdLab.userData.set(t < 11.9 ? '日本人 8%' : '100人中 8人'); if (t > 8.2) pop(crowdLab, 8.2, t, 3.6, 0.9); else crowdLab.visible = false;
-  const u = ease(t / 16); look(lerp(0, 0.4, u), lerp(7.0, 6.2, u), lerp(13, 12, u), 0, 1.2, 0, 50);
+  crowdLab.position.set(0, 3.6, 1.0); crowdLab.userData.set('100人中 8人'); if (t > 8.2) pop(crowdLab, 8.2, t, 3.6, 0.9); else crowdLab.visible = false;
+  const u = ease(t / 12); look(lerp(0, 0.4, u), lerp(7.0, 6.2, u), lerp(13, 12, u), 0, 1.2, 0, 50);
   if (t < 3.9) setTop('人口（中国2025年末・日本2026年9月）', '中国14億・日本1.2億', fade(t, 0.15, 3.9, 0.2), GOLD);
   else if (t < 7.9) setTop('合計（インドは約14.6億）', '15億2,754万人', fade(t, 3.9, 7.9, 0.2), GOLD);
-  else if (t < 11.9) setTop('合併後の日本人の割合', '8%', fade(t, 7.9, 11.9, 0.2), BLUE);
-  else setTop('100人の会議なら', '日本人は8人', fade(t, 11.9, 15.9, 0.2), BLUE);
+  else setTop('合併後の日本人の割合', '8%', fade(t, 7.9, 11.9, 0.2), BLUE);
   return stage;
 }
 function shotArea(t, T) {
@@ -139,97 +164,139 @@ function shotArea(t, T) {
   setTop('面積（中国 約960万km²・日本 約37.8万km²）', '日本は約3.8%', fade(t, 0.15, 3.9, 0.2), BLUE);
   return stage;
 }
-function barScene(t, T, H, a, b, c, labs, stack, cols = [MIX, US, MIX]) {
-  mode('bars'); setNames(...labs); B.a.mat.color.set(cols[0]); B.b.mat.color.set(cols[1]); B.c.mat.color.set(cols[2]); B.a.g.position.y = 0.3;
-  const g1 = easeOut(clamp((t - 0.2) / 1.4)), g2 = easeOut(clamp((t - 0.8) / 1.4));
-  B.a.setH(a.h * H * g1, a.v); B.b.setH(b.h * H * g2, b.v);
-  if (c) { B.c.g.visible = true; B.a.g.position.x = -2.5; B.c.g.position.x = 0; B.b.g.position.x = 2.5; B.c.setH(c.h * H * easeOut(clamp((t - 1.4) / 1.4)), c.v); }
-  else { B.c.g.visible = false; B.a.g.position.x = -1.4; B.b.g.position.x = 1.4; }
-  stackJP.visible = !!stack; if (stack) { stackJP.position.set(B.a.g.position.x, 0.3 + (a.h - stack) * H * g1, 0); stackJP.scale.y = Math.max(0.001, stack * H * g1); }
-  look(0, 4.4, c ? 15.5 : 13.5, 0, 2.9, 0, 50);
-}
-function shotGDP(t, T) {
-  lift(240); const H = 4.6 / 30.86;
-  barScene(t, T, H, { h: 24.08, v: '24.1兆ドル' }, { h: 30.86, v: '30.9兆ドル' }, null, ['中国＋日本', 'アメリカ', ''], 4.45);
-  if (t < 3.9) setTop('名目GDP（2025年・IMF）', '合わせて24.1兆ドル', fade(t, 0.15, 3.9, 0.2), GOLD);
-  else setTop('アメリカとの差', 'まだ届かない', fade(t, 3.9, 7.9, 0.2), RED);
+function shotStatus(t, T) {
+  lift(240); landScene(t, 1); mode('land', 'tags'); areaLab.visible = false;
+  jpTile.position.y = 0.45 + Math.abs(Math.sin(T * 3)) * 0.12;
+  const jx = jpTile.position.x, jz = jpTile.position.z;
+  tagProv.position.set(jx - 0.9, 2.8, jz + 0.6); tagSar.position.set(jx - 1.2, 1.8, jz + 1.6); keepLab.position.set(-0.2, 3.6, -1.0);
+  if (t < 3.9) { pop(tagProv, 0.5, t, 2.0, 1.0); pop(tagSar, 1.2, t, 3.4, 0.57); keepLab.visible = false; }
+  else if (t < 7.9) { tagProv.visible = false; tagSar.visible = false; }
+  else { tagProv.visible = false; pop(tagSar, 8.0, t, 3.4, 0.57); pop(keepLab, 8.6, t, 4.4, 0.55); }
+  const u = ease(t / 12); look(lerp(0.6, 0.4, u), lerp(12, 13, u), lerp(5.5, 6.0, u), 0.4, 0, -1.0, 50);
+  if (t < 3.9) setTop('中国の区分', '省？ 特別行政区？', fade(t, 0.15, 3.9, 0.2), GOLD);
+  else if (t < 7.9) setTop('省になるなら（広東省 1億2,859万人）', '人口2番目の省', fade(t, 3.9, 7.9, 0.2), RED);
+  else setTop('香港型の特別行政区なら', '法律もお金もそのまま', fade(t, 7.9, 11.9, 0.2), GREEN);
   return stage;
 }
-function shotPer(t, T) {
-  lift(240); const H = 4.4 / 36.119;
-  barScene(t, T, H, { h: 36.119, v: '3.6万ドル' }, { h: 13.97, v: '1.4万ドル' }, t > 4 ? { h: 15.764, v: '約1.6万ドル' } : null, ['日本', '中国', '合併後'], 0, ['#e8e8e8', CN, MIX]);
-  if (!(t > 4)) { B.c.g.visible = false; }
-  if (t < 3.9) setTop('1人あたり名目GDP（2025年・IMF）', '日本3.6万・中国1.4万', fade(t, 0.15, 3.9, 0.2), GOLD);
-  else setTop('合併後の平均', '日本の半分以下', fade(t, 3.9, 7.9, 0.2), RED);
+function shotGuang(t, T) {
+  lift(240); const H = 4.4 / 128.59; mode('bars'); setNames('広東省', '日本', '');
+  B.a.mat.color.set(CN); B.b.mat.color.set('#e8e8e8'); B.c.g.visible = false; stackJP.visible = false;
+  B.a.g.position.set(-1.4, 0.3, 0); B.b.g.position.set(1.4, 0.3, 0);
+  const g1 = easeOut(clamp((t - 0.2) / 1.2)), g2 = easeOut(clamp((t - 0.7) / 1.2));
+  B.a.setH(128.59 * H * g1, '1億2,859万'); B.b.setH(122.65 * H * g2, '1億2,265万');
+  look(0, 4.4, 14.5, 0, 3.0, 0, 50);
+  setTop('省になるなら（広東省 1億2,859万人）', '人口2番目の省', fade(t, 0.15, 3.9, 0.2), RED);
   return stage;
 }
-function shotMil(t, T) {
-  lift(240); const H = 4.6 / 954;
-  barScene(t, T, H, { h: 398.2, v: '3,982億ドル' }, { h: 954, v: '9,540億ドル' }, null, ['中国＋日本', 'アメリカ', ''], 62.2);
-  if (t < 3.9) setTop('軍事費（2025年・SIPRI）', '合わせて3,982億ドル', fade(t, 0.15, 3.9, 0.2), GOLD);
-  else setTop('アメリカとくらべて', '約4割', fade(t, 3.9, 7.9, 0.2), RED);
+function shotRules(t, T) {
+  lift(240); mode('land', 'tags'); landScene(t, 1); mode('land', 'tags'); areaLab.visible = false; tagSar.visible = false; keepLab.visible = false;
+  tagProv.userData.set('省'); tagProv.position.set(jpTile.position.x - 0.6, 2.4, jpTile.position.z + 0.6); pop(tagProv, 0.3, t, 2.0, 1.0);
+  look(0.6, 11, 5.0, 0.6, 0, -1.2, 50);
+  setTop('もし省になったら', 'ルールが変わる', fade(t, 0.15, 3.9, 0.2), RED);
   return stage;
 }
-function shotGold(t, T) {
-  lift(240); const H = 4.4 / 60;
-  barScene(t, T, H, { h: 60, v: '金60個' }, { h: 40, v: '金40個' }, null, ['中国＋日本', 'アメリカ', ''], 20, ['#e0b04a', US, MIX]); if (t > 4.2) B.a.g.position.y = 0.3 + Math.abs(Math.sin(T * 5)) * 0.15; else B.a.g.position.y = 0.3;
-  if (t < 3.9) setTop('パリ五輪の金メダル（中国40・日本20）', '60個', fade(t, 0.15, 3.9, 0.2), GOLD);
-  else setTop('アメリカ40個を抜いて', '世界1位', fade(t, 3.9, 7.9, 0.2), GOLD);
+function shotRoad(t, T) {
+  lift(240); mode('road');
+  const sw = ease(clamp((t - 1.6) / 1.0));
+  car.position.set(lerp(-1.0, 1.0, sw), 0, 6 - ((t * 3) % 12)); car.rotation.y = Math.PI;
+  sideLab.userData.set(sw < 0.5 ? '左側通行' : '右側通行'); sideLab.position.set(0, 3.2, 0); sideLab.scale.set(2.6, 0.65, 1);
+  look(0, 6.5, 9.0, 0, 0.5, 0, 50);
+  setTop('中国の道路交通安全法', '右側通行', fade(t, 0.15, 3.9, 0.2), RED);
+  return stage;
+}
+function shotMarry(t, T) {
+  lift(240); mode('couple', 'age'); ageLab.position.set(0, 3.0, 0.4);
+  ageLab.userData.set(t < 1.6 ? '日本：男女とも18歳' : '中国：男22歳・女20歳'); pop(ageLab, t < 1.6 ? 0.2 : 1.6, t, 3.6, 0.6);
+  groom.rotation.y = 0.25; bride.rotation.y = -0.25;
+  look(0, 2.6, 8.4, 0, 1.9, 0, 50);
+  setTop('結婚できる年齢（中国 民法典）', '男22歳・女20歳', fade(t, 0.15, 3.9, 0.2), GOLD);
+  return stage;
+}
+function shotBottle(t, T) {
+  lift(240); mode('bottle', 'age'); bottle.rotation.y = T * 0.6; bottle.position.set(0, 0.3, 0);
+  ageLab.position.set(0, 3.3, 0.4); ageLab.userData.set(t < 1.6 ? '日本：20歳から' : '中国：18歳から'); pop(ageLab, t < 1.6 ? 0.2 : 1.6, t, 3.6, 0.6);
+  look(0, 2.6, 8.4, 0, 1.9, 0, 50);
+  setTop('お酒（中国は18歳未満への販売禁止）', '18歳から', fade(t, 0.15, 3.9, 0.2), GOLD);
+  return stage;
+}
+function shotVote(t, T) {
+  lift(240); mode('vote');
+  const p = ballot.userData.paper; const d = clamp((t - 0.5) / 1.0); p.position.y = lerp(2.6, 1.7, ease(d)); p.visible = d < 1;
+  voteLab.position.set(0, 3.4, 0.4); pop(voteLab, 1.6, t, 4.4, 0.55);
+  look(0, 2.8, 7.4, 0, 1.9, 0, 50);
+  setTop('全国人民代表大会の代表（選挙法）', '間接選挙', fade(t, 0.15, 3.9, 0.2), RED);
+  return stage;
+}
+function shotApps(t, T) {
+  lift(240); mode('apps');
+  appTiles.forEach((g, i) => { const k = clamp((t - 0.6 - i * 0.25) / 0.4); g.userData.b.material.color.copy(g.userData.col).lerp(new THREE.Color('#3a3f4a'), k); g.userData.xs.forEach(x => { x.visible = k > 0.02; x.scale.set(k, 1, 1); }); g.rotation.y = Math.sin(T * 1.2 + i) * 0.1; });
+  look(0, 3.0, 10.5, 0, 2.9, 0, 50);
+  setTop('グレート・ファイアウォール', 'つながらない', fade(t, 0.15, 3.9, 0.2), RED);
+  return stage;
+}
+function shotCrime(t, T) {
+  lift(240); const H = 4.0 / 0.5; mode('bars'); setNames('日本', '中国', '');
+  B.a.mat.color.set('#e8e8e8'); B.b.mat.color.set(CN); B.c.g.visible = false; stackJP.visible = false;
+  B.a.g.position.set(-1.4, 0.3, 0); B.b.g.position.set(1.4, 0.3, 0);
+  B.a.setH(0.2 * H * easeOut(clamp((t - 0.2) / 1.2)), '0.2'); B.b.setH(0.5 * H * easeOut(clamp((t - 0.7) / 1.2)), '0.5');
+  look(0, 4.2, 13, 0, 2.7, 0, 50);
+  if (t < 3.9) setTop('殺人の発生率（10万人あたり・UNODC）', '日本0.2・中国0.5', fade(t, 0.15, 3.9, 0.2), GOLD);
+  else setTop('アメリカは5.3（2017年）', 'どちらも低い', fade(t, 3.9, 7.9, 0.2), GREEN);
   return stage;
 }
 function shotClock(t, T) {
   lift(240); mode('clocks');
   const m = ease(clamp((t - 1.4) / 1.6));
   clkJ.position.set(lerp(1.4, 0, m), 3.0, 0); clkC.position.set(lerp(-1.4, 0, m), 3.0, -0.2);
-  const hJ = 0, hC = lerp(-Math.PI / 6, 0, m);
-  clkJ.userData.hh.rotation.z = -hJ; clkJ.userData.mh.rotation.z = 0; clkC.userData.hh.rotation.z = -hC; clkC.userData.mh.rotation.z = 0;
-  clkLabJ.position.set(clkJ.position.x, 1.5, 0.3); clkLabC.position.set(clkC.position.x, 1.5, 0.3); clkLabJ.visible = m < 0.9; clkLabC.visible = m < 0.9;
-  clkC.visible = m < 0.98;
+  clkJ.userData.hh.rotation.z = 0; clkC.userData.hh.rotation.z = lerp(Math.PI / 6, 0, m);
+  clkLabJ.position.set(clkJ.position.x, 1.5, 0.3); clkLabC.position.set(clkC.position.x, 1.5, 0.3); clkLabJ.visible = m < 0.9; clkLabC.visible = m < 0.9; clkC.visible = m < 0.98;
   look(0, 3.2, 8.5, 0, 2.6, 0, 50);
   setTop('中国は全土で1つの時間', '時差1時間が消える', fade(t, 0.15, 3.9, 0.2), GOLD);
   return stage;
 }
-function shotApps(t, T) {
-  lift(240); mode('apps');
-  appTiles.forEach((g, i) => { const k = clamp((t - 4.4 - i * 0.25) / 0.4); g.userData.b.material.color.copy(g.userData.col).lerp(new THREE.Color('#3a3f4a'), k); g.userData.xs.forEach(x => { x.visible = k > 0.02; x.scale.set(k, 1, 1); }); g.rotation.y = Math.sin(T * 1.2 + i) * 0.1; });
-  look(0, 3.0, 10.5, 0, 2.9, 0, 50);
-  if (t < 3.9) setTop('もし中国のネットのルールなら', '…', fade(t, 0.15, 3.9, 0.2), GOLD);
-  else setTop('グレート・ファイアウォール', 'つながらない', fade(t, 3.9, 7.9, 0.2), RED);
+function shotPer(t, T) {
+  lift(240); const H = 4.4 / 36.119; mode('bars'); setNames('日本', '中国', '合併後');
+  B.a.mat.color.set('#e8e8e8'); B.b.mat.color.set(CN); B.c.mat.color.set(MIX); stackJP.visible = false; B.c.g.visible = true;
+  B.a.g.position.set(-2.5, 0.3, 0); B.c.g.position.set(0, 0.3, 0); B.b.g.position.set(2.5, 0.3, 0);
+  B.a.setH(36.119 * H * easeOut(clamp((t - 0.2) / 1.2)), '3.6万ドル'); B.b.setH(13.97 * H * easeOut(clamp((t - 0.6) / 1.2)), '1.4万ドル'); B.c.setH(15.764 * H * easeOut(clamp((t - 1.4) / 1.2)), '約1.6万ドル');
+  look(0, 4.4, 15.5, 0, 2.9, 0, 50);
+  setTop('1人あたりGDP（2025年・IMF）合併後の平均', '日本の半分以下', fade(t, 0.15, 3.9, 0.2), RED);
   return stage;
 }
 function shotResult(t, T) {
   lift(260); mode('crowd'); popLab.visible = false;
   rings.forEach(r => { r.visible = true; r.scale.setScalar(1 + Math.sin(T * 6) * 0.08); });
   crowd.people.forEach((p, i) => { p.position.y = JP8.includes(i) ? Math.abs(Math.sin(T * 5 + i)) * 0.15 : 0; });
-  crowdLab.position.set(0, 3.6, 1.0); crowdLab.userData.set('100人中 8人'); pop(crowdLab, 3.8, t, 3.6, 0.9);
+  crowdLab.position.set(0, 3.6, 1.0); crowdLab.userData.set('100人中 8人'); pop(crowdLab, 0.4, t, 3.6, 0.9);
   const u = ease(t / 8); look(lerp(0.4, 0, u), lerp(7.5, 6.6, u), lerp(14, 12.5, u), 0, 1.2, 0, 50);
-  if (t < 3.9) setTop('人口・金メダル', '世界一', fade(t, 0.15, 3.9, 0.2), GOLD);
-  else setTop('でも日本人は', '100人中8人', fade(t, 3.9, 7.9, 0.2), BLUE);
+  if (t < 3.9) setTop('合併後の日本人', '100人中8人', fade(t, 0.15, 3.9, 0.2), BLUE);
+  else setTop('省になったら', 'ルールも変わる', fade(t, 3.9, 8.1, 0.2), RED);
   return stage;
 }
 function shotTwist(t, T) { lift(240); mode('phone'); bigPhone.rotation.y = Math.sin(T * 0.8) * 0.15; look(0, 3.4, 9.0, 0, 2.6, 0, 50); setTop('Instagramは中国では', '見られない', fade(t, 0.15, 2.6, 0.2), RED); return stage; }
 function shotAsk(t, T) { lift(300); landScene(t, 1); mode('land', 'name'); areaLab.visible = false; jpName.visible = false; cnName.visible = false; nameQ.position.set(-0.2, 2.5, 0.2); nameQ.material.depthTest = false; nameQ.renderOrder = 9; pop(nameQ, 0.2, t, 5.6, 0.93); const u = ease(t / 3.4); look(-0.2, lerp(16, 15.5, u), 6.2, -0.2, 0, -1.2, 50); return stage; }
 
 const shots = [
-  { a: 0, b: 4.1, f: shot0 }, { a: 4.1, b: 20.0, f: shotPop }, { a: 20.0, b: 24.0, f: shotArea }, { a: 24.0, b: 32.0, f: shotGDP },
-  { a: 32.0, b: 40.0, f: shotPer }, { a: 40.0, b: 48.0, f: shotMil }, { a: 48.0, b: 56.0, f: shotGold }, { a: 56.0, b: 60.0, f: shotClock },
-  { a: 60.0, b: 68.0, f: shotApps }, { a: 68.0, b: 76.0, f: shotResult }, { a: 76.0, b: 78.7, f: shotTwist }, { a: 78.7, b: 82.4, f: shotAsk },
-  { a: 82.4, b: 86.4, f: endCard },
+  { a: 0, b: 4.1, f: shot0 }, { a: 4.1, b: 16.0, f: shotPop }, { a: 16.0, b: 20.0, f: shotArea }, { a: 20.0, b: 24.0, f: (t, T) => shotStatus(t, T) },
+  { a: 24.0, b: 28.0, f: shotGuang }, { a: 28.0, b: 32.0, f: (t, T) => shotStatus(t + 8, T) }, { a: 32.0, b: 36.0, f: shotRules }, { a: 36.0, b: 40.0, f: shotRoad },
+  { a: 40.0, b: 44.0, f: shotMarry }, { a: 44.0, b: 48.0, f: shotBottle }, { a: 48.0, b: 52.0, f: shotVote }, { a: 52.0, b: 56.0, f: shotApps },
+  { a: 56.0, b: 64.0, f: shotCrime }, { a: 64.0, b: 68.0, f: shotClock }, { a: 68.0, b: 72.0, f: shotPer }, { a: 72.0, b: 80.2, f: shotResult },
+  { a: 80.2, b: 82.9, f: shotTwist }, { a: 82.9, b: 86.8, f: shotAsk }, { a: 86.8, b: 90.8, f: endCard },
 ];
 runStory({
-  shots, subs: SUBS, duration: 86.4,
+  shots, subs: SUBS, duration: 90.8,
   meta: {
     id: '0604',
     title: '中国と日本が合併したらどうなる？',
     titleHtml: '中国と日本が<br>合併したらどうなる？',
-    mood: 'tension', seed: 604, hits: [12.1, 68.1], risers: [8.0, 68.0],
-    impacts: [8.1, 12.1, 20.1, 24.1, 36.1, 40.1, 48.1, 52.1, 64.1, 68.1, 76.1],
-    sfx: [[0.3, 'whoosh'], [3.0, 'poof'], [8.3, 'meter', 0.8], [12.2, 'bubble'], [20.4, 'bubble'], [24.3, 'meter', 0.8], [32.3, 'meter', 0.5], [40.3, 'meter', 0.6], [48.3, 'meter', 1.0], [57.6, 'whoosh'], [64.5, 'buzz'], [76.2, 'alarm']],
+    mood: 'tension', seed: 604, hits: [12.1, 72.1], risers: [8.0, 72.0],
+    impacts: [8.1, 12.1, 16.1, 24.1, 36.1, 40.1, 44.1, 48.1, 52.1, 56.1, 68.1, 72.1, 80.3],
+    sfx: [[0.3, 'whoosh'], [3.0, 'poof'], [8.3, 'meter', 0.8], [12.2, 'bubble'], [16.4, 'bubble'], [20.5, 'whoosh'], [24.3, 'meter', 0.8], [28.6, 'bubble'], [37.6, 'whoosh'], [41.6, 'bubble'], [45.6, 'bubble'], [49.6, 'buzz'], [52.6, 'alarm'], [56.3, 'meter', 0.4], [65.4, 'whoosh'], [68.3, 'meter', 0.5], [80.4, 'alarm']],
     ask: '合併したら、国の名前どうする？',
-    narr: { 'YouTube': 'ユーチューブ', 'Google': 'グーグル', 'LINE': 'ライン', '1億2,265万人': '1億2265万人', '15億2,754万人': '15億2754万人', '3,982億ドル': '3982億ドル', '24.1兆ドル': '24.1兆ドル' },
-    caption: '中国と日本が合併したらどうなる？\n\n人口：中国14億489万人＋日本1億2,265万人＝15億2,754万人。インド（約14.6億人）を抜いて世界1位。\nそのうち日本人は8%。100人の会議なら日本人は8人。\n面積：日本は全体の約3.8%。\n\nGDP：合わせて24.1兆ドル。アメリカは30.9兆ドルで、合併しても届かない。\n1人あたりGDP：日本3.6万ドル、中国1.4万ドル。合併後の平均は約1.6万ドルで、日本の半分以下。\n軍事費：合わせて3,982億ドル。アメリカ（9,540億ドル）の約4割。\nパリ五輪の金メダル：合わせて60個。アメリカの40個を抜いて世界1位（総数も136個で1位）。\n時差：中国は国じゅう同じ時間。日本との1時間の時差が消える。\nネット：中国のルールに合わせると、インスタもYouTubeもLINEもGoogleも使えない。\n\n結果：人口も金メダルも世界一。でも日本人は100人中8人。\nそしてこの動画も、中国では見られない。\n\n合併したら、国の名前どうする？ コメントで教えて。\n\n※数字で比べるだけの「もしも」です。\n\n出典：中国国家統計局（2026年1月）、総務省統計局 人口推計（2026年9月概算）、国連 世界人口推計2024、IMF World Economic Outlook（2026年10月）、SIPRI（2026年4月）、パリ2024オリンピック公式メダル数',
-    hashtags: ['もしもラボ', 'もしも', '中国', '日本', '雑学'],
-    endStats: [['合併後の人口', '15億2,754万人', '世界1位'], ['日本人の割合', '8%', '100人中8人'], ['GDP', '24.1兆ドル', 'アメリカは30.9兆'], ['1人あたりGDP', '約1.6万ドル', '日本の半分以下'], ['金メダル', '60個', 'パリ五輪・世界1位']],
-    sources: '出典：中国国家統計局、総務省統計局、国連、IMF（2026年10月）、<br>SIPRI（2026年）、パリ2024オリンピック',
+    narr: { 'YouTube': 'ユーチューブ', 'Google': 'グーグル', 'LINE': 'ライン', '広東省': 'カントンしょう', '男22歳・女20歳': '男性22歳、女性20歳', '0.2、': 'れいてんに、', '0.5。': 'れいてんご。' },
+    caption: '中国と日本が合併したらどうなる？\n\n人口：中国 約14億人＋日本 約1.2億人＝約15.3億人。インドを抜いて世界1位。\n日本人は100人中8人。面積は日本が全体の約3.8%。\n\n日本列島はどういう扱いになる？\n・省になるなら、人口は広東省（1億2,859万人）に次ぐ2番目\n・香港のような特別行政区なら、法律もお金も今のまま\n\n省になった場合、暮らしのルールが変わる（中国の法律）\n・車は左側通行から右側通行に\n・結婚できる年齢は、男女18歳から男22歳・女20歳に\n・お酒を買えるのは20歳から18歳に\n・国の議会（全国人民代表大会）の代表は間接選挙。直接は選べなくなる\n・インスタもYouTubeもLINEもGoogleもつながらない\n\n治安：殺人の発生率（10万人あたり）は日本0.2、中国0.5。どちらも世界でトップクラスに低い。\n時差：中国は国じゅう同じ時間。1時間の時差が消える。\n1人あたりGDP：日本3.6万ドル、中国1.4万ドル。合併後の平均は約1.6万ドルで日本の半分以下。\n\n結果：日本人は100人中8人。車も結婚もネットも変わる。\nそしてこの動画も、中国では見られない。\n\n合併したら、国の名前どうする？ コメントで教えて。\n\n※数字と制度で比べるだけの「もしも」です。\n\n出典：中国国家統計局（2026年1月）、総務省統計局 人口推計（2026年9月概算）、国連 世界人口推計2024、広東省統計（2025年末）、中華人民共和国 道路交通安全法・民法典・未成年人保護法・選挙法、香港基本法、法務省 犯罪白書／UNODC、世界銀行、IMF World Economic Outlook（2026年10月）',
+    hashtags: ['もしも', '中国', '日本', '雑学', 'もしもラボ'],
+    endStats: [['合併後の人口', '約15.3億人', '世界1位'], ['日本人の割合', '100人中8人', '8%'], ['省になったら', '人口2番目', '広東省の次'], ['車', '右側通行に', '道路交通安全法'], ['結婚できる年齢', '男22・女20', '民法典']],
+    sources: '出典：中国国家統計局、総務省統計局、国連、広東省統計、<br>中国の法律（道路交通安全法・民法典ほか）、犯罪白書、IMF',
   },
 });
