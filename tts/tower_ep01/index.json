@@ -156,9 +156,9 @@
   "model": "gemini-3.8-flash-tts"
  },
  "r4": {
-  "dur": 3.942,
+  "dur": 4.613,
   "voice": "Charon",
-  "text": "便器にゴミ袋をかぶせ、新聞紙を入れる。",
+  "text": "べんきに、ゴミ袋をかぶせ、新聞紙を入れる。",
   "model": "gemini-3.8-flash-tts"
  },
  "r5": {
