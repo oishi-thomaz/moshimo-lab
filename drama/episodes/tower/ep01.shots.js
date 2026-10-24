@@ -224,9 +224,10 @@ const SHOTS = [
     g.save(); cam(g, { x: 560, y: fy, z });
     const stream = Math.max(0, 0.6 - lt * 0.4) * (Math.sin(lt * 17) > -0.2 ? 1 : 0.2);
     const B = bath(g, { level: 0.12, stream, t: lt, power: 0.25, drops: lt > 1.4 ? 0.6 : 0 });
-    if (lt > S.L('w5')) { const a = inv(S.L('w5') + 0.3, S.L('w5') + 0.8, lt); line(g, 930, B.wl, 930, 1480, 6, rgba('#d63a32', a)); line(g, 905, B.wl, 955, B.wl, 6, rgba('#d63a32', a)); tag(g, '数センチ', 800, B.wl - 70, { size: 40, bg: '#d63a32', color: '#fff', alpha: a }); }
+    if (lt > S.L('w5')) { const a = inv(S.L('w5') + 0.3, S.L('w5') + 0.8, lt); line(g, 930, B.wl, 930, 1480, 6, rgba('#d63a32', a)); line(g, 905, B.wl, 955, B.wl, 6, rgba('#d63a32', a)); }
     g.restore();
     darkness(g, 0.32, '#04060c', [phoneLight(560, 1000, 850)]);
+    if (lt > S.L('w5')) tag(g, '数センチ', 540, 990, { size: 44, bg: '#d63a32', color: '#fff', alpha: inv(S.L('w5') + 0.3, S.L('w5') + 0.8, lt) });
     if (lt > S.L('w5') + 1.5) glow(g, 540, 1300, 500, 'rgba(120,200,255,1)', 0.25 * inv(S.L('w5') + 1.5, D, lt));
   } },
   // ── ノック（玄関・暗い）
@@ -328,7 +329,7 @@ const SHOTS = [
   // ── 館内放送
   { at: 'chime', draw(g, lt, D, S) {
     g.save(); cam(g, { x: 540, y: 820, z: lerp(1.0, 1.1, lt / D) }); speaker(g, { t: lt, on: lt > 0.9 ? 1 : 0 }); g.restore();
-    tag(g, '館内放送', 540, 1000, { size: 38, bg: '#ffd451', color: '#1b1b22', alpha: inv(0.2, 0.5, lt) });
+    tag(g, '館内放送', 540, 1000, { size: 38, bg: '#ffd451', color: '#1b1b22', alpha: Math.min(inv(0.2, 0.5, lt), 1 - inv(S.L('p2') - 0.2, S.L('p2'), lt)) });
   } },
   // ── 柴田さん安心 / ミオは不安
   { at: 'p3', draw(g, lt, D, S) {
@@ -509,7 +510,7 @@ function peep(g, lt, S, { z = 1, tagA = 0, nod = 0, leave = 0, focusEyes = false
 const CHIPS = [
   { at: 'a3', label: '1日目', val: '19:42', dur: 2.6 },
   { at: 'p5', label: '地震から', val: '30分', dur: 2.6 },
-  { at: 'k1', label: '1日目', val: '22:00', dur: 2.2 },
+  { at: 'k1', label: '1日目', val: '22:00', dur: 1.5 },
 ];
 
 // 効果音（tools/sfx.py の種類）
