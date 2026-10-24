@@ -1,0 +1,60 @@
+name: drama-tts
+
+# ドラマ（いつわ劇場）の声だけを作って、drama-tts ブランチに置く。もしもラボの毎日の書き出し・投稿とは別物
+on:
+  workflow_dispatch:
+    inputs:
+      script:
+        description: '台本ファイル（例 drama/episodes/tower/ep01.script.js）'
+        required: true
+      name:
+        description: '出力の名前（例 tower_ep01）'
+        required: true
+      test:
+        description: '声の聞き比べ用なら 1'
+        required: false
+        default: ''
+
+permissions:
+  contents: write
+
+concurrency:
+  group: drama-tts
+  cancel-in-progress: false
+
+jobs:
+  tts:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: ffmpeg
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+      - uses: actions/cache@v4
+        with:
+          path: cache/drama-tts
+          key: drama-tts-${{ github.run_id }}
+          restore-keys: drama-tts-
+      - name: TTS
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          node drama/tools/tts.mjs --script "${{ github.event.inputs.script }}" --out "tts/${{ github.event.inputs.name }}" ${{ github.event.inputs.test && '--test 1' || '' }}
+      - name: Push to drama-tts branch
+        run: |
+          NAME="${{ github.event.inputs.name }}"
+          mv "tts/$NAME" /tmp/tts_out
+          git config user.name "drama-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git ls-remote --exit-code origin drama-tts >/dev/null; then
+            git fetch -q origin drama-tts && git checkout -q -B drama-tts origin/drama-tts
+          else
+            git checkout -q --orphan drama-tts && git rm -rfq --cached . && git clean -fdxq -e cache
+          fi
+          rm -rf "tts/$NAME" && mkdir -p tts && mv /tmp/tts_out "tts/$NAME"
+          git add -f "tts/$NAME"
+          git commit -qm "tts $NAME" || true
+          for i in 1 2 3; do git push -q origin drama-tts && break; sleep 5; git pull -q --rebase origin drama-tts; done
