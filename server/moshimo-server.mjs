@@ -146,6 +146,46 @@ function approvalMessages(id) {
   ];
 }
 
+// 投稿したカード（インスタとYouTubeの結果を1通にまとめる。無料プランの通数を節約）
+function postedCard(id, r) {
+  const m = meta(id); const title = m.title || `動画 ${id}`;
+  const ok = (x) => x && x.ok;
+  const allOk = ok(r.ig) && (ok(r.yt) || !r.yt);
+  const head = allOk ? '投稿した' : (ok(r.ig) || ok(r.yt)) ? '一部だけ投稿できた' : '投稿に失敗した';
+  const color = allOk ? '#1DB446' : '#E0453A';
+  const row = (k, x) => ({ type: 'box', layout: 'horizontal', spacing: 'md', contents: [
+    { type: 'text', text: k, size: 'sm', color: '#888888', flex: 4 },
+    { type: 'text', text: !x ? '—' : x.ok ? '投稿済み' : x.skip ? '上げない設定' : '失敗', size: 'sm', weight: 'bold', flex: 5, align: 'end', color: !x || x.skip ? '#888888' : x.ok ? '#1DB446' : '#E0453A' }] });
+  const body = [
+    { type: 'text', text: `${head}・${id}`, size: 'xs', color, weight: 'bold' },
+    { type: 'text', text: title, size: 'lg', weight: 'bold', wrap: true, margin: 'sm' },
+    { type: 'box', layout: 'vertical', margin: 'lg', spacing: 'sm', contents: [row('インスタ', r.ig), row('YouTube', r.yt), { type: 'box', layout: 'horizontal', contents: [
+      { type: 'text', text: '時刻', size: 'sm', color: '#888888', flex: 4 }, { type: 'text', text: fmt(Date.now()), size: 'sm', weight: 'bold', flex: 5, align: 'end' }] }] },
+  ];
+  const errs = [r.ig && !r.ig.ok && r.ig.error ? `インスタ：${r.ig.error}` : '', r.yt && !r.yt.ok && r.yt.error ? `YouTube：${r.yt.error}` : ''].filter(Boolean).join('\n');
+  if (errs) body.push({ type: 'separator', margin: 'lg' }, { type: 'text', text: errs.slice(0, 300), size: 'xxs', color: '#E0453A', wrap: true, margin: 'md' });
+  const btns = [];
+  if (r.ig && r.ig.ok && r.ig.url) btns.push({ type: 'button', style: 'primary', color: '#C13584', height: 'sm', action: { type: 'uri', label: 'インスタで見る', uri: r.ig.url } });
+  if (r.yt && r.yt.ok && r.yt.url) btns.push({ type: 'button', style: 'primary', color: '#E62117', height: 'sm', action: { type: 'uri', label: 'YouTubeで見る', uri: r.yt.url } });
+  if (r.ig && !r.ig.ok) btns.push({ type: 'button', style: 'secondary', height: 'sm', action: { type: 'postback', label: 'インスタにもう一回', data: `retry:${id}`, displayText: `${id} をもう一回投稿` } });
+  if (r.yt && !r.yt.ok && !r.yt.skip) btns.push({ type: 'box', layout: 'horizontal', spacing: 'sm', contents: [
+    { type: 'button', style: 'secondary', height: 'sm', action: { type: 'postback', label: 'YouTubeもう一回', data: `ytretry:${id}`, displayText: `${id} をYouTubeにもう一回` } },
+    { type: 'button', style: 'secondary', height: 'sm', action: { type: 'postback', label: 'YouTubeはやめる', data: `ytskip:${id}`, displayText: `${id} はYouTubeに上げない` } }] });
+  const bubble = { type: 'bubble', size: 'mega',
+    hero: { type: 'image', url: `${BASE_URL}/media/${id}_cover.jpg`, size: 'full', aspectRatio: '4:5', aspectMode: 'cover' },
+    body: { type: 'box', layout: 'vertical', contents: body } };
+  if (btns.length) bubble.footer = { type: 'box', layout: 'vertical', spacing: 'sm', contents: btns };
+  return { type: 'flex', altText: `${head} ${id} ${title}`.slice(0, 380), contents: bubble };
+}
+function postedText(id, r) {
+  const m = meta(id); const l = (k, x) => !x ? '' : x.ok ? `${k}：${x.url || '投稿済み'}` : `${k}：失敗 ${x.error || ''}`;
+  return text([`投稿した：${id} ${m.title || ''}`, l('インスタ', r.ig), l('YouTube', r.yt)].filter(Boolean).join('\n'));
+}
+async function pushPosted(id, r) {
+  const ok = await push(postedCard(id, r));
+  if (ok === false) { log('posted card rejected, sending text'); await push(postedText(id, r)); }
+}
+
 async function onPostback(ev) {
   const [act, id] = String(ev.postback.data).split(':');
   const it = state.items[id];
@@ -287,14 +327,13 @@ async function publish(id) {
     const info = await ig('GET', `/${p.id}`, { fields: 'permalink' }).catch(() => ({}));
     Object.assign(it, { status: 'published', mediaId: p.id, permalink: info.permalink || '', publishedAt: Date.now() }); save();
     log('published', id, it.permalink);
-    await push(text(`投稿した：${id} ${m.title || ''}\n${it.permalink || ''}`));
-    await youtube(id);
+    const yr = await youtube(id, true);
+    await pushPosted(id, { ig: { ok: true, url: it.permalink }, yt: yr });
   } catch (e) {
     Object.assign(it, { status: 'error', error: String(e.message || e) }); save();
     log('publish error', id, e);
-    await push([text(`投稿に失敗した：${id}\n${it.error}`.slice(0, 1000)),
-      { type: 'template', altText: '再投稿', template: { type: 'confirm', text: `${id} をもう一回投稿する？`, actions: [{ type: 'postback', label: 'もう一回', data: `retry:${id}` }, { type: 'postback', label: 'やめる', data: `reject:${id}` }] } }]);
-    await youtube(id); // インスタが失敗しても YouTube は予定どおり出す
+    const yr = await youtube(id, true); // インスタが失敗しても YouTube は予定どおり出す
+    await pushPosted(id, { ig: { ok: false, error: it.error.slice(0, 200) }, yt: yr });
   }
 }
 
@@ -396,11 +435,15 @@ function ytMeta(m) {
   const tags = [...new Set(['もしもラボ', ...(m.hashtags || []), 'もしも', '雑学', 'shorts'])].slice(0, 15);
   return { title, desc, tags };
 }
-async function youtube(id) {
+async function youtube(id, quiet = false) {
   const it = state.items[id];
-  if (!it || !state.yt?.refresh || it.yt?.videoId || it.yt?.uploading || it.yt?.skipped) return;
+  if (!it || !state.yt?.refresh) return undefined;
+  if (it.yt?.videoId) return { ok: true, url: `https://youtube.com/shorts/${it.yt.videoId}` };
+  if (it.yt?.skipped) return { skip: true };
+  if (it.yt?.uploading) return undefined;
+  const done = async (r) => { if (!quiet) await pushPosted(id, { yt: r }); return r; };
   const file = path.join(MEDIA, `${id}.mp4`);
-  if (!fs.existsSync(file)) { it.yt = { error: '動画ファイルがVPSにない' }; delete it.ytAt; save(); return push(text(`YouTubeに上げられへん：${id} の動画ファイルがない`)); }
+  if (!fs.existsSync(file)) { it.yt = { error: '動画ファイルがVPSにない' }; delete it.ytAt; save(); return done({ ok: false, error: '動画ファイルがVPSにない' }); }
   const m = meta(id); const { title, desc, tags } = ytMeta(m);
   it.yt = { uploading: true }; delete it.ytAt; save();
   try {
@@ -418,12 +461,11 @@ async function youtube(id) {
     it.yt = { videoId, at: Date.now() }; save();
     log('youtube', id, videoId);
     if (m.ask) await yt('POST', 'https://www.googleapis.com/youtube/v3/commentThreads?part=snippet', JSON.stringify({ snippet: { videoId, topLevelComment: { snippet: { textOriginal: `${m.ask} コメントで教えて！` } } } }), { 'content-type': 'application/json' }).catch(e => log('yt comment', e.message));
-    await push(text(`YouTubeにも投稿した：${id} ${m.title || ''}\nhttps://youtube.com/shorts/${videoId}`));
+    return done({ ok: true, url: `https://youtube.com/shorts/${videoId}` });
   } catch (e) {
     it.yt = { error: String(e.message || e).slice(0, 500) }; save();
     log('youtube error', id, e);
-    await push([text(`YouTubeへの投稿に失敗した：${id}\n${it.yt.error}`),
-      { type: 'template', altText: 'YouTube再投稿', template: { type: 'confirm', text: `${id} をYouTubeにもう一回上げる？`, actions: [{ type: 'postback', label: 'もう一回', data: `ytretry:${id}` }, { type: 'postback', label: 'やめる', data: `ytskip:${id}` }] } }]);
+    return done({ ok: false, error: it.yt.error.slice(0, 200) });
   }
 }
 
