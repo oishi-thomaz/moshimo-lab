@@ -12,21 +12,21 @@
   "model": "gemini-3.8-flash-tts"
  },
  "h3": {
-  "dur": 6.846,
+  "dur": 4.869,
   "voice": "Charon",
-  "text": "地上ひゃくメートル。そこは、誰も助けに来ない、孤島になる。",
+  "text": "地上ひゃくメートル。そこは、孤島になる。",
   "model": "gemini-3.8-flash-tts"
  },
  "a1": {
-  "dur": 7.12,
+  "dur": 5.494,
   "voice": "Charon",
-  "text": "水野ミオ、にじゅうきゅうさい。タワマンの、さんじゅうに階で、ひとり暮らし。",
+  "text": "水野ミオ、にじゅうきゅうさい。さんじゅうに階で、ひとり暮らし。",
   "model": "gemini-3.8-flash-tts"
  },
  "a2": {
-  "dur": 5.72,
+  "dur": 2.765,
   "voice": "Charon",
-  "text": "家賃は給料の半分。それでも、この夜景が好きだった。",
+  "text": "この夜景が、自慢だった。",
   "model": "gemini-3.8-flash-tts"
  },
  "a3": {
@@ -42,9 +42,9 @@
   "model": "gemini-3.8-flash-tts"
  },
  "q2": {
-  "dur": 5.593,
+  "dur": 4.032,
   "voice": "Charon",
-  "text": "高層階は、ゆっくり、大きく、長く揺れる。",
+  "text": "高層階は、大きく、長く揺れる。",
   "model": "gemini-3.8-flash-tts"
  },
  "q3": {
@@ -60,21 +60,15 @@
   "model": "gemini-3.8-flash-tts"
  },
  "e1": {
-  "dur": 5.739,
+  "dur": 3.341,
   "voice": "Charon",
-  "text": "エレベーターは最寄りの階で止まり、技術者が点検するまで動かない。",
+  "text": "エレベーターは、点検が済むまで動かない。",
   "model": "gemini-3.8-flash-tts"
  },
  "e2": {
-  "dur": 7.705,
+  "dur": 4.366,
   "voice": "Charon",
-  "text": "にせんじゅうはち年の、大阪北部地震では、およそ、ろくまんろくせんだいが止まった。",
-  "model": "gemini-3.8-flash-tts"
- },
- "e3": {
-  "dur": 2.279,
-  "voice": "Charon",
-  "text": "技術者は、すぐには来ない。",
+  "text": "大阪北部地震では、ろくまんろくせんだいが止まった。",
   "model": "gemini-3.8-flash-tts"
  },
  "w1": {
@@ -96,15 +90,15 @@
   "model": "gemini-3.8-flash-tts"
  },
  "w4": {
-  "dur": 5.72,
+  "dur": 3.735,
   "voice": "Charon",
-  "text": "出てきたのは、配管に残っていた最後の水だけ。",
+  "text": "出たのは、配管に残った最後の水だけ。",
   "model": "gemini-3.8-flash-tts"
  },
  "w5": {
-  "dur": 6.691,
+  "dur": 4.774,
   "voice": "Charon",
-  "text": "浴槽の底に、たった数センチ。これがミオの命綱になる。",
+  "text": "浴槽に、数センチ。これが命綱だ。",
   "model": "gemini-3.8-flash-tts"
  },
  "s1": {
@@ -114,9 +108,9 @@
   "model": "gemini-3.8-flash-tts"
  },
  "s2": {
-  "dur": 7.748,
+  "dur": 4.714,
   "voice": "Charon",
-  "text": "隣の、さんにーまるいち号室の、柴田さん。ろくさいの娘、ことねちゃんと、二人暮らしだ。",
+  "text": "隣の柴田さん。ろくさいの娘と、二人暮らしだ。",
   "model": "gemini-3.8-flash-tts"
  },
  "s3": {
@@ -144,15 +138,15 @@
   "model": "gemini-3.8-flash-tts"
  },
  "r1": {
-  "dur": 4.965,
+  "dur": 4.161,
   "voice": "Charon",
-  "text": "地震のあと、排水管はどこかで割れているかもしれない。",
+  "text": "地震のあと、排水管は割れているかもしれない。",
   "model": "gemini-3.8-flash-tts"
  },
  "r2": {
-  "dur": 5.648,
+  "dur": 3.633,
   "voice": "Charon",
-  "text": "そのまま流せば、汚水は下の階で、あふれ出す。",
+  "text": "流せば、汚水は下の階であふれ出す。",
   "model": "gemini-3.8-flash-tts"
  },
  "r3": {
@@ -162,27 +156,21 @@
   "model": "gemini-3.8-flash-tts"
  },
  "r4": {
-  "dur": 5.99,
+  "dur": 3.942,
   "voice": "Charon",
-  "text": "ミオは便器にゴミ袋をかぶせ、新聞紙をちぎって入れた。",
+  "text": "便器にゴミ袋をかぶせ、新聞紙を入れる。",
   "model": "gemini-3.8-flash-tts"
  },
  "r5": {
-  "dur": 2.816,
+  "dur": 1.92,
   "voice": "Charon",
-  "text": "これで、流さずに用を足せる。",
-  "model": "gemini-3.8-flash-tts"
- },
- "p1": {
-  "dur": 2.632,
-  "voice": "Schedar",
-  "text": "こちら、防災センターです。",
+  "text": "流さずに使えるトイレだ。",
   "model": "gemini-3.8-flash-tts"
  },
  "p2": {
-  "dur": 9.699,
+  "dur": 7.336,
   "voice": "Schedar",
-  "text": "排水管の点検が終わりました。トイレは通常どおり、使用できます。",
+  "text": "防災センターです。点検が終わりました。トイレは、使えます。",
   "model": "gemini-3.8-flash-tts"
  },
  "p3": {
@@ -191,16 +179,10 @@
   "text": "よかった…。管理会社が言うなら、大丈夫ですよね。",
   "model": "gemini-3.8-flash-tts"
  },
- "p4": {
-  "dur": 3.954,
-  "voice": "Charon",
-  "text": "地震から、まだ、さんじゅっぷん。",
-  "model": "gemini-3.8-flash-tts"
- },
  "p5": {
-  "dur": 6.561,
+  "dur": 5.151,
   "voice": "Charon",
-  "text": "よんじゅうご階建ての配管を、さんじゅっぷんで、調べられるはずがない。",
+  "text": "よんじゅうご階分の配管を、さんじゅっぷんで調べられるはずがない。",
   "model": "gemini-3.8-flash-tts"
  },
  "p6": {
@@ -210,9 +192,9 @@
   "model": "gemini-3.8-flash-tts"
  },
  "p7": {
-  "dur": 6.251,
+  "dur": 5.578,
   "voice": "Charon",
-  "text": "だが、この放送を信じた部屋は、ひとつやふたつではなかった。",
+  "text": "だが、放送を信じた部屋は、ひとつやふたつではなかった。",
   "model": "gemini-3.8-flash-tts"
  },
  "p8": {
@@ -228,9 +210,9 @@
   "model": "gemini-3.8-flash-tts"
  },
  "k1": {
-  "dur": 3.396,
+  "dur": 0.986,
   "voice": "Charon",
-  "text": "午後、じゅうじ。ドアを、叩く音。",
+  "text": "午後、じゅうじ。",
   "model": "gemini-3.8-flash-tts"
  },
  "k2": {
@@ -246,9 +228,9 @@
   "model": "gemini-3.8-flash-tts"
  },
  "k4": {
-  "dur": 5.468,
+  "dur": 3.849,
   "voice": "Charon",
-  "text": "ドアスコープの向こうには、帽子とマスクの、作業着の男。",
+  "text": "ドアスコープの向こうに、作業着の男。",
   "model": "gemini-3.8-flash-tts"
  },
  "k5": {
@@ -276,9 +258,9 @@
   "model": "gemini-3.8-flash-tts"
  },
  "k9": {
-  "dur": 5.877,
+  "dur": 4.751,
   "voice": "Charon",
-  "text": "さんじゅうに階まで、階段で、上がってきたはずの、その男は",
+  "text": "さんじゅうに階まで、階段で上がってきたはずの、その男は",
   "model": "gemini-3.8-flash-tts"
  },
  "k10": {
