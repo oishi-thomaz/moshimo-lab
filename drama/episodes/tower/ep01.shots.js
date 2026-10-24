@@ -304,7 +304,7 @@ const SHOTS = [
   { at: 'r3', draw(g, lt, D, S) {
     g.save(); cam(g, { x: 540, y: 960, z: 1.1 }); toilet(g, { power: 0.3 }); g.restore();
     g.fillStyle = 'rgba(8,10,16,.72)'; g.fillRect(0, 0, W, H);
-    const a = inv(S.L('rule') - 0.05, S.L('rule') + 0.25, lt), s = lerp(1.25, 1, back(a));
+    const a = inv(0.0, 0.3, lt), s = lerp(1.25, 1, back(a));
     if (a > 0) {
       g.save(); g.translate(540, 760); g.scale(s, s); g.globalAlpha = Math.min(1, a * 1.5); g.rotate(-0.02);
       g.shadowColor = 'rgba(0,0,0,.5)'; g.shadowBlur = 40; g.shadowOffsetY = 14;
@@ -533,7 +533,7 @@ const SFX = [
   { at: 's3', off: 1.0, type: 'ding', vol: 0.5 },
   { at: 's6', type: 'hit', vol: 0.5 },
   { at: 'r2', off: 1.0, type: 'splash', vol: 0.6 },
-  { at: 'rule', type: 'impact', vol: 0.9 },
+  { at: 'r3', type: 'impact', vol: 0.9 },
   { at: 'r4', off: 0.3, type: 'rustle', dur: 1.0, vol: 0.6 },
   { at: 'r4', off: 1.6, type: 'tear', dur: 1.6, vol: 0.5 },
   { at: 'chime', type: 'chime', vol: 0.7 },
@@ -556,7 +556,7 @@ const MUSIC = [
   { at: 'q1', mood: 'tension' },
   { at: 'knock1', mood: 'silence' },
   { at: 's2', mood: 'uneasy' },
-  { at: 'rule', mood: 'silence' },
+  { at: 'r3', mood: 'silence' },
   { at: 'r4', mood: 'uneasy' },
   { at: 'chime', mood: 'silence' },
   { at: 'p3', mood: 'mystery' },
