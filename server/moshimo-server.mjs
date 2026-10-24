@@ -182,8 +182,62 @@ function postedText(id, r) {
   return text([`投稿した：${id} ${m.title || ''}`, l('インスタ', r.ig), l('YouTube', r.yt)].filter(Boolean).join('\n'));
 }
 async function pushPosted(id, r) {
+  const failed = (r.ig && !r.ig.ok) || (r.yt && !r.yt.ok && !r.yt.skip);
+  logPosted(id, r);
+  if (!failed) return; // うまくいったときは送らない（次のまとめに入る）
   const ok = await push(postedCard(id, r));
   if (ok === false) { log('posted card rejected, sending text'); await push(postedText(id, r)); }
+}
+
+// ---------------- 通数の節約（LINE無料プランは月200通。返事は無料、1回の送信で吹き出し5つまで1通） ----------------
+// 承認カードと「投稿した」は1件ずつ送らず、朝のまとめ（日報と同じ1通）と夕方（新着があるときだけ）にまとめて送る。
+const DIGEST_EVENING = env.DIGEST_EVENING || '17:00';
+const DIGEST_FALLBACK = env.DIGEST_FALLBACK || '08:30'; // 日報が来なかった日はこの時刻に承認・投稿だけ送る
+const pendingIds = () => Object.entries(state.items).filter(([, it]) => it.status === 'pending').sort((a, b) => a[1].receivedAt - b[1].receivedAt).map(([id]) => id);
+function approvalCarousel(ids) {
+  if (!ids.length) return null;
+  const bubbles = ids.slice(0, 12).map(id => card(id).contents);
+  return { type: 'flex', altText: `承認待ち ${ids.length}本：${ids.slice(0, 5).join('、')}`.slice(0, 380), contents: bubbles.length === 1 ? bubbles[0] : { type: 'carousel', contents: bubbles } };
+}
+function postedCarousel(list) {
+  if (!list.length) return null;
+  const bubbles = list.slice(-12).map(x => postedCard(x.id, x.r).contents);
+  return { type: 'flex', altText: `投稿した ${list.length}本`.slice(0, 380), contents: bubbles.length === 1 ? bubbles[0] : { type: 'carousel', contents: bubbles } };
+}
+function logPosted(id, r) { state.postedLog = [...(state.postedLog || []), { id, r, t: Date.now() }].filter(x => x.t > Date.now() - 7 * 86400e3).slice(-40); save(); }
+function digestMessages() {
+  const out = [];
+  const pend = pendingIds(); const posted = (state.postedLog || []).filter(x => x.t > (state.digestAt || 0));
+  const notes = state.notices || [];
+  if (notes.length) out.push(text(notes.map(n => `・${n.m}`).join('\n').slice(0, 4800)));
+  const pc = postedCarousel(posted); if (pc) out.push(pc);
+  const ac = approvalCarousel(pend); if (ac) out.push(ac);
+  return out;
+}
+function markDigest() { state.digestAt = Date.now(); state.notices = []; state.digestSeen = Object.fromEntries(pendingIds().map(id => [id, 1])); save(); }
+const dayKey = (t = Date.now()) => { const j = new Date(t + JST); return `${j.getUTCFullYear()}-${j.getUTCMonth() + 1}-${j.getUTCDate()}`; };
+const atToday = hm => { const j = new Date(Date.now() + JST); const [hh, mm] = hm.split(':').map(Number); return Date.UTC(j.getUTCFullYear(), j.getUTCMonth(), j.getUTCDate()) - JST + (hh * 60 + mm) * 60e3; };
+async function pushDigest(extra = []) {
+  const msgs = [...extra, ...digestMessages()].slice(0, 5);
+  if (!msgs.length) return false;
+  try { await pushChecked(msgs); }
+  catch (e) { log('digest push failed', e.message); await push(text(`まとめのカードが送れへんかった。承認待ち：${pendingIds().join('、') || 'なし'}\n「承認待ち」と送るとカードで返事する`)); }
+  markDigest(); return true;
+}
+// 朝（日報と一緒に送れなかった日）と夕方（朝より後に新しい承認待ちが届いたときだけ）
+async function digestTick() {
+  const now = Date.now(), dk = dayKey();
+  state.digestDone = state.digestDone || {};
+  if (now >= atToday(DIGEST_FALLBACK) && now < atToday(DIGEST_FALLBACK) + 3 * 3600e3 && !state.digestDone[`m:${dk}`]) {
+    state.digestDone[`m:${dk}`] = 1; save();
+    if (!(state.digestAt > atToday('05:00'))) await pushDigest();
+  }
+  if (now >= atToday(DIGEST_EVENING) && now < atToday(DIGEST_EVENING) + 3 * 3600e3 && !state.digestDone[`e:${dk}`]) {
+    state.digestDone[`e:${dk}`] = 1; save();
+    const fresh = pendingIds().filter(id => !(state.digestSeen || {})[id]);
+    if (fresh.length) await pushDigest();
+  }
+  for (const k of Object.keys(state.digestDone)) if (!k.endsWith(dk)) delete state.digestDone[k];
 }
 
 async function onPostback(ev) {
@@ -251,6 +305,19 @@ async function onLineWebhook(req, res) {
     }
     if (uid !== state.owner) continue;                               // 持ち主以外は無視
     if (ev.type === 'postback') await onPostback(ev);
+    else if (ev.type === 'message' && ev.message.type === 'text' && /^通数$/.test(ev.message.text.trim())) {
+      const g = async u => { const r = await fetch(`https://api.line.me/v2/bot/message/${u}`, { headers: { authorization: `Bearer ${LINE_TOKEN}` } }); return r.json(); };
+      const [q, c] = await Promise.all([g('quota').catch(() => ({})), g('quota/consumption').catch(() => ({}))]);
+      await reply(ev.replyToken, text(`今月の送信：${c.totalUsage ?? '?'}通 / ${q.value ?? '?'}通\n（返事は数えられない。まとめは朝と、新着がある日の夕方だけ）`));
+    }
+    else if (ev.type === 'message' && ev.message.type === 'text' && /^(承認待ち|承認)$/.test(ev.message.text.trim())) {
+      const ac = approvalCarousel(pendingIds());
+      await reply(ev.replyToken, ac ? [ac] : text('承認待ちの動画はない'));
+    }
+    else if (ev.type === 'message' && ev.message.type === 'text' && /^(投稿|投稿した)$/.test(ev.message.text.trim())) {
+      const pc = postedCarousel((state.postedLog || []).filter(x => x.t > Date.now() - 86400e3));
+      await reply(ev.replyToken, pc ? [pc] : text('この24時間に投稿した動画はない'));
+    }
     else if (ev.type === 'message' && ev.message.type === 'text' && /^投稿時間/.test(ev.message.text.trim())) {
       await reply(ev.replyToken, text(setPostTimes(ev.message.text.trim())));
     }
@@ -497,7 +564,7 @@ async function remind() {
     const pending = Object.entries(state.items).filter(([, it]) => it.status === 'pending').sort((a, b) => a[1].receivedAt - b[1].receivedAt);
     if (!pending.length) continue;
     const [id] = pending[0];
-    await push([text(`まだ承認待ちの動画がある（${id}${pending.length > 1 ? ` ほか${pending.length - 1}本` : ''}）`), card(id, 'まだ承認待ち')]);
+    void id; // 催促はやめた（朝・夕方のまとめで代わりにする）
   }
 }
 
@@ -757,8 +824,12 @@ function flexReport(card) {
   return { type: 'flex', altText: String(card.title || '日報').slice(0, 390), contents: bubble(nz(card.title, '日報'), card.subtitle ? String(card.subtitle) : '', secs.length ? secs : [{ type: 'text', text: '-', size: 'sm' }], card.foot ? String(card.foot) : '') };
 }
 async function pushReport(r) {
-  if (r.card) { try { await pushChecked(flexReport(r.card)); return; } catch (e) { log('flex report failed', e.message); } }
-  await push(splitLine(r.message || (r.card && JSON.stringify(r.card)) || ''));
+  // 日報と一緒に、前回のまとめ以降に投稿した分と承認待ちを同じ1通で送る
+  const dg = digestMessages();
+  if (r.card) { try { await pushChecked([flexReport(r.card), ...dg].slice(0, 5)); markDigest(); return; } catch (e) { log('flex report failed', e.message); } }
+  const body = splitLine(r.message || (r.card && JSON.stringify(r.card)) || '');
+  try { await pushChecked([...body.slice(0, 5 - Math.min(dg.length, 3)), ...dg.slice(0, 3)].slice(0, 5)); markDigest(); }
+  catch (e) { log('report+digest failed', e.message); await push(body); }
 }
 async function pushChecked(msg) {
   if (!state.owner || !LINE_TOKEN) throw new Error('no owner/token');
@@ -818,8 +889,10 @@ async function detectBuzz(snap) {
   state.an.alerts = [...(state.an.alerts || []), ...alerts].slice(-100); save();
   // 伸びが大きい順。同じ動画の 勢い と 節目 は1行にまとめる
   const seen = new Set(); const list = alerts.sort((x, y) => (y.gain || 0) - (x.gain || 0)).filter(a => { const k = `${a.p}:${a.k || 'f'}`; if (seen.has(k)) return false; seen.add(k); return true; });
-  try { await pushChecked(flexAlert(list, now)); }
-  catch (e) { log('flex alert failed', e.message); await push(text(`【伸びてる】\n${list.map(a => a.kind === 'followers' ? `${PLAT[a.p]} フォロワー +${a.gain}/時（今 ${kfmt(a.total)}）` : `${PLAT[a.p]} ${a.title} +${kfmt(a.gain || 0)}/時（累計 ${kfmt(a.total)}）`).join('\n')}`)); }
+  const big = list.filter(a => a.kind === 'milestone' && a.ms >= 100000);
+  if (!big.length) return; // 勢いとフォロワーの伸びは日報で見る。10万回以上の節目だけすぐ送る
+  try { await pushChecked(flexAlert(big, now)); }
+  catch (e) { log('flex alert failed', e.message); await push(text(`【伸びてる】\n${big.map(a => a.kind === 'followers' ? `${PLAT[a.p]} フォロワー +${a.gain}/時（今 ${kfmt(a.total)}）` : `${PLAT[a.p]} ${a.title} +${kfmt(a.gain || 0)}/時（累計 ${kfmt(a.total)}）`).join('\n')}`)); }
 }
 let collecting = false;
 async function collect() {
@@ -901,6 +974,7 @@ setInterval(async () => {
     for (const [id, it] of Object.entries(state.items)) if (it.ytAt && it.ytAt <= Date.now()) await youtube(id);
     await refreshToken();
     await remind().catch(e => log('remind failed', e));
+    await digestTick().catch(e => log('digest failed', e));
     await flushOutbox().catch(e => log('outbox failed', e));
   } finally { busy = false; }
   // 毎時5分に3媒体の数字を取る（投稿の処理とは別に動かす）
@@ -949,14 +1023,13 @@ http.createServer(async (req, res) => {
       if (!validId(id) || !fs.existsSync(path.join(MEDIA, `${id}.mp4`))) return send(res, 400, { ok: false, error: 'missing video' });
       const prev = state.items[id];
       if (prev && prev.status === 'published') return send(res, 409, { ok: false, error: 'already published' });
-      state.items[id] = { status: 'pending', receivedAt: Date.now() }; save();
-      await pushApproval(id);
+      state.items[id] = { status: 'pending', receivedAt: Date.now() }; save(); // 承認カードはまとめて送る（朝・夕方・「承認待ち」と送ったとき）
       return send(res, 200, { ok: true });
     }
     if (req.method === 'POST' && p === '/hook/notice') {
       if (!authed(req)) return send(res, 401, { ok: false });
       const { message } = JSON.parse((await readBody(req)).toString('utf8'));
-      await push(text(String(message || '')));
+      state.notices = [...(state.notices || []), { m: String(message || '').slice(0, 800), t: Date.now() }].slice(-10); save(); // 次のまとめに入れる
       return send(res, 200, { ok: true });
     }
     if (req.method === 'POST' && p === '/line/webhook') return onLineWebhook(req, res);
