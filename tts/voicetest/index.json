@@ -1,0 +1,68 @@
+{
+ "nar_Charon": {
+  "dur": 10.443,
+  "voice": "Charon",
+  "text": "もし大地震が起きた時、あなたがタワマンの、さんじゅうに階にいたら。絶対に、トイレを流すな。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "nar_Algenib": {
+  "dur": 10.218,
+  "voice": "Algenib",
+  "text": "もし大地震が起きた時、あなたがタワマンの、さんじゅうに階にいたら。絶対に、トイレを流すな。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "nar_Iapetus": {
+  "dur": 10.56,
+  "voice": "Iapetus",
+  "text": "もし大地震が起きた時、あなたがタワマンの、さんじゅうに階にいたら。絶対に、トイレを流すな。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "nar_Orus": {
+  "dur": 10.069,
+  "voice": "Orus",
+  "text": "もし大地震が起きた時、あなたがタワマンの、さんじゅうに階にいたら。絶対に、トイレを流すな。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "nar_Rasalgethi": {
+  "dur": 9.688,
+  "voice": "Rasalgethi",
+  "text": "もし大地震が起きた時、あなたがタワマンの、さんじゅうに階にいたら。絶対に、トイレを流すな。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "mio_Kore": {
+  "dur": 4.48,
+  "voice": "Kore",
+  "text": "待って！流しちゃダメ！…明日に、してください。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "mio_Aoede": {
+  "dur": 4.848,
+  "voice": "Aoede",
+  "text": "待って！流しちゃダメ！…明日に、してください。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "mio_Leda": {
+  "dur": 4.661,
+  "voice": "Leda",
+  "text": "待って！流しちゃダメ！…明日に、してください。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "mio_Despina": {
+  "dur": 3.378,
+  "voice": "Despina",
+  "text": "待って！流しちゃダメ！…明日に、してください。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "koto_Leda": {
+  "dur": 2.986,
+  "voice": "Leda",
+  "text": "パパ、おトイレ行きたい…",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "koto_Achernar": {
+  "dur": 3.015,
+  "voice": "Achernar",
+  "text": "パパ、おトイレ行きたい…",
+  "model": "gemini-3.8-flash-tts"
+ }
+}
