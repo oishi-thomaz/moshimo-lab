@@ -703,13 +703,13 @@ function flexAlert(alerts, now) {
     if (i) rows.push({ type: 'separator' });
     const value = a.kind === 'followers' ? `+${a.gain}人/時` : a.kind === 'milestone' ? `${kfmt(a.ms)}突破` : `+${kfmt(a.gain)}/時`;
     const main = a.kind === 'followers' ? 'フォロワー' : a.title;
-    const sub = a.kind === 'followers' ? `今 ${kfmt(a.total)}人` : `累計 ${kfmt(a.total)}再生${a.kind === 'velocity' && a.base ? `・いつもの${Math.round(a.gain / a.base)}倍` : ''}`;
+    const sub = a.kind === 'followers' ? `今 ${kfmt(a.total)}人` : `累計 ${kfmt(a.total)}再生${a.kind === 'velocity' ? (a.accel ? `・直前の${a.accel}倍に加速` : a.ageH != null && a.ageH <= 12 ? `・投稿${a.ageH}時間` : '') : ''}`;
     rows.push({ type: 'box', layout: 'vertical', spacing: 'xs', contents: [
       { type: 'box', layout: 'horizontal', alignItems: 'center', contents: [tag(PLAT[a.p], PCOL[a.p]), { type: 'text', text: value, weight: 'bold', size: 'md', color: '#0A7D3C', align: 'end' }] },
       { type: 'text', text: nz(main), size: 'sm', weight: 'bold', wrap: true, color: '#111111' },
       { type: 'text', text: sub, size: 'xs', color: '#888888' }] });
   });
-  return { type: 'flex', altText: `伸びてる：${alerts.map(a => a.kind === 'followers' ? `${PLAT[a.p]}フォロワー` : a.title).join('、')}`.slice(0, 390), contents: bubble('📈 伸びてる', `${fmt(now)} 時点・直近1時間`, rows, '次の手は解析のときにClaudeが打つ') };
+  return { type: 'flex', altText: `バズりだした：${alerts.map(a => a.kind === 'followers' ? `${PLAT[a.p]}フォロワー` : a.title).join('、')}`.slice(0, 390), contents: bubble('🔥 バズりだした', `${fmt(now)} 時点・直近1時間`, rows, '次の手は解析のときにClaudeが打つ') };
 }
 // 日報カード：{ title, subtitle, sections: [{ head, rows: [{ label, value, delta, sub, tag }] } | { head, text } | { head, items: [..] }], foot }
 const TAGC = { インスタ: PCOL.ig, YouTube: PCOL.yt, TikTok: PCOL.tt };
@@ -753,27 +753,42 @@ async function detectBuzz(snap) {
   if (prev) for (const p of ['ig', 'yt', 'tt']) { for (const [k, v] of Object.entries(prev.v[p] || {})) if (cur.v[p][k] == null && snap[p] && !snap[p].error) cur.v[p][k] = v; if (cur.f[p] == null) cur.f[p] = prev.f[p]; }
   state.an.prev = cur;
   if (!prev || now - prev.t > 3 * 3600e3) return;
+  // バズりだした の判定（2026/10/24 ゆうとの指摘で厳しくした）
+  //  再生：1時間の伸びが媒体ごとの下限以上 かつ その動画の直前6時間の平均の2.5倍以上（＝今まさに加速してる）
+  //        記録が足りない新しい動画（投稿12時間以内）は下限の2倍以上。同じ動画は24時間に1回まで
+  //  節目：累計10万・50万・100万・300万を超えたとき（1回だけ）
+  //  フォロワー：1時間の増加が媒体ごとの下限以上（6時間に1回まで）
+  const FLOOR = { ig: 3000, tt: 8000, yt: 1000 }, ACCEL = 2.5, FFLOOR = { ig: 100, tt: 1000, yt: 500 };
   const hrs = (now - prev.t) / 3600e3;
-  const g = state.an.gains = state.an.gains || { ig: [], yt: [], tt: [], fig: [], fyt: [], ftt: [] };
+  const vh = state.an.vh = state.an.vh || {};
   const alerts = []; state.an.alerted = state.an.alerted || {};
   const once = (key, ms) => { if (state.an.alerted[key] && now - state.an.alerted[key] < ms) return false; state.an.alerted[key] = now; return true; };
   for (const p of ['ig', 'yt', 'tt']) {
-    const s = snap[p] || {}; const base = median(g[p]);
+    const s = snap[p] || {};
     for (const [k, v] of Object.entries(cur.v[p])) {
-      const pv = prev.v[p][k]; if (pv == null) continue;
+      const key = `${p}:${k}`; const h = (vh[key] = (vh[key] || []).filter(([t]) => now - t <= 8 * 3600e3));
+      const pv = prev.v[p][k]; h.push([now, v]);
+      if (pv == null) continue;
       const gain = Math.round((v - pv) / hrs);
-      if (gain > 0) g[p].push(gain);
-      if (gain >= Math.max(300, base * 6) && once(`v:${p}:${k}`, 12 * 3600e3)) alerts.push({ t: now, p, k, kind: 'velocity', gain, base, total: v, title: titleOf(p, k, s.media && s.media[k]) });
-      for (const ms of [10000, 30000, 100000, 300000, 1000000, 3000000]) if (pv < ms && v >= ms && once(`m:${p}:${k}:${ms}`, 365 * 86400e3)) alerts.push({ t: now, p, k, kind: 'milestone', ms, total: v, title: titleOf(p, k, s.media && s.media[k]) });
+      const rec = s.media && s.media[k]; const ageH = rec && rec.t ? (now - rec.t) / 3600e3 : 999;
+      const past = h.filter(([t]) => t <= prev.t && now - t <= 7 * 3600e3);
+      let hit = false, accel = null;
+      if (past.length >= 3 && past[past.length - 1][0] - past[0][0] >= 3 * 3600e3) {
+        const avg = (past[past.length - 1][1] - past[0][1]) / ((past[past.length - 1][0] - past[0][0]) / 3600e3);
+        accel = avg > 0 ? Math.round(gain / avg * 10) / 10 : null;
+        hit = gain >= FLOOR[p] && gain >= ACCEL * Math.max(avg, 1);
+      } else if (ageH <= 12) hit = gain >= FLOOR[p] * 2;
+      if (hit && once(`v:${p}:${k}`, 24 * 3600e3)) alerts.push({ t: now, p, k, kind: 'velocity', gain, accel, ageH: Math.round(ageH), total: v, title: titleOf(p, k, rec) });
+      for (const ms of [100000, 500000, 1000000, 3000000]) if (pv < ms && v >= ms && once(`m:${p}:${k}:${ms}`, 365 * 86400e3)) alerts.push({ t: now, p, k, kind: 'milestone', ms, total: v, title: titleOf(p, k, rec) });
     }
     const f0 = prev.f[p], f1 = cur.f[p];
     if (f0 != null && f1 != null) {
-      const fg = Math.round((f1 - f0) / hrs); const fb = median(g['f' + p]);
-      if (fg > 0) g['f' + p].push(fg);
-      if (fg >= Math.max(30, fb * 6) && once(`f:${p}`, 6 * 3600e3)) alerts.push({ t: now, p, kind: 'followers', gain: fg, base: fb, total: f1 });
+      const fg = Math.round((f1 - f0) / hrs);
+      if (fg >= FFLOOR[p] && once(`f:${p}`, 6 * 3600e3)) alerts.push({ t: now, p, kind: 'followers', gain: fg, total: f1 });
     }
   }
-  for (const k of Object.keys(g)) g[k] = g[k].slice(-400);
+  for (const key of Object.keys(vh)) if (!vh[key].length || now - vh[key][vh[key].length - 1][0] > 8 * 3600e3) delete vh[key];
+  delete state.an.gains;
   for (const [k, t] of Object.entries(state.an.alerted)) if (now - t > 30 * 86400e3 && !k.startsWith('m:')) delete state.an.alerted[k];
   if (!alerts.length) return;
   state.an.alerts = [...(state.an.alerts || []), ...alerts].slice(-100); save();
