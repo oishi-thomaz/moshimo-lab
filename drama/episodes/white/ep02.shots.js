@@ -97,6 +97,16 @@ const SHOTS = [
     const y = 820 + ((lt * 60) % 120); g.save(); g.globalAlpha = inv(0.5, 1.0, lt); ell(g, 450, y, 10, 16, '#bfe0ff'); g.restore();
   } },
 
+  // 坂口が外の車に気づく
+  { at: 'k1', draw(g, lt, D, S) {
+    g.save(); cam(g, { x: 700, y: 1000, z: slow(lt, D + 2, 1.15, 1.22) }); living(g, { t: lt });
+    figure(g, P.sakaguchi, { x: 860, y: 1560, s: 1.2, turn: 0.7, look: 1, lookY: -0.3, arms: [10, 0, 60, -150], eyes: 'narrow', mouth: 'line', lightFrom: 'right' }); g.restore();
+    glow(g, 960, 700, 300, 'rgba(255,240,200,1)', 0.12 * (1 + Math.sin(lt * 3)) / 2);
+  } },
+  { at: 'k2', draw(g, lt, D, S) {
+    bg(g, '#1a1416', '#0c0a0b');
+    g.save(); cam(g, { x: 540, y: 800, z: slow(lt, D, 1.0, 1.05) }); close(g, P.yuuma, { y: 760, s: 4.0, eyes: 'dot', brow: -0.5, mouth: 'line', talk: talking(lt, S, ['k2']) * 0.4, lightFrom: 'left', look: 0.4 }); g.restore();
+  } },
   // ── 3. 外のジン
   { at: 'c1', draw(g, lt, D, S) {
     g.save(); cam(g, { x: 540, y: 1100, z: slow(lt, D, 1.0, 1.05) }); street(g, { lit2: 0.6, lit1: 0.8, t: lt }); g.restore();
@@ -113,6 +123,11 @@ const SHOTS = [
     // 握った紙
   } },
 
+  { at: 'c7', draw(g, lt, D, S) {
+    bg(g, '#070a14', '#0d1222');
+    g.save(); cam(g, { x: 540, y: 800, z: slow(lt, D, 1.0, 1.08) }); close(g, P.yuuma, { y: 760, s: 4.0, eyes: 'dot', brow: -0.8, mouth: 'line', lightFrom: 'right', look: -0.5 }); g.restore();
+    mood(g, { red: 0.12 * inv(0.5, D, lt) });
+  } },
   // ── 4. 金庫
   { at: 'd1', draw(g, lt, D, S) {
     g.save(); cam(g, { x: 540, y: 1100, z: 1.0 }); living(g, { t: lt });
@@ -150,7 +165,7 @@ const SHOTS = [
     const typed = '全部、警察に話す。もう、お前の言うことは聞かへん';
     const n = Math.floor(clamp((lt - S.L('e2')) / Math.max(0.1, S.Le('e2') - S.L('e2'))) * typed.length);
     const sent = lt > S.L('send') + 0.2;
-    chat(g, [{ t: -9, from: 'karasu', text: '次の仕事や。今夜、この家の金庫の中身を持ってこい' }, { t: -8, from: 'karasu', text: '番号は、お前が知っとるやろ' }, ...(sent ? [{ t: S.L('send') + 0.2, from: 'me', text: typed, read: lt > S.L('send') + 1.1 }] : [])], lt, { y: 330, h: 720 });
+    chat(g, [{ t: -9, from: 'karasu', text: '次の仕事や。今夜、この家の金庫の中身を持ってこい' }, { t: -8, from: 'karasu', text: '番号は、お前が知っとるやろ' }, ...(sent ? [{ t: S.L('send') + 0.2, from: 'me', text: typed, read: false }] : [])], lt, { y: 330, h: 720 });
     if (!sent) { fillRR(g, 90, 1080, 900, 110, 30, '#1c2030'); text(g, typed.slice(0, n) + (Math.sin(lt * 8) > 0 ? '｜' : ''), 120, 1135, { size: 36, color: '#fff', align: 'left' }); }
   } },
 
@@ -221,6 +236,8 @@ const SFX = [
   { at: 'd4', type: 'heartbeat', dur: 2.0, vol: 0.5 },
   { at: 'd6', type: 'subdrop', vol: 0.5 },
   { at: 'send', off: 0.2, type: 'pop', vol: 0.7 },
+  { at: 'k1', type: 'rustle', dur: 0.5, vol: 0.4 },
+  { at: 'c7', type: 'heartbeat', dur: 1.6, vol: 0.4 },
   { at: 'f1', type: 'vibrate', dur: 2.4, vol: 1.0 },
   { at: 'f2', type: 'vibrate', dur: 2.0, vol: 0.7 },
   { at: 'f3', off: 0.3, type: 'stab', vol: 0.8 },
@@ -235,7 +252,8 @@ const MUSIC = [
   { at: 'c1', mood: 'suspense' },
   { at: 'd1', mood: 'uneasy' },
   { at: 'd6', mood: 'dread' },
-  { at: 'send', mood: 'silence' },
+  { at: 'send', mood: 'calm' },
+  { at: 'f1', mood: 'silence' },
   { at: 'f3', mood: 'suspense' },
   { at: 'reveal', mood: 'silence' },
   { at: 'end', off: 0.8, mood: 'ending' },
