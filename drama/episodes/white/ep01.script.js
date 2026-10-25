@@ -34,7 +34,7 @@ export const LINES = [
 
   // ── 今
   { id: 'c1', who: 'Y', text: '母さんに、2階に行くなって送った。', read: '母さんに、にかいに行くなって送った。', gap: 0.1 },
-  { id: 'c2', who: 'Y', text: '[[r:既読が、つかへん。]]', gap: 0.2 },
+  { id: 'c2', who: 'Y', text: '[[r:既読が、つかへん。]]', read: 'きどくが、つかへん。', gap: 0.2 },
   { id: 'c3', who: 'Y', text: '警察や。1、1…', read: '警察や。いち、いち…', gap: 0.05 },
   { beat: 'cut110', dur: 0.35 },
   { id: 'c4', who: 'K', text: '', read: '通報したら、にかいのやつが降りる。', gap: 0.15 },
@@ -49,18 +49,18 @@ export const LINES = [
 
   // ── 検問
   { beat: 'siren', dur: 0.7 },
-  { id: 'e1', who: 'Y', text: '[[r:検問…！]]', gap: 0.1 },
+  { id: 'e1', who: 'Y', text: '[[r:検問…！]]', read: 'けんもんや…！', gap: 0.1 },
   { id: 'e2', who: 'P', text: 'こんばんは。どちらまで？', gap: 0.1 },
   { id: 'e3', who: 'J', text: '実家に、忘れもん取りに。', gap: 0.15 },
   { id: 'e4', who: 'Y', text: '手袋、[[r:見られた。]]', gap: 0.5 },
   { id: 'e5', who: 'P', text: '…気をつけて。', gap: 0.3 },
 
   // ── 妹
-  { id: 'f1', who: 'M', text: '', read: 'ミクが、にかい見に行くって。', gap: 0.1 },
+  { id: 'f1', who: 'M', text: '', read: 'ミクが、にかいを見に行くって。', gap: 0.1 },
   { id: 'f2', who: 'Y', text: '[[r:やめろ、ミク…！]]', style: 'A 21-year-old Japanese man shouting desperately at his phone, Kansai dialect. Short and sharp.', gap: 0.15 },
   { id: 'f3', who: 'K', text: '', read: '来たら、何もせえへん。', gap: 0.2 },
   { id: 'f4', who: 'Y', text: '先輩に、助けてって送った。', gap: 0.1 },
-  { id: 'f5', who: 'K', text: '', read: 'タクミくんなら、ここにおるで。', gap: 0.15 },
+  { id: 'f5', who: 'K', text: '', read: 'たくみくんなら、ここにおるで。', gap: 0.15 },
   { id: 'f6', who: 'Y', text: 'この仕事を紹介したのは、[[r:先輩]]やった。', gap: 0.3 },
 
   // ── 実家
@@ -68,7 +68,7 @@ export const LINES = [
   { id: 'g2', who: 'Y', text: '明かりがついてるのは、2階の、[[r:俺の部屋]]だけ。', read: '明かりがついてるのは、にかいの、俺の部屋だけ。', gap: 0.2 },
   { beat: 'door', dur: 0.6 },
   { id: 'g3', who: 'Y', text: '鍵が、[[r:開いてる。]]', gap: 0.25 },
-  { id: 'g4', who: 'Y', text: 'この靴…[[r:誰のや。]]', gap: 0.3 },
+  { id: 'g4', who: 'Y', text: 'この靴…[[r:誰のや。]]', read: 'この靴…だれのや。', gap: 0.3 },
   { id: 'g5', who: 'Y', text: '母さんに、電話をかけた。', gap: 0.1 },
   { beat: 'ring', dur: 1.6 },
   { id: 'g6', who: 'Y', text: '[[r:2階で、鳴ってる。]]', read: 'にかいで、鳴ってる。', style: 'A 21-year-old Japanese man whispering in terror in a dark house, Kansai dialect.', gap: 0.25 },

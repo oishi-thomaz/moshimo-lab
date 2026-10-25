@@ -214,6 +214,117 @@ def fx_zapoff(rng, e):
     x = sine(300 * np.exp(-t * 5) + 40, n) * np.exp(-t * 4) * 0.6 + bp(noise(n, rng), 2000, 7000) * env(n, 0.0005, 0.02)
     return st(norm(x) * 0.6)
 
+# ---- ホワイト案件用 ----
+def fx_notif(rng, e):
+    # カラスの通知音：ガラスっぽい2音＋低い唸り（この作品の合図）
+    n = int(1.6 * SR); t = np.arange(n) / SR; out = np.zeros(n)
+    for i, f in enumerate([1318.5, 987.8]):
+        s = int(i * 0.11 * SR); m = n - s; tt = np.arange(m) / SR
+        out[s:] += (sine(f, m) + 0.5 * sine(f * 2.01, m) + 0.2 * sine(f * 3.98, m)) * np.exp(-tt * 7) * np.minimum(1, tt / 0.002)
+    out += sine(55, n) * env(n, 0.01, 0.5) * 0.6
+    return reverb(st(norm(out) * 0.8), rng, 1.6, 0.35)
+def fx_pop(rng, e):
+    n = int(0.25 * SR); t = np.arange(n) / SR
+    return st(sine(600 + 900 * np.exp(-t * 40), n) * env(n, 0.001, 0.04) * 0.6)
+def fx_clock(rng, e):
+    # 秒針：rate 開始の間隔→ rate2 終わりの間隔（速くなる）
+    dur = e.get('dur', 5); n = int(dur * SR); out = np.zeros(n); k = 0.0; i = 0
+    r0, r1 = e.get('rate', 1.0), e.get('rate2', e.get('rate', 1.0))
+    while k < dur - 0.05:
+        m = int(0.05 * SR); tt = np.arange(m) / SR; s = int(k * SR)
+        f = 3200 if i % 2 == 0 else 2600
+        out[s:s + m] += (sine(f, m) * np.exp(-tt * 260) + bp(noise(m, rng), 3000, 9000) * np.exp(-tt * 400) * 0.5)[: n - s]
+        k += lerp_(r0, r1, k / dur); i += 1
+    return st(out * 0.55)
+def lerp_(a, b, k): return a + (b - a) * k
+def fx_stab(rng, e):
+    n = int(2.2 * SR); t = np.arange(n) / SR
+    cl = sum(np.sign(sine(f, n)) * 0.3 + sine(f, n) for f in (233.1, 246.9, 349.2, 493.9))
+    cl = bp(cl, 150, 4000) * env(n, 0.003, 0.5)
+    hit = sine(60 * np.exp(-t * 6) + 30, n) * env(n, 0.001, 0.4)
+    return reverb(st(norm(cl * 0.5 + hit)), rng, 2.2, 0.4)
+def fx_glitch(rng, e):
+    dur = e.get('dur', 0.4); n = int(dur * SR); out = np.zeros(n); k = 0
+    while k < n:
+        m = int(rng.uniform(0.01, 0.05) * SR); f = rng.uniform(200, 4000)
+        out[k:k + m] = (np.sign(sine(f, min(m, n - k))) * rng.uniform(0.2, 0.7))[: n - k]; k += m
+    return st(bp(out, 100, 9000) * 0.5)
+def fx_shutter(rng, e):
+    n = int(0.4 * SR); out = np.zeros(n)
+    for s0 in (0, 0.07):
+        m = int(0.05 * SR); s = int(s0 * SR); out[s:s + m] += bp(noise(m, rng), 1500, 9000) * env(m, 0.0005, 0.01)
+    return reverb(st(out * 0.9), rng, 0.4, 0.15)
+def fx_dial(rng, e):
+    n = int(1.0 * SR); out = np.zeros(n)
+    for i in range(e.get('n', 2)):
+        s = int(i * 0.42 * SR); m = int(0.18 * SR); out[s:s + m] += (sine(697, m) + sine(1209, m)) * 0.35 * env(m, 0.003, 0.5)
+    return st(out)
+def fx_announce(rng, e):
+    # 駅の案内チャイム＋ざわめき
+    dur = e.get('dur', 3); n = int(dur * SR); out = np.zeros(n)
+    for i, f in enumerate([659.3, 830.6, 987.8, 1318.5]):
+        s = int(i * 0.18 * SR); m = int(1.0 * SR); out[s:s + m] += (sine(f, m) * np.exp(-np.arange(m) / SR * 4))[: n - s] * 0.4
+    crowd = bp(noise(n, rng), 300, 2500) * 0.15 * np.minimum(1, np.arange(n) / SR / 0.5)
+    return reverb(st(out + crowd), rng, 2.2, 0.5)
+def fx_carstop(rng, e):
+    n = int(1.6 * SR); t = np.arange(n) / SR
+    skid = bp(noise(n, rng), 1500, 4500) * env(n, 0.02, 0.35) * 0.5
+    eng = bp(sine(45 + 8 * np.sin(t * 30), n) + noise(n, rng) * 0.2, hi=300) * np.minimum(1, t / 0.2) * 0.8
+    return st(norm(skid + eng) * 0.8, 0.2)
+def fx_engine(rng, e):
+    dur = e.get('dur', 6); n = int(dur * SR); t = np.arange(n) / SR
+    x = bp(sine(38 + 2 * np.sin(t * 0.7), n) + 0.5 * sine(76, n) + noise(n, rng) * 0.4, hi=220)
+    road = bp(noise(n, rng), 100, 700) * 0.4
+    f = np.minimum(1, t / 0.6) * np.minimum(1, (t[-1] - t) / 0.6)
+    return st(norm(x + road) * f * 0.6)
+def fx_siren(rng, e):
+    dur = e.get('dur', 2.5); n = int(dur * SR); t = np.arange(n) / SR
+    f = 700 + 300 * (0.5 + 0.5 * np.sin(2 * np.pi * 0.9 * t))
+    x = np.sign(sine(f, n)) * 0.3 + sine(f, n) * 0.5
+    x = bp(x, 300, 3000) * np.minimum(1, t / 0.3) * np.minimum(1, (t[-1] - t) / 0.5)
+    return reverb(st(x * 0.7, 0.5), rng, 1.8, 0.45)
+def fx_tap3(rng, e):
+    n = int(1.2 * SR); out = np.zeros(n)
+    for i in range(3):
+        m = int(0.15 * SR); tt = np.arange(m) / SR; s = int((0.05 + i * 0.3) * SR)
+        out[s:s + m] += (sine(180, m) * np.exp(-tt * 45) + sine(420, m) * np.exp(-tt * 70) * 0.4 + bp(noise(m, rng), 1000, 5000) * np.exp(-tt * 200) * 0.3)
+    return reverb(st(norm(out) * 0.8), rng, 0.6, 0.15)
+def fx_unlock(rng, e):
+    n = int(0.6 * SR); out = np.zeros(n)
+    for s0, f in ((0, 2400), (0.12, 1500)):
+        m = int(0.06 * SR); s = int(s0 * SR); out[s:s + m] += (sine(f, m) + bp(noise(m, rng), 1500, 8000)) * env(m, 0.0005, 0.012)
+    return reverb(st(out * 0.8), rng, 0.6, 0.2)
+def fx_creak(rng, e):
+    n = int(1.4 * SR); t = np.arange(n) / SR
+    f = 160 + 90 * np.sin(t * 3.3) + 40 * np.sin(t * 11)
+    x = bp(np.sign(sine(f, n)) * 0.6 + noise(n, rng) * 0.15, 250, 2500) * env(n, 0.15, 0.6)
+    return reverb(st(x * 0.4), rng, 1.4, 0.4)
+def fx_ringtone(rng, e):
+    # 2階で鳴るスマホ（こもった音）
+    dur = e.get('dur', 2); n = int(dur * SR); out = np.zeros(n); notes = [1046.5, 1318.5, 1568.0, 1318.5]
+    k = 0.0; i = 0
+    while k < dur - 0.1:
+        m = int(0.2 * SR); tt = np.arange(m) / SR; s = int(k * SR)
+        out[s:s + m] += ((sine(notes[i % 4], m) + 0.3 * sine(notes[i % 4] * 3, m)) * np.exp(-tt * 14))[: n - s]
+        k += 0.16 if i % 8 < 4 else 0.16; i += 1
+        if i % 8 == 0: k += 0.4
+    out = bp(out, 300, 2200)
+    return reverb(st(out * 0.6, -0.1), rng, 1.8, 0.55)
+def fx_pickup(rng, e):
+    n = int(0.5 * SR); x = bp(noise(n, rng), 800, 4000) * env(n, 0.0005, 0.015) + sine(120, n) * env(n, 0.001, 0.05)
+    return st(x * 0.7)
+def fx_boxopen(rng, e):
+    n = int(0.9 * SR); t = np.arange(n) / SR
+    x = bp(noise(n, rng), 400, 3000) * env(n, 0.01, 0.2) + sine(90, n) * env(n, 0.002, 0.08)
+    return reverb(st(x * 0.6), rng, 0.8, 0.2)
+def fx_riser(rng, e):
+    dur = e.get('dur', 2); n = int(dur * SR); t = np.arange(n) / SR
+    x = bp(noise(n, rng), 800, 7000) * (t / dur) ** 2 + sine(80 + 300 * (t / dur) ** 2, n) * (t / dur) * 0.3
+    return st(x * 0.5)
+def fx_subdrop(rng, e):
+    n = int(2.5 * SR); t = np.arange(n) / SR
+    return reverb(st(sine(70 * np.exp(-t * 0.8) + 25, n) * env(n, 0.005, 1.2)), rng, 2, 0.3)
+
 FX = {k[3:]: v for k, v in globals().items() if k.startswith('fx_')}
 
 
@@ -246,6 +357,30 @@ def mood_track(mood, dur, rng):
                 k += 0.75
             hi = (np.sin(2 * np.pi * hz(root + 36) * t) + np.sin(2 * np.pi * hz(root + 37) * t)) * 0.03 * np.minimum(1, t / 4)
             out += st(hi, 0.3)
+    if mood == 'thriller':
+        dr = pad([hz(root - 12), hz(root - 5)], n, rng, 0.2, 0.12) * 0.7; out += st(dr)
+        bpm = 112; step = 60 / bpm / 2; k = 0.0; i = 0; arp = [0, 3, 7, 10, 7, 3, 12, 3]
+        while k < dur:
+            s = int(k * SR); m = int(0.22 * SR); tt = np.arange(m) / SR
+            f = hz(root + 12 + arp[i % 8] + (0 if (i // 16) % 2 == 0 else -2))
+            v = (np.sign(np.sin(2 * np.pi * f * tt)) * 0.25 + np.sin(2 * np.pi * f * tt)) * np.exp(-tt * 16) * 0.22
+            out[s:s + m] += st(bp(v, 200, 3000), 0.35 if i % 2 else -0.35)[: n - s]
+            if i % 4 == 0:
+                kk = np.sin(2 * np.pi * (50 * np.exp(-tt * 20) + 40) * tt) * np.exp(-tt * 12) * 0.9; out[s:s + m] += st(kk)[: n - s]
+            if i % 2 == 1:
+                hh = bp(rng.standard_normal(m), 6000, 11000) * np.exp(-tt * 90) * 0.08; out[s:s + m] += st(hh, 0.2)[: n - s]
+            k += step; i += 1
+    if mood == 'flash':
+        k = 0.0; prog = [[57, 60, 64], [55, 59, 62], [53, 57, 60], [52, 55, 59]]; ci = 0
+        while k < dur:
+            ch = prog[ci % 4]; s = int(k * SR)
+            for j, nt in enumerate(ch + [ch[0] + 12]):
+                pm = int(2.0 * SR); ps = s + int(j * 0.35 * SR)
+                if ps < n:
+                    tt = np.arange(pm) / SR; wob = 1 + 0.004 * np.sin(2 * np.pi * 5 * tt)
+                    out[ps:ps + pm] += st(np.sin(2 * np.pi * hz(nt) * wob * tt) * np.exp(-tt * 2) * 0.14)[: n - ps]
+            k += 1.6; ci += 1
+        out = bp(out, 200, 2500) + st(bp(rng.standard_normal(n), 2000, 8000) * 0.01)
     if mood == 'tension':
         dr = pad([hz(root - 12), hz(root - 9), hz(root - 5)], n, rng, 0.3) * 0.8
         out += st(dr)
@@ -311,6 +446,10 @@ def build_sfx(meta, rng):
 
 
 VOICE_FX = {
+    'robot': "asetrate=48000*0.93,aresample=48000,atempo=1.0753,acrusher=bits=8:mode=log:aa=1:mix=0.3,aeval=val(0)*(0.72+0.28*sin(2*PI*70*t)),highpass=f=170,lowpass=f=5200,aecho=0.8:0.5:18:0.25",
+    'msg': 'highpass=f=120,lowpass=f=7500,aecho=0.8:0.4:25:0.18',
+    'outside': 'lowpass=f=3600,aecho=0.8:0.6:45:0.25',
+    'phone': 'highpass=f=380,lowpass=f=3300,acrusher=bits=10:mix=0.15,volume=1.25',
     'child': 'asetrate=48000*1.16,aresample=48000,atempo=0.862',
     'pa': 'highpass=f=320,lowpass=f=3600,acompressor=threshold=0.1:ratio=4,aecho=0.8:0.6:45|90:0.35|0.22,volume=0.95',
     'door': 'lowpass=f=1700,highpass=f=110,aecho=0.7:0.55:22:0.3,volume=0.9',

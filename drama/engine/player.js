@@ -130,11 +130,11 @@ export function drawChip(g, label, val, alpha) {
 }
 
 // まとめて走らせる
-export async function runEpisode({ SERIES, EPISODE, CAST, LINES, SHOTS, SFX = [], MUSIC = [], CHIPS = [], post }) {
+export async function runEpisode({ SERIES, EPISODE, CAST, LINES, SHOTS, SFX = [], MUSIC = [], CHIPS = [], post, subDraw = drawSub, defGap = 0.28 }) {
   const c = document.getElementById('c'); const g = c.getContext('2d');
   await document.fonts.load(`800 60px "M PLUS Rounded 1c"`, 'あ漢字'); await document.fonts.load(`500 40px "M PLUS Rounded 1c"`, 'あ'); await document.fonts.ready;
   const timing = await loadTiming();
-  const TL = buildTimeline(LINES, timing);
+  const TL = buildTimeline(LINES, timing, { defGap });
   const at = (ref) => { const [id, edge] = String(ref).split(':'); const it = TL.byId[id]; if (!it) throw new Error('no line ' + id); return edge === 'end' ? it.t1 : it.t0; };
   const shots = SHOTS.map(s => ({ ...s, start: at(s.at) + (s.off || 0) })).sort((a, b) => a.start - b.start);
   shots.forEach((s, i) => { s.end = i < shots.length - 1 ? shots[i + 1].start : TL.duration; });
@@ -161,10 +161,10 @@ export async function runEpisode({ SERIES, EPISODE, CAST, LINES, SHOTS, SFX = []
     // チップ
     for (const ch of chips) { const a = Math.min(inv(ch.t0, ch.t0 + 0.25, t), 1 - inv(ch.t0 + (ch.dur || 2.8), ch.t0 + (ch.dur || 2.8) + 0.3, t)); if (a > 0) drawChip(g, ch.label, ch.val, a); }
     // 字幕
-    if (!S.noSubs) { const sb = subs.find(x => t >= x.t0 && t < x.t1); if (sb) drawSub(g, sb.text, { alpha: Math.min(1, (t - sb.t0) / 0.08), who: sb.who, names }); }
-    if (post) post(g, t);
+    if (!S.noSubs) { const sb = subs.find(x => t >= x.t0 && t < x.t1); if (sb) subDraw(g, sb.text, { alpha: Math.min(1, (t - sb.t0) / 0.08), who: sb.who, names }); }
+    if (post) post(g, t, { at, S, lt });
   };
-  window.TL = TL; window.SHOTS_T = shots.map(s => [s.at, +s.start.toFixed(2), +s.end.toFixed(2)]);
+  window.AT = at; window.TL = TL; window.SHOTS_T = shots.map(s => [s.at, +s.start.toFixed(2), +s.end.toFixed(2)]);
   window.renderAt(0);
   window.READY = true;
 }
