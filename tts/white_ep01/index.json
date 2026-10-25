@@ -1,0 +1,242 @@
+{
+ "o1": {
+  "dur": 1.314,
+  "voice": "Schedar",
+  "text": "次の現場。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "o2": {
+  "dur": 1.485,
+  "voice": "Puck",
+  "text": "…ここ、俺の家や。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "o3": {
+  "dur": 2.621,
+  "voice": "Puck",
+  "text": "この写真、家の中から撮られてる。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "o4": {
+  "dur": 3.712,
+  "voice": "Sulafat",
+  "text": "ユウマ、帰ってきてるん？　にかいで物音するけど。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "o5": {
+  "dur": 0.906,
+  "voice": "Puck",
+  "text": "俺は、帰ってへん。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "o6": {
+  "dur": 6.449,
+  "voice": "Schedar",
+  "text": "にじゅういちじまでに来い。金庫の番号は、お前が知ってる。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b1": {
+  "dur": 3.463,
+  "voice": "Puck",
+  "text": "3日前。日給いちまんごせんえんの、引越しバイト。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b2": {
+  "dur": 3.055,
+  "voice": "Puck",
+  "text": "運んだ段ボールの中身は、札束やった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b3": {
+  "dur": 6.007,
+  "voice": "Schedar",
+  "text": "お前の顔、カメラに残ってるで。もう共犯や。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b4": {
+  "dur": 2.954,
+  "voice": "Puck",
+  "text": "免許証を撮られて、全部終わった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c1": {
+  "dur": 2.817,
+  "voice": "Puck",
+  "text": "母さんに、にかいに行くなって送った。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c2": {
+  "dur": 2.115,
+  "voice": "Puck",
+  "text": "既読が、つかへん。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c3": {
+  "dur": 1.587,
+  "voice": "Puck",
+  "text": "警察や。いち、いち…",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c4": {
+  "dur": 4.016,
+  "voice": "Schedar",
+  "text": "通報したら、にかいのやつが降りる。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c5": {
+  "dur": 3.396,
+  "voice": "Puck",
+  "text": "なんでわかるねん。スマホ、見られてる…？",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d1": {
+  "dur": 3.203,
+  "voice": "Puck",
+  "text": "こんな時に、電車が止まった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d2": {
+  "dur": 1.511,
+  "voice": "Algenib",
+  "text": "乗れ。カラスからや。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d3": {
+  "dur": 2.128,
+  "voice": "Algenib",
+  "text": "スマホは切るな。全部見られてる。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d4": {
+  "dur": 4.98,
+  "voice": "Algenib",
+  "text": "最初の現場はな、だいたい身内の家や。逃げられへんようにな。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d5": {
+  "dur": 3.912,
+  "voice": "Algenib",
+  "text": "ヤバなったら、俺がさんかい叩く。そしたら逃げろ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d6": {
+  "dur": 1.994,
+  "voice": "Puck",
+  "text": "こいつの手、震えてる。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e1": {
+  "dur": 0.803,
+  "voice": "Puck",
+  "text": "検問…！",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e2": {
+  "dur": 1.363,
+  "voice": "Orus",
+  "text": "こんばんは。どちらまで？",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e3": {
+  "dur": 2.242,
+  "voice": "Algenib",
+  "text": "実家に、忘れもん取りに。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e4": {
+  "dur": 1.456,
+  "voice": "Puck",
+  "text": "手袋、見られた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e5": {
+  "dur": 1.096,
+  "voice": "Orus",
+  "text": "…気をつけて。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "f1": {
+  "dur": 2.46,
+  "voice": "Sulafat",
+  "text": "ミクが、にかい見に行くって。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "f2": {
+  "dur": 0.846,
+  "voice": "Puck",
+  "text": "やめろ、ミク…！",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "f3": {
+  "dur": 2.46,
+  "voice": "Schedar",
+  "text": "来たら、何もせえへん。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "f4": {
+  "dur": 2.285,
+  "voice": "Puck",
+  "text": "先輩に、助けてって送った。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "f5": {
+  "dur": 2.983,
+  "voice": "Schedar",
+  "text": "タクミくんなら、ここにおるで。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "f6": {
+  "dur": 3.021,
+  "voice": "Puck",
+  "text": "この仕事を紹介したのは、先輩やった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "g1": {
+  "dur": 3.092,
+  "voice": "Puck",
+  "text": "にじゅうじ、ごじゅうはっぷん。いっかいは、真っ暗や。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "g2": {
+  "dur": 3.596,
+  "voice": "Puck",
+  "text": "明かりがついてるのは、にかいの、俺の部屋だけ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "g3": {
+  "dur": 1.744,
+  "voice": "Puck",
+  "text": "鍵が、開いてる。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "g4": {
+  "dur": 1.997,
+  "voice": "Puck",
+  "text": "この靴…誰のや。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "g5": {
+  "dur": 1.816,
+  "voice": "Puck",
+  "text": "母さんに、電話をかけた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "g6": {
+  "dur": 1.782,
+  "voice": "Puck",
+  "text": "にかいで、鳴ってる。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "g7": {
+  "dur": 1.767,
+  "voice": "Charon",
+  "text": "…おかえり、ユウマくん。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "x1": {
+  "dur": 2.104,
+  "voice": "Schedar",
+  "text": "次回。おかえり。",
+  "model": "gemini-3.8-flash-tts"
+ }
+}
