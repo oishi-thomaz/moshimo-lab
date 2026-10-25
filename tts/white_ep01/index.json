@@ -1,8 +1,8 @@
 {
  "a1": {
-  "dur": 1.686,
+  "dur": 2.075,
   "voice": "Alnilam",
-  "text": "着いたな。入れ。",
+  "text": "着いたな。中に入れ。",
   "model": "gemini-3.8-flash-tts"
  },
  "a2": {
@@ -42,34 +42,34 @@
   "model": "gemini-3.8-flash-tts"
  },
  "b4": {
-  "dur": 2.56,
+  "dur": 2.448,
   "voice": "Achird",
   "text": "そんな時に見つけたんが、このバイトや。",
-  "model": "gemini-3.8-flash-lite-tts"
+  "model": "gemini-3.8-flash-tts"
  },
  "b5": {
-  "dur": 3.606,
+  "dur": 3.628,
   "voice": "Achird",
   "text": "引越しの手伝いで、日払い、いちまんごせんえん。",
-  "model": "gemini-3.8-flash-lite-tts"
+  "model": "gemini-3.8-flash-tts"
  },
  "b6": {
-  "dur": 1.982,
+  "dur": 2.33,
   "voice": "Achird",
   "text": "普通のバイトやと、思ってた。",
-  "model": "gemini-3.8-flash-lite-tts"
+  "model": "gemini-3.8-flash-tts"
  },
  "c1": {
-  "dur": 4.315,
+  "dur": 5.259,
   "voice": "Algenib",
   "text": "篠原くんか。ジンや。今日は荷物運ぶだけやから。",
-  "model": "gemini-3.8-flash-lite-tts"
+  "model": "gemini-3.8-flash-tts"
  },
  "c2": {
-  "dur": 3.188,
+  "dur": 3.204,
   "voice": "Achird",
   "text": "段ボールを積んで、別の家に運ぶだけ。",
-  "model": "gemini-3.8-flash-lite-tts"
+  "model": "gemini-3.8-flash-tts"
  },
  "c3": {
   "dur": 2.236,
@@ -78,9 +78,9 @@
   "model": "gemini-3.8-flash-lite-tts"
  },
  "c5": {
-  "dur": 5.462,
+  "dur": 6.299,
   "voice": "Achird",
-  "text": "最後の箱が落ちて、中から出てきたんは…札束やった。",
+  "text": "最後の箱が落ちて、中から出てきたんは…さつたばやった。",
   "model": "gemini-3.8-flash-lite-tts"
  },
  "c6": {
@@ -120,9 +120,9 @@
   "model": "gemini-3.8-flash-lite-tts"
  },
  "d6": {
-  "dur": 2.909,
+  "dur": 2.573,
   "voice": "Achird",
-  "text": "それが、一番の間違いやった。",
+  "text": "それが、一番の間違いやったんや。",
   "model": "gemini-3.8-flash-lite-tts"
  },
  "e1": {
@@ -240,9 +240,9 @@
   "model": "gemini-3.8-flash-lite-tts"
  },
  "g6": {
-  "dur": 1.914,
+  "dur": 2.059,
   "voice": "Charon",
-  "text": "…おかえり、ユウマくん。",
+  "text": "…おかえり、ゆうまくん。",
   "model": "gemini-3.8-flash-lite-tts"
  },
  "g7": {
