@@ -69,7 +69,7 @@ const SHOTS = [
   { at: 'a4', draw(g, lt, D, S) {
     g.save(); cam(g, { x: 540, y: 1150, z: slow(lt, D, 1.05, 1.1) }); genkan(g, { t: lt, light: 0.8 }); g.restore();
     g.fillStyle = 'rgba(0,0,0,.35)'; g.fillRect(0, 0, W, H);
-    figure(g, P.sakaguchi, { x: 540, y: 1700, s: 1.5, arms: [10, 0, 40, -110], phone: true, mouth: 'smile', talk: talking(lt, S, ['a4']) * 0.5, eyes: 'narrow', lightFrom: 'left' });
+    figure(g, P.sakaguchi, { x: 540, y: 1560, s: 1.25, arms: [10, 0, 40, -110], phone: true, mouth: 'smile', talk: talking(lt, S, ['a4']) * 0.5, eyes: 'narrow', lightFrom: 'left' });
   } },
   { at: 'a5', draw(g, lt, D, S) {
     bg(g, '#1a1416', '#0c0a0b');
