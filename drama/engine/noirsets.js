@@ -1,6 +1,6 @@
 // 「ホワイト案件」の背景：住宅街の家・リビング・駅・車内・検問・引越しトラック・妹の部屋・玄関・階段
 import { W, H, clamp, lerp, inv, ease, rng, noise1, rr, fillRR, circ, ell, poly, line, vgrad, glow, rgba, mix, text } from './core.js';
-import { C, toneRect, toneFill, CAST2, figure, head } from './noir.js';
+import { C, toneRect, toneFill, CAST2, figure, head, close, crowIcon } from './noir.js';
 
 // 夜空（星なし・街の明かりの照り返し）
 export function nightSky(g, { y0 = -300, h = H + 600, warm = 0.2 } = {}) {
@@ -324,4 +324,61 @@ export function altar(g, { t = 0 } = {}) {
   fillRR(g, 330, 1060, 420, 360, 16, '#3a3e48'); fillRR(g, 360, 1090, 360, 300, 10, '#4a4f5a'); circ(g, 540, 1240, 70, '#2a2e36'); circ(g, 540, 1240, 54, '#5a606a');
   for (let i = 0; i < 12; i++) { const a = i / 12 * Math.PI * 2; line(g, 540 + Math.cos(a) * 44, 1240 + Math.sin(a) * 44, 540 + Math.cos(a) * 54, 1240 + Math.sin(a) * 54, 3, '#c9ced4'); }
   fillRR(g, 640, 1220, 50, 40, 6, '#9aa0aa');
+}
+
+// ===== 第2話で使う場面 =====
+// 実家のリビング（夜・間接照明）
+export function living(g, { t = 0, dim = 0 } = {}) {
+  vgrad(g, -300, -300, W + 600, H + 600, [[0, mix('#3a2e2a', '#1a1416', dim)], [1, mix('#241c1a', '#0e0b0c', dim)]]);
+  // 壁と窓（カーテン）
+  fillRR(g, 640, 300, 360, 520, 6, '#141626'); fillRR(g, 620, 280, 120, 560, 10, '#6a5040'); fillRR(g, 900, 280, 120, 560, 10, '#6a5040');
+  // 照明
+  glow(g, 300, 380, 520, 'rgba(255,200,140,1)', 0.35 * (1 - dim)); fillRR(g, 260, 330, 80, 50, 20, '#e9c88f');
+  // テレビ台とテレビ（消えてる）
+  fillRR(g, 40, 820, 420, 260, 8, '#0c0c10'); fillRR(g, 20, 1080, 460, 80, 6, '#4a3424');
+  // 床・ラグ
+  vgrad(g, -300, 1160, W + 600, 800, [[0, '#4a3a2c'], [1, '#2a2018']]); ell(g, 540, 1450, 520, 140, '#5a4a3e');
+  // ソファ
+  fillRR(g, 560, 1080, 520, 160, 40, '#5a4a5a'); fillRR(g, 530, 1180, 580, 140, 46, '#6a5a6a');
+  // ローテーブルと湯のみ
+  fillRR(g, 260, 1360, 560, 40, 10, '#6a4a32'); fillRR(g, 290, 1400, 24, 120, 4, '#4a3324'); fillRR(g, 766, 1400, 24, 120, 4, '#4a3324');
+  for (const x of [420, 640]) { fillRR(g, x - 28, 1300, 56, 62, 10, '#d9d2c4'); ell(g, x, 1302, 28, 8, '#b8a888'); }
+  toneRect(g, -300, -300, W + 600, H + 600, 'rgba(0,0,0,.12)', 9, 2);
+}
+// 階段を見上げる（上から男が降りてくる）
+export function stairsDown(g, { t = 0, k = 0, P, o = {} } = {}) {
+  vgrad(g, -300, -300, W + 600, H + 600, [[0, '#0e0c10'], [1, '#1a1618']]);
+  for (let i = 0; i < 12; i++) { const y = 1800 - i * 115, x0 = 160 + i * 18, x1 = 920 - i * 18; fillRR(g, x0, y - 30, x1 - x0, 30, 2, mix('#4a4252', '#221e28', i / 12)); fillRR(g, x0, y, x1 - x0, 85, 2, mix('#2e2834', '#141218', i / 12)); }
+  glow(g, 540, 300, 500, 'rgba(255,200,130,1)', 0.3);
+  const y = lerp(560, 1500, k), s = lerp(0.8, 1.6, k);
+  figure(g, P, { x: 540, y, s, walk: k < 1 ? t * 1.2 : null, arms: [10, 0, 30, -60], ...o });
+}
+// 車の窓ごしのジン（外から）
+export function carWindow(g, { t = 0, jin = {}, paper = 0 } = {}) {
+  nightSky(g);
+  vgrad(g, -300, 900, W + 600, 1200, [[0, '#14182a'], [1, '#07080e']]);
+  // 車体
+  fillRR(g, -120, 520, 1320, 1100, 80, '#1c1e24'); fillRR(g, 60, 600, 960, 640, 40, '#0b0c10');
+  g.save(); rr(g, 60, 600, 960, 640, 40); g.clip(); vgrad(g, 60, 600, 960, 640, [[0, '#1a1c26'], [1, '#0c0d12']]); close(g, CAST2.jin, { x: 540, y: 880, s: 3.2, lightFrom: 'left', ...jin }); g.restore();
+  g.lineWidth = 8; g.strokeStyle = '#2a2c34'; rr(g, 60, 600, 960, 640, 40); g.stroke();
+  glow(g, 900, 300, 400, 'rgba(200,215,255,1)', 0.15);
+  if (paper > 0) { g.save(); g.translate(lerp(540, 600, paper), lerp(1200, 1320, paper)); g.rotate(-0.1); fillRR(g, -170, -60, 340, 120, 6, '#f1ece0'); text(g, '090-XXXX-XXXX', 0, 2, { size: 40, color: '#2a2530', weight: 800 }); g.restore(); }
+}
+// テーブルの上で震えるスマホ（カラスの画面）
+export function buzzPhone(g, { t = 0, on = 0, shown = 0, msg = '' } = {}) {
+  vgrad(g, -300, -300, W + 600, H + 600, [[0, '#2a201a'], [1, '#140f0c']]);
+  for (let i = 0; i < 6; i++) line(g, 0, 300 + i * 260, W, 260 + i * 260, 3, 'rgba(0,0,0,.18)');
+  const vib = on ? noise1(t * 60, 2) * 10 : 0;
+  g.save(); g.translate(540 + vib, 860); g.rotate(-0.08 + (on ? noise1(t * 50, 5) * 0.02 : 0));
+  fillRR(g, -230, -440, 460, 880, 50, '#0d0e12');
+  fillRR(g, -210, -420, 420, 840, 38, on ? '#141927' : '#050608');
+  if (on) {
+    glow(g, 0, 0, 500, 'rgba(120,150,255,1)', 0.12);
+    crowIcon(g, 0, -260, 60); text(g, 'カラス', 0, -170, { size: 40, color: '#e9edf5', weight: 800 });
+    g.save(); g.globalAlpha = shown; fillRR(g, -190, -100, 380, 260, 26, '#1c1f2b'); g.lineWidth = 3; g.strokeStyle = rgba(C.red, 0.9); rr(g, -190, -100, 380, 260, 26); g.stroke();
+    text(g, 'ユウマ', -160, -60, { size: 30, color: '#9aa5bb', align: 'left', weight: 800 });
+    const lines = msg.split('\n'); lines.forEach((s, i) => text(g, s, -160, -10 + i * 50, { size: 36, color: '#fff', align: 'left', weight: 800 }));
+    g.restore();
+  }
+  g.restore();
 }

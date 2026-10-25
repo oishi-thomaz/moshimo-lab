@@ -24,6 +24,7 @@ export const CAST2 = {
   mom: { hair: 'tied', hairC: '#3b2a24', top: '#8f8478', top2: '#7a7065', bottom: '#4a4550', shoes: '#ccc', tall: 0.95, female: true },
   miku: { hair: 'pony', hairC: '#20171a', top: '#2e3b63', top2: '#24304f', bottom: '#2e3b63', shoes: '#eee', tall: 0.9, female: true, jersey: true },
   officer: { hair: 'police', hairC: '#1b1b1f', top: '#1e2a44', top2: '#162036', bottom: '#1e2a44', shoes: '#111', tall: 1.0 },
+  sakaguchi: { hair: 'parted', hairC: '#5a5450', top: '#b9a88c', top2: '#a39276', bottom: '#3a3a44', shoes: '#2a2018', tall: 1.0, glasses: true, cardigan: true },
   takumi: { hair: 'parted', hairC: '#3a2a20', top: '#b8b2a6', top2: '#a49e92', bottom: '#2a2e38', shoes: '#ddd', tall: 1.0 },
 };
 const INK = '#141218';
@@ -105,6 +106,7 @@ export function head(g, P, x, y, r, o = {}) {
   line(g, x + (o.turn || 0) * r * 0.32 + r * 0.03, y + r * 0.22, x + (o.turn || 0) * r * 0.32 - r * 0.03, y + r * 0.36, r * 0.035, 'rgba(90,60,60,.55)');
   eyes(g, x, y, r, o); mouth(g, x, y, r, o);
   if (P.scar) line(g, x - r * 0.62, y - r * 0.2, x - r * 0.4, y + r * 0.25, r * 0.04, 'rgba(150,60,70,.8)');
+  if (P.glasses) { const gx = x + (o.turn || 0) * r * 0.3; g.save(); g.lineWidth = r * 0.05; g.strokeStyle = '#2a2420'; for (const sd of [-1, 1]) { g.beginPath(); g.ellipse(gx + sd * r * 0.36, y + r * 0.1, r * 0.25, r * 0.19, 0, 0, 7); g.stroke(); } line(g, gx - r * 0.11, y + r * 0.08, gx + r * 0.11, y + r * 0.08, r * 0.04, '#2a2420'); if (o.glint) { g.globalAlpha = o.glint; g.fillStyle = 'rgba(255,255,255,.85)'; for (const sd of [-1, 1]) { g.beginPath(); g.ellipse(gx + sd * r * 0.36, y + r * 0.1, r * 0.24, r * 0.18, 0, 0, 7); g.fill(); } } g.restore(); }
   if (o.sweat) { const sx = x + r * 0.85, sy = y - r * 0.3 + ((o.sweat * 0.6) % 1) * r * 0.4; poly(g, [[sx, sy - r * 0.2], [sx - r * 0.08, sy], [sx + r * 0.08, sy]], '#bfe0ff'); circ(g, sx, sy, r * 0.08, '#bfe0ff'); }
   hairFront(g, x, y, r, P, o.turn || 0);
   g.restore();
@@ -301,12 +303,15 @@ export function subBand(g, s, { y = 1290, size = 60, alpha = 1, who = null, name
   g.font = `800 ${size}px ${FONT}`; g.textBaseline = 'middle';
   const chars = []; for (const [str, em] of runs(s)) for (const ch of str) chars.push([ch, em, g.measureText(ch).width]);
   const total = chars.reduce((a, c) => a + c[2], 0), maxW = 900;
+  // 区切りの良いところで割る（target＝前半の幅の目安、restMax＝後半に許す幅）
+  const split = (cs, target, restMax) => {
+    const tot = cs.reduce((a, c) => a + c[2], 0); let best = 1, bs = -1e9, acc = 0; const txt = cs.map(c => c[0]).join('');
+    for (let i = 1; i < cs.length - 1; i++) { acc += cs[i - 1][2]; const p = txt[i - 1], c = txt[i]; if ('、。！？…ーっゃゅょ」'.includes(c)) continue; let sc = -Math.abs(acc - target) / 40; if ('、。！？…'.includes(p)) sc += 30; else if ('はがをにでのとへもや'.includes(p) && !/[ぁ-ん]/.test(c)) sc += 10; else if ('はがをにでのとへもや'.includes(p)) sc += 3; else if (/[ぁ-ん]/.test(p) && /[一-龯ァ-ヴ0-9]/.test(c)) sc += 6; else if (/[ぁ-ん]/.test(p) && /[ぁ-ん]/.test(c)) sc -= 25; else sc -= 8; if (acc > maxW + 30 || tot - acc > restMax + 30) sc -= 100; if (sc > bs) { bs = sc; best = i; } }
+    return [cs.slice(0, best), cs.slice(best)];
+  };
   let lines = [chars];
-  if (total > maxW) {
-    let best = 1, bs = -1e9, acc = 0; const txt = chars.map(c => c[0]).join('');
-    for (let i = 1; i < chars.length - 1; i++) { acc += chars[i - 1][2]; const p = txt[i - 1], c = txt[i]; if ('、。！？…ーっゃゅょ」'.includes(c)) continue; let sc = -Math.abs(acc - total / 2) / 40; if ('、。！？…'.includes(p)) sc += 30; else if ('はがをにでのとへもや'.includes(p) && !/[ぁ-ん]/.test(c)) sc += 10; else if ('はがをにでのとへもや'.includes(p)) sc += 3; else if (/[ぁ-ん]/.test(p) && /[一-龯ァ-ヴ0-9]/.test(c)) sc += 6; else if (/[ぁ-ん]/.test(p) && /[ぁ-ん]/.test(c)) sc -= 25; else sc -= 8; if (acc > maxW + 30 || total - acc > maxW + 30) sc -= 100; if (sc > bs) { bs = sc; best = i; } }
-    lines = [chars.slice(0, best), chars.slice(best)];
-  }
+  if (total > maxW * 1.9) { const [a, rest] = split(chars, total / 3, maxW * 2); lines = [a, ...split(rest, (total - a.reduce((x, c) => x + c[2], 0)) / 2, maxW)]; }
+  else if (total > maxW) lines = split(chars, total / 2, maxW);
   const lh = size * 1.45, bandH = lines.length * lh + 34, y0 = y - bandH / 2;
   const bw = Math.max(...lines.map(l => l.reduce((a, c) => a + c[2], 0))) + 80;
   g.fillStyle = 'rgba(4,5,9,.78)'; g.fillRect(540 - bw / 2, y0, bw, bandH);

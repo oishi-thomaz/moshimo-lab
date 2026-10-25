@@ -5,7 +5,8 @@ export const SERIES = { title: 'ホワイト案件', account: 'いつわ劇場',
 export const EPISODE = { no: 2, title: 'おかえり', next: 'カラスの巣', ask: 'ユウマはどうする？ コメントで予想して' };
 
 export const OSAKA_STYLE = 'あなたは大阪で生まれ育った大阪の人です。京阪式アクセントの、普段どおりの自然な大阪弁で話してください。標準語（東京式）のアクセントやイントネーションは絶対に使わないでください。「ほんま」「あかん」「やろ」「へん」「ねん」などは、大阪の人が日常で話す抑揚そのままで。お笑い芸人のような大げさな関西弁にはしないでください。';
-export const TTS_MODEL = null; // 聞き比べの結果で決める（null なら既定のモデル）
+export const TTS_MODEL = 'gemini-2.5-pro-preview-tts'; // 大阪弁の聞き比べ 候補1（日本語の指示 × 2.5 Pro）
+export const TTS_FALLBACK = ['gemini-2.5-flash-preview-tts']; // Pro が上限なら Flash に。もしもラボの 3.8 は使わない
 const PACE = '会話は普通のドラマの速さで。ゆっくりすぎず、急ぎすぎず。';
 export const CAST = {
   Y: { name: '', voice: 'Achird', style: OSAKA_STYLE + '21歳の大学生の男性。自分の身に起きたことを、小さな声で緊張しながら語る心の声。' + PACE, model: TTS_MODEL },
@@ -18,7 +19,7 @@ export const CAST = {
 export const LINES = [
   // ── 前回のあらすじ
   { beat: 'recap', dur: 0.6 },
-  { id: 'r1', who: 'Y', text: '闇バイトで脅されて、実家の金庫を狙えと言われた俺は、オカンに電話をかけた。', gap: 0.3 },
+  { id: 'r1', who: 'Y', text: '闇バイトで脅されて、実家の金庫を狙えと言われた俺は、／オカンに電話をかけた。', gap: 0.3 },
   { id: 'r2', who: 'Y', text: '出たんは、[[r:知らん男の声]]やった。', gap: 0.3 },
   { id: 'r3', who: 'X', text: '…おかえり、ユウマくん。', read: '…おかえり、ゆうまくん。', gap: 0.4 },
   { beat: 'title', dur: 2.2 },
@@ -26,14 +27,14 @@ export const LINES = [
   // ── 1. 降りてきた男
   { beat: 'door', dur: 1.0 },
   { id: 'a1', who: 'Y', text: '玄関のドアが開いて、男が階段を降りてきた。', gap: 0.35 },
-  { id: 'a2', who: 'S', text: '驚かせてごめんな。坂口いいます。お母さんと、お付き合いさせてもろてる。', gap: 0.4 },
+  { id: 'a2', who: 'S', text: '驚かせてごめんな。坂口いいます。／お母さんと、お付き合いさせてもろてる。', gap: 0.4 },
   { id: 'a3', who: 'Y', text: 'オカンが前に言うてた[[r:会わせたい人]]って…この人か。', gap: 0.35 },
-  { id: 'a4', who: 'S', text: 'お母さん、夜勤にスマホ忘れていきはってな。届けに行こ思て、取りに来たとこやねん。', gap: 0.4 },
+  { id: 'a4', who: 'S', text: 'お母さん、夜勤にスマホ忘れていきはってな。／届けに行こ思て、取りに来たとこやねん。', gap: 0.4 },
   { id: 'a5', who: 'Y', text: '優しそうな人やった。体の力が、一気に抜けた。', gap: 0.6 },
 
   // ── 2. 全部話す
   { id: 'b1', who: 'Y', text: '気づいたら、[[r:全部話してた。]]', gap: 0.35 },
-  { id: 'b2', who: 'Y', text: 'バイトのこと。カラスのこと。今夜、この家の金庫を狙えって言われたこと。', gap: 0.5 },
+  { id: 'b2', who: 'Y', text: 'バイトのこと。カラスのこと。／今夜、この家の金庫を狙えって言われたこと。', gap: 0.5 },
   { id: 'b3', who: 'S', text: '…よう話してくれたな。一人で、しんどかったやろ。', gap: 0.4 },
   { id: 'b4', who: 'S', text: '明日の朝、一緒に[[r:警察]]行こ。俺もついてったる。', gap: 0.35 },
   { id: 'b5', who: 'S', text: 'お母さんには、俺から話しとくから。', gap: 0.4 },

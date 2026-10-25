@@ -39,6 +39,7 @@ if (args.test) {
   jobs.push({ id: 'koto_Achernar', voice: 'Achernar', style: 'A shy 6-year-old Japanese girl, small and sleepy voice, speaking softly to her dad.', text: 'パパ、おトイレ行きたい…' });
 } else {
   const mod = await import(pathToFileURL(path.resolve(args.script)).href);
+  if (Array.isArray(mod.TTS_FALLBACK)) FALLBACK.splice(0, FALLBACK.length, ...mod.TTS_FALLBACK);
   for (const L of mod.LINES) {
     if (!L.id) continue;
     const c = mod.CAST[L.who];
@@ -106,10 +107,10 @@ async function ttsRetry(text, style, voice, model) {
 }
 const dur = f => Number(execFileSync('ffprobe', ['-v', 'error', '-show_entries', 'format=duration', '-of', 'csv=p=0', f]).toString().trim());
 
-const index = {};
+const index = {}; const DEAD = {};
 for (const J of jobs) {
   for (;;) {
-    const M = J.model || MODEL;
+    let M = J.model || MODEL; while (DEAD[M]) M = DEAD[M];
     const h = crypto.createHash('md5').update([M, J.voice, J.style, J.text, MOCK].join('|')).digest('hex').slice(0, 16);
     const raw = path.join(CACHE, `${h}.wav`);
     try {
@@ -118,7 +119,7 @@ for (const J of jobs) {
         else { fs.writeFileSync(raw, await ttsRetry(J.text, J.style, J.voice, M)); await sleep(6500); }
       }
     } catch (e) {
-      if ((isDaily(e) || isModel(e)) && FALLBACK.length && !MOCK) { const nx = FALLBACK.shift(); console.log(`${M} が使えない（${e.message.slice(0, 160)}）→ ${nx}`); if (J.model) J.model = nx; MODEL = nx; continue; }
+      if ((isDaily(e) || isModel(e)) && FALLBACK.length && !MOCK) { const nx = FALLBACK.shift(); console.log(`${M} が使えない（${e.message.slice(0, 160)}）→ ${nx}`); DEAD[M] = nx; continue; }
       throw e;
     }
     const out = path.join(OUT, `${J.id}.wav`);

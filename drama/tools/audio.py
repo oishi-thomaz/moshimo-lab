@@ -325,6 +325,14 @@ def fx_subdrop(rng, e):
     n = int(2.5 * SR); t = np.arange(n) / SR
     return reverb(st(sine(70 * np.exp(-t * 0.8) + 25, n) * env(n, 0.005, 1.2)), rng, 2, 0.3)
 
+def fx_vibrate(rng, e):
+    dur = e.get('dur', 1.6); n = int(dur * SR); t = np.arange(n) / SR
+    gate = ((t % 0.75) < 0.42).astype(float); gate = np.convolve(gate, np.ones(300) / 300, mode='same')
+    x = (np.sign(sine(160, n)) * 0.4 + sine(160, n)) * gate + bp(noise(n, rng), 120, 900) * gate * 0.3
+    return st(bp(x, 80, 2500) * 0.7)
+def fx_doorbell_open(rng, e):
+    return fx_creak(rng, e)
+
 FX = {k[3:]: v for k, v in globals().items() if k.startswith('fx_')}
 
 
