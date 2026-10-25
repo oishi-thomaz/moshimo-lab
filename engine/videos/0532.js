@@ -102,17 +102,17 @@ const SUBS = [
   [26.1, 30, '山梨県1つ分の広さに、<br>すっぽり収まる。'],
   [30.2, 34.1, 'では、この四角の中で<br>何が起きる？'],
   [34.2, 38.1, '人は立っているだけで、<br>1人約100Wの熱を出す。'],
-  [38.2, 42.1, '82億人で8,200億W。<br>原発約820基分。'],
-  [42.2, 46.1, '1m²あたり約200W。<br>太陽の光（約160W）より強い。'],
-  [46.2, 50.1, '四角の中は熱がこもり、<br>どんどん暑くなる。'],
-  [50.2, 54.1, 'トイレは1人1日約1.2L。<br>全員で東京ドーム約8杯分。'],
-  [54.2, 58.1, 'それが毎日、<br>この四角の中に出る。'],
-  [58.2, 62.1, '全員の体重を足すと、<br>多めに見て約5億トン。'],
-  [62.2, 66.1, '地球はかたむく？<br>重心のずれは0.0005mm。'],
-  [66.2, 70.1, '地球の重さの、<br>約12兆分の1しかない。'],
+  [38.2, 42.6, '全員で8,200億W。<br>原発820基分。'],
+  [42.7, 46.9, '1m²あたり約200W。<br>太陽の光（約160W）より強い。'],
+  [47.0, 50.6, '四角の中は熱がこもり、<br>どんどん暑くなる。'],
+  [50.7, 55.0, 'トイレは1人1日1.2L。<br>全員でドーム約8杯分。'],
+  [55.1, 58.6, 'それが毎日、<br>この四角の中に出る。'],
+  [58.7, 62.4, '全員の体重を足すと、<br>多めに見て約5億トン。'],
+  [62.5, 66.3, '地球はかたむく？<br>重心のずれは0.0005mm。'],
+  [66.4, 70.1, '地球の重さの、<br>約12兆分の1しかない。'],
   [70.2, 77.4, '結果：四角の中は太陽より熱い。<br>でも地球はびくともしない。'],
-  [77.5, 80.1, 'そのとき陸地の99.997%は、<br>人が1人もいない。'],
-  [80.2, 83.4, 'あなたなら真ん中と端、<br>どっちに立つ？'],
+  [77.5, 80.7, '陸地の99.997%は、<br>無人になる。'],
+  [80.8, 84.2, 'あなたなら真ん中と端、<br>どっちに立つ？'],
 ];
 
 const POP = 82.32; // 億人
@@ -201,8 +201,8 @@ function shotDome(t) {
   domes.forEach((d, i) => { const k = ease(clamp((t - 0.4 - i * 0.25) / 0.4)); d.scale.setScalar(Math.max(0.001, k)); d.visible = k > 0.01; });
   domeLab.visible = t > 2.6; domeLab.scale.set(4.2, 0.7, 1);
   const u = ease(t / 8); look(lerp(0, 0.4, u), lerp(7.5, 7.0, u), lerp(14, 13, u), 0, 1.4, 0, 50);
-  if (t < 3.9) setTop('トイレ（1人1日約1.2Lで計算）', '1日 約988万m³', fade(t, 0.15, 3.9, 0.25), '#7fd4ff');
-  else setTop('それが毎日', '四角の中に出る', fade(t, 3.9, 7.9, 0.25), '#7fd4ff');
+  if (t < 4.5) setTop('トイレ（1人1日約1.2Lで計算）', '1日 約988万m³', fade(t, 0.15, 4.5, 0.25), '#7fd4ff');
+  else setTop('それが毎日', '四角の中に出る', fade(t, 4.5, 8, 0.25), '#7fd4ff');
   return stage;
 }
 function shotWeight(t) { // globe: everyone on one point, earth doesn't budge
@@ -228,8 +228,8 @@ function shotResult(t) { // map: the square glows hot red
 function shotEmpty(t) { // globe: one tiny point, rest empty
   setEarthNight(0); farmVis(0); gDots.visible = false; jGlow.visible = true; jGlow.material.opacity = 0.6 + 0.4 * Math.sin(t * 6); gSpark.set(0); shiftLab.visible = false;
   earth.rotation.y = faceLon(150) - t * 0.05;
-  look(0, 2, lerp(32, 35, ease(t / 2.6)), 0, 1, 0, 45);
-  setTop('人がいない陸地', '99.997%', fade(t, 0.15, 2.6, 0.25), '#7fd4ff');
+  look(0, 2, lerp(32, 35, ease(t / 3.3)), 0, 1, 0, 45);
+  setTop('人がいない陸地', '99.997%', fade(t, 0.15, 3.3, 0.25), '#7fd4ff');
   return space;
 }
 function shot8(t) { // loop: like the hook, everyone already at one point
@@ -243,13 +243,13 @@ function reset(f) { if (![shot4, shotQ, shotResult].includes(f)) mapOff(false); 
 
 const shots = [
   { a: 0, b: 2.5, f: shot0 }, { a: 2.5, b: 6, f: shot1 }, { a: 6, b: 14, f: shot2 }, { a: 14, b: 22, f: shot3 },
-  { a: 22, b: 30, f: shot4 }, { a: 30, b: 34, f: shotQ }, { a: 34, b: 42, f: (t, T) => shotHeat(t, T) }, { a: 42, b: 46, f: shotBars },
-  { a: 46, b: 50, f: (t, T) => shotHeat(t + 12, T) }, { a: 50, b: 58, f: shotDome }, { a: 58, b: 70, f: shotWeight }, { a: 70, b: 77.4, f: shotResult },
-  { a: 77.4, b: 80.1, f: shotEmpty }, { a: 80.1, b: 83.6, f: shot8 }, { a: 83.6, b: 88.6, f: endCard },
+  { a: 22, b: 30, f: shot4 }, { a: 30, b: 34, f: shotQ }, { a: 34, b: 42.6, f: (t, T) => shotHeat(t, T) }, { a: 42.6, b: 46.9, f: shotBars },
+  { a: 46.9, b: 50.6, f: (t, T) => shotHeat(t + 12, T) }, { a: 50.6, b: 58.6, f: shotDome }, { a: 58.6, b: 70.1, f: shotWeight }, { a: 70.1, b: 77.4, f: shotResult },
+  { a: 77.4, b: 80.7, f: shotEmpty }, { a: 80.7, b: 84.4, f: shot8 }, { a: 84.4, b: 89.4, f: endCard },
 ];
 shots.forEach(s => { const f = s.f; s.f = (t, T) => { reset(f); return f(t, T); }; });
 runStory({
-  shots, subs: SUBS, duration: 88.6,
+  shots, subs: SUBS, duration: 89.4,
   meta: {
     id: '0532',
     series: '日本人全員で',
