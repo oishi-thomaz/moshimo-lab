@@ -241,7 +241,7 @@ export function chat(g, msgs, t, { title = 'カラス', x = 70, y = 150, w = 940
   line(g, x, y + 110, x + w, y + 110, 2, 'rgba(255,255,255,.06)', 'butt');
   // 吹き出し
   g.save(); rr(g, x, y + 112, w, h - 112, 0); g.clip();
-  g.font = `800 40px ${FONT}`;
+  g.font = `800 46px ${FONT}`;
   const shown = msgs.filter(m => t >= m.t);
   // 下から積む
   let cy = y + h - 40;
@@ -249,7 +249,7 @@ export function chat(g, msgs, t, { title = 'カラス', x = 70, y = 150, w = 940
   for (let i = shown.length - 1; i >= 0; i--) {
     const m = shown[i]; const mine = m.from === 'me';
     let bh, lines = [];
-    if (m.img) bh = m.h || 420; else { lines = String(m.text).split('\n').flatMap(x => wrap(g, x, w * 0.62)); bh = lines.length * 54 + 40; }
+    if (m.img) bh = m.h || 420; else { lines = String(m.text).split('\n').flatMap(x => wrap(g, x, w * 0.62)); bh = lines.length * 62 + 44; }
     cy -= bh; lay.push({ m, mine, bh, lines, y: cy }); cy -= 34;
   }
   if (typing && t >= typing[0] && t < typing[1]) {
@@ -270,7 +270,7 @@ export function chat(g, msgs, t, { title = 'カラス', x = 70, y = 150, w = 940
     fillRR(g, bx, L.y, bw, bh, 30, col);
     if (m.from === 'karasu') { g.lineWidth = 3; g.strokeStyle = rgba(C.red, 0.85); rr(g, bx, L.y, bw, bh, 30); g.stroke(); }
     if (m.img) { g.save(); rr(g, bx + 12, L.y + 12, bw - 24, bh - 24, 22); g.clip(); g.translate(bx + 12, L.y + 12); m.img(g, bw - 24, bh - 24, t); g.restore(); }
-    else lines.forEach((s, i) => text2(g, s, bx + 28, L.y + 40 + i * 54, 40, mine ? '#fff' : (m.from === 'karasu' ? '#f1f1f4' : '#1a1d26'), 'left'));
+    else lines.forEach((s, i) => text2(g, s, bx + 28, L.y + 44 + i * 62, 46, mine ? '#fff' : (m.from === 'karasu' ? '#f1f1f4' : '#1a1d26'), 'left'));
     if (mine) text2(g, m.read === false ? '' : (m.read ? '既読' : ''), bx - 14, L.y + bh - 18, 24, '#9aa5bb', 'right', 500);
     g.restore();
   }
@@ -279,7 +279,7 @@ export function chat(g, msgs, t, { title = 'カラス', x = 70, y = 150, w = 940
 }
 
 // ---------- タイマー（残り時間） ----------
-export function timer(g, secLeft, { y = 118, alpha = 1, t = 0 } = {}) {
+export function timer(g, secLeft, { y = 250, alpha = 1, t = 0 } = {}) {
   if (alpha <= 0) return;
   const s = Math.max(0, Math.floor(secLeft)), hh = Math.floor(s / 3600), mm = Math.floor((s % 3600) / 60), ss2 = s % 60;
   const str = `${hh}:${String(mm).padStart(2, '0')}:${String(ss2).padStart(2, '0')}`;

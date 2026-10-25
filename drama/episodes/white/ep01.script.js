@@ -34,7 +34,7 @@ export const LINES = [
 
   // ── 今
   { id: 'c1', who: 'Y', text: '母さんに、2階に行くなって送った。', read: '母さんに、にかいに行くなって送った。', gap: 0.1 },
-  { id: 'c2', who: 'Y', text: '[[r:既読が、つかへん。]]', read: 'きどくが、つかへん。', gap: 0.2 },
+  { id: 'c2', who: 'Y', text: '[[r:既読に、ならへん。]]', gap: 0.2 },
   { id: 'c3', who: 'Y', text: '警察や。1、1…', read: '警察や。いち、いち…', gap: 0.05 },
   { beat: 'cut110', dur: 0.35 },
   { id: 'c4', who: 'K', text: '', read: '通報したら、にかいのやつが降りる。', gap: 0.15 },
@@ -49,7 +49,7 @@ export const LINES = [
 
   // ── 検問
   { beat: 'siren', dur: 0.7 },
-  { id: 'e1', who: 'Y', text: '[[r:検問…！]]', read: 'けんもんや…！', gap: 0.1 },
+  { id: 'e1', who: 'Y', text: 'やばい、[[r:検問や…！]]', gap: 0.1 },
   { id: 'e2', who: 'P', text: 'こんばんは。どちらまで？', gap: 0.1 },
   { id: 'e3', who: 'J', text: '実家に、忘れもん取りに。', gap: 0.15 },
   { id: 'e4', who: 'Y', text: '手袋、[[r:見られた。]]', gap: 0.5 },
@@ -60,7 +60,7 @@ export const LINES = [
   { id: 'f2', who: 'Y', text: '[[r:やめろ、ミク…！]]', style: 'A 21-year-old Japanese man shouting desperately at his phone, Kansai dialect. Short and sharp.', gap: 0.15 },
   { id: 'f3', who: 'K', text: '', read: '来たら、何もせえへん。', gap: 0.2 },
   { id: 'f4', who: 'Y', text: '先輩に、助けてって送った。', gap: 0.1 },
-  { id: 'f5', who: 'K', text: '', read: 'たくみくんなら、ここにおるで。', gap: 0.15 },
+  { id: 'f5', who: 'K', text: '', read: '先輩なら、ここにおるで。', gap: 0.15 },
   { id: 'f6', who: 'Y', text: 'この仕事を紹介したのは、[[r:先輩]]やった。', gap: 0.3 },
 
   // ── 実家

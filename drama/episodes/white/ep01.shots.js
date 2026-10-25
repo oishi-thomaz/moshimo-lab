@@ -40,20 +40,19 @@ const SHOTS = [
     const k = easeOut(inv(0, 0.35, lt));
     // ロック画面の通知
     g.save(); g.translate(0, (1 - k) * -200); g.globalAlpha = k;
-    fillRR(g, 90, 360, 900, 170, 40, 'rgba(30,34,48,.92)'); crowIcon(g, 180, 445, 46);
-    text(g, 'カラス', 260, 410, { size: 34, color: '#9aa5bb', align: 'left', weight: 800 }); text(g, 'いま', 950, 410, { size: 26, color: '#6a7385', align: 'right', weight: 500 });
-    text(g, '次の現場', 260, 470, { size: 50, color: '#fff', align: 'left', weight: 800 });
+    fillRR(g, 90, 560, 900, 170, 40, 'rgba(30,34,48,.92)'); crowIcon(g, 180, 645, 46);
+    text(g, 'カラス', 260, 610, { size: 34, color: '#9aa5bb', align: 'left', weight: 800 }); text(g, 'いま', 950, 610, { size: 26, color: '#6a7385', align: 'right', weight: 500 });
+    text(g, '次の現場', 260, 670, { size: 50, color: '#fff', align: 'left', weight: 800 });
     g.restore();
-    glow(g, 540, 445, 600, 'rgba(255,40,60,1)', 0.12 * k);
+    glow(g, 540, 645, 600, 'rgba(255,40,60,1)', 0.12 * k);
   } },
   // ── 実家の写真
   { at: 'o2', off: -0.15, draw(g, lt, D, S) {
     blurStreet(g, lt);
     const msgs = [{ t: -5, from: 'karasu', text: '次の現場' }, { t: 0, from: 'karasu', img: housePhoto, h: 470 }];
     const z = lerp(1, 1.12, ease(clamp(lt / D)));
-    g.save(); cam(g, { x: 540, y: 700, z }); chat(g, msgs, lt, { y: 200, h: 940 }); g.restore();
+    g.save(); cam(g, { x: 540, y: 770, z }); chat(g, msgs, lt, { y: 330, h: 880 }); g.restore();
     // 表札に赤い丸
-    const a = inv(0.4, 0.8, lt); if (a > 0) { g.save(); g.globalAlpha = a; g.lineWidth = 8; g.strokeStyle = C.red; g.beginPath(); g.ellipse(540 + 248 * z * 0.66 - 30, 700 + (870 - 700) * z, 70, 46, 0, 0, 7); g.stroke(); g.restore(); }
   } },
   // ── リビングの写真（家の中から）
   { at: 'o3', off: -0.25, draw(g, lt, D, S) {
@@ -69,7 +68,7 @@ const SHOTS = [
   // ── 母からのLINE
   { at: 'o4', off: -0.2, draw(g, lt, D, S) {
     blurStreet(g, lt);
-    chat(g, [{ t: 0, from: 'mom', text: 'ユウマ、帰ってきてるん？\n2階で物音するけど' }], lt, { title: '母', y: 300, h: 640 });
+    chat(g, [{ t: 0, from: 'mom', text: 'ユウマ、帰ってきてるん？\n2階で物音するけど' }], lt, { title: '母', y: 380, h: 640 });
   } },
   // ── 俺は帰ってへん
   { at: 'o5', draw(g, lt, D, S) {
@@ -83,7 +82,7 @@ const SHOTS = [
   // ── 21時までに来い
   { at: 'o6', draw(g, lt, D, S) {
     blurStreet(g, lt);
-    chat(g, [{ t: -3, from: 'karasu', img: housePhoto, h: 330 }, { t: 0.05, from: 'karasu', text: '21時までに来い' }, { t: 1.2, from: 'karasu', text: '金庫の番号は、お前が知ってる' }], lt, { y: 200, h: 900 });
+    chat(g, [{ t: -3, from: 'karasu', img: housePhoto, h: 330 }, { t: 0.05, from: 'karasu', text: '21時までに来い' }, { t: 1.2, from: 'karasu', text: '金庫の番号は、お前が知ってる' }], lt, { y: 330, h: 860 });
     mood(g, { red: 0.12 * inv(1.2, 2.5, lt) });
   } },
   // ── タイトル
@@ -117,7 +116,7 @@ const SHOTS = [
   } },
   { at: 'b3', draw(g, lt, D, S) {
     bg(g, '#141416', '#0a0a0c');
-    chat(g, [{ t: 0, from: 'karasu', img: cctv, h: 520 }, { t: 0.5, from: 'karasu', text: 'お前の顔、カメラに残ってるで' }, { t: 1.6, from: 'karasu', text: 'もう共犯や' }], lt, { y: 200, h: 920 });
+    chat(g, [{ t: 0, from: 'karasu', img: cctv, h: 520 }, { t: 0.5, from: 'karasu', text: 'お前の顔、カメラに残ってるで' }, { t: 1.6, from: 'karasu', text: 'もう共犯や' }], lt, { y: 330, h: 880 });
     mood(g, { desat: 0.6, red: 0.08 * inv(1.6, 2.2, lt) });
   } },
   { at: 'b4', draw(g, lt, D, S) {
@@ -133,24 +132,24 @@ const SHOTS = [
   // ── 今：既読がつかない
   { at: 'c1', draw(g, lt, D, S) {
     blurStreet(g, lt);
-    chat(g, [{ t: -5, from: 'mom', text: 'ユウマ、帰ってきてるん？\n2階で物音するけど' }, { t: 0.4, from: 'me', text: '2階に行くな', read: false }, { t: 1.0, from: 'me', text: '母さん？', read: false }], lt, { title: '母', y: 200, h: 900 });
-    if (lt > S.L('c2')) { const a = inv(S.L('c2'), S.L('c2') + 0.3, lt); g.save(); g.globalAlpha = a; g.lineWidth = 6; g.strokeStyle = C.red; g.beginPath(); g.arc(860, 985, 70, 0, 7); g.stroke(); g.restore(); sfxText(g, '既読…', 760, 1120, { size: 60, rot: 0.05, alpha: a, color: '#f4f1ea' }); }
+    chat(g, [{ t: -5, from: 'mom', text: 'ユウマ、帰ってきてるん？\n2階で物音するけど' }, { t: 0.4, from: 'me', text: '2階に行くな', read: false }, { t: 1.0, from: 'me', text: '母さん？', read: false }], lt, { title: '母', y: 330, h: 860 });
+    if (lt > S.L('c2')) { const a = inv(S.L('c2'), S.L('c2') + 0.3, lt); g.save(); g.globalAlpha = a; g.lineWidth = 6; g.strokeStyle = C.red; g.beginPath(); g.arc(860, 985, 70, 0, 7); g.stroke(); g.restore(); sfxText(g, '未読', 760, 1120, { size: 60, rot: 0.05, alpha: a, color: '#f4f1ea' }); }
   } },
   // ── 110 → カラスが先回り
   { at: 'c3', draw(g, lt, D, S) {
     bg(g, '#05060a', '#0b0d16');
-    fillRR(g, 170, 180, 740, 1040, 50, '#0d1019');
+    fillRR(g, 170, 330, 740, 900, 50, '#0d1019');
     const typed = lt > S.L('c3') + 1.0 ? '11' : lt > S.L('c3') + 0.6 ? '1' : '';
-    text(g, typed, 540, 330, { size: 110, color: '#fff', weight: 500, font: '"Noto Sans CJK JP"' });
+    text(g, typed, 540, 450, { size: 110, color: '#fff', weight: 500, font: '"Noto Sans CJK JP"' });
     const keys = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '*', '0', '#'];
-    keys.forEach((k, i) => { const x = 340 + (i % 3) * 200, y = 520 + Math.floor(i / 3) * 170; const hit = k === '1' && ((lt > S.L('c3') + 0.6 && lt < S.L('c3') + 0.75) || (lt > S.L('c3') + 1.0 && lt < S.L('c3') + 1.15)); circ(g, x, y, 70, hit ? '#5a6480' : '#1d2230'); text(g, k, x, y + 2, { size: 56, color: '#fff', weight: 500, font: '"Noto Sans CJK JP"' }); });
+    keys.forEach((k, i) => { const x = 340 + (i % 3) * 200, y = 620 + Math.floor(i / 3) * 150; const hit = k === '1' && ((lt > S.L('c3') + 0.6 && lt < S.L('c3') + 0.75) || (lt > S.L('c3') + 1.0 && lt < S.L('c3') + 1.15)); circ(g, x, y, 62, hit ? '#5a6480' : '#1d2230'); text(g, k, x, y + 2, { size: 56, color: '#fff', weight: 500, font: '"Noto Sans CJK JP"' }); });
     // カラスの通知が割り込む
     const cut = S.L('cut110');
     if (lt > cut) {
       if (lt < cut + 0.3) { g.save(); g.globalAlpha = 0.6; for (let i = 0; i < 8; i++) { const R = rng(i + Math.floor(lt * 30)); g.fillStyle = R() < 0.5 ? '#ff2a40' : '#2affee'; g.fillRect(0, R() * H, W, 10 + R() * 40); } g.restore(); }
       const k = easeOut(inv(cut, cut + 0.25, lt));
-      g.save(); g.translate(0, (1 - k) * -300); fillRR(g, 90, 240, 900, 230, 40, 'rgba(24,26,36,.97)'); g.lineWidth = 4; g.strokeStyle = C.red; rr(g, 90, 240, 900, 230, 40); g.stroke(); crowIcon(g, 180, 340, 46);
-      text(g, 'カラス', 260, 300, { size: 32, color: '#9aa5bb', align: 'left' }); text(g, '通報したら、', 260, 360, { size: 46, color: '#fff', align: 'left' }); text(g, '2階のやつが降りる', 260, 420, { size: 46, color: '#fff', align: 'left' }); g.restore();
+      g.save(); g.translate(0, (1 - k) * -300); fillRR(g, 90, 330, 900, 230, 40, 'rgba(24,26,36,.97)'); g.lineWidth = 4; g.strokeStyle = C.red; rr(g, 90, 330, 900, 230, 40); g.stroke(); crowIcon(g, 180, 430, 46);
+      text(g, 'カラス', 260, 390, { size: 32, color: '#9aa5bb', align: 'left' }); text(g, '通報したら、', 260, 450, { size: 46, color: '#fff', align: 'left' }); text(g, '2階のやつが降りる', 260, 510, { size: 46, color: '#fff', align: 'left' }); g.restore();
       mood(g, { red: 0.15 * k });
     }
   } },
@@ -235,7 +234,7 @@ const SHOTS = [
   // ── 母「ミクが2階見に行くって」
   { at: 'f1', draw(g, lt, D, S) {
     bg(g, '#05060a', '#0b0c12');
-    chat(g, [{ t: -5, from: 'me', text: '2階に行くな', read: false }, { t: -4, from: 'me', text: '母さん？', read: false }, { t: 0, from: 'mom', text: 'ミクが、2階見に行くって' }], lt, { title: '母', y: 200, h: 900 });
+    chat(g, [{ t: -5, from: 'me', text: '2階に行くな', read: false }, { t: -4, from: 'me', text: '母さん？', read: false }, { t: 0, from: 'mom', text: 'ミクが、2階見に行くって' }], lt, { title: '母', y: 330, h: 860 });
   } },
   { at: 'f2', draw(g, lt, D, S) {
     const sh = shake(lt, lt < 0.6 ? 14 : 3);
@@ -246,15 +245,15 @@ const SHOTS = [
   } },
   { at: 'f3', off: -0.2, draw(g, lt, D, S) {
     bg(g, '#05060a', '#0b0c12');
-    chat(g, [{ t: 0, from: 'karasu', img: sisterPhoto, h: 520 }, { t: 0.6, from: 'karasu', text: '来たら、何もせえへん' }], lt, { y: 200, h: 920 });
+    chat(g, [{ t: 0, from: 'karasu', img: sisterPhoto, h: 520 }, { t: 0.6, from: 'karasu', text: '来たら、何もせえへん' }], lt, { y: 330, h: 880 });
     mood(g, { red: 0.1 * inv(0.2, 1.0, lt) });
   } },
   { at: 'f4', draw(g, lt, D, S) {
     bg(g, '#05060a', '#0b0c12');
     const f5 = S.L('f5');
-    if (lt < f5 - 0.1) chat(g, [{ t: 0.2, from: 'me', text: '先輩、助けてください', read: true }], lt, { title: 'タクミ先輩', y: 200, h: 900, typing: [0.9, 99] });
+    if (lt < f5 - 0.1) chat(g, [{ t: 0.2, from: 'me', text: '先輩、助けてください', read: true }], lt, { title: 'タクミ先輩', y: 330, h: 860, typing: [0.9, 99] });
     else {
-      chat(g, [{ t: f5 - 0.1, from: 'karasu', img: takumiPhoto, h: 500 }, { t: f5 + 0.4, from: 'karasu', text: 'タクミくんなら、ここにおるで' }], lt, { y: 200, h: 920 });
+      chat(g, [{ t: f5 - 0.1, from: 'karasu', img: takumiPhoto, h: 500 }, { t: f5 + 0.4, from: 'karasu', text: '先輩なら、ここにおるで' }], lt, { y: 330, h: 880 });
       if (lt < f5 + 0.15) { g.fillStyle = 'rgba(255,40,60,.35)'; g.fillRect(0, 0, W, H); }
     }
   } },
@@ -270,7 +269,7 @@ const SHOTS = [
   // ── 実家 20:58
   { at: 'g1', draw(g, lt, D, S) {
     g.save(); cam(g, { x: 540, y: lerp(1050, 900, ease(clamp(lt / D))), z: lerp(1.0, 1.15, ease(clamp(lt / D))) }); street(g, { lit2: 1, lit1: 0, t: lt }); g.restore();
-    figure(g, P.yuuma, { x: 540, y: 1900, s: 2.0, turn: 0, arms: [10, 0, 10, 0], shadow: false, alpha: 0.95, gloves: true });
+    figure(g, P.yuuma, { x: 860, y: 1960, s: 1.9, turn: -0.6, look: -1, lookY: -1, arms: [10, 0, 10, 0], shadow: false, alpha: 0.95, gloves: true, brow: -1 });
     mood(g, { desat: 0.2 });
   } },
   { at: 'g2', draw(g, lt, D, S) {

@@ -176,7 +176,8 @@ export function truckBack(g, { open = 0, t = 0 } = {}) {
 export function genkan(g, { t = 0, door = 0, light = 0.6 } = {}) {
   vgrad(g, -300, -300, W + 600, H + 600, [[0, '#0c0e16'], [1, '#05060a']]);
   // 床（たたき）
-  vgrad(g, -300, 1250, W + 600, 700, [[0, '#1d1c22'], [1, '#0d0d10']]);
+  vgrad(g, -300, 1250, W + 600, 700, [[0, '#2c2a33'], [1, '#18171c']]);
+  g.save(); g.globalCompositeOperation = 'lighter'; g.globalAlpha = 0.35 * light; const gr0 = g.createRadialGradient(700, 1460, 20, 700, 1460, 520); gr0.addColorStop(0, 'rgba(220,235,255,1)'); gr0.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = gr0; g.fillRect(100, 1000, 1000, 900); g.restore();
   line(g, -300, 1250, W + 300, 1250, 10, '#2a2730', 'butt');
   // 靴
   const shoe = (x, y, c, wd = 120, rot = 0) => { g.save(); g.translate(x, y); g.rotate(rot); ell(g, 0, 0, wd / 2, 26, c); fillRR(g, -wd / 2 + 10, -30, wd * 0.55, 34, 14, c); g.restore(); };
@@ -190,7 +191,7 @@ export function genkan(g, { t = 0, door = 0, light = 0.6 } = {}) {
 export function stairsUp(g, { t = 0, ring = 0, shadow = 0 } = {}) {
   vgrad(g, -300, -300, W + 600, H + 600, [[0, '#06070c'], [1, '#0a0c14']]);
   // 階段
-  for (let i = 0; i < 12; i++) { const y = 1800 - i * 115, x0 = 160 + i * 18, x1 = 920 - i * 18; fillRR(g, x0, y - 30, x1 - x0, 30, 2, mix('#2a2430', '#141218', i / 12)); fillRR(g, x0, y, x1 - x0, 85, 2, mix('#1c1820', '#0c0b0f', i / 12)); }
+  for (let i = 0; i < 12; i++) { const y = 1800 - i * 115, x0 = 160 + i * 18, x1 = 920 - i * 18; fillRR(g, x0, y - 30, x1 - x0, 30, 2, mix('#4a4252', '#221e28', i / 12)); fillRR(g, x0, y, x1 - x0, 85, 2, mix('#2e2834', '#141218', i / 12)); }
   // 2階のドア
   fillRR(g, 400, 250, 300, 380, 6, '#100f14');
   const gap = 0.5 + 0.5 * noise1(t * 0.5, 4);
