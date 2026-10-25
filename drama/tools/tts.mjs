@@ -19,6 +19,13 @@ const FALLBACK = ['gemini-3.8-flash-lite-tts', 'gemini-2.5-pro-preview-tts', 'ge
 const OUT = args.out; fs.mkdirSync(OUT, { recursive: true });
 const CACHE = process.env.TTS_CACHE || 'cache/drama-tts'; fs.mkdirSync(CACHE, { recursive: true });
 
+// ---------- モデル一覧（--models 1） ----------
+if (args.models) {
+  const r = await fetch('https://generativelanguage.googleapis.com/v1beta/models?pageSize=200', { headers: { 'x-goog-api-key': KEY } });
+  const j = await r.json(); const names = (j.models || []).map(m => m.name).filter(n => /tts|audio|speech/i.test(n));
+  console.log('TTS MODELS:', names.join(' '));
+  fs.writeFileSync(path.join(OUT, 'models.txt'), names.join('\n')); fs.writeFileSync(path.join(OUT, 'index.json'), '{}'); process.exit(0);
+}
 // ---------- 読む行を集める ----------
 const jobs = [];
 const plain = s => String(s || '').replace(/\[\[[a-z]+:([^\]]*)\]\]/g, '$1').replace(/／/g, '').replace(/<[^>]+>/g, '');
@@ -37,7 +44,7 @@ if (args.test) {
     const c = mod.CAST[L.who];
     const text = (L.read || plain(L.text)).trim();
     if (!text) continue;
-    jobs.push({ id: L.id, voice: c.voice, style: L.style || c.style, text });
+    jobs.push({ id: L.id, voice: c.voice, style: L.style || c.style, text, model: L.model || c.model });
   }
 }
 
@@ -64,11 +71,11 @@ async function post(url, body) {
   return JSON.parse(txt);
 }
 const toWav = a => { const b = Buffer.from(a.data, 'base64'); return b.slice(0, 4).toString() === 'RIFF' ? b : wavFromPcm(b); };
-async function tts(text, style, voice) {
+async function tts(text, style, voice, model = MODEL) {
   const base = 'https://generativelanguage.googleapis.com/v1beta';
   try {
     const j = await post(`${base}/interactions`, {
-      model: MODEL,
+      model,
       input: [{ type: 'user_input', content: [{ type: 'text', text, annotations: [{ type: 'speech_metadata', style }] }] }],
       response_format: { type: 'audio' },
       generation_config: { speech_config: [{ voice }] },
@@ -77,7 +84,7 @@ async function tts(text, style, voice) {
     return toWav(a);
   } catch (e) {
     if (e.status === 429 || e.status >= 500) throw e;
-    const j = await post(`${base}/models/${MODEL}:generateContent`, {
+    const j = await post(`${base}/models/${model}:generateContent`, {
       contents: [{ parts: [{ text: `${style}\n\nRead this aloud in Japanese:\n${text}` }] }],
       generationConfig: { responseModalities: ['AUDIO'], speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: voice } } } },
     });
@@ -87,9 +94,9 @@ async function tts(text, style, voice) {
 }
 const isDaily = e => e.status === 429 && /per day|PerDay|daily/i.test(e.message);
 const isModel = e => e.status === 404 || (e.status === 400 && /model/i.test(e.message));
-async function ttsRetry(text, style, voice) {
+async function ttsRetry(text, style, voice, model) {
   for (let k = 0; ; k++) {
-    try { return await tts(text, style, voice); }
+    try { return await tts(text, style, voice, model); }
     catch (e) {
       if (isDaily(e) || isModel(e)) throw e;
       if (k >= 5 || !(e.status === 429 || e.status >= 500)) throw e;
@@ -102,12 +109,13 @@ const dur = f => Number(execFileSync('ffprobe', ['-v', 'error', '-show_entries',
 const index = {};
 for (const J of jobs) {
   for (;;) {
-    const h = crypto.createHash('md5').update([MODEL, J.voice, J.style, J.text, MOCK].join('|')).digest('hex').slice(0, 16);
+    const M = J.model || MODEL;
+    const h = crypto.createHash('md5').update([M, J.voice, J.style, J.text, MOCK].join('|')).digest('hex').slice(0, 16);
     const raw = path.join(CACHE, `${h}.wav`);
     try {
       if (!fs.existsSync(raw)) {
         if (MOCK) execFileSync('ffmpeg', ['-v', 'error', '-y', '-f', 'lavfi', '-i', `sine=frequency=330:sample_rate=24000:duration=${(J.text.length * 0.13).toFixed(2)}`, '-ac', '1', raw]);
-        else { fs.writeFileSync(raw, await ttsRetry(J.text, J.style, J.voice)); await sleep(6500); }
+        else { fs.writeFileSync(raw, await ttsRetry(J.text, J.style, J.voice, M)); await sleep(6500); }
       }
     } catch (e) {
       if ((isDaily(e) || isModel(e)) && FALLBACK.length && !MOCK) { console.log(`${MODEL} が使えない（${e.message.slice(0, 160)}）→ ${FALLBACK[0]}`); MODEL = FALLBACK.shift(); continue; }
@@ -115,7 +123,7 @@ for (const J of jobs) {
     }
     const out = path.join(OUT, `${J.id}.wav`);
     execFileSync('ffmpeg', ['-v', 'error', '-y', '-i', raw, '-af', 'silenceremove=start_periods=1:start_threshold=-45dB,areverse,silenceremove=start_periods=1:start_threshold=-45dB,areverse', '-ar', '48000', '-ac', '1', out]);
-    index[J.id] = { dur: Number(dur(out).toFixed(3)), voice: J.voice, text: J.text, model: MODEL };
+    index[J.id] = { dur: Number(dur(out).toFixed(3)), voice: J.voice, text: J.text, model: M };
     console.log(`${J.id.padEnd(14)} ${index[J.id].dur.toFixed(2)}s  ${J.voice.padEnd(10)} ${J.text}`);
     break;
   }

@@ -42,7 +42,7 @@ jobs:
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: |
-          node drama/tools/tts.mjs --script "${{ github.event.inputs.script }}" --out "tts/${{ github.event.inputs.name }}" ${{ github.event.inputs.test && '--test 1' || '' }}
+          node drama/tools/tts.mjs --script "${{ github.event.inputs.script }}" --out "tts/${{ github.event.inputs.name }}" ${{ github.event.inputs.test == '1' && '--test 1' || '' }} ${{ github.event.inputs.test == 'models' && '--models 1' || '' }}
       - name: Push to drama-tts branch
         run: |
           NAME="${{ github.event.inputs.name }}"
