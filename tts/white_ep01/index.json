@@ -1,242 +1,260 @@
 {
- "o1": {
-  "dur": 1.314,
-  "voice": "Schedar",
-  "text": "次の現場。",
+ "a1": {
+  "dur": 1.686,
+  "voice": "Alnilam",
+  "text": "着いたな。入れ。",
   "model": "gemini-3.8-flash-tts"
  },
- "o2": {
-  "dur": 1.485,
-  "voice": "Puck",
-  "text": "…ここ、俺の家や。",
+ "a2": {
+  "dur": 3.312,
+  "voice": "Achird",
+  "text": "目の前にあるんは、俺が生まれ育った家や。",
   "model": "gemini-3.8-flash-tts"
  },
- "o3": {
-  "dur": 2.621,
-  "voice": "Puck",
-  "text": "この写真、家の中から撮られてる。",
+ "a3": {
+  "dur": 2.52,
+  "voice": "Achird",
+  "text": "俺は今から、この家に盗みに入る。",
   "model": "gemini-3.8-flash-tts"
  },
- "o4": {
-  "dur": 3.712,
-  "voice": "Sulafat",
-  "text": "ユウマ、帰ってきてるん？　にかいで物音するけど。",
-  "model": "gemini-3.8-flash-tts"
- },
- "o5": {
-  "dur": 0.906,
-  "voice": "Puck",
-  "text": "俺は、帰ってへん。",
-  "model": "gemini-3.8-flash-tts"
- },
- "o6": {
-  "dur": 6.449,
-  "voice": "Schedar",
-  "text": "にじゅういちじまでに来い。金庫の番号は、お前が知ってる。",
+ "a4": {
+  "dur": 5.14,
+  "voice": "Achird",
+  "text": "なんでこうなったんか。話は、みっか前にさかのぼる。",
   "model": "gemini-3.8-flash-tts"
  },
  "b1": {
-  "dur": 3.463,
-  "voice": "Puck",
-  "text": "3日前。日給いちまんごせんえんの、引越しバイト。",
+  "dur": 3.859,
+  "voice": "Achird",
+  "text": "しのはらユウマ、にじゅういっさい。大学さんねん。",
   "model": "gemini-3.8-flash-tts"
  },
  "b2": {
-  "dur": 3.055,
-  "voice": "Puck",
-  "text": "運んだ段ボールの中身は、札束やった。",
+  "dur": 4.318,
+  "voice": "Achird",
+  "text": "オカンは介護の夜勤をしながら、ちゅうさんの妹を育ててる。",
   "model": "gemini-3.8-flash-tts"
  },
  "b3": {
-  "dur": 6.007,
-  "voice": "Schedar",
-  "text": "お前の顔、カメラに残ってるで。もう共犯や。",
+  "dur": 5.003,
+  "voice": "Achird",
+  "text": "仕送りなんか頼まれへんし、家賃はもう、ふたつき払えてへん。",
   "model": "gemini-3.8-flash-tts"
  },
  "b4": {
-  "dur": 2.954,
-  "voice": "Puck",
-  "text": "免許証を撮られて、全部終わった。",
-  "model": "gemini-3.8-flash-tts"
+  "dur": 2.56,
+  "voice": "Achird",
+  "text": "そんな時に見つけたんが、このバイトや。",
+  "model": "gemini-3.8-flash-lite-tts"
+ },
+ "b5": {
+  "dur": 3.606,
+  "voice": "Achird",
+  "text": "引越しの手伝いで、日払い、いちまんごせんえん。",
+  "model": "gemini-3.8-flash-lite-tts"
+ },
+ "b6": {
+  "dur": 1.982,
+  "voice": "Achird",
+  "text": "普通のバイトやと、思ってた。",
+  "model": "gemini-3.8-flash-lite-tts"
  },
  "c1": {
-  "dur": 2.817,
-  "voice": "Puck",
-  "text": "母さんに、にかいに行くなって送った。",
-  "model": "gemini-3.8-flash-tts"
+  "dur": 4.315,
+  "voice": "Algenib",
+  "text": "篠原くんか。ジンや。今日は荷物運ぶだけやから。",
+  "model": "gemini-3.8-flash-lite-tts"
  },
  "c2": {
-  "dur": 2.068,
-  "voice": "Puck",
-  "text": "既読に、ならへん。",
-  "model": "gemini-3.8-flash-tts"
+  "dur": 3.188,
+  "voice": "Achird",
+  "text": "段ボールを積んで、別の家に運ぶだけ。",
+  "model": "gemini-3.8-flash-lite-tts"
  },
  "c3": {
-  "dur": 1.587,
-  "voice": "Puck",
-  "text": "警察や。いち、いち…",
-  "model": "gemini-3.8-flash-tts"
- },
- "c4": {
-  "dur": 4.016,
-  "voice": "Schedar",
-  "text": "通報したら、にかいのやつが降りる。",
-  "model": "gemini-3.8-flash-tts"
+  "dur": 2.236,
+  "voice": "Algenib",
+  "text": "おつかれ。ほい、今日の分。",
+  "model": "gemini-3.8-flash-lite-tts"
  },
  "c5": {
-  "dur": 3.396,
-  "voice": "Puck",
-  "text": "なんでわかるねん。スマホ、見られてる…？",
-  "model": "gemini-3.8-flash-tts"
+  "dur": 5.462,
+  "voice": "Achird",
+  "text": "最後の箱が落ちて、中から出てきたんは…札束やった。",
+  "model": "gemini-3.8-flash-lite-tts"
+ },
+ "c6": {
+  "dur": 1.218,
+  "voice": "Algenib",
+  "text": "…見てもうたな。",
+  "model": "gemini-3.8-flash-lite-tts"
  },
  "d1": {
-  "dur": 3.203,
-  "voice": "Puck",
-  "text": "こんな時に、電車が止まった。",
-  "model": "gemini-3.8-flash-tts"
+  "dur": 3.502,
+  "voice": "Achird",
+  "text": "帰り道、知らん相手からメッセージが来た。",
+  "model": "gemini-3.8-flash-lite-tts"
  },
  "d2": {
-  "dur": 1.511,
-  "voice": "Algenib",
-  "text": "乗れ。カラスからや。",
-  "model": "gemini-3.8-flash-tts"
+  "dur": 4.289,
+  "voice": "Alnilam",
+  "text": "お前が今日運んだんはな、年寄りから騙し取った金や。",
+  "model": "gemini-3.8-flash-lite-tts"
  },
  "d3": {
-  "dur": 2.128,
-  "voice": "Algenib",
-  "text": "スマホは切るな。全部見られてる。",
-  "model": "gemini-3.8-flash-tts"
+  "dur": 3.115,
+  "voice": "Alnilam",
+  "text": "もう共犯やで。逃げられへんで。",
+  "model": "gemini-3.8-flash-lite-tts"
  },
  "d4": {
-  "dur": 4.98,
-  "voice": "Algenib",
-  "text": "最初の現場はな、だいたい身内の家や。逃げられへんようにな。",
-  "model": "gemini-3.8-flash-tts"
+  "dur": 5.426,
+  "voice": "Alnilam",
+  "text": "免許証の写真、送ってこい。送らんかったら、警察行きやで。",
+  "model": "gemini-3.8-flash-lite-tts"
  },
  "d5": {
-  "dur": 3.912,
-  "voice": "Algenib",
-  "text": "ヤバなったら、俺がさんかい叩く。そしたら逃げろ。",
-  "model": "gemini-3.8-flash-tts"
+  "dur": 3.121,
+  "voice": "Achird",
+  "text": "怖くて、言われたとおりに送ってしもた。",
+  "model": "gemini-3.8-flash-lite-tts"
  },
  "d6": {
-  "dur": 1.994,
-  "voice": "Puck",
-  "text": "こいつの手、震えてる。",
-  "model": "gemini-3.8-flash-tts"
+  "dur": 2.909,
+  "voice": "Achird",
+  "text": "それが、一番の間違いやった。",
+  "model": "gemini-3.8-flash-lite-tts"
  },
  "e1": {
-  "dur": 0.884,
-  "voice": "Puck",
-  "text": "やばい、検問や…！",
-  "model": "gemini-3.8-flash-tts"
+  "dur": 3.013,
+  "voice": "Achird",
+  "text": "次の日、俺はこいつをブロックした。",
+  "model": "gemini-3.8-flash-lite-tts"
  },
  "e2": {
-  "dur": 1.363,
-  "voice": "Orus",
-  "text": "こんばんは。どちらまで？",
-  "model": "gemini-3.8-flash-tts"
+  "dur": 4.547,
+  "voice": "Achird",
+  "text": "みっか後の朝。知らん番号から、写真が届いた。",
+  "model": "gemini-3.8-flash-lite-tts"
  },
  "e3": {
-  "dur": 2.242,
-  "voice": "Algenib",
-  "text": "実家に、忘れもん取りに。",
-  "model": "gemini-3.8-flash-tts"
+  "dur": 1.309,
+  "voice": "Achird",
+  "text": "オカンの職場や。",
+  "model": "gemini-3.8-flash-lite-tts"
  },
  "e4": {
-  "dur": 1.456,
-  "voice": "Puck",
-  "text": "手袋、見られた。",
-  "model": "gemini-3.8-flash-tts"
+  "dur": 4.645,
+  "voice": "Alnilam",
+  "text": "ミクちゃん、中3やな。かわいい妹やんけ。",
+  "model": "gemini-3.8-flash-lite-tts"
  },
  "e5": {
-  "dur": 1.096,
-  "voice": "Orus",
-  "text": "…気をつけて。",
-  "model": "gemini-3.8-flash-tts"
+  "dur": 3.029,
+  "voice": "Alnilam",
+  "text": "ブロックして、逃げれると思たんか。",
+  "model": "gemini-3.8-flash-lite-tts"
+ },
+ "e6": {
+  "dur": 5.183,
+  "voice": "Alnilam",
+  "text": "次の仕事や。今夜、この家の金庫の中身を持ってこい。",
+  "model": "gemini-3.8-flash-lite-tts"
+ },
+ "e7": {
+  "dur": 2.773,
+  "voice": "Alnilam",
+  "text": "番号は、お前が知っとるやろ。",
+  "model": "gemini-3.8-flash-lite-tts"
+ },
+ "e8": {
+  "dur": 2.671,
+  "voice": "Achird",
+  "text": "送られてきた住所は、俺の実家やった。",
+  "model": "gemini-3.8-flash-lite-tts"
+ },
+ "e9": {
+  "dur": 3.858,
+  "voice": "Achird",
+  "text": "金庫には、死んだオトンの保険金が入ってる。",
+  "model": "gemini-3.8-flash-lite-tts"
  },
  "f1": {
-  "dur": 2.302,
-  "voice": "Sulafat",
-  "text": "ミクが、にかいを見に行くって。",
-  "model": "gemini-3.8-flash-tts"
+  "dur": 3.292,
+  "voice": "Achird",
+  "text": "その夜、迎えに来たんは、ジンやった。",
+  "model": "gemini-3.8-flash-lite-tts"
  },
  "f2": {
-  "dur": 0.846,
-  "voice": "Puck",
-  "text": "やめろ、ミク…！",
-  "model": "gemini-3.8-flash-tts"
+  "dur": 3.356,
+  "voice": "Algenib",
+  "text": "最初の現場はな、だいたい身内の家や。",
+  "model": "gemini-3.8-flash-lite-tts"
  },
  "f3": {
-  "dur": 2.46,
-  "voice": "Schedar",
-  "text": "来たら、何もせえへん。",
-  "model": "gemini-3.8-flash-tts"
+  "dur": 2.596,
+  "voice": "Algenib",
+  "text": "家族は、警察に言われへんからな。",
+  "model": "gemini-3.8-flash-lite-tts"
  },
  "f4": {
-  "dur": 2.285,
-  "voice": "Puck",
-  "text": "先輩に、助けてって送った。",
-  "model": "gemini-3.8-flash-tts"
+  "dur": 5.701,
+  "voice": "Algenib",
+  "text": "ヤバなったら、俺がさんかい叩く。そしたら、何も考えんと逃げろ。",
+  "model": "gemini-3.8-flash-lite-tts"
  },
  "f5": {
-  "dur": 2.726,
-  "voice": "Schedar",
-  "text": "先輩なら、ここにおるで。",
-  "model": "gemini-3.8-flash-tts"
- },
- "f6": {
-  "dur": 3.021,
-  "voice": "Puck",
-  "text": "この仕事を紹介したのは、先輩やった。",
-  "model": "gemini-3.8-flash-tts"
+  "dur": 1.689,
+  "voice": "Achird",
+  "text": "なんで、そんなこと教えてくれるんや。",
+  "model": "gemini-3.8-flash-lite-tts"
  },
  "g1": {
-  "dur": 3.092,
-  "voice": "Puck",
-  "text": "にじゅうじ、ごじゅうはっぷん。いっかいは、真っ暗や。",
-  "model": "gemini-3.8-flash-tts"
+  "dur": 1.381,
+  "voice": "Achird",
+  "text": "そして、今や。",
+  "model": "gemini-3.8-flash-lite-tts"
  },
  "g2": {
-  "dur": 3.596,
-  "voice": "Puck",
-  "text": "明かりがついてるのは、にかいの、俺の部屋だけ。",
-  "model": "gemini-3.8-flash-tts"
+  "dur": 4.59,
+  "voice": "Achird",
+  "text": "盗みなんかせえへん。オカンに全部話す。",
+  "model": "gemini-3.8-flash-lite-tts"
  },
  "g3": {
-  "dur": 1.744,
-  "voice": "Puck",
-  "text": "鍵が、開いてる。",
-  "model": "gemini-3.8-flash-tts"
+  "dur": 2.087,
+  "voice": "Achird",
+  "text": "オカンに、電話をかけた。",
+  "model": "gemini-3.8-flash-lite-tts"
  },
  "g4": {
-  "dur": 1.801,
-  "voice": "Puck",
-  "text": "この靴…だれのや。",
-  "model": "gemini-3.8-flash-tts"
+  "dur": 3.148,
+  "voice": "Achird",
+  "text": "家の中で、オカンのスマホが鳴ってる。",
+  "model": "gemini-3.8-flash-lite-tts"
  },
  "g5": {
-  "dur": 1.816,
-  "voice": "Puck",
-  "text": "母さんに、電話をかけた。",
-  "model": "gemini-3.8-flash-tts"
+  "dur": 1.109,
+  "voice": "Achird",
+  "text": "にかいからや。",
+  "model": "gemini-3.8-flash-lite-tts"
  },
  "g6": {
-  "dur": 1.782,
-  "voice": "Puck",
-  "text": "にかいで、鳴ってる。",
-  "model": "gemini-3.8-flash-tts"
- },
- "g7": {
-  "dur": 1.767,
+  "dur": 1.914,
   "voice": "Charon",
   "text": "…おかえり、ユウマくん。",
-  "model": "gemini-3.8-flash-tts"
+  "model": "gemini-3.8-flash-lite-tts"
+ },
+ "g7": {
+  "dur": 2.889,
+  "voice": "Achird",
+  "text": "電話に出たんは、オカンやなかった。",
+  "model": "gemini-3.8-flash-lite-tts"
  },
  "x1": {
-  "dur": 2.104,
-  "voice": "Schedar",
+  "dur": 1.835,
+  "voice": "Alnilam",
   "text": "次回。おかえり。",
-  "model": "gemini-3.8-flash-tts"
+  "model": "gemini-3.8-flash-lite-tts"
  }
 }
