@@ -151,7 +151,7 @@ const SHOTS = [
   { at: 'c1', draw(g, lt, D, S) {
     blurStreet(g, lt);
     chat(g, [{ t: -5, from: 'mom', text: 'ユウマ、帰ってきてるん？\n2階で物音するけど' }, { t: 0.4, from: 'me', text: '2階に行くな', read: false }, { t: 1.0, from: 'me', text: '母さん？', read: false }], lt, { title: '母', y: 330, h: 860 });
-    if (lt > S.L('c2')) { const a = inv(S.L('c2'), S.L('c2') + 0.3, lt); sfxText(g, '未読', 300, 760, { size: 120, rot: -0.12, alpha: a, color: C.red, shake: 3, t: lt }); }
+    if (lt > S.L('c2')) { const a = inv(S.L('c2'), S.L('c2') + 0.3, lt); sfxText(g, '未読', 330, 1040, { size: 120, rot: -0.12, alpha: a, color: C.red, shake: 3, t: lt }); }
   } },
   // ── 110 → カラスが先回り
   { at: 'c3', draw(g, lt, D, S) {
