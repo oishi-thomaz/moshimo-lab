@@ -105,6 +105,16 @@ CHROME_PATH=<chromium> node tools/render.mjs --video NNNN --stills 0.5,2,5,10,16
 - scenes/deerpark.js：古都の公園（芝生・松・石灯籠・朱色の鳥居・前の道路と横断歩道・向かいの低い建物）とローポリの鹿。makeDeer({kind: buck / doe / fawn})、deerWalk・deerGraze・deerBow（おじぎ）、makeHerd(max, seed, 範囲) で数千頭の群れ（setN(n)、clear(cx,cz,r) で手前だけ空ける）、setLawn(k) で芝生→土、makeCar（setBrake）、makeSenbei、setParkEnv で day / dusk
 - scenes/farm.js：日本の農村（田んぼ3×2枚・キャベツ畑・農家の家と納屋・山・電柱）。setRice(grow, gold) で稲、setVeg(k) でキャベツ、setWeeds(k) で耕作放棄（雑草が伸びて田の水が泥色に）、makeFarmer(r)（麦わら帽子の農家）と farmerWork(p, t) で腰をかがめた作業、makeTractor（架空色、userData.spin）、setFarmEnv で day / dusk / gray
 - scenes/grocer.js：スーパーの青果・卵・お米売り場（野菜の平台・卵の冷蔵ケース・米袋の山・吊り看板 やさい / たまご / お米）。setStock({veg, egg, rice}) で残る量、setSoldOut({...}) で品切れの札、tagsOn で国産の値札、setGrocerLight で day / dim
+- scenes/xbutton.js：絶滅ボタンシリーズ共通の赤いボタン（台・キャップ・名札・押す手。どのシーンにも置ける）。makeXButton({label}) の userData に press(k)・hand(k)・labelOn、xCountdown(残り秒) で 0:01.40 の表示、xHook(t, 押す秒) で押すタイミング
+- scenes/hornet.js：スズメバチまわり。makeHornet、makeHornetNest（マーブル模様の巣・原点が吊るす点）、makeEave（家の壁と軒。userData.nestAt。scale 0.62 で物置）、makeHive（重箱式の巣箱）、makeBeeBall(n)（熱殺蜂球。set(集まり具合, t, 熱)）、makeCaterpillars(spots)（毛虫。set(k, t)）
+- scenes/plaza.js：駅前広場（架空の もしも台駅の駅舎とひさし・タイル・ベンチ・植え込み・時計の柱）とローポリのハト。makePigeon（userData.anim(t,{walk,peck,fly})）、makeFlock(n, seed, 範囲).set(数, t)、makeDroppings（setK でフンの量）、makePlazaPeople、LEDGE、setPlazaEnv で day / dusk
+- scenes/beach.js：夏の砂浜と波打つ海（砂浜・海底・波打ちぎわの泡・パラソル・遠くの山）。setSea(t,{level, amp}) で波と海面の高さ、floorY(z)、makeSwimmers(n, seed, 範囲).set(k, t)（0 浜で待つ→1 海に入る）、makeFarCrowd、makeGauge（目盛りの柱、setMark で赤い線）、PARASOLS、setBeachEnv で day / dusk
+- scenes/appliances.js：ブランドなしのローポリ家電（makeTV / makeMicrowave / makeWasher / makeFridge / makeAircon）と、5つの台座にダメージメーターが付いたラインナップ（aLineup、setASlot(i, {show, meter, word, glow, t})、aLineupIdle、setALabels）。ヤバい順の家電回用
+- scenes/xbutton.js：絶滅ボタンシリーズ共通の赤いボタン（台・キャップ・名札・押す手。どのシーンにも置ける）。makeXButton({label}) の userData.press(k)・hand(k)・labelOn、xCountdown(残り秒) で 0:01.40 の表示、xHook(t, 押す秒) で押すタイミング
+- scenes/hornet.js：スズメバチまわりの部品。makeHornet、makeHornetNest（マーブル模様の巣・原点が吊るす点）、makeEave（家の壁と軒。userData.nestAt に巣の位置。scale 0.62 で物置）、makeHive（重箱式の巣箱）、makeBeeBall(n)（熱殺蜂球。set(集まり具合, t, 熱) で赤く光る）、makeCaterpillars(spots)（毛虫。set(k, t)）
+- scenes/plaza.js：駅前広場（架空の もしも台駅の駅舎とひさし・タイル・ベンチ・植え込み・時計の柱）とローポリのハト。makePigeon（userData.anim(t,{walk,peck,fly})）、makeFlock(n, seed, 範囲).set(数, t)、makeDroppings（setK でフンの量）、makePlazaPeople、LEDGE、setPlazaEnv で day / dusk
+- scenes/beach.js：夏の砂浜と波打つ海（坂の砂浜・海底・波打ちぎわの泡・パラソル・遠くの山）。setSea(t,{level, amp}) で波と海面（level を上げると砂浜が沈む）、floorY(z)、makeSwimmers(n, seed, 範囲).set(k, t)（0 浜で待つ→1 海へ）、makeFarCrowd、makeGauge（目盛りの柱、setMark で赤い線）、PARASOLS、setBeachEnv で day / dusk
+- scenes/appliances.js：ブランドなしのローポリ家電（makeTV / makeMicrowave / makeWasher / makeFridge / makeAircon）と、5つの台座にダメージメーター付きのラインナップ（aLineup、setASlot(i, {show, meter, word, glow, t})、aLineupIdle、setALabels）。ヤバい順の家電回用
 
 ## 着地は人への影響で言い切る（2026/10/20 ゆうとの指摘・最重要）
 - 結果は「何がいくつ消えた」で終わらせない。それで人間の暮らし・お金・体・心がどう変わったかを数字で言い切る（例：蚊の回＝マラリアだけで年61万人が助かる）。
