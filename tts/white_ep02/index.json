@@ -1,0 +1,200 @@
+{
+ "r1": {
+  "dur": 6.527,
+  "voice": "Achird",
+  "text": "闇バイトで脅されて、実家の金庫を狙えと言われた俺は、オカンに電話をかけた。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "r2": {
+  "dur": 2.674,
+  "voice": "Achird",
+  "text": "出たんは、知らん男の声やった。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "r3": {
+  "dur": 1.278,
+  "voice": "Charon",
+  "text": "…おかえり、ゆうまくん。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "a1": {
+  "dur": 3.446,
+  "voice": "Achird",
+  "text": "玄関のドアが開いて、男が階段を降りてきた。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "a2": {
+  "dur": 5.281,
+  "voice": "Charon",
+  "text": "驚かせてごめんな。坂口いいます。お母さんと、お付き合いさせてもろてる。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "a3": {
+  "dur": 4.205,
+  "voice": "Achird",
+  "text": "オカンが前に言うてた会わせたい人って…この人か。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "a4": {
+  "dur": 5.073,
+  "voice": "Charon",
+  "text": "お母さん、夜勤にスマホ忘れていきはってな。届けに行こ思て、取りに来たとこやねん。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "a5": {
+  "dur": 5.348,
+  "voice": "Achird",
+  "text": "優しそうな人やった。体の力が、一気に抜けた。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "b1": {
+  "dur": 2.063,
+  "voice": "Achird",
+  "text": "気づいたら、全部話してた。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "b2": {
+  "dur": 5.417,
+  "voice": "Achird",
+  "text": "バイトのこと。カラスのこと。今夜、この家の金庫を狙えって言われたこと。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "b3": {
+  "dur": 3.435,
+  "voice": "Charon",
+  "text": "…よう話してくれたな。一人で、しんどかったやろ。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "b4": {
+  "dur": 2.988,
+  "voice": "Charon",
+  "text": "明日の朝、一緒に警察行こ。俺もついてったる。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "b5": {
+  "dur": 1.981,
+  "voice": "Charon",
+  "text": "お母さんには、俺から話しとくから。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "b6": {
+  "dur": 1.794,
+  "voice": "Achird",
+  "text": "誰かに、そう言うてほしかった。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "c1": {
+  "dur": 2.054,
+  "voice": "Achird",
+  "text": "外では、ジンが車で待ってた。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "c2": {
+  "dur": 1.953,
+  "voice": "Achird",
+  "text": "俺は降りる。もう、やらへん。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "c3": {
+  "dur": 0.999,
+  "voice": "Algenib",
+  "text": "…そうか。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "c4": {
+  "dur": 4.205,
+  "voice": "Algenib",
+  "text": "ほな、これ持っとけ。何かあったら、ここに電話せえ。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "c5": {
+  "dur": 3.512,
+  "voice": "Algenib",
+  "text": "カラスはな、お前が思てるより、近くにおるで。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "c6": {
+  "dur": 1.589,
+  "voice": "Achird",
+  "text": "車は、そのまま走っていった。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "d1": {
+  "dur": 1.971,
+  "voice": "Charon",
+  "text": "金庫、無事か見とこか。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "d2": {
+  "dur": 3.098,
+  "voice": "Achird",
+  "text": "坂口さんは、迷わず仏壇の下の扉を開けた。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "d3": {
+  "dur": 1.298,
+  "voice": "Charon",
+  "text": "番号、ユウマくん知ってるんか？",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "d4": {
+  "dur": 1.094,
+  "voice": "Achird",
+  "text": "…オトンの誕生日や。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "d5": {
+  "dur": 2.824,
+  "voice": "Charon",
+  "text": "そうか。ほな、明日まで触らんとこな。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "d6": {
+  "dur": 2.055,
+  "voice": "Charon",
+  "text": "ミクちゃんは、もう、にかいで寝てるで。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "e1": {
+  "dur": 3.503,
+  "voice": "Achird",
+  "text": "これで終わりや。俺は、カラスにメッセージを送った。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "e2": {
+  "dur": 4.197,
+  "voice": "Achird",
+  "text": "全部、警察に話す。もう、お前の言うことは聞かへん。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "f1": {
+  "dur": 3.185,
+  "voice": "Achird",
+  "text": "その時、テーブルの上で、スマホが震えた。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "f2": {
+  "dur": 1.77,
+  "voice": "Achird",
+  "text": "坂口さんの、スマホやった。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "f3": {
+  "dur": 3.879,
+  "voice": "Achird",
+  "text": "画面に出てたんは…俺が今送ったメッセージやった。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "f4": {
+  "dur": 3.354,
+  "voice": "Charon",
+  "text": "…ほんまに、ええ子やなあ。ゆうまくん。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "x1": {
+  "dur": 1.892,
+  "voice": "Alnilam",
+  "text": "次回。カラスの巣。",
+  "model": "gemini-2.5-pro-preview-tts"
+ }
+}
