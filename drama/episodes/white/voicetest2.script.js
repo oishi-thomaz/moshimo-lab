@@ -16,7 +16,6 @@ const VARIANTS = [
   ['A', 'gemini-3.8-flash-tts', 0],
   ['B', 'gemini-3.8-flash-tts', 1],
   ['C', 'gemini-2.5-pro-preview-tts', 1],
-  ['D', 'gemini-3.1-flash-tts-preview', 1],
 ];
 export const CAST = {};
 export const LINES = [];
