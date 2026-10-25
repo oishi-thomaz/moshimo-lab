@@ -45,7 +45,7 @@ if (args.test) {
     const c = mod.CAST[L.who];
     const text = (L.read || plain(L.text)).trim();
     if (!text) continue;
-    jobs.push({ id: L.id, voice: c.voice, style: L.style || c.style, text, model: L.model || c.model });
+    jobs.push({ id: L.id, voice: c.voice, style: L.style || c.style, text, model: L.model || c.model, take: L.take });
   }
 }
 
@@ -111,7 +111,7 @@ const index = {}; const DEAD = {};
 for (const J of jobs) {
   for (;;) {
     let M = J.model || MODEL; while (DEAD[M]) M = DEAD[M];
-    const h = crypto.createHash('md5').update([M, J.voice, J.style, J.text, MOCK].join('|')).digest('hex').slice(0, 16);
+    const h = crypto.createHash('md5').update([M, J.voice, J.style, J.text, MOCK].join('|') + (J.take ? `|take${J.take}` : '')).digest('hex').slice(0, 16);
     const raw = path.join(CACHE, `${h}.wav`);
     try {
       if (!fs.existsSync(raw)) {
