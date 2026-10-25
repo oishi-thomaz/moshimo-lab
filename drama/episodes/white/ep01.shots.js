@@ -133,7 +133,7 @@ const SHOTS = [
     for (const [x, y, sx, sy] of [[180, 330, 1, 1], [900, 330, -1, 1], [180, 1110, 1, -1], [900, 1110, -1, -1]]) { line(g, x, y, x + sx * 60, y, 6, 'rgba(255,255,255,.8)'); line(g, x, y, x, y + sy * 60, 6, 'rgba(255,255,255,.8)'); }
     circ(g, 540, 1160, 46, '#f4f1ea'); circ(g, 540, 1160, 38, '#050506'); circ(g, 540, 1160, 32, '#f4f1ea');
     const fl = 1.2; if (lt > fl && lt < fl + 0.15) { g.fillStyle = 'rgba(255,255,255,.9)'; g.fillRect(0, 0, W, H); }
-    if (lt > fl + 0.3) { g.save(); g.globalAlpha = inv(fl + 0.3, fl + 0.6, lt); fillRR(g, 330, 1260 - 120, 420, 80, 40, '#2f6bd8'); text(g, '送信しました', 540, 1180, { size: 36, color: '#fff' }); g.restore(); }
+    if (lt > fl + 0.3) { g.save(); g.globalAlpha = inv(fl + 0.3, fl + 0.6, lt); fillRR(g, 330, 1000, 420, 80, 40, '#2f6bd8'); text(g, '送信しました', 540, 1040, { size: 36, color: '#fff' }); g.restore(); }
   } },
   { at: 'd6', draw(g, lt, D, S) {
     bg(g, '#030305', '#08090e');
