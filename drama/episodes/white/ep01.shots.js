@@ -11,8 +11,37 @@ const talking = (lt, S, ids) => { for (const id of ids) { const a = S.L(id), b =
 const blink = (lt, k = 0) => ((lt + k * 1.3) % 3.1) < 0.1;
 const bg = (g, a = '#06070c', b = '#0d1120') => vgrad(g, -300, -300, W + 600, H + 600, [[0, a], [1, b]]);
 // ぼかした夜道（チャットの後ろ）
+let BLUR = null;
 function blurStreet(g, t) {
-  g.save(); g.filter = 'blur(14px) brightness(0.55)'; street(g, { t, lit2: 0, lit1: 0 }); g.restore();
+  if (!BLUR) { BLUR = document.createElement('canvas'); BLUR.width = W; BLUR.height = H; const b = BLUR.getContext('2d'); const tmp = document.createElement('canvas'); tmp.width = W; tmp.height = H; street(tmp.getContext('2d'), { t: 0, lit2: 0, lit1: 0 }); b.filter = 'blur(14px) brightness(0.55)'; b.drawImage(tmp, 0, 0); }
+  g.drawImage(BLUR, 0, 0);
+}
+// 表紙（プロフィールの一覧で読めるように、3:4の中央に大きく）
+export function cover(g, lt = 9, epNo = 1, epTitle = '次の現場') {
+  const k = easeOut(inv(0, 0.3, lt)), gl = lt < 0.35 ? noise1(lt * 60, 3) * 16 : 0;
+  // 背景：2階だけ光る実家と赤い夜
+  g.save(); cam(g, { x: 520, y: 1000, z: 1.25 }); street(g, { lit2: 1.2, lit1: 0 }); g.restore();
+  vgrad(g, 0, 0, W, H, [[0, 'rgba(3,3,6,.9)'], [0.3, 'rgba(3,3,6,.45)'], [0.6, 'rgba(3,3,6,.35)'], [1, 'rgba(3,3,6,.9)']]);
+  glow(g, 540, 820, 760, 'rgba(220,20,40,1)', 0.28 * k);
+  // 下：スマホに照らされたユウマの顔
+  g.save(); g.globalAlpha = k; close(g, P.yuuma, { y: 1560, s: 3.0, eyes: 'wide', brow: -1, mouth: 'open', phoneLight: true }); g.restore();
+  vgrad(g, 0, 1250, W, 200, [[0, 'rgba(3,3,6,.6)'], [1, 'rgba(3,3,6,0)']]);
+  // カラスの通知
+  g.save(); g.globalAlpha = k; fillRR(g, 190, 330, 700, 110, 34, 'rgba(24,26,36,.95)'); g.lineWidth = 4; g.strokeStyle = C.red; rr(g, 190, 330, 700, 110, 34); g.stroke(); crowIcon(g, 255, 385, 34);
+  text(g, 'カラス：次の現場', 315, 387, { size: 42, color: '#fff', align: 'left' }); g.restore();
+  // タイトル
+  const ts = (gx, col) => { g.save(); g.font = `700 160px ${SERIF}`; g.textAlign = 'center'; g.textBaseline = 'middle'; g.lineJoin = 'round'; g.letterSpacing = '4px'; g.globalAlpha = k; g.lineWidth = 18; g.strokeStyle = '#05060a'; g.strokeText('ホワイト案件', gx, 600); g.fillStyle = col; g.fillText('ホワイト案件', gx, 600); g.restore(); };
+  if (gl) ts(540 - gl, rgba('#ff2a40', 0.6));
+  ts(540 + gl, '#f4f1ea');
+  // 話数（いちばん大きく）
+  const b = easeOut(inv(0.15, 0.5, lt)), sc = lerp(1.3, 1, back(b));
+  g.save(); g.translate(540, 870); g.scale(sc, sc); g.globalAlpha = b;
+  g.font = `900 300px "Noto Sans CJK JP", sans-serif`; g.textAlign = 'center'; g.textBaseline = 'middle'; g.lineJoin = 'round';
+  g.lineWidth = 30; g.strokeStyle = '#05060a'; g.strokeText(`第${epNo}話`, 0, 0); g.fillStyle = C.red; g.fillText(`第${epNo}話`, 0, 0); g.restore();
+  // 話のタイトル
+  const c = easeOut(inv(0.35, 0.7, lt));
+  g.save(); g.globalAlpha = c; fillRR(g, 540 - 320, 1060, 640, 116, 14, '#f4f1ea'); text(g, epTitle, 540, 1120, { size: 82, color: '#0a0a0e', weight: 800 });
+  fillRR(g, 540 - 90, 1196, 180, 52, 26, C.red); text(g, '全5話', 540, 1223, { size: 32, color: '#fff', weight: 800, spacing: 6 }); g.restore();
 }
 // 免許証
 function license(g, x, y, s, a = 1) {
@@ -86,18 +115,7 @@ const SHOTS = [
     mood(g, { red: 0.12 * inv(1.2, 2.5, lt) });
   } },
   // ── タイトル
-  { at: 'title', noSubs: true, finish: { vignette: 0.7, grainA: 0.12 }, draw(g, lt, D, S) {
-    bg(g, '#030305', '#08090e');
-    const a = easeOut(inv(0, 0.25, lt));
-    // 赤いひっかき傷
-    g.save(); g.globalAlpha = a; for (let i = 0; i < 3; i++) { const y = 700 + i * 46; poly(g, [[180 + i * 30, y + 30], [900 - i * 20, y - 40], [905 - i * 20, y - 28], [185 + i * 30, y + 44]], C.red); } g.restore();
-    const gl = lt < 0.4 ? noise1(lt * 60, 3) * 14 : 0;
-    text(g, 'ホワイト案件', 540 + gl, 760, { size: 150, color: '#f4f1ea', font: SERIF, weight: 700, alpha: a, spacing: 6 });
-    if (lt < 0.4) text(g, 'ホワイト案件', 540 - gl, 760, { size: 150, color: rgba('#ff2a40', 0.5), font: SERIF, weight: 700, alpha: a, spacing: 6 });
-    const b = easeOut(inv(0.4, 0.8, lt));
-    text(g, '第1話　次の現場', 540, 920, { size: 52, color: '#c9ccd6', alpha: b, weight: 800 });
-    text(g, '全5話', 540, 600, { size: 32, color: '#8a8f9c', alpha: b, weight: 800, spacing: 10 });
-  } },
+  { at: 'title', noSubs: true, finish: { vignette: 0.55, grainA: 0.1 }, draw(g, lt, D, S) { vgrad(g, 0, 0, W, H, [[0, '#030305'], [1, '#08090e']]); cover(g, lt); } },
   // ── 3日前（回想：色抜け）
   { at: 'b1', draw(g, lt, D, S) {
     panels(g, [
@@ -133,7 +151,7 @@ const SHOTS = [
   { at: 'c1', draw(g, lt, D, S) {
     blurStreet(g, lt);
     chat(g, [{ t: -5, from: 'mom', text: 'ユウマ、帰ってきてるん？\n2階で物音するけど' }, { t: 0.4, from: 'me', text: '2階に行くな', read: false }, { t: 1.0, from: 'me', text: '母さん？', read: false }], lt, { title: '母', y: 330, h: 860 });
-    if (lt > S.L('c2')) { const a = inv(S.L('c2'), S.L('c2') + 0.3, lt); g.save(); g.globalAlpha = a; g.lineWidth = 6; g.strokeStyle = C.red; g.beginPath(); g.arc(860, 985, 70, 0, 7); g.stroke(); g.restore(); sfxText(g, '未読', 760, 1120, { size: 60, rot: 0.05, alpha: a, color: '#f4f1ea' }); }
+    if (lt > S.L('c2')) { const a = inv(S.L('c2'), S.L('c2') + 0.3, lt); sfxText(g, '未読', 300, 760, { size: 120, rot: -0.12, alpha: a, color: C.red, shake: 3, t: lt }); }
   } },
   // ── 110 → カラスが先回り
   { at: 'c3', draw(g, lt, D, S) {
