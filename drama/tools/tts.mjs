@@ -68,7 +68,7 @@ function findAudio(o) {
 async function post(url, body) {
   const res = await fetch(url, { method: 'POST', headers: { 'content-type': 'application/json', 'x-goog-api-key': KEY }, body: JSON.stringify(body) });
   const txt = await res.text();
-  if (!res.ok) { const e = new Error(`HTTP ${res.status}: ${txt.slice(0, 300)}`); e.status = res.status; throw e; }
+  if (!res.ok) { const e = new Error(`HTTP ${res.status}: ${txt.slice(0, 3000)}`); e.status = res.status; throw e; }
   return JSON.parse(txt);
 }
 const toWav = a => { const b = Buffer.from(a.data, 'base64'); return b.slice(0, 4).toString() === 'RIFF' ? b : wavFromPcm(b); };
@@ -93,13 +93,14 @@ async function tts(text, style, voice, model = MODEL) {
     return toWav(a);
   }
 }
-const isDaily = e => e.status === 429 && /per day|PerDay|daily/i.test(e.message);
+const isDaily = e => e.daily || (e.status === 429 && /per.?day|PerDay|daily|RPD/i.test(e.message));
 const isModel = e => e.status === 404 || (e.status === 400 && /model/i.test(e.message));
 async function ttsRetry(text, style, voice, model) {
   for (let k = 0; ; k++) {
     try { return await tts(text, style, voice, model); }
     catch (e) {
       if (isDaily(e) || isModel(e)) throw e;
+      if (e.status === 429 && k >= 2 && /quota/i.test(e.message)) throw Object.assign(e, { daily: true });
       if (k >= 5 || !(e.status === 429 || e.status >= 500)) throw e;
       const w = 15000 * (k + 1); console.log(`  retry in ${w / 1000}s (${e.message.slice(0, 100)})`); await sleep(w);
     }
@@ -120,7 +121,7 @@ for (const J of jobs) {
       }
     } catch (e) {
       if ((isDaily(e) || isModel(e)) && FALLBACK.length && !MOCK) { const nx = FALLBACK.shift(); console.log(`${M} が使えない（${e.message.slice(0, 160)}）→ ${nx}`); DEAD[M] = nx; continue; }
-      throw e;
+      console.log(`止めた：${e.message.slice(0, 1500)}`); throw e;
     }
     const out = path.join(OUT, `${J.id}.wav`);
     execFileSync('ffmpeg', ['-v', 'error', '-y', '-i', raw, '-af', 'silenceremove=start_periods=1:start_threshold=-45dB,areverse,silenceremove=start_periods=1:start_threshold=-45dB,areverse', '-ar', '48000', '-ac', '1', out]);

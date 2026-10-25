@@ -6,7 +6,7 @@ export const EPISODE = { no: 2, title: 'おかえり', next: 'カラスの巣', 
 
 export const OSAKA_STYLE = 'あなたは大阪で生まれ育った大阪の人です。京阪式アクセントの、普段どおりの自然な大阪弁で話してください。標準語（東京式）のアクセントやイントネーションは絶対に使わないでください。「ほんま」「あかん」「やろ」「へん」「ねん」などは、大阪の人が日常で話す抑揚そのままで。お笑い芸人のような大げさな関西弁にはしないでください。';
 export const TTS_MODEL = 'gemini-2.5-pro-preview-tts'; // 大阪弁の聞き比べ 候補1（日本語の指示 × 2.5 Pro）
-export const TTS_FALLBACK = ['gemini-2.5-flash-preview-tts']; // Pro が上限なら Flash に。もしもラボの 3.8 は使わない
+export const TTS_FALLBACK = []; // 声が混ざらないよう Pro だけで作る（上限なら翌日に続きを作る）。もしもラボの 3.8 は使わない
 const PACE = '会話は普通のドラマの速さで。ゆっくりすぎず、急ぎすぎず。';
 export const CAST = {
   Y: { name: '', voice: 'Achird', style: OSAKA_STYLE + '21歳の大学生の男性。自分の身に起きたことを、小さな声で緊張しながら語る心の声。' + PACE, model: TTS_MODEL },

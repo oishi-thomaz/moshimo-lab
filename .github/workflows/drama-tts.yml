@@ -33,7 +33,7 @@ jobs:
           node-version: 22
       - name: ffmpeg
         run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
-      - uses: actions/cache@v4
+      - uses: actions/cache/restore@v4
         with:
           path: cache/drama-tts
           key: drama-tts-${{ github.run_id }}
@@ -43,6 +43,12 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: |
           node drama/tools/tts.mjs --script "${{ github.event.inputs.script }}" --out "tts/${{ github.event.inputs.name }}" ${{ github.event.inputs.test == '1' && '--test 1' || '' }} ${{ github.event.inputs.test == 'models' && '--models 1' || '' }}
+      - name: Save voice cache（途中で止まっても作れた分は残す）
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: cache/drama-tts
+          key: drama-tts-${{ github.run_id }}
       - name: Push to drama-tts branch
         run: |
           NAME="${{ github.event.inputs.name }}"
