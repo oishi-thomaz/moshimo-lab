@@ -1,0 +1,56 @@
+{
+ "1_Y": {
+  "dur": 6.435,
+  "voice": "Achird",
+  "text": "ほんまにあかんて。なんでこんなことになってしもたんやろ。オカンには、絶対言われへん。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "1_K": {
+  "dur": 5.793,
+  "voice": "Alnilam",
+  "text": "お前、ほんまにわかってへんな。もう逃げられへんねん。番号、知っとるやろ。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "1_S": {
+  "dur": 5.418,
+  "voice": "Charon",
+  "text": "よう話してくれたな。しんどかったやろ。明日の朝、一緒に警察行こか。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "2_Y": {
+  "dur": 5.647,
+  "voice": "Achird",
+  "text": "ほんまにあかんて。なんでこんなことになってしもたんやろ。オカンには、絶対言われへん。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "2_K": {
+  "dur": 5.742,
+  "voice": "Alnilam",
+  "text": "お前、ほんまにわかってへんな。もう逃げられへんねん。番号、知っとるやろ。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "2_S": {
+  "dur": 5.787,
+  "voice": "Charon",
+  "text": "よう話してくれたな。しんどかったやろ。明日の朝、一緒に警察行こか。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "3_Y": {
+  "dur": 8.052,
+  "voice": "Achird",
+  "text": "ほんまにあかんて。なんでこんなことになってしもたんやろ。オカンには、絶対言われへん。",
+  "model": "gemini-2.5-flash-preview-tts"
+ },
+ "3_K": {
+  "dur": 6.609,
+  "voice": "Alnilam",
+  "text": "お前、ほんまにわかってへんな。もう逃げられへんねん。番号、知っとるやろ。",
+  "model": "gemini-2.5-flash-preview-tts"
+ },
+ "3_S": {
+  "dur": 5.444,
+  "voice": "Charon",
+  "text": "よう話してくれたな。しんどかったやろ。明日の朝、一緒に警察行こか。",
+  "model": "gemini-2.5-flash-preview-tts"
+ }
+}
