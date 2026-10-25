@@ -66,9 +66,9 @@
   "model": "gemini-3.8-flash-tts"
  },
  "c2": {
-  "dur": 2.115,
+  "dur": 1.332,
   "voice": "Puck",
-  "text": "既読が、つかへん。",
+  "text": "きどくが、つかへん。",
   "model": "gemini-3.8-flash-tts"
  },
  "c3": {
@@ -126,9 +126,9 @@
   "model": "gemini-3.8-flash-tts"
  },
  "e1": {
-  "dur": 0.803,
+  "dur": 0.501,
   "voice": "Puck",
-  "text": "検問…！",
+  "text": "けんもんや…！",
   "model": "gemini-3.8-flash-tts"
  },
  "e2": {
@@ -156,9 +156,9 @@
   "model": "gemini-3.8-flash-tts"
  },
  "f1": {
-  "dur": 2.46,
+  "dur": 2.302,
   "voice": "Sulafat",
-  "text": "ミクが、にかい見に行くって。",
+  "text": "ミクが、にかいを見に行くって。",
   "model": "gemini-3.8-flash-tts"
  },
  "f2": {
@@ -180,9 +180,9 @@
   "model": "gemini-3.8-flash-tts"
  },
  "f5": {
-  "dur": 2.983,
+  "dur": 2.644,
   "voice": "Schedar",
-  "text": "タクミくんなら、ここにおるで。",
+  "text": "たくみくんなら、ここにおるで。",
   "model": "gemini-3.8-flash-tts"
  },
  "f6": {
@@ -210,9 +210,9 @@
   "model": "gemini-3.8-flash-tts"
  },
  "g4": {
-  "dur": 1.997,
+  "dur": 1.801,
   "voice": "Puck",
-  "text": "この靴…誰のや。",
+  "text": "この靴…だれのや。",
   "model": "gemini-3.8-flash-tts"
  },
  "g5": {
