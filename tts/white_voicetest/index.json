@@ -1,0 +1,50 @@
+{
+ "karasu_a_Charon": {
+  "dur": 9.421,
+  "voice": "Charon",
+  "text": "お前はもう共犯やで。逃げられへんで。次の仕事や。金庫の番号は、お前が知っとるやろ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "karasu_b_Algenib": {
+  "dur": 9.506,
+  "voice": "Algenib",
+  "text": "お前はもう共犯やで。逃げられへんで。次の仕事や。金庫の番号は、お前が知っとるやろ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "karasu_c_Alnilam": {
+  "dur": 10.432,
+  "voice": "Alnilam",
+  "text": "お前はもう共犯やで。逃げられへんで。次の仕事や。金庫の番号は、お前が知っとるやろ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "karasu_d_Iapetus": {
+  "dur": 10.869,
+  "voice": "Iapetus",
+  "text": "お前はもう共犯やで。逃げられへんで。次の仕事や。金庫の番号は、お前が知っとるやろ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "karasu_e_Rasalgethi": {
+  "dur": 9.753,
+  "voice": "Rasalgethi",
+  "text": "お前はもう共犯やで。逃げられへんで。次の仕事や。金庫の番号は、お前が知っとるやろ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "yuuma_1_Puck": {
+  "dur": 5.369,
+  "voice": "Puck",
+  "text": "なんでやねん。ここ、俺の実家やんけ。こんなん、行けるわけないやろ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "yuuma_2_Fenrir": {
+  "dur": 6.276,
+  "voice": "Fenrir",
+  "text": "なんでやねん。ここ、俺の実家やんけ。こんなん、行けるわけないやろ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "yuuma_3_Achird": {
+  "dur": 5.825,
+  "voice": "Achird",
+  "text": "なんでやねん。ここ、俺の実家やんけ。こんなん、行けるわけないやろ。",
+  "model": "gemini-3.8-flash-tts"
+ }
+}
