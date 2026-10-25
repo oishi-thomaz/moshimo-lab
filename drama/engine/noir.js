@@ -304,7 +304,7 @@ export function subBand(g, s, { y = 1290, size = 60, alpha = 1, who = null, name
   let lines = [chars];
   if (total > maxW) {
     let best = 1, bs = -1e9, acc = 0; const txt = chars.map(c => c[0]).join('');
-    for (let i = 1; i < chars.length - 1; i++) { acc += chars[i - 1][2]; const p = txt[i - 1], c = txt[i]; if ('、。！？…ーっゃゅょ」'.includes(c)) continue; let sc = -Math.abs(acc - total / 2) / 40; if ('、。！？'.includes(p)) sc += 12; else if ('はがをにでのとへもや'.includes(p)) sc += 5; else if (/[ぁ-ん]/.test(p) && /[一-龯ァ-ヴ0-9]/.test(c)) sc += 3; else sc -= 6; if (sc > bs) { bs = sc; best = i; } }
+    for (let i = 1; i < chars.length - 1; i++) { acc += chars[i - 1][2]; const p = txt[i - 1], c = txt[i]; if ('、。！？…ーっゃゅょ」'.includes(c)) continue; let sc = -Math.abs(acc - total / 2) / 40; if ('、。！？…'.includes(p)) sc += 30; else if ('はがをにでのとへもや'.includes(p) && !/[ぁ-ん]/.test(c)) sc += 10; else if ('はがをにでのとへもや'.includes(p)) sc += 3; else if (/[ぁ-ん]/.test(p) && /[一-龯ァ-ヴ0-9]/.test(c)) sc += 6; else if (/[ぁ-ん]/.test(p) && /[ぁ-ん]/.test(c)) sc -= 25; else sc -= 8; if (acc > maxW + 30 || total - acc > maxW + 30) sc -= 100; if (sc > bs) { bs = sc; best = i; } }
     lines = [chars.slice(0, best), chars.slice(best)];
   }
   const lh = size * 1.45, bandH = lines.length * lh + 34, y0 = y - bandH / 2;
