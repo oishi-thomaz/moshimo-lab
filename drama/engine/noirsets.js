@@ -200,3 +200,128 @@ export function stairsUp(g, { t = 0, ring = 0, shadow = 0 } = {}) {
   if (shadow > 0) { g.save(); g.globalAlpha = shadow; fillRR(g, 470, 620, 60, 16, 4, '#000'); fillRR(g, 570, 620, 60, 16, 4, '#000'); g.restore(); }
   if (ring > 0) { const p = (t * 1.6) % 1; g.save(); g.globalAlpha = ring * (1 - p) * 0.6; g.lineWidth = 6; g.strokeStyle = '#cfe0ff'; g.beginPath(); g.arc(550, 440, 120 + p * 260, 0, 7); g.stroke(); g.restore(); }
 }
+
+// ===== 組み直し版で使う場面 =====
+// ユウマの部屋（ワンルーム・夜）
+export function room1(g, { t = 0, morning = 0 } = {}) {
+  vgrad(g, -300, -300, W + 600, H + 600, [[0, mix('#1a1f30', '#5a6070', morning)], [1, mix('#10131e', '#3a3e4a', morning)]]);
+  // 窓
+  fillRR(g, 620, 260, 360, 520, 6, mix('#0a0e1c', '#c9d6e8', morning)); line(g, 800, 260, 800, 780, 10, '#151a2a', 'butt'); g.lineWidth = 14; g.strokeStyle = '#151a2a'; g.strokeRect(620, 260, 360, 520);
+  if (!morning) for (let i = 0; i < 14; i++) { const R = rng(i + 7); fillRR(g, 640 + R() * 320, 560 + R() * 200, 10, 14, 1, rgba('#ffd28a', 0.6)); }
+  // 床
+  vgrad(g, -300, 1300, W + 600, 800, [[0, mix('#2a2420', '#6a5a48', morning)], [1, mix('#17130f', '#3a3026', morning)]]);
+  // ベッド
+  fillRR(g, 560, 1120, 560, 220, 20, mix('#2b3550', '#6a7a9a', morning)); fillRR(g, 600, 1080, 200, 80, 30, mix('#d9d4c8', '#f0ece4', morning));
+  // 机とノートPC
+  fillRR(g, -40, 1060, 560, 30, 6, '#3a2c20'); fillRR(g, 0, 1090, 24, 300, 4, '#2a2018'); fillRR(g, 450, 1090, 24, 300, 4, '#2a2018');
+  fillRR(g, 120, 900, 260, 160, 8, '#1a1c22'); fillRR(g, 135, 912, 230, 136, 4, morning ? '#2a3040' : '#8fb4ff'); fillRR(g, 90, 1050, 320, 14, 4, '#2a2c34');
+  if (!morning) { g.save(); g.globalCompositeOperation = 'lighter'; glow(g, 250, 980, 420, 'rgba(140,180,255,1)', 0.35); g.restore(); }
+  // 封筒（督促）
+  g.save(); g.translate(400, 1052); g.rotate(-0.15); fillRR(g, -60, -18, 120, 30, 3, '#e9e4da'); fillRR(g, -20, -16, 40, 10, 2, C.red); g.restore();
+  toneRect(g, -300, -300, W + 600, H + 600, 'rgba(0,0,0,.12)', 9, 2);
+}
+// 家賃の督促状（アップ）
+export function rentNotice(g, { t = 0, stamp = 1 } = {}) {
+  vgrad(g, -300, -300, W + 600, H + 600, [[0, '#2a2420'], [1, '#17130f']]);
+  g.save(); g.translate(540, 860); g.rotate(-0.04);
+  fillRR(g, -380, -520, 760, 1040, 6, '#ece7dc');
+  text(g, '家賃お支払いのお願い', 0, -400, { size: 54, color: '#2a2530', weight: 800 });
+  for (let i = 0; i < 6; i++) fillRR(g, -300, -300 + i * 50, 600 - (i % 3) * 80, 16, 6, '#cfc8b8');
+  fillRR(g, -300, 40, 600, 150, 8, '#f6f1e6'); g.lineWidth = 3; g.strokeStyle = '#a9a294'; g.strokeRect(-300, 40, 600, 150);
+  text(g, '未払い　2か月分', 0, 90, { size: 48, color: '#2a2530', weight: 800 }); text(g, '134,000円', 0, 150, { size: 54, color: C.red, weight: 800 });
+  if (stamp > 0) { g.save(); g.globalAlpha = stamp; g.translate(200, 330); g.rotate(-0.2); g.scale(lerp(1.6, 1, stamp), lerp(1.6, 1, stamp)); g.lineWidth = 12; g.strokeStyle = C.red; rr(g, -130, -70, 260, 140, 18); g.stroke(); text(g, '督促', 0, 4, { size: 86, color: C.red, weight: 900 }); g.restore(); }
+  g.restore();
+}
+// スマホの求人画面
+export function jobPhone(g, { t = 0, tap = 0 } = {}) {
+  vgrad(g, -300, -300, W + 600, H + 600, [[0, '#0b0d16'], [1, '#05060a']]);
+  fillRR(g, 170, 200, 740, 1240, 60, '#0d0f14'); fillRR(g, 190, 220, 700, 1200, 46, '#f2f0ea');
+  fillRR(g, 190, 220, 700, 120, 46, '#5d8f6a'); g.fillStyle = '#5d8f6a'; g.fillRect(190, 300, 700, 40);
+  text(g, 'かんたん日払いバイト', 540, 285, { size: 40, color: '#fff' });
+  fillRR(g, 230, 380, 620, 300, 20, '#d9e4d4'); g.save(); g.translate(540, 560); fillRR(g, -140, -60, 280, 130, 10, '#e9dcc0'); line(g, -140, -20, 140, -20, 6, '#c9b892', 'butt'); fillRR(g, -200, 30, 90, 60, 6, '#e9dcc0'); fillRR(g, 120, 20, 70, 70, 6, '#e9dcc0'); g.restore();
+  text(g, '【急募】引越しスタッフ', 540, 740, { size: 50, color: '#2a2530' });
+  text(g, '日給 15,000円', 540, 840, { size: 84, color: '#2a2530' });
+  text(g, '日払い・未経験OK・即日', 540, 930, { size: 38, color: '#5a5560' });
+  text(g, '荷物を運ぶだけのカンタン作業です', 540, 1000, { size: 32, color: '#7a7570' });
+  fillRR(g, 300, 1120, 480, 120, 60, tap > 0.5 ? '#3d6f4a' : '#5d8f6a'); text(g, '応募する', 540, 1182, { size: 50, color: '#fff' });
+  if (tap > 0) { g.save(); g.globalAlpha = Math.sin(tap * Math.PI); circ(g, 600, 1190, 70 * tap + 20, 'rgba(255,255,255,.35)'); g.restore(); }
+}
+// マンション前のワゴン車（夕方）
+export function vanScene(g, { t = 0, jin = {}, yuuma = {}, carry = 0 } = {}) {
+  vgrad(g, -300, -300, W + 600, 1700, [[0, '#3a3550'], [0.6, '#6a5060'], [1, '#8a6a60']]);
+  // マンション
+  fillRR(g, -100, 200, 700, 1300, 6, '#4a4658'); for (let r = 0; r < 9; r++) for (let c = 0; c < 4; c++) fillRR(g, -60 + c * 160, 260 + r * 130, 110, 80, 4, (r + c) % 3 ? '#2e2c3a' : rgba('#ffd28a', 0.6));
+  fillRR(g, 120, 1280, 240, 220, 6, '#2a2836');
+  vgrad(g, -300, 1500, W + 600, 600, [[0, '#2a2830'], [1, '#141318']]);
+  // ワゴン車（白・ロゴなし）
+  g.save(); g.translate(760, 1500);
+  fillRR(g, -300, -420, 560, 360, 30, '#d9dce2'); fillRR(g, -320, -200, 640, 160, 20, '#c9ccd4'); fillRR(g, 120, -400, 120, 140, 10, '#3a4458');
+  circ(g, -190, -40, 62, '#141318'); circ(g, 170, -40, 62, '#141318'); circ(g, -190, -40, 26, '#8a8c92'); circ(g, 170, -40, 26, '#8a8c92');
+  fillRR(g, -300, -380, 260, 300, 10, '#2a2c34'); // 開いたスライドドアの中
+  for (let i = 0; i < 3; i++) fillRR(g, -280 + i * 80, -200 - (i % 2) * 70, 75, 65, 4, '#9a8a70');
+  g.restore();
+  figure(g, CAST2.jin, { x: 330, y: 1640, s: 1.15, turn: 0.3, arms: [10, 0, 20, 0], lightFrom: 'right', ...jin });
+  figure(g, CAST2.yuuma, { x: 600, y: 1660, s: 1.1, turn: -0.3, arms: carry ? [120, 40, 120, 40] : [8, 0, 8, 0], ...yuuma });
+  if (carry) { g.save(); g.translate(600, 1180); fillRR(g, -90, -60, 180, 120, 6, '#9a8a70'); line(g, -90, -20, 90, -20, 6, '#c9b892', 'butt'); g.restore(); }
+  toneRect(g, -300, -300, W + 600, H + 600, 'rgba(0,0,0,.12)', 9, 2);
+}
+// 封筒を渡す手
+export function envelope(g, { t = 0, k = 1 } = {}) {
+  vgrad(g, -300, -300, W + 600, H + 600, [[0, '#3a3040'], [1, '#1a1620']]);
+  g.save(); g.translate(lerp(900, 560, k), 860); g.rotate(-0.12);
+  fillRR(g, -230, -140, 460, 280, 10, '#e9e0c8'); poly(g, [[-230, -140], [0, 10], [230, -140]], '#d9cfb4');
+  text(g, '今日の分', 0, 70, { size: 46, color: '#5a4a3a' });
+  g.restore();
+  // 手（ジンの手・刺青）
+  g.save(); g.translate(lerp(1080, 760, k), 960); fillRR(g, -60, -50, 200, 100, 50, C.skin); line(g, 0, 10, 90, -10, 5, '#2a2a3a'); fillRR(g, 100, -60, 300, 120, 40, '#141519'); g.restore();
+}
+// 写真（介護施設の前のオカン・望遠）
+export function carePhoto(g, w, h) {
+  g.save(); g.scale(w / 1000, h / 700);
+  vgrad(g, 0, 0, 1000, 700, [[0, '#a9b4c0'], [1, '#7a8692']]);
+  fillRR(g, 120, 120, 760, 480, 6, '#e3ddd0'); for (let c = 0; c < 5; c++) fillRR(g, 170 + c * 140, 180, 90, 90, 4, '#9ab0c4');
+  fillRR(g, 420, 360, 160, 240, 4, '#7a6a5a'); fillRR(g, 300, 300, 400, 50, 6, '#5d8f6a'); g.font = '800 34px "M PLUS Rounded 1c"'; g.fillStyle = '#fff'; g.textAlign = 'center'; g.fillText('介護施設 ひだまり', 500, 335);
+  figure(g, CAST2.mom, { x: 640, y: 700, s: 0.75, turn: -0.3, arms: [10, 0, 30, -60], shadow: false, mouth: 'smile', look: -0.6 });
+  // 望遠の枠とぼけ
+  g.fillStyle = 'rgba(20,30,20,.55)'; g.fillRect(0, 0, 90, 700); g.fillRect(0, 0, 1000, 60);
+  toneRect(g, 0, 0, 1000, 700, 'rgba(0,0,0,.15)', 8, 1.8);
+  g.font = '500 30px "Noto Sans CJK JP"'; g.fillStyle = 'rgba(255,255,255,.8)'; g.textAlign = 'right'; g.fillText('8:12', 970, 670);
+  g.restore();
+}
+// 写真（中学の校門の妹）
+export function schoolPhoto(g, w, h) {
+  g.save(); g.scale(w / 1000, h / 700);
+  vgrad(g, 0, 0, 1000, 700, [[0, '#b9c6d4'], [1, '#8a98a6']]);
+  fillRR(g, 0, 420, 1000, 280, 0, '#6a6a6e');
+  fillRR(g, 60, 220, 60, 420, 4, '#c9c4b8'); fillRR(g, 880, 220, 60, 420, 4, '#c9c4b8'); fillRR(g, 40, 300, 30, 80, 2, '#e9e4da');
+  g.font = '800 26px "Noto Sans CJK JP"'; g.fillStyle = '#2a2530'; g.save(); g.translate(55, 340); g.rotate(Math.PI / 2); g.fillText('市立中学校', -60, 0); g.restore();
+  fillRR(g, 200, 140, 600, 260, 6, '#e3ddd0'); for (let c = 0; c < 6; c++) fillRR(g, 230 + c * 95, 180, 70, 60, 4, '#9ab0c4');
+  figure(g, CAST2.miku, { x: 520, y: 720, s: 0.8, turn: 0.2, arms: [10, 0, 10, 0], shadow: false, look: 0.4 });
+  g.fillStyle = 'rgba(20,30,20,.5)'; g.fillRect(910, 0, 90, 700);
+  toneRect(g, 0, 0, 1000, 700, 'rgba(0,0,0,.15)', 8, 1.8);
+  g.font = '500 30px "Noto Sans CJK JP"'; g.fillStyle = 'rgba(255,255,255,.8)'; g.textAlign = 'right'; g.fillText('8:05', 880, 670);
+  g.restore();
+}
+// 地図（ピンが実家に刺さる）
+export function mapPhoto(g, w, h, t = 0) {
+  g.save(); g.scale(w / 1000, h / 700);
+  g.fillStyle = '#e8e6df'; g.fillRect(0, 0, 1000, 700);
+  for (let i = 0; i < 9; i++) { line(g, i * 130 - 40, 0, i * 130 + 60, 700, 22, '#ffffff', 'butt'); line(g, 0, i * 100 - 20, 1000, i * 100 + 20, 16, '#ffffff', 'butt'); }
+  fillRR(g, 620, 80, 260, 200, 20, '#cfe3c8'); fillRR(g, 80, 420, 200, 180, 20, '#cfe3c8');
+  g.save(); g.translate(500, 330); poly(g, [[0, 0], [-34, -60], [34, -60]], C.red); circ(g, 0, -80, 44, C.red); circ(g, 0, -80, 16, '#fff'); g.restore();
+  fillRR(g, 300, 400, 400, 120, 16, '#ffffff'); g.font = '800 34px "M PLUS Rounded 1c"'; g.fillStyle = '#2a2530'; g.textAlign = 'center'; g.fillText('篠原', 500, 450); g.font = '500 24px "Noto Sans CJK JP"'; g.fillText('大阪府○○市△△町 2-14', 500, 492);
+  g.restore();
+}
+// 仏壇と金庫（オトンの写真）
+export function altar(g, { t = 0 } = {}) {
+  vgrad(g, -300, -300, W + 600, H + 600, [[0, '#1a1416'], [1, '#0c0a0b']]);
+  fillRR(g, 240, 240, 600, 760, 10, '#3a2418'); fillRR(g, 270, 270, 540, 700, 6, '#2a1a12');
+  glow(g, 380, 500, 160, 'rgba(255,190,110,1)', 0.35); glow(g, 700, 500, 160, 'rgba(255,190,110,1)', 0.35);
+  fillRR(g, 450, 360, 180, 230, 6, '#d9cfb4'); fillRR(g, 465, 375, 150, 200, 4, '#8a8a8e');
+  head(g, { hair: 'parted', hairC: '#2a2420', tall: 1 }, 540, 465, 52, { mouth: 'smile', eyes: 'narrow' });
+  for (const x of [380, 700]) { fillRR(g, x - 8, 520, 16, 70, 4, '#f4f1ea'); ell(g, x, 512, 8, 16, '#ffcf8a'); }
+  // 金庫
+  fillRR(g, 330, 1060, 420, 360, 16, '#3a3e48'); fillRR(g, 360, 1090, 360, 300, 10, '#4a4f5a'); circ(g, 540, 1240, 70, '#2a2e36'); circ(g, 540, 1240, 54, '#5a606a');
+  for (let i = 0; i < 12; i++) { const a = i / 12 * Math.PI * 2; line(g, 540 + Math.cos(a) * 44, 1240 + Math.sin(a) * 44, 540 + Math.cos(a) * 54, 1240 + Math.sin(a) * 54, 3, '#c9ced4'); }
+  fillRR(g, 640, 1220, 50, 40, 6, '#9aa0aa');
+}
