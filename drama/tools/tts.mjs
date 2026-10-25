@@ -118,7 +118,7 @@ for (const J of jobs) {
         else { fs.writeFileSync(raw, await ttsRetry(J.text, J.style, J.voice, M)); await sleep(6500); }
       }
     } catch (e) {
-      if ((isDaily(e) || isModel(e)) && FALLBACK.length && !MOCK) { console.log(`${MODEL} が使えない（${e.message.slice(0, 160)}）→ ${FALLBACK[0]}`); MODEL = FALLBACK.shift(); continue; }
+      if ((isDaily(e) || isModel(e)) && FALLBACK.length && !MOCK) { const nx = FALLBACK.shift(); console.log(`${M} が使えない（${e.message.slice(0, 160)}）→ ${nx}`); if (J.model) J.model = nx; MODEL = nx; continue; }
       throw e;
     }
     const out = path.join(OUT, `${J.id}.wav`);

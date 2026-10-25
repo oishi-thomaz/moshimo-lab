@@ -13,9 +13,9 @@ const T = {
   S: 'よう話してくれたな。しんどかったやろ。明日の朝、一緒に警察行こか。',
 };
 const VARIANTS = [
-  ['A', 'gemini-3.8-flash-tts', 0],
-  ['B', 'gemini-3.8-flash-tts', 1],
-  ['C', 'gemini-2.5-pro-preview-tts', 1],
+  ['1', 'gemini-2.5-pro-preview-tts', 1],
+  ['2', 'gemini-2.5-pro-preview-tts', 0],
+  ['3', 'gemini-2.5-flash-preview-tts', 1],
 ];
 export const CAST = {};
 export const LINES = [];
