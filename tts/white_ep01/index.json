@@ -66,9 +66,9 @@
   "model": "gemini-3.8-flash-tts"
  },
  "c2": {
-  "dur": 1.332,
+  "dur": 2.068,
   "voice": "Puck",
-  "text": "きどくが、つかへん。",
+  "text": "既読に、ならへん。",
   "model": "gemini-3.8-flash-tts"
  },
  "c3": {
@@ -126,9 +126,9 @@
   "model": "gemini-3.8-flash-tts"
  },
  "e1": {
-  "dur": 0.501,
+  "dur": 0.884,
   "voice": "Puck",
-  "text": "けんもんや…！",
+  "text": "やばい、検問や…！",
   "model": "gemini-3.8-flash-tts"
  },
  "e2": {
@@ -180,9 +180,9 @@
   "model": "gemini-3.8-flash-tts"
  },
  "f5": {
-  "dur": 2.644,
+  "dur": 2.726,
   "voice": "Schedar",
-  "text": "たくみくんなら、ここにおるで。",
+  "text": "先輩なら、ここにおるで。",
   "model": "gemini-3.8-flash-tts"
  },
  "f6": {
