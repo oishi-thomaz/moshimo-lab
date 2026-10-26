@@ -66,7 +66,7 @@
   "model": "gemini-2.5-pro-preview-tts"
  },
  "b4": {
-  "dur": 3.492,
+  "dur": 3.144,
   "voice": "Charon",
   "text": "明日の朝、一緒に警察行こ。俺もついてったる。",
   "model": "gemini-2.5-pro-preview-tts"
@@ -90,7 +90,7 @@
   "model": "gemini-2.5-pro-preview-tts"
  },
  "k2": {
-  "dur": 2.259,
+  "dur": 2.486,
   "voice": "Achird",
   "text": "バイトの先輩や。断ってくる。",
   "model": "gemini-2.5-pro-preview-tts"
@@ -138,9 +138,9 @@
   "model": "gemini-2.5-pro-preview-tts"
  },
  "d1": {
-  "dur": 1.329,
+  "dur": 1.88,
   "voice": "Charon",
-  "text": "金庫、無事か見とこか。",
+  "text": "きんこ、無事か、見とこか。",
   "model": "gemini-2.5-pro-preview-tts"
  },
  "d2": {
@@ -156,7 +156,7 @@
   "model": "gemini-2.5-pro-preview-tts"
  },
  "d4": {
-  "dur": 1.543,
+  "dur": 1.031,
   "voice": "Achird",
   "text": "…オトンの誕生日や。",
   "model": "gemini-2.5-pro-preview-tts"
@@ -186,7 +186,7 @@
   "model": "gemini-2.5-pro-preview-tts"
  },
  "e3": {
-  "dur": 4.901,
+  "dur": 5.036,
   "voice": "Achird",
   "text": "きどくは、つかへん。でも、これで全部終わる。そう思た。",
   "model": "gemini-2.5-pro-preview-tts"
