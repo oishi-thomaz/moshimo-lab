@@ -1,8 +1,8 @@
 {
  "r1": {
-  "dur": 6.527,
+  "dur": 5.839,
   "voice": "Achird",
-  "text": "闇バイトで脅されて、実家の金庫を狙えと言われた俺は、オカンに電話をかけた。",
+  "text": "闇バイトでおどされて、実家の金庫を狙えと言われた俺は、オカンに電話をかけた。",
   "model": "gemini-2.5-pro-preview-tts"
  },
  "r2": {
@@ -12,7 +12,7 @@
   "model": "gemini-2.5-pro-preview-tts"
  },
  "r3": {
-  "dur": 1.278,
+  "dur": 1.255,
   "voice": "Charon",
   "text": "…おかえり、ゆうまくん。",
   "model": "gemini-2.5-pro-preview-tts"
@@ -66,7 +66,7 @@
   "model": "gemini-2.5-pro-preview-tts"
  },
  "b4": {
-  "dur": 2.988,
+  "dur": 3.492,
   "voice": "Charon",
   "text": "明日の朝、一緒に警察行こ。俺もついてったる。",
   "model": "gemini-2.5-pro-preview-tts"
@@ -78,9 +78,21 @@
   "model": "gemini-2.5-pro-preview-tts"
  },
  "b6": {
-  "dur": 1.794,
+  "dur": 2.076,
   "voice": "Achird",
   "text": "誰かに、そう言うてほしかった。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "k1": {
+  "dur": 2.151,
+  "voice": "Charon",
+  "text": "…外の車、ユウマくんの友達か？",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "k2": {
+  "dur": 2.259,
+  "voice": "Achird",
+  "text": "バイトの先輩や。断ってくる。",
   "model": "gemini-2.5-pro-preview-tts"
  },
  "c1": {
@@ -90,7 +102,7 @@
   "model": "gemini-2.5-pro-preview-tts"
  },
  "c2": {
-  "dur": 1.953,
+  "dur": 2.399,
   "voice": "Achird",
   "text": "俺は降りる。もう、やらへん。",
   "model": "gemini-2.5-pro-preview-tts"
@@ -119,8 +131,14 @@
   "text": "車は、そのまま走っていった。",
   "model": "gemini-2.5-pro-preview-tts"
  },
+ "c7": {
+  "dur": 2.897,
+  "voice": "Achird",
+  "text": "近くにおるって…どういう意味や。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
  "d1": {
-  "dur": 1.971,
+  "dur": 1.329,
   "voice": "Charon",
   "text": "金庫、無事か見とこか。",
   "model": "gemini-2.5-pro-preview-tts"
@@ -132,13 +150,13 @@
   "model": "gemini-2.5-pro-preview-tts"
  },
  "d3": {
-  "dur": 1.298,
+  "dur": 1.823,
   "voice": "Charon",
   "text": "番号、ユウマくん知ってるんか？",
   "model": "gemini-2.5-pro-preview-tts"
  },
  "d4": {
-  "dur": 1.094,
+  "dur": 1.543,
   "voice": "Achird",
   "text": "…オトンの誕生日や。",
   "model": "gemini-2.5-pro-preview-tts"
@@ -156,15 +174,21 @@
   "model": "gemini-2.5-pro-preview-tts"
  },
  "e1": {
-  "dur": 3.503,
+  "dur": 3.606,
   "voice": "Achird",
   "text": "これで終わりや。俺は、カラスにメッセージを送った。",
   "model": "gemini-2.5-pro-preview-tts"
  },
  "e2": {
-  "dur": 4.197,
+  "dur": 3.738,
   "voice": "Achird",
   "text": "全部、警察に話す。もう、お前の言うことは聞かへん。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "e3": {
+  "dur": 4.901,
+  "voice": "Achird",
+  "text": "きどくは、つかへん。でも、これで全部終わる。そう思た。",
   "model": "gemini-2.5-pro-preview-tts"
  },
  "f1": {
@@ -174,7 +198,7 @@
   "model": "gemini-2.5-pro-preview-tts"
  },
  "f2": {
-  "dur": 1.77,
+  "dur": 2.092,
   "voice": "Achird",
   "text": "坂口さんの、スマホやった。",
   "model": "gemini-2.5-pro-preview-tts"
