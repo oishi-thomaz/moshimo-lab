@@ -1,0 +1,164 @@
+{
+ "r1": {
+  "dur": 4.802,
+  "voice": "Achird",
+  "text": "ミクを連れて逃げた先、オカンの職場には、坂口が先に来てた。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "a1": {
+  "dur": 5.384,
+  "voice": "Charon",
+  "text": "夜中に寄ったらな、金庫が空っぽで、ユウマくんが、ミクちゃん連れて出ていくとこやったんや。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "a2": {
+  "dur": 5.138,
+  "voice": "Charon",
+  "text": "悪い連中と、付きおうてるんちゃうか。心配でな、ここで待ってたんや。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "a3": {
+  "dur": 6.005,
+  "voice": "Achird",
+  "text": "全部、逆や。でも、ポケットのさつたばが、坂口の話を本当に見せてた。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "a4": {
+  "dur": 2.718,
+  "voice": "Sulafat",
+  "text": "ユウマ。お母さんの目、見て言うて。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "b1": {
+  "dur": 4.867,
+  "voice": "Achird",
+  "text": "ここで嘘ついたら、坂口と同じや。俺は、全部話すことにした。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "b2": {
+  "dur": 5.341,
+  "voice": "Achird",
+  "text": "オカン、ごめん。俺、闇バイトやった。お年寄りから騙し取った金、運んだ。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "b3": {
+  "dur": 2.889,
+  "voice": "Achird",
+  "text": "でも、金庫は開けてへん。開けたんは、この人や。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "b4": {
+  "dur": 2.98,
+  "voice": "Charon",
+  "text": "何を言うてんねん。証拠でもあるんか？",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "c1": {
+  "dur": 0.486,
+  "voice": "Leda",
+  "text": "…あるよ。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "c2": {
+  "dur": 2.405,
+  "voice": "Achird",
+  "text": "ミクが、スマホの再生ボタンを押した。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "c4": {
+  "dur": 2.599,
+  "voice": "Achird",
+  "text": "坂口の顔から、笑みが消えた。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "c5": {
+  "dur": 2.507,
+  "voice": "Charon",
+  "text": "…親子そろって、ほんま、ええ子やなあ。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "c6": {
+  "dur": 4.223,
+  "voice": "Achird",
+  "text": "坂口はオカンを突き飛ばして、駐車場の車へ走った。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "d1": {
+  "dur": 4.851,
+  "voice": "Achird",
+  "text": "エンジンがかかった、その瞬間。駐車場が、赤い光に包まれた。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "d2": {
+  "dur": 3.261,
+  "voice": "Orus",
+  "text": "坂口やな。エンジン切って、車から降りなさい。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "d3": {
+  "dur": 3.374,
+  "voice": "Achird",
+  "text": "パトカーの後ろから降りてきたんは…ジンやった。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "d4": {
+  "dur": 4.77,
+  "voice": "Algenib",
+  "text": "俺が、全部話した。弟も、さっき保護してもろた。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "d5": {
+  "dur": 2.445,
+  "voice": "Algenib",
+  "text": "次は、お前の番やで。ゆうま。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "e1": {
+  "dur": 6.47,
+  "voice": "Achird",
+  "text": "俺は、自分の手を見た。さつたばを運んだ手。しもんのついた手。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "e2": {
+  "dur": 3.837,
+  "voice": "Achird",
+  "text": "逃げることも、できたかもしれへん。でも。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "e3": {
+  "dur": 3.363,
+  "voice": "Achird",
+  "text": "俺も、話します。自分がやったことも、全部。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "e4": {
+  "dur": 0.922,
+  "voice": "Sulafat",
+  "text": "…一緒に、行こ。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "e5": {
+  "dur": 4.367,
+  "voice": "Achird",
+  "text": "坂口が言うたのと、同じ言葉やのに。全然ちがう温度やった。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "f1": {
+  "dur": 3.083,
+  "voice": "Achird",
+  "text": "坂口は、カラスの一羽にすぎへんかった。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "f2": {
+  "dur": 5.348,
+  "voice": "Achird",
+  "text": "今夜もどこかで、誰かのスマホに、あの白い案件が届いてる。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "x1": {
+  "dur": 1.052,
+  "voice": "Alnilam",
+  "text": "明日、空いてる？",
+  "model": "gemini-2.5-pro-preview-tts"
+ }
+}
