@@ -1,0 +1,176 @@
+{
+ "a1": {
+  "dur": 3.856,
+  "voice": "Kore",
+  "text": "本棚の上で、赤い光が点滅していた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a2": {
+  "dur": 5.148,
+  "voice": "Kore",
+  "text": "本のすき間に手を入れると、指先に、冷たいものが触れた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a3": {
+  "dur": 4.814,
+  "voice": "Kore",
+  "text": "スマホだった。カメラが、ソファに向けられている。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a4": {
+  "dur": 6.875,
+  "voice": "Kore",
+  "text": "画面には、録画中の赤い丸。今この瞬間も、私を撮っていた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b1": {
+  "dur": 1.829,
+  "voice": "Autonoe",
+  "text": "アカリ？どうしたの？",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b2": {
+  "dur": 4.059,
+  "voice": "Kore",
+  "text": "ミサキ…これ、本棚に隠してあった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b3": {
+  "dur": 4.263,
+  "voice": "Autonoe",
+  "text": "…これ、けんとのスマホ。前に使ってたやつ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b4": {
+  "dur": 5.656,
+  "voice": "Kore",
+  "text": "やまうちけんと。ミサキの彼氏で、この部屋の合い鍵を持っている。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b5": {
+  "dur": 3.447,
+  "voice": "Kore",
+  "text": "その時、そのスマホにメッセージが届いた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b6": {
+  "dur": 4.959,
+  "voice": "Schedar",
+  "text": "鬼塚さん。あと5分で着く。女を、部屋から出すな。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b7": {
+  "dur": 6.965,
+  "voice": "Autonoe",
+  "text": "けんと、最近…配信者の撮影のバイトを始めたって。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b8": {
+  "dur": 3.415,
+  "voice": "Kore",
+  "text": "けんとは、鬼塚のカメラマンだった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c1": {
+  "dur": 6.02,
+  "voice": "Fenrir",
+  "text": "どうもー！ジャスティス鬼塚です！通り魔の女の、潜伏先に来ましたー！",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c2": {
+  "dur": 2.233,
+  "voice": "Autonoe",
+  "text": "アカリ、こっち！非常口から出られる！",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c3": {
+  "dur": 2.567,
+  "voice": "Kore",
+  "text": "ミサキと一緒に、非常階段を駆け下りた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c4": {
+  "dur": 4.848,
+  "voice": "Kore",
+  "text": "地下の駐車場。ミサキの車に飛び込んで、息を殺した。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c5": {
+  "dur": 4.641,
+  "voice": "Kore",
+  "text": "車のすぐ横を、スマホを掲げた人たちが通り過ぎていく。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c6": {
+  "dur": 1.512,
+  "voice": "Autonoe",
+  "text": "…行った。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d1": {
+  "dur": 3.73,
+  "voice": "Autonoe",
+  "text": "ごめん…健人のこと、全然気づかなかった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d1b": {
+  "dur": 1.516,
+  "voice": "Kore",
+  "text": "ミサキのせいじゃないよ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d2": {
+  "dur": 7.079,
+  "voice": "Kore",
+  "text": "どうして、私なの。あの夜、ただあの道を、歩いていただけなのに。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d3": {
+  "dur": 2.854,
+  "voice": "Kore",
+  "text": "…違う。歩いていただけじゃない。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d4": {
+  "dur": 4.731,
+  "voice": "Kore",
+  "text": "あの時、私はスマホを掲げて、写真を撮っていた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d5": {
+  "dur": 4.093,
+  "voice": "Kore",
+  "text": "ミサキに送ろうとして、撮ったまま忘れていた自撮り。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e1": {
+  "dur": 6.461,
+  "voice": "Kore",
+  "text": "にじゅうさんじ、じゅうにふん。笑っている私の後ろに、暗い路地が写っていた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e2": {
+  "dur": 4.778,
+  "voice": "Kore",
+  "text": "拡大すると…暗がりに、誰か立っている。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e3": {
+  "dur": 3.1,
+  "voice": "Kore",
+  "text": "その手で光っていたのは、刃物だった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e4": {
+  "dur": 5.171,
+  "voice": "Kore",
+  "text": "その顔は…今、私を追いかけている、あの男だった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "x1": {
+  "dur": 1.771,
+  "voice": "Schedar",
+  "text": "次回。証拠。",
+  "model": "gemini-3.8-flash-tts"
+ }
+}
