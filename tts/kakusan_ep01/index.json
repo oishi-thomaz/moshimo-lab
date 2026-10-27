@@ -1,0 +1,218 @@
+{
+ "o1": {
+  "dur": 3.999,
+  "voice": "Kore",
+  "text": "朝、しちじ。スマホの通知が、止まらなかった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "o2": {
+  "dur": 4.818,
+  "voice": "Schedar",
+  "text": "昨夜の駅前通り魔。犯人はこの女。拡散希望。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "o3": {
+  "dur": 3.317,
+  "voice": "Kore",
+  "text": "写真に写っていたのは…私だった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a1": {
+  "dur": 4.696,
+  "voice": "Kore",
+  "text": "せとアカリ、にじゅうよんさい。駅前のカフェで働いている。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a2": {
+  "dur": 6.72,
+  "voice": "Kore",
+  "text": "昨日の夜、確かにあの道を通った。バイト帰りの、にじゅうさんじすぎ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a3": {
+  "dur": 5.608,
+  "voice": "Kore",
+  "text": "でも、人が刺されたなんて、今朝のニュースで初めて知った。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a4": {
+  "dur": 6.656,
+  "voice": "Kore",
+  "text": "写真の私は、スマホを手に歩いているだけ。それだけなのに。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b1": {
+  "dur": 3.322,
+  "voice": "Kore",
+  "text": "いちじかんで、名前が出た。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b2": {
+  "dur": 4.038,
+  "voice": "Schedar",
+  "text": "名前は、瀬戸アカリ。駅前のカフェの店員。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b3": {
+  "dur": 3.378,
+  "voice": "Kore",
+  "text": "にじかんで、働いている店が炎上した。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b4": {
+  "dur": 1.89,
+  "voice": "Kore",
+  "text": "そして、さんじかんで…",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b5": {
+  "dur": 5.186,
+  "voice": "Schedar",
+  "text": "住所、特定しました。まるまるハイツ、にーまるさん号室。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b6": {
+  "dur": 1.443,
+  "voice": "Kore",
+  "text": "私の部屋だった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c1": {
+  "dur": 6.096,
+  "voice": "Fenrir",
+  "text": "どうもー！ジャスティス鬼塚です！今、通り魔の犯人の家の前に来てまーす！",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c2": {
+  "dur": 6.582,
+  "voice": "Kore",
+  "text": "しじん逮捕系の配信者、ジャスティス鬼塚。フォロワーは、はちじゅうまんにん。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c3": {
+  "dur": 5.36,
+  "voice": "Fenrir",
+  "text": "瀬戸さーん！出てきてくださーい！みんな、見てますよー！",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c4": {
+  "dur": 6.03,
+  "voice": "Kore",
+  "text": "同時視聴、じゅうにまんにん。コメントは全部、私に向いていた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d1": {
+  "dur": 3.231,
+  "voice": "Kore",
+  "text": "震える手で、警察に電話した。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d2": {
+  "dur": 5.945,
+  "voice": "Gacrux",
+  "text": "瀬戸アカリさん、ですね。ちょうど、こちらからも連絡しようと思っていました。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d3": {
+  "dur": 4.544,
+  "voice": "Gacrux",
+  "text": "署まで来ていただけますか。あなたに、お話を伺いたいので。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d4": {
+  "dur": 3.499,
+  "voice": "Kore",
+  "text": "警察まで、私を疑っている。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e1": {
+  "dur": 6.224,
+  "voice": "Kore",
+  "text": "ここにいたら、終わる。私はベランダから、隣の非常階段に飛び移った。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e2": {
+  "dur": 3.581,
+  "voice": "Kore",
+  "text": "フードとマスクで顔を隠して、裏通りを走った。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e3": {
+  "dur": 6.308,
+  "voice": "Kore",
+  "text": "すれ違う人が、みんなスマホを見ている。みんなが、私を探している気がした。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e4": {
+  "dur": 2.897,
+  "voice": "Kore",
+  "text": "頼れるのは、一人しかいなかった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e5": {
+  "dur": 3.955,
+  "voice": "Autonoe",
+  "text": "アカリ？今どこ？…うちに来て。誰にも言わないから。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "f1": {
+  "dur": 8.177,
+  "voice": "Kore",
+  "text": "坂本ミサキ。高校からの親友。ミサキの部屋に入った瞬間、涙が止まらなくなった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "f2": {
+  "dur": 3.562,
+  "voice": "Autonoe",
+  "text": "大丈夫。アカリがそんなことするわけないじゃん。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "f3": {
+  "dur": 2.573,
+  "voice": "Autonoe",
+  "text": "お風呂わかしてくるね。少し休んで。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "f4": {
+  "dur": 2.395,
+  "voice": "Kore",
+  "text": "やっと、息ができた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "g1": {
+  "dur": 6.455,
+  "voice": "Kore",
+  "text": "その時、スマホが震えた。正義の目の、新しい投稿だった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "g2": {
+  "dur": 3.427,
+  "voice": "Schedar",
+  "text": "犯人の女、現在ここに潜伏中。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "g3": {
+  "dur": 2.965,
+  "voice": "Kore",
+  "text": "添付された写真は…この部屋だった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "g4": {
+  "dur": 7.058,
+  "voice": "Kore",
+  "text": "ソファに座る私を、後ろから撮った写真。投稿されたのは、いっぷんまえ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "g5": {
+  "dur": 2.212,
+  "voice": "Kore",
+  "text": "この部屋に、誰かいる。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "x1": {
+  "dur": 1.685,
+  "voice": "Schedar",
+  "text": "次回。潜伏先。",
+  "model": "gemini-3.8-flash-tts"
+ }
+}
