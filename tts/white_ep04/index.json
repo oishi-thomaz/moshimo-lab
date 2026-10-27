@@ -1,0 +1,194 @@
+{
+ "r1": {
+  "dur": 3.992,
+  "voice": "Achird",
+  "text": "助けを呼んだはずのジンは、家に上がるなり、玄関の鍵を閉めた。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "a1": {
+  "dur": 4.406,
+  "voice": "Charon",
+  "text": "車に乗せとけ。金を積んだら、こいつごと山に運ぶ。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "a2": {
+  "dur": 0.245,
+  "voice": "Algenib",
+  "text": "…はい。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "a3": {
+  "dur": 4.026,
+  "voice": "Achird",
+  "text": "ジンの手が、俺の腕をつかんだ。その手は、やっぱり震えてた。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "a4": {
+  "dur": 2.712,
+  "voice": "Charon",
+  "text": "俺はその間に、ミクちゃんに挨拶してくるわ。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "a5": {
+  "dur": 2.517,
+  "voice": "Achird",
+  "text": "坂口が、ゆっくり階段を上がっていく。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "b1": {
+  "dur": 2.693,
+  "voice": "Achird",
+  "text": "その時。ジンが、テーブルを叩いた。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "b2": {
+  "dur": 4.251,
+  "voice": "Achird",
+  "text": "さんかい。最初の夜にジンが言うてた、逃げろの合図や。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "b3": {
+  "dur": 3.035,
+  "voice": "Algenib",
+  "text": "俺が時間稼ぐ。妹連れて、にかいの窓から逃げろ。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "b4": {
+  "dur": 3.564,
+  "voice": "Achird",
+  "text": "なんでや…お前、カラスの手下ちゃうんか。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "b5": {
+  "dur": 4.816,
+  "voice": "Algenib",
+  "text": "弟が、あいつに捕まってんねん。俺も、お前と同じや。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "c1": {
+  "dur": 3.321,
+  "voice": "Achird",
+  "text": "ジンは玄関を開け放って、外に向かって叫んだ。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "c2": {
+  "dur": 2.882,
+  "voice": "Algenib",
+  "text": "カラスさん！こいつ、外に逃げよった！",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "c3": {
+  "dur": 4.292,
+  "voice": "Achird",
+  "text": "階段を駆け下りた坂口が、そのまま、夜の外へ飛び出していった。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "c4": {
+  "dur": 2.258,
+  "voice": "Achird",
+  "text": "今や。俺は、にかいへ駆け上がった。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "d1": {
+  "dur": 3.584,
+  "voice": "Achird",
+  "text": "ミクの部屋のドアを開けると…ミクは、起きてた。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "d2": {
+  "dur": 3.197,
+  "voice": "Leda",
+  "text": "お兄ちゃん…。全部、聞こえてた。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "d3": {
+  "dur": 3.627,
+  "voice": "Achird",
+  "text": "ミクの手には、スマホ。画面には、録音中の赤い丸。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "d4": {
+  "dur": 5.384,
+  "voice": "Leda",
+  "text": "床の下から、あの人の声がして。ずっと、録ってた。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "d5": {
+  "dur": 4.719,
+  "voice": "Achird",
+  "text": "行くで。俺はミクの手を引いて、窓から、いっかいの屋根に降りた。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "e1": {
+  "dur": 4.114,
+  "voice": "Achird",
+  "text": "裸足のミクの手を引いて、夜の住宅街を走った。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "e2": {
+  "dur": 5.21,
+  "voice": "Achird",
+  "text": "後ろから、車のライトが追ってくる。公園の遊具の陰に、飛び込んだ。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "e3": {
+  "dur": 2.458,
+  "voice": "Achird",
+  "text": "スマホが震えた。カラスからや。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "e4": {
+  "dur": 3.872,
+  "voice": "Alnilam",
+  "text": "逃げても無駄や。お前の行くとこなんか、ひとつしかないやろ。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "e5": {
+  "dur": 4.948,
+  "voice": "Achird",
+  "text": "行くとこなら、ある。オカンの職場や。オカンに全部話したら、終わる。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "f1": {
+  "dur": 2.998,
+  "voice": "Achird",
+  "text": "夜明け前。オカンが働く、介護施設に着いた。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "f2": {
+  "dur": 2.166,
+  "voice": "Achird",
+  "text": "入口に、オカンが立ってた。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "f3": {
+  "dur": 0.497,
+  "voice": "Achird",
+  "text": "オカン！",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "f4": {
+  "dur": 2.182,
+  "voice": "Achird",
+  "text": "でも、オカンの後ろから出てきたんは…",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "f5": {
+  "dur": 3.813,
+  "voice": "Charon",
+  "text": "ゆうまくん。金庫のお金、どこにやったんや？",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "f6": {
+  "dur": 4.737,
+  "voice": "Sulafat",
+  "text": "ユウマ…ほんまなん？そのポケットのお金、なんなん？",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "x1": {
+  "dur": 2.722,
+  "voice": "Alnilam",
+  "text": "次回、最終話。白と黒。",
+  "model": "gemini-2.5-pro-preview-tts"
+ }
+}
