@@ -114,15 +114,15 @@
   "model": "gemini-2.5-pro-preview-tts"
  },
  "d5": {
-  "dur": 4.719,
+  "dur": 4.767,
   "voice": "Achird",
   "text": "行くで。俺はミクの手を引いて、窓から、いっかいの屋根に降りた。",
   "model": "gemini-2.5-pro-preview-tts"
  },
  "e1": {
-  "dur": 4.114,
+  "dur": 3.579,
   "voice": "Achird",
-  "text": "裸足のミクの手を引いて、夜の住宅街を走った。",
+  "text": "はだしのミクの手を引いて、夜の住宅街を走った。",
   "model": "gemini-2.5-pro-preview-tts"
  },
  "e2": {
@@ -156,7 +156,7 @@
   "model": "gemini-2.5-pro-preview-tts"
  },
  "f2": {
-  "dur": 2.166,
+  "dur": 2.076,
   "voice": "Achird",
   "text": "入口に、オカンが立ってた。",
   "model": "gemini-2.5-pro-preview-tts"
@@ -168,7 +168,7 @@
   "model": "gemini-2.5-pro-preview-tts"
  },
  "f4": {
-  "dur": 2.182,
+  "dur": 2.395,
   "voice": "Achird",
   "text": "でも、オカンの後ろから出てきたんは…",
   "model": "gemini-2.5-pro-preview-tts"
