@@ -1,0 +1,182 @@
+{
+ "r1": {
+  "dur": 5.88,
+  "voice": "Achird",
+  "text": "全部、警察に話す。カラスにそう送った瞬間、坂口さんのスマホが震えた。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "a1": {
+  "dur": 4.25,
+  "voice": "Achird",
+  "text": "坂口さんは、震えるスマホを手に取って、ゆっくり、俺に画面を向けた。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "a2": {
+  "dur": 1.866,
+  "voice": "Charon",
+  "text": "カラスはな、俺や。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "a3": {
+  "dur": 5.301,
+  "voice": "Achird",
+  "text": "頭が、真っ白になった。オカンの恋人が…カラス？",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "a4": {
+  "dur": 7.96,
+  "voice": "Charon",
+  "text": "夕飯の写真も、お母さんの職場の写真も、全部、この家から撮ったんや。ええ家族やなあ。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "b1": {
+  "dur": 4.757,
+  "voice": "Achird",
+  "text": "なんでや。なんで俺に、自分の家を襲わせたんや。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "b2": {
+  "dur": 7.195,
+  "voice": "Charon",
+  "text": "金庫の中は、お父さんの保険金やろ。俺がとったら、ただの泥棒や。警察も動く。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "b3": {
+  "dur": 5.346,
+  "voice": "Charon",
+  "text": "でも、息子がとったら、どうや。お母さんは、警察に言われへん。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "b4": {
+  "dur": 7.389,
+  "voice": "Achird",
+  "text": "背中が、冷たくなった。この男は、オカンの優しさまで計算に入れてた。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "c1": {
+  "dur": 6.555,
+  "voice": "Achird",
+  "text": "俺はスマホを出した。ひゃくとおばんを押そうとした指が、止まった。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "c2": {
+  "dur": 5.253,
+  "voice": "Charon",
+  "text": "ええよ、かけても。お前がさつたば運んでる写真、ちゃんと持ってるからな。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "c3": {
+  "dur": 5.912,
+  "voice": "Charon",
+  "text": "捕まるのは、お前が先や。そしたらミクちゃん、ひとりやなあ。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "c4": {
+  "dur": 2.33,
+  "voice": "Achird",
+  "text": "にかいで寝てるミクの顔が、浮かんだ。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "d1": {
+  "dur": 6.161,
+  "voice": "Achird",
+  "text": "坂口さんは、金庫の前にしゃがんだ。オトンの誕生日。俺が教えた番号や。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "d2": {
+  "dur": 3.95,
+  "voice": "Achird",
+  "text": "中には、おびのついたさつたばが、ぎっしり詰まってた。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "d3": {
+  "dur": 1.095,
+  "voice": "Charon",
+  "text": "手袋、外し。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "d4": {
+  "dur": 5.429,
+  "voice": "Charon",
+  "text": "お前のしもんつけて、お前がとったことにするんや。ほら、持ち。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "d5": {
+  "dur": 7.751,
+  "voice": "Achird",
+  "text": "さつたばを、握らされた。ずしりと重い、オトンの命の値段やった。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "d6": {
+  "dur": 3.331,
+  "voice": "Charon",
+  "text": "ポケットにも、ひとつ入れといたるわ。おだちんや。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "e1": {
+  "dur": 6.252,
+  "voice": "Achird",
+  "text": "その時、ポケットの中で、紙に指が触れた。ジンがくれた番号や。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "e2": {
+  "dur": 4.622,
+  "voice": "Achird",
+  "text": "坂口さんがさつたばを数えてる隙に、ポケットの中で、その番号にかけた。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "e3": {
+  "dur": 1.416,
+  "voice": "Achird",
+  "text": "頼む。出てくれ。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "e4": {
+  "dur": 2.645,
+  "voice": "Achird",
+  "text": "さんぷんご。玄関のチャイムが鳴った。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "e5": {
+  "dur": 1.369,
+  "voice": "Charon",
+  "text": "…誰や、こんな時間に。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "e6": {
+  "dur": 4.557,
+  "voice": "Achird",
+  "text": "ドアの向こうに立ってたんは、ジンやった。助かった。そう思た。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "f1": {
+  "dur": 4.502,
+  "voice": "Achird",
+  "text": "ジンは、黙って家に上がると、後ろ手で、玄関の鍵を閉めた。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "f2": {
+  "dur": 2.519,
+  "voice": "Algenib",
+  "text": "カラスさん。こいつ、どうします？",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "f3": {
+  "dur": 1.034,
+  "voice": "Charon",
+  "text": "ご苦労さん、ジン。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "f4": {
+  "dur": 3.578,
+  "voice": "Achird",
+  "text": "助けを呼んだはずの番号は、カラスの巣につながってた。",
+  "model": "gemini-2.5-pro-preview-tts"
+ },
+ "x1": {
+  "dur": 1.559,
+  "voice": "Alnilam",
+  "text": "次回。相棒。",
+  "model": "gemini-2.5-pro-preview-tts"
+ }
+}
