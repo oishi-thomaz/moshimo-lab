@@ -126,5 +126,5 @@ export function callScreen(g, w, h, { t = 0, name = '', sub = '', mode = 'callin
   text(g, name, w / 2, h * 0.28 + 190, { size: 56, color: '#fff', weight: 800 });
   text(g, mode === 'calling' ? '発信中…' : sub, w / 2, h * 0.28 + 260, { size: 34, color: '#9aa5bb', weight: 500 });
   if (mode === 'calling') { const p = (t * 1.2) % 1; g.save(); g.globalAlpha = 1 - p; g.lineWidth = 6; g.strokeStyle = '#7ce0a0'; g.beginPath(); g.arc(w / 2, h * 0.28, 120 + p * 120, 0, 7); g.stroke(); g.restore(); }
-  circ(g, w / 2, h * 0.84, 70, K.red); fillRR(g, w / 2 - 34, h * 0.84 - 9, 68, 18, 9, '#fff');
+  circ(g, w / 2, h * 0.64, 70, K.red); fillRR(g, w / 2 - 34, h * 0.64 - 9, 68, 18, 9, '#fff');
 }

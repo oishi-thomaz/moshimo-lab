@@ -83,8 +83,8 @@ const SHOTS = [
   { at: 'b3', draw(g, lt, D, S) {
     bg(g); chip(g, '拡散から2時間', 1);
     const h1 = postCard(g, 60, 340, 960, { name: 'cafe hitotoki 駅前店', handle: '@hitotoki_ekimae', avatar: 'cafe', text: '本日は臨時休業とさせていただきます。', rt: 900, likes: 300, views: 120000, time: '4時間' });
-    const R = ['従業員の管理どうなってんの', '二度と行かない', '店員の名前出せよ', '犯人雇ってた店はここです'];
-    R.forEach((s, i) => { const a = inv(0.4 + i * 0.5, 0.7 + i * 0.5, lt); if (a <= 0) return; g.save(); g.globalAlpha = a; postCard(g, 110, 340 + h1 + 20 + i * 220, 910, { name: ['名無し', 'まさ', 'ゆい', 'ken'][i], handle: ['@nanashi', '@masa_0', '@yui_y', '@ken_k'][i], avatar: i + 2, text: s, rt: 50 + i * 30, likes: 200 + i * 90, views: 9000, time: '3時間' }); g.restore(); });
+    const R = ['従業員の管理どうなってんの', '犯人雇ってた店はここです'];
+    R.forEach((s, i) => { const a = inv(0.4 + i * 0.8, 0.7 + i * 0.8, lt); if (a <= 0) return; g.save(); g.globalAlpha = a; postCard(g, 110, 340 + h1 + 20 + i * 195, 910, { name: ['名無し', 'ken'][i], handle: ['@nanashi', '@ken_k'][i], avatar: i + 2, text: s, rt: 50 + i * 30, likes: 200 + i * 90, views: 9000, time: '3時間' }); g.restore(); });
     sfxText(g, '炎上', 860, 300, { size: 120, color: K.orange, alpha: inv(1.0, 1.3, lt), rot: 0.1 });
   } },
   { at: 'b4', draw(g, lt, D, S) { bg(g, '#05060a', '#0b0d14'); chip(g, '拡散から3時間', 1); bigCounter(g, 540, 820, ramp(lt, 0, D + 3, 52000, 98000), { size: 160 }); } },
