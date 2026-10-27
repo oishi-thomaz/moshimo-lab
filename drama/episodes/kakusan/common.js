@@ -1,5 +1,5 @@
 // #拡散希望 の共通部品：表紙（第◯話を大きく）・エンドカード・見出しチップ
-import { W, H, clamp, lerp, inv, ease, easeOut, back, noise1, rr, fillRR, circ, vgrad, glow, rgba, text, poly, FONT } from '../../engine/core.js';
+import { W, H, clamp, lerp, inv, ease, easeOut, back, noise1, rr, fillRR, circ, vgrad, glow, rgba, text, poly, FONT, SERIF } from '../../engine/core.js';
 import { C } from '../../engine/noir.js';
 import { K, avatar, bigCounter } from '../../engine/sns.js';
 
@@ -54,6 +54,18 @@ export function cover(g, lt, { no, title, back: drawBack, face, pill, count = 52
 export function endCard(g, lt, { SERIES, EPISODE }) {
   vgrad(g, -300, -300, W + 600, H + 600, [[0, '#05070b'], [1, '#0b0f16']]);
   const a = easeOut(inv(0.1, 0.5, lt));
+  if (!EPISODE.next) { // 最終話：完
+    seriesTitle(g, 540, 560, 120, a);
+    const b = easeOut(inv(0.6, 1.1, lt));
+    poly(g, [[300, 660], [780, 640], [782, 650], [302, 672]], rgba(K.orange, b));
+    text(g, '完', 540, 820, { size: 180, color: '#f4f6f8', weight: 900, alpha: b, font: SERIF });
+    const c = easeOut(inv(1.5, 2.0, lt));
+    g.save(); g.globalAlpha = c; g.font = `800 38px ${FONT}`; const w = g.measureText(EPISODE.ask).width + 90; fillRR(g, 540 - w / 2, 990, w, 90, 45, K.orange); text(g, EPISODE.ask, 540, 1036, { size: 38, color: '#fff' }); g.restore();
+    const d = easeOut(inv(2.2, 2.6, lt));
+    text(g, SERIES.account, 540, 1210, { size: 56, color: '#f4f6f8', alpha: d, spacing: 8 });
+    text(g, '全5話　ご覧いただきありがとうございました', 540, 1280, { size: 30, color: '#8a8f9c', alpha: d, weight: 500 });
+    return;
+  }
   seriesTitle(g, 540, 470, 80, a * 0.85);
   text(g, `第${EPISODE.no}話「${EPISODE.title}」終`, 540, 570, { size: 42, color: '#c9ccd6', alpha: a });
   const b = easeOut(inv(0.6, 1.1, lt));
