@@ -25,6 +25,12 @@ export const CAST2 = {
   miku: { hair: 'pony', hairC: '#20171a', top: '#2e3b63', top2: '#24304f', bottom: '#2e3b63', shoes: '#eee', tall: 0.9, female: true, jersey: true },
   officer: { hair: 'police', hairC: '#1b1b1f', top: '#1e2a44', top2: '#162036', bottom: '#1e2a44', shoes: '#111', tall: 1.0 },
   sakaguchi: { hair: 'parted', hairC: '#5a5450', top: '#b9a88c', top2: '#a39276', bottom: '#3a3a44', shoes: '#2a2018', tall: 1.0, glasses: true, cardigan: true },
+  // #拡散希望
+  akari: { hair: 'bob', hairC: '#2a1e1c', top: '#8a96a8', top2: '#6f7b8e', hood: true, bottom: '#2a2e3a', shoes: '#e8e8e8', tall: 0.95, female: true },
+  misaki: { hair: 'long', hairC: '#5a3a2a', top: '#d9c8b4', top2: '#c4b29c', bottom: '#4a4a58', shoes: '#ddd', tall: 0.95, female: true },
+  onizuka: { hair: 'cap', hairC: '#1a1a20', capC: '#16161c', capMark: '#ff6a2b', top: '#e8572a', top2: '#c9461f', bottom: '#1c1c22', shoes: '#f0f0f0', tall: 1.08 },
+  kento: { hair: 'messy', hairC: '#3a2a1e', top: '#3d4a3a', top2: '#2f3a2d', bottom: '#2a2a30', shoes: '#ccc', tall: 1.02 },
+  makabe: { hair: 'parted', hairC: '#3a3a3e', top: '#2e3440', top2: '#252a34', bottom: '#2e3440', shoes: '#111', tall: 1.0 },
   takumi: { hair: 'parted', hairC: '#3a2a20', top: '#b8b2a6', top2: '#a49e92', bottom: '#2a2e38', shoes: '#ddd', tall: 1.0 },
 };
 const INK = '#141218';
@@ -59,7 +65,10 @@ function hairBack(g, x, y, r, P) {
   const c = P.hairC;
   if (P.hair === 'tied') { circ(g, x + r * 0.2, y - r * 1.0, r * 0.32, c); }
   if (P.hair === 'pony') { g.save(); g.translate(x + r * 0.7, y - r * 0.5); g.rotate(0.5); ell(g, 0, r * 0.45, r * 0.22, r * 0.6, c); g.restore(); }
+  if (P.hair === 'long') { fillRR(g, x - r * 1.12, y - r * 0.6, r * 2.24, r * 2.3, r * 0.5, c); }
+  if (P.hair === 'bob') { fillRR(g, x - r * 1.1, y - r * 0.7, r * 2.2, r * 1.6, r * 0.45, c); }
 }
+const o2turn = (tt, r) => tt * 1.5;
 function hairFront(g, x, y, r, P, t = 0) {
   const c = P.hairC, tt = t * r * 0.2;
   g.fillStyle = c; g.beginPath();
@@ -78,6 +87,16 @@ function hairFront(g, x, y, r, P, t = 0) {
   } else if (P.hair === 'tied' || P.hair === 'pony') {
     g.moveTo(x - r * 1.0, y + r * 0.1); g.quadraticCurveTo(x - r * 1.05, y - r * 1.15, x + tt, y - r * 1.12); g.quadraticCurveTo(x + r * 1.05, y - r * 1.15, x + r * 1.0, y + r * 0.1);
     g.lineTo(x + r * 0.85, y - r * 0.35); g.quadraticCurveTo(x + r * 0.2 + tt, y - r * 0.7, x - r * 0.3 + tt, y - r * 0.42); g.quadraticCurveTo(x - r * 0.7, y - r * 0.55, x - r * 0.85, y - r * 0.3); g.closePath(); g.fill();
+  } else if (P.hair === 'bob' || P.hair === 'long') {
+    // ぱっつん気味の前髪＋頭の丸み
+    g.moveTo(x - r * 1.08, y + r * 0.2); g.quadraticCurveTo(x - r * 1.12, y - r * 1.2, x + tt, y - r * 1.16); g.quadraticCurveTo(x + r * 1.12, y - r * 1.2, x + r * 1.08, y + r * 0.2);
+    g.lineTo(x + r * 0.9, y + r * 0.2); g.lineTo(x + r * 0.86, y - r * 0.3); g.quadraticCurveTo(x + tt, y - r * 0.42, x - r * 0.86, y - r * 0.3); g.lineTo(x - r * 0.9, y + r * 0.2); g.closePath(); g.fill();
+  } else if (P.hair === 'cap') {
+    // キャップ（つばを前に）
+    g.moveTo(x - r * 1.02, y - r * 0.3); g.quadraticCurveTo(x - r * 1.0, y - r * 1.25, x, y - r * 1.22); g.quadraticCurveTo(x + r * 1.0, y - r * 1.25, x + r * 1.02, y - r * 0.3); g.closePath();
+    g.fillStyle = P.capC || '#1a1a20'; g.fill();
+    g.beginPath(); g.ellipse(x + (o2turn(tt, r)), y - r * 0.32, r * 1.15, r * 0.2, 0, 0, Math.PI * 2); g.fillStyle = P.capC || '#1a1a20'; g.fill();
+    fillRR(g, x - r * 0.28, y - r * 1.0, r * 0.56, r * 0.32, r * 0.08, P.capMark || '#ff6a2b');
   } else if (P.hair === 'parted') {
     g.moveTo(x - r * 1.0, y); g.quadraticCurveTo(x - r * 1.05, y - r * 1.2, x - r * 0.1, y - r * 1.12); g.quadraticCurveTo(x + r * 1.1, y - r * 1.1, x + r * 1.0, y);
     g.lineTo(x + r * 0.8, y - r * 0.45); g.quadraticCurveTo(x - r * 0.2, y - r * 0.85, x - r * 0.9, y - r * 0.35); g.closePath(); g.fill();

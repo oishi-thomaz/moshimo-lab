@@ -330,6 +330,41 @@ def fx_vibrate(rng, e):
     gate = ((t % 0.75) < 0.42).astype(float); gate = np.convolve(gate, np.ones(300) / 300, mode='same')
     x = (np.sign(sine(160, n)) * 0.4 + sine(160, n)) * gate + bp(noise(n, rng), 120, 900) * gate * 0.3
     return st(bp(x, 80, 2500) * 0.7)
+# ---- #拡散希望 用 ----
+def ping1(rng, f=1760):
+    m = int(0.18 * SR); tt = np.arange(m) / SR
+    return (sine(f, m) + 0.4 * sine(f * 1.5, m)) * np.exp(-tt * 28) * np.minimum(1, tt / 0.001)
+def fx_ping(rng, e):
+    # 投稿アプリの通知：短く軽い1音
+    x = np.zeros(int(0.4 * SR)); p = ping1(rng); x[:len(p)] += p
+    return reverb(st(norm(x) * 0.6), rng, 0.6, 0.2)
+def fx_pingstorm(rng, e):
+    # 通知が止まらない：だんだん間隔が詰まって重なっていく
+    n = int(e.get('dur', 3) * SR); out = np.zeros(n); t = 0.0; k = 0
+    while t < e.get('dur', 3) - 0.2:
+        s = int(t * SR); p = ping1(rng, [1760, 1568, 1976, 1318][k % 4]) * (0.5 + 0.5 * rng.random()); out[s:s + len(p)] += p[: n - s]
+        t += max(0.04, 0.35 * np.exp(-t * 0.9)) * (0.6 + 0.8 * rng.random()); k += 1
+    out *= np.minimum(1, np.arange(n) / SR / 0.05)
+    return reverb(st(norm(out) * 0.7), rng, 0.8, 0.25)
+def fx_crowd(rng, e):
+    # ドアの外の人だかり：ざわめき（声の帯域のノイズを揺らす）
+    n = int(e.get('dur', 6) * SR); t = np.arange(n) / SR; x = np.zeros(n)
+    for k in range(7):
+        f0 = 180 + rng.random() * 300; b = bp(noise(n, rng), f0, f0 * 3.2)
+        x += b * (0.4 + 0.6 * np.abs(np.sin(t * (1.3 + rng.random() * 2.5) + k))) 
+    x = bp(x, 150, 2500)
+    f = np.minimum(1, t / 0.8) * np.minimum(1, (t[-1] - t) / 0.8)
+    return st(norm(x) * f * 0.5, 0.0)
+def fx_pound(rng, e):
+    # ドアを強く叩く（n回）
+    n = int(e.get('dur', 1.6) * SR); out = np.zeros(n)
+    for i in range(e.get('n', 4)):
+        s = int((0.05 + i * 0.32) * SR)
+        if s >= n: break
+        m = int(0.25 * SR); tt = np.arange(m) / SR
+        k = (bp(noise(m, rng), 60, 900) * 1.4 + sine(70, m)) * np.exp(-tt * 26)
+        out[s:s + m] += k[: n - s]
+    return reverb(st(norm(out) * 0.9), rng, 0.7, 0.25)
 def fx_doorbell_open(rng, e):
     return fx_creak(rng, e)
 
