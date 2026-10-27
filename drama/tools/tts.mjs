@@ -41,7 +41,7 @@ if (args.test) {
   const mod = await import(pathToFileURL(path.resolve(args.script)).href);
   if (Array.isArray(mod.TTS_FALLBACK)) FALLBACK.splice(0, FALLBACK.length, ...mod.TTS_FALLBACK);
   for (const L of mod.LINES) {
-    if (!L.id) continue;
+    if (!L.id || L.reuse) continue; // reuse の行は前の話の声を使う（build 時に reuse.mjs がコピー）
     const c = mod.CAST[L.who];
     const text = (L.read || plain(L.text)).trim();
     if (!text) continue;

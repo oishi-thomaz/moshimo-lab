@@ -5,6 +5,8 @@ set -euo pipefail
 EP="${1:?ep}"; TTS="${2:?tts dir}"; OUT="${3:?out prefix}"
 cd "$(dirname "$0")/../.."
 mkdir -p "$(dirname "$OUT")"
+# 前の話の声をそのまま使う行があればコピーする
+node drama/tools/reuse.mjs --script "drama/episodes/${EP}.script.js" --tts "$TTS"
 node drama/tools/render.mjs --ep "$EP" --tts "$TTS/index.json" --meta "${OUT}.json"
 python3 drama/tools/audio.py --meta "${OUT}.json" --tts "$TTS" --out "$OUT"
 node drama/tools/render.mjs --ep "$EP" --tts "$TTS/index.json" --out "${OUT}_video.mp4"
