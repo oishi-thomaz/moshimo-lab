@@ -69,11 +69,11 @@ export function albumScreen(g, w, h, { t = 9, hi = 0, title = 'アカリとミ�
   if (hi > 0) { const x = gap, y = 240; g.save(); g.globalAlpha = hi; g.lineWidth = 10; g.strokeStyle = K.orange; rr(g, x - 4, y - 4, cw + 8, cw + 8, 10); g.stroke(); fillRR(g, x + 12, y + cw - 56, 130, 44, 22, 'rgba(0,0,0,.7)'); text(g, '23:12', x + 77, y + cw - 34, { size: 28, color: '#fff' }); g.restore(); }
 }
 // 写真を消す画面
-export function deleteScreen(g, w, h, { k = 0, img } = {}) {
+export function deleteScreen(g, w, h, { k = 0, img, ask = 'この写真を削除しますか？', done = '写真を削除しました' } = {}) {
   g.fillStyle = '#000'; g.fillRect(0, 0, w, h);
   if (k < 1) { g.save(); g.globalAlpha = 1 - clamp((k - 0.6) / 0.3); rr(g, 0, 170, w, h - 340, 0); g.clip(); g.translate(0, 170); img(g, w, h - 340); g.restore(); }
-  if (k > 0.05 && k < 0.6) { g.fillStyle = 'rgba(0,0,0,.55)'; g.fillRect(0, 0, w, h); fillRR(g, 60, h / 2 - 170, w - 120, 340, 30, '#2a2f38'); text(g, 'この写真を削除しますか？', w / 2, h / 2 - 80, { size: 40, color: '#fff' }); line(g, 60, h / 2 + 10, w - 60, h / 2 + 10, 2, '#454b56', 'butt'); text(g, '削除', w / 2, h / 2 + 90, { size: 46, color: K.red }); }
-  if (k >= 0.6) { const a = clamp((k - 0.6) / 0.2); g.save(); g.globalAlpha = a; fillRR(g, 80, h / 2 - 60, w - 160, 120, 60, 'rgba(255,255,255,.12)'); text(g, '写真を削除しました', w / 2, h / 2, { size: 42, color: '#fff' }); g.restore(); }
+  if (k > 0.05 && k < 0.6) { g.fillStyle = 'rgba(0,0,0,.55)'; g.fillRect(0, 0, w, h); fillRR(g, 60, h / 2 - 170, w - 120, 340, 30, '#2a2f38'); text(g, ask, w / 2, h / 2 - 80, { size: Math.min(40, (w - 180) / ask.length * 1.05), color: '#fff' }); line(g, 60, h / 2 + 10, w - 60, h / 2 + 10, 2, '#454b56', 'butt'); text(g, '削除', w / 2, h / 2 + 90, { size: 46, color: K.red }); }
+  if (k >= 0.6) { const a = clamp((k - 0.6) / 0.2); g.save(); g.globalAlpha = a; fillRR(g, 80, h / 2 - 60, w - 160, 120, 60, 'rgba(255,255,255,.12)'); text(g, done, w / 2, h / 2, { size: Math.min(42, (w - 200) / done.length * 1.05), color: '#fff' }); g.restore(); }
 }
 // アカウントの切り替え（ジャスティス鬼塚／正義の目）
 export function acctScreen(g, w, h, { t = 9 } = {}) {

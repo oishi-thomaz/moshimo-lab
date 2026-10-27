@@ -4,7 +4,7 @@ import { C, CAST2, figure, close, speedLines, sfxText, mood, subBand } from '../
 import { K, short, appIcon, avatar, postCard, bigCounter, trendList, phoneFrame, liveView } from '../../engine/sns.js';
 import { akariRoom } from '../../engine/kakusets.js';
 import { parkingLot } from '../../engine/noirsets2.js';
-import { selfiePhoto, girlPhoto, warehouse, tiedChair, droppedPhone, sirenDoor, chatScreen, thumbOver, nightSky } from '../../engine/kakusets2.js';
+import { selfiePhoto, girlPhoto, warehouse, tiedChair, droppedPhone, sirenDoor, chatScreen, thumbOver, nightSky, acctScreen } from '../../engine/kakusets2.js';
 import { runEpisode } from '../../engine/player.js';
 import { talking, bg, slow, heads, cover as coverBase, endCard, chip } from './common.js';
 import { SERIES, EPISODE, CAST, LINES } from './ep05.script.js';
@@ -69,8 +69,8 @@ const SHOTS = [
   { at: 'c3', draw(g, lt, D, S) { dark(g); face(g, 'onizuka', lt, D, S, ['c3'], { eyes: 'narrow', brow: 0.6, mouth: 'smile', turn: 0.3, look: 0.6 }); } },
   { at: 'c4', draw(g, lt, D, S) { dark(g); face(g, 'makabe', lt, D, S, ['c4', 'c5'], { eyes: 'narrow', brow: 0.3, mouth: 'line', turn: -0.2, look: -0.4 }); } },
   { at: 'c5', draw(g, lt, D, S) {
-    const sw = S.L('c5') + (S.Le('c5') - S.L('c5')) * 0.45;
-    if (lt < sw) { g.save(); cam(g, { x: 540, y: 1050, z: 1.0 }); warehouse(g, { t: lt }); figure(g, P.kento, { x: 760, y: 1620, s: 1.2, arms: [10, 0, 10, 0], eyes: 'closed', brow: -0.8, mouth: 'frown', lookY: 0.8 }); figure(g, { ...P.officer }, { x: 920, y: 1640, s: 1.2, turn: -0.4, look: -1, arms: [10, 0, 60, -40], eyes: 'narrow' }); g.restore(); }
+    const sw = S.L('c5') + (S.Le('c5') - S.L('c5')) * 0.4;
+    if (lt < sw) { dark(g); face(g, 'makabe', lt, D, S, ['c5'], { eyes: 'narrow', brow: 0.3, mouth: 'line', turn: -0.2, look: -0.4 }); g.save(); g.translate(800, 960); g.rotate(0.08); phoneFrame(g, -150, -260, 300, 520, (p, w, h) => { p.save(); p.scale(0.62, 0.62); acctScreen(p, w / 0.62, h / 0.62, { t: 9 }); p.restore(); }); g.restore(); }
     else { dark(g); face(g, 'onizuka', lt, D, S, [], { eyes: 'wide', brow: -0.2, mouth: 'line', sweat: lt * 1.5 }); }
   } },
   { at: 'c6', draw(g, lt, D, S) {

@@ -16,7 +16,7 @@ const COLD = Os('カメラが止まった後の素顔。陽気さは消え、低
 export const LINES = [
   // ── 前回
   { beat: 'recap', dur: 0.6 },
-  { id: 'r1', who: 'A', text: '鬼塚は私のスマホを奪い、／あの写真を、[[r:消した。]]', reuse: 'kakusan_ep03/e1', gap: 0.3 },
+  { id: 'r1', who: 'A', text: '鬼塚は私のスマホを奪い、／投稿も、あの写真も、[[r:全部消した。]]', reuse: 'kakusan_ep03/e1', gap: 0.3 },
   { id: 'r2', who: 'OL', text: '[[r:もう、誰もお前を信じない。]]', reuse: 'kakusan_ep03/e2', gap: 0.5 },
   { beat: 'title', dur: 2.2 },
 

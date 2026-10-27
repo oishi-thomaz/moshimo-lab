@@ -38,7 +38,7 @@ export function cover(g, lt = 9) {
 
 const SHOTS = [
   // ── 前回
-  { at: 'recap', draw(g, lt, D, S) { dark(g); phoneFrame(g, 190, 180, 700, 1260, (p, w, h) => deleteScreen(p, w, h, { k: 0.3 + clamp(lt / 3) * 0.7, img: (q, iw, ih) => selfiePhoto(q, iw, ih) })); recapTag(g); } },
+  { at: 'recap', draw(g, lt, D, S) { dark(g); phoneFrame(g, 190, 180, 700, 1260, (p, w, h) => deleteScreen(p, w, h, { k: 0.3 + clamp(lt / 3) * 0.7, img: (q, iw, ih) => selfiePhoto(q, iw, ih), ask: '投稿と写真を削除しますか？', done: '投稿と写真を削除しました' })); recapTag(g); } },
   { at: 'r2', finish: { vignette: 0.85 }, draw(g, lt, D, S) { dark(g); g.save(); cam(g, { x: 640, y: 780, z: slow(lt, D, 1.3, 1.4) }); close(g, P.onizuka, { y: 760, s: 4.0, eyes: 'narrow', brow: 0.9, mouth: 'line', lightFrom: 'left', turn: 0.5, look: 0.8 }); g.restore(); mood(g, { red: 0.14 }); recapTag(g, 1 - inv(D - 0.3, D, lt)); } },
   { at: 'title', noSubs: true, finish: { vignette: 0.55, grainA: 0.1 }, draw(g, lt) { bg(g, '#030305', '#08090e'); cover(g, lt); } },
 
