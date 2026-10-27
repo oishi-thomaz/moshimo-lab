@@ -133,7 +133,7 @@ const SHOTS = [
   { at: 'f6', finish: { vignette: 0.6 }, draw(g, lt, D, S) {
     const sw = S.L('f6') + (S.Le('f6') - S.L('f6')) * 0.42;
     if (lt < sw) { vgrad(g, -300, -300, W + 600, H + 600, [[0, '#3a3046'], [1, '#1a1420']]); face(g, 'mom', lt, D, S, ['f6'], { eyes: 'wide', brow: -0.7, mouth: 'line', lightFrom: 'right' }); }
-    else { g.save(); cam(g, { x: 560, y: 960, z: lerp(1.0, 1.2, easeOut(inv(sw, D, lt))) }); pocketMoney(g, { t: lt, k: 0.3 }); g.restore(); mood(g, { red: 0.2 * inv(sw, sw + 1, lt) }); }
+    else { g.save(); cam(g, { x: 560, y: 960, z: lerp(1.0, 1.2, easeOut(inv(sw, D, lt))) }); pocketMoney(g, { t: lt, k: 1 }); g.restore(); mood(g, { red: 0.2 * inv(sw, sw + 1, lt) }); }
     if (lt > S.Le('f6') + 0.6) { g.fillStyle = '#000'; g.fillRect(0, 0, W, H); }
   } },
   { at: 'end', noSubs: true, finish: { vignette: 0.6, grainA: 0.1 }, draw(g, lt) { endCard(g, lt, { SERIES, EPISODE }); } },
