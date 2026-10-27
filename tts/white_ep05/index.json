@@ -54,9 +54,9 @@
   "model": "gemini-2.5-pro-preview-tts"
  },
  "c1": {
-  "dur": 0.52,
+  "dur": 2.216,
   "voice": "Leda",
-  "text": "あるよ。",
+  "text": "あるよ。ここに、全部。",
   "model": "gemini-2.5-pro-preview-tts"
  },
  "c2": {
