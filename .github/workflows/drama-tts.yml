@@ -40,7 +40,8 @@ jobs:
           restore-keys: drama-tts-
       - name: TTS
         env:
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          # ドラマ専用のキーがあればそれを使う（もしもラボと1日の上限を分ける）
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY_DRAMA || secrets.GEMINI_API_KEY }}
         run: |
           node drama/tools/tts.mjs --script "${{ github.event.inputs.script }}" --out "tts/${{ github.event.inputs.name }}" ${{ github.event.inputs.test == '1' && '--test 1' || '' }} ${{ github.event.inputs.test == 'models' && '--models 1' || '' }}
       - name: Save voice cache（途中で止まっても作れた分は残す）
