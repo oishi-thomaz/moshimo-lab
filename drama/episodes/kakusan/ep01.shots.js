@@ -155,7 +155,7 @@ const SHOTS = [
   { at: 'turn', finish: { vignette: 0.75 }, draw(g, lt, D, S) {
     // ソファから振り返る：本棚の上で赤い光
     const k = ease(clamp(lt / D));
-    g.save(); cam(g, { x: lerp(540, 200, k), y: lerp(1000, 420, k), z: lerp(1.0, 2.6, k) }); misakiRoom(g, { t: lt, redDot: 1, bath: 1 }); g.restore();
+    g.save(); cam(g, { x: lerp(540, 200, k), y: lerp(1000, 420, k), z: lerp(1.0, 2.6, k) }); misakiRoom(g, { t: lt, redDot: 0.6, bath: 1 }); g.restore();
   } },
   { at: 'g5', finish: { vignette: 0.8 }, draw(g, lt, D, S) {
     warm(g); face(g, 'akari', lt, D, S, [], { eyes: 'wide', brow: -1, mouth: 'line', turn: -0.5, look: -1, lookY: -0.4, z1: 1.16 });
@@ -194,7 +194,7 @@ const SFX = [
   { at: 'e2', type: 'wind', dur: 9, vol: 0.25 },
   { at: 'e5', off: -0.4, type: 'pickup', vol: 0.6 },
   { at: 'f1', type: 'roomtone', dur: 18, vol: 0.3 },
-  { at: 'f3', off: 1.5, type: 'faucet', dur: 6, vol: 0.25 },
+  { at: 'f3', off: 1.5, type: 'faucet', dur: 40, vol: 0.2 },
   { at: 'g1', type: 'vibrate', dur: 1.4, vol: 0.9 },
   { at: 'g2', type: 'ping', vol: 0.6 },
   { at: 'g3', off: 0.4, type: 'stinger', vol: 0.6 },
