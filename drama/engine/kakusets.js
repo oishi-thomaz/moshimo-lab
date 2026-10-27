@@ -89,7 +89,7 @@ export function misakiRoom(g, { t = 0, redDot = 0, bath = 1 } = {}) {
   glow(g, 540, 300, 700, 'rgba(255,214,160,1)', 0.25);
   // 本棚（左上）
   fillRR(g, 40, 280, 300, 760, 8, '#6a4a32'); for (let r = 0; r < 4; r++) { fillRR(g, 56, 300 + r * 185, 268, 160, 4, '#3a2a1e'); for (let i = 0; i < 6; i++) fillRR(g, 66 + i * 42, 320 + r * 185 + (i % 3) * 10, 32, 140 - (i % 3) * 10, 3, ['#8a5a4a', '#4a6a8a', '#d9c8a4', '#6a8a5a', '#a4a4b4', '#8a6aa4'][(i + r) % 6]); }
-  if (redDot > 0 && Math.sin(t * 6) > 0) { circ(g, 260, 340, 7, '#ff2a2a'); g.save(); g.globalCompositeOperation = 'lighter'; glow(g, 260, 340, 40, 'rgba(255,40,40,1)', 0.6 * redDot); g.restore(); }
+  if (redDot > 0 && (redDot >= 1 || Math.sin(t * 6) > 0)) { circ(g, 260, 340, 7, '#ff2a2a'); g.save(); g.globalCompositeOperation = 'lighter'; glow(g, 260, 340, 40, 'rgba(255,40,40,1)', 0.6 * redDot); g.restore(); }
   // 浴室のドア（右）
   fillRR(g, 820, 380, 220, 700, 6, '#d9d2c4'); if (bath) { g.save(); g.globalCompositeOperation = 'lighter'; fillRR(g, 830, 390, 30, 680, 4, 'rgba(255,240,210,.5)'); g.restore(); }
   // 床とラグ
