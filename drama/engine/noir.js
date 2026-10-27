@@ -109,6 +109,8 @@ export function head(g, P, x, y, r, o = {}) {
   if (P.glasses) { const gx = x + (o.turn || 0) * r * 0.3; g.save(); g.lineWidth = r * 0.05; g.strokeStyle = '#2a2420'; for (const sd of [-1, 1]) { g.beginPath(); g.ellipse(gx + sd * r * 0.36, y + r * 0.1, r * 0.25, r * 0.19, 0, 0, 7); g.stroke(); } line(g, gx - r * 0.11, y + r * 0.08, gx + r * 0.11, y + r * 0.08, r * 0.04, '#2a2420'); if (o.glint) { g.globalAlpha = o.glint; g.fillStyle = 'rgba(255,255,255,.85)'; for (const sd of [-1, 1]) { g.beginPath(); g.ellipse(gx + sd * r * 0.36, y + r * 0.1, r * 0.24, r * 0.18, 0, 0, 7); g.fill(); } } g.restore(); }
   if (o.sweat) { const sx = x + r * 0.85, sy = y - r * 0.3 + ((o.sweat * 0.6) % 1) * r * 0.4; poly(g, [[sx, sy - r * 0.2], [sx - r * 0.08, sy], [sx + r * 0.08, sy]], '#bfe0ff'); circ(g, sx, sy, r * 0.08, '#bfe0ff'); }
   hairFront(g, x, y, r, P, o.turn || 0);
+  // 女性は横の髪を頬まで下ろす
+  if (P.female) { for (const sd of [-1, 1]) { g.beginPath(); g.moveTo(x + sd * r * 0.98, y - r * 0.4); g.quadraticCurveTo(x + sd * r * 1.12, y + r * 0.4, x + sd * r * 0.92, y + r * 0.85); g.lineTo(x + sd * r * 0.72, y + r * 0.55); g.quadraticCurveTo(x + sd * r * 0.82, y - r * 0.05, x + sd * r * 0.7, y - r * 0.4); g.closePath(); g.fillStyle = P.hairC; g.fill(); } }
   g.restore();
 }
 

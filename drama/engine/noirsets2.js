@@ -184,7 +184,8 @@ export function recPhone(g, x, y, s = 1, { t = 0, rec = 1, play = 0, sec = 0, ro
   // ボタン
   if (play) { circ(g, 0, 250, 70, '#2a2e3a'); poly(g, [[-18, 220], [-18, 280], [32, 250]], '#f1f3f8'); }
   else { circ(g, 0, 250, 74, '#f1f3f8'); const p = 0.5 + 0.5 * Math.sin(t * 5); circ(g, 0, 250, 56, rgba(C.red, 0.7 + 0.3 * p)); }
-  if (rec && !play) { const p = 0.5 + 0.5 * Math.sin(t * 5); circ(g, -150, -350, 12, rgba(C.red, p)); text(g, '録音中', -120, -350, { size: 26, color: C.red, align: 'left', weight: 800 }); }
+  if (rec && !play) { const p = 0.5 + 0.5 * Math.sin(t * 5); circ(g, -70, -150, 14, rgba(C.red, p)); text(g, '録音中', -45, -150, { size: 34, color: C.red, align: 'left', weight: 800 }); }
+  if (play) text(g, '再生中', 0, -150, { size: 34, color: '#4a8ef0', weight: 800 });
   g.restore();
 }
 // 窓から1階の屋根に降りる2人（家の正面・2階の窓が開いて明かり）
