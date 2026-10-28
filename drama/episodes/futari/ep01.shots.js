@@ -6,7 +6,7 @@ import { close, figure, mood, speedLines, sfxText } from '../../engine/noir.js';
 import { phoneFrame, intercom } from '../../engine/sns.js';
 import { F, chanoma, twoCalls, twoLines, dialScreen, callLog, twinWaves, photo, shiba, smartSpeaker, doorCam, wallClock } from '../../engine/futarisets.js';
 import { runEpisode } from '../../engine/player.js';
-import { P, talking, bg, slow, heads, cover as coverBase, endCard } from './common.js';
+import { P, talking, bg, slow, heads, chip, cover as coverBase, endCard } from './common.js';
 import { SERIES, EPISODE, CAST, LINES } from './ep01.script.js';
 
 const ramp = (lt, a, b, n0, n1) => lerp(n0, n1, easeOut(inv(a, b, lt)));
@@ -34,12 +34,16 @@ export function cover(g, lt = 9) {
 }
 
 const SHOTS = [
-  // ── 冒頭：着信
-  { at: 'open', draw(g, lt, D) { const k = ease(inv(0, D + 2, lt)); g.save(); cam(g, { x: lerp(300, 470, k), y: lerp(470, 1380, k), z: lerp(2.2, 1.5, k) }); chanoma(g, { t: lt, ring: 1 }); g.restore(); } },
-  { at: 'o1', draw(g, lt, D) { const k = ease(inv(0, D, lt)); g.save(); cam(g, { x: 470, y: lerp(1380, 1430, k), z: lerp(1.5, 2.4, k) }); chanoma(g, { t: lt, ring: 1 }); g.restore(); } },
+  // ── 冒頭：いきなり2本の電話（1フレーム目から「ハルト」が2つ鳴っている）
+  { at: 'cold', finish: { vignette: 0.6 }, draw(g, lt, D) { phone(g, lt, D, (p, w, h) => twoLines(p, w, h, { t: lt, active: 1, sec1: 48, sec2: 0, alarm: 1 }), { z0: 1.06, z1: 1.06 }); mood(g, { red: 0.12 }); } },
+  { at: 'h1', finish: { vignette: 0.6 }, draw(g, lt, D) { phone(g, lt, D, (p, w, h) => twoLines(p, w, h, { t: lt, active: 1, sec1: 48, sec2: 0, alarm: 1 }), { z0: 1.06, z1: 1.12 }); mood(g, { red: 0.12 * (1 - inv(0, 0.6, lt)) }); } },
+  { at: 'h2', finish: { vignette: 0.6 }, draw(g, lt, D) { phone(g, lt, D, (p, w, h) => twoLines(p, w, h, { t: lt, active: 2, sec1: 50, sec2: 2, alarm: 1 }), { z0: 1.12, z1: 1.18 }); } },
+  { at: 'h3', finish: { vignette: 0.7 }, draw(g, lt, D, S) { dark(g); speedLines(g, 540, 760, { inner: 470, t: lt, color: 'rgba(200,255,220,.16)' }); g.save(); cam(g, { x: 540, y: 800, z: slow(lt, D, 1.0, 1.1) }); close(g, P.sawako, { y: 780, s: 4.0, eyes: 'wide', brow: -0.6, mouth: 'line', lightFrom: 'left', phoneLight: true }); g.restore(); } },
+  { at: 'title', noSubs: true, finish: { vignette: 0.55, grainA: 0.1 }, draw(g, lt) { bg(g, '#030504', '#080b09'); cover(g, lt); } },
+  // ── 最初の1本
+  { at: 'o1', draw(g, lt, D) { const k = ease(inv(0, D, lt)); g.save(); cam(g, { x: lerp(300, 470, k), y: lerp(470, 1430, k), z: lerp(2.2, 2.2, k) }); chanoma(g, { t: lt, ring: 1 }); g.restore(); } },
   { at: 'o2', draw(g, lt, D) { phone(g, lt, D, (p, w, h) => twoCalls(p, w, h, { t: lt, phase: 0, sec: Math.floor(lt) })); } },
   { at: 'o3', finish: { vignette: 0.7 }, draw(g, lt, D, S) { dark(g); speedLines(g, 540, 760, { inner: 470, t: lt, color: 'rgba(200,255,220,.18)' }); g.save(); cam(g, { x: 540, y: 800, z: slow(lt, D, 1.0, 1.14) }); close(g, P.sawako, { y: 780, s: 4.0, eyes: 'wide', brow: -0.6, mouth: 'open', lightFrom: 'left', phoneLight: true }); g.restore(); } },
-  { at: 'title', noSubs: true, finish: { vignette: 0.55, grainA: 0.1 }, draw(g, lt) { bg(g, '#030504', '#080b09'); cover(g, lt); } },
 
   // ── 1. 私と息子
   { at: 'a1', draw(g, lt, D, S) { face(g, lt, D, S, [], { eyes: 'normal', mouth: 'line' }); const a = inv(0.2, 0.5, lt); g.save(); g.globalAlpha = a; fillRR(g, 290, 330, 500, 130, 20, 'rgba(8,12,10,.88)'); text(g, '宮下佐和子（58）', 540, 380, { size: 48, color: '#fff' }); text(g, '郊外の一軒家', 540, 432, { size: 30, color: '#b9c9c0' }); g.restore(); } },
@@ -90,10 +94,12 @@ const SHOTS = [
 ];
 
 const SFX = [
-  { at: 'open', type: 'roomtone', dur: 9, vol: 0.4 },
-  { at: 'open', type: 'vibrate', dur: 3.2, vol: 0.7 },
-  { at: 'open', off: 0.2, type: 'ringtone', dur: 3.0, vol: 0.5 },
-  { at: 'o1', off: 1.6, type: 'clock', dur: 3, vol: 0.35 },
+  { at: 'cold', type: 'hit', vol: 0.9 },
+  { at: 'cold', type: 'ringtone', dur: 6.5, vol: 0.35 },
+  { at: 'h2', type: 'stab', vol: 0.7 },
+  { at: 'h3', type: 'heartbeat', dur: 3, vol: 0.7 },
+  { at: 'o1', type: 'roomtone', dur: 9, vol: 0.4 },
+  { at: 'o1', type: 'vibrate', dur: 3.0, vol: 0.6 },
   { at: 'o2', type: 'pickup', vol: 0.6 },
   { at: 'o2:end', off: 0.1, type: 'hit', vol: 0.8 },
   { at: 'o3', type: 'heartbeat', dur: 2, vol: 0.6 },
@@ -121,7 +127,8 @@ const SFX = [
   { at: 'end', off: 0.6, type: 'ping', vol: 0.5 },
 ];
 const MUSIC = [
-  { at: 'open', mood: 'silence' },
+  { at: 'cold', mood: 'thriller' },
+  { at: 'o1', mood: 'silence' },
   { at: 'title', mood: 'silence' },
   { at: 'a1', mood: 'uneasy' },
   { at: 'b1', mood: 'suspense' },
