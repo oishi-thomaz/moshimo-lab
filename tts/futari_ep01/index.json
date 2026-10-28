@@ -1,8 +1,26 @@
 {
- "o1": {
-  "dur": 5.562,
+ "h1": {
+  "dur": 3.61,
+  "voice": "Iapetus",
+  "text": "かあさん、たすけて！人をはねたんだ！",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "h2": {
+  "dur": 2.072,
+  "voice": "Iapetus",
+  "text": "きって、かあさん！それ、俺じゃない！",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "h3": {
+  "dur": 5.983,
   "voice": "Sulafat",
-  "text": "ごぜん、にじ、じゅうさんぷん。息子のハルトから、電話が鳴った。",
+  "text": "同じ声の息子から、にほんの電話。どちらかが、偽物だ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "o1": {
+  "dur": 5.51,
+  "voice": "Sulafat",
+  "text": "ごぜん、にじ、じゅうさんぷん。最初の電話は、こうだった。",
   "model": "gemini-3.8-flash-tts"
  },
  "o2": {
