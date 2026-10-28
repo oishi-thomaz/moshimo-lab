@@ -75,7 +75,7 @@ function fieldMode(m) { FLD.visible = m === 'grass'; FOR.visible = m === 'forest
 
 const SUBS = [
   [2.6, 6.0, '時間を少し戻そう。<br>いつもの布団の中。'],
-  [6.2, 10.1, '世界中のダニが、<br>一斉に消えた。'],
+  [6.2, 10.1, '布団はきれいになる。<br>でもヤバいのは森の中。'],
   [10.1, 14, 'ダニの仲間は、<br>5万種以上いた。'],
   [14.2, 18.1, 'まず、布団のダニが消えた。'],
   [18.1, 22, '子どものぜん息の7〜9割は、<br>ダニが原因だった。'],
@@ -90,17 +90,17 @@ const SUBS = [
   [56.2, 59.4, '次に絶滅ボタンを<br>押したい生き物は？'],
 ];
 
-const TP = 1.4;
+const HOOK_LIFT = 0;
+const TP = 0.5; // v2：0.5秒で押す（冒頭で待たせない）
 function btnState(t) { const h = xHook(t, TP); btn.userData.press(h.press); btn.userData.hand(h.hand); }
-function hookCam(t, d = 2.5) { const u = ease(t / d); look(lerp(0.55, 0.5, u), lerp(1.75, 1.7, u), lerp(0.25, 0.1, u), 1.35, 0.9, -1.3, 50); }
+function hookCam(t, d = 2.5) { const u = ease(t / d); look(lerp(0.45, 0.4, u), lerp(2.15, 2.1, u), lerp(0.75, 0.6, u), 1.3, 0.85, -1.25, 46); } // v2：少し上から、ボタンと拡大したダニをタイトルの下にまとめて
 function shot0(t) { // hook: magnified mites crawling on the blanket next to the red button
-  lift(240);
+  lift(HOOK_LIFT);
   bedroom('day', { ceil: 6, hemi: 1.05 }); btn.userData.labelOn(false); btnState(t);
   closeMites(t, t < TP); bedMites.set(t < TP ? 240 : 0, t); pilMites.set(0, t);
   hookSpark.set(t >= TP ? (t - TP) / 0.9 : 0);
   el.flash.style.opacity = t >= TP ? 0.55 * Math.max(0, 1 - (t - TP) / 0.3) : 0;
   hookCam(t);
-  el.title.style.opacity = 1;
   setHud('絶滅ボタンを押すまで', xCountdown(TP - t), 1, { mono: true, color: t < TP ? '#fff' : '#ff6b6b' });
   return room;
 }
@@ -110,16 +110,14 @@ function shot1(t) { // everyday: the bed, mites everywhere on the blanket (magni
   bedroom('day', { ceil: 6, hemi: 1.05 }); btn.userData.labelOn(false); btn.userData.press(0); btn.userData.hand(0);
   closeMites(t + 3, true); bedMites.set(240, t + 3); pilMites.set(50, t + 3); hookSpark.set(0);
   bedCam(t, 3.5, [-0.3, 2.4, 1.6], [-0.1, 2.3, 1.2]);
-  el.title.style.opacity = clamp(1 - (t - 0.2) / 0.5);
   return room;
 }
 function shot2(t) { // +1秒: all the bed mites vanish
   lift(200);
   bedroom('day', { ceil: 6, hemi: 1.05 }); btn.userData.labelOn(false); btn.userData.press(1); btn.userData.hand(0);
-  const tv = 0.6;
+  const tv = 0; // v2：冒頭で押した直後からつながるので、布団のダニはもう消えている（消えた跡の光だけ）
   closeMites(t + 6, t < tv); bedMites.set(t < tv ? 240 : 0, t + 6); pilMites.set(t < tv ? 50 : 0, t + 6);
   bedSpark.set(t >= tv ? (t - tv) / 1.3 : 0);
-  el.flash.style.opacity = t >= tv ? 0.4 * Math.max(0, 1 - (t - tv) / 0.3) : 0;
   bedCam(t, 8, [-0.1, 2.3, 1.2], [0.2, 2.7, 2.0]);
   hudTime('+1秒');
   setTop('ダニの仲間（世界・2011年）', countUp(t, 54617, 1.2, 1.4).toLocaleString('en-US') + '種', fade(t, 1.15, 8, 0.25));
@@ -186,7 +184,7 @@ function shot7(t) { // result: the child sleeps well; morning
   return room;
 }
 function shot8(t) { // loop: the red button on the empty blanket again
-  lift(240);
+  lift(HOOK_LIFT);
   bedroom('day', { ceil: 6, hemi: 1.05 }); btn.visible = true; btn.userData.labelOn(false); btn.userData.press(0); btn.userData.hand(0);
   closeMites(0, false); bedMites.set(0, t); pilMites.set(0, t); hookSpark.set(0);
   hookCam(t + 0.5, 4.5);
@@ -202,15 +200,18 @@ const shots = [
 ];
 runStory({
   shots, subs: SUBS, duration: 64.5,
+  cut: [[2.5, 6.0]], // v2：いつもの布団（元の2.5〜6秒）を抜いて、押した直後から本題へ
   meta: {
     id: '0705',
+    v2: true,
+    hookLine: '世界中のダニが、一斉に消えた。',
     series: '絶滅ボタン',
     hookType: 'H5',
     cat: '生き物・動物',
     title: '世界中のダニが絶滅したら？',
     titleHtml: '世界中のダニが<br>絶滅したら？',
-    mood: 'mystery', seed: 705, hits: [1.4, 48.1], risers: [6.0], impacts: [18.6, 34.9],
-    sfx: [[1.4, 'poof'], [6.6, 'poof'], [23.0, 'poof'], [34.5, 'poof'], [2.6, 'skitter']],
+    mood: 'mystery', seed: 705, hits: [0.5, 48.1], risers: [6.0], impacts: [18.6, 34.9],
+    sfx: [[0.5, 'poof'], [23.0, 'poof'], [34.5, 'poof'], [0.05, 'skitter']],
     narr: { '5万種': '5万しゅ', '7〜9割': '7から9わり', '1m²': '1平方メートル', '数千〜数万匹': '数千から数万匹', 'ダニ絶滅ボタン': 'ダニぜつめつボタン', '2025年': '2025年' },
     ask: '次に絶滅ボタンを押したい生き物は？',
     caption: 'もしも世界中のダニが一瞬で絶滅したら？\nダニの仲間は、世界で5万4,617種が見つかっている（2011年）。\nまず消えるのは布団のダニ。子どものぜん息の大半（70〜90%）は、ダニが原因のアレルギーだ（厚生労働省）。\n草むらのマダニも消える。マダニがうつす病気SFTSは、2025年に191人で過去最多。致命率は約10〜30%とされる。\nでもダニの仕事はそれだけじゃない。森の土には1m²あたり数千〜数万匹のダニがいて、落ち葉を細かくして土に戻す分解の役目を担っている（森林総合研究所）。\n結果、ぜん息とマダニの病気は減るけど、森は土の掃除係を失う。\n\n次に絶滅ボタンを押したい生き物は？ コメントで教えて。\n\n出典：Zhang, Zootaxa 3148（2011年）、厚生労働省 リウマチ・アレルギー情報、福島県 SFTS（2026年）、森林総合研究所 森林生物データベース',
