@@ -1,0 +1,164 @@
+{
+ "a1": {
+  "dur": 2.198,
+  "voice": "Kore",
+  "text": "刃物が振り上げられた、その時。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a2": {
+  "dur": 1.11,
+  "voice": "Umbriel",
+  "text": "やめてください！",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a3": {
+  "dur": 2.549,
+  "voice": "Kore",
+  "text": "けんとが、鬼塚に飛びかかった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a3b": {
+  "dur": 2.181,
+  "voice": "Fenrir",
+  "text": "てめえ…！離せ！",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a4": {
+  "dur": 4.568,
+  "voice": "Kore",
+  "text": "配信が切れたのは、けんとがスマホを叩き落としたからだった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b1": {
+  "dur": 4.96,
+  "voice": "Kore",
+  "text": "あとで知った。その時ミサキは、あの写真を投稿していた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b2": {
+  "dur": 9.853,
+  "voice": "Schedar",
+  "text": "これは事件の夜、23時12分に撮られた写真です。後ろに写っているのは、鬼塚レオ。拡散希望。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b2b": {
+  "dur": 5.027,
+  "voice": "Schedar",
+  "text": "これ、本物じゃないか。さっきの配信、本当だったんだ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b3": {
+  "dur": 5.955,
+  "voice": "Kore",
+  "text": "私を犯人にした、拡散希望が、今度は、本当のことを運んでいった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c1": {
+  "dur": 4.565,
+  "voice": "Kore",
+  "text": "サイレンの音がして、倉庫に、まかべ刑事が入ってきた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c2": {
+  "dur": 3.534,
+  "voice": "Gacrux",
+  "text": "おにづかレオ。殺人未遂の疑いで逮捕する。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c3": {
+  "dur": 4.167,
+  "voice": "Fenrir",
+  "text": "証拠なんて、どこにあるんですか？",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c4": {
+  "dur": 3.64,
+  "voice": "Gacrux",
+  "text": "あの写真なら、もう日本中が見ていますよ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c5": {
+  "dur": 5.537,
+  "voice": "Gacrux",
+  "text": "それに、あなたのスマホ。正義の目に、ログインしたままでしたよ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c6": {
+  "dur": 5.987,
+  "voice": "Gacrux",
+  "text": "せとさん。話を聞きたかったのは、あなたを目撃者だと考えていたからです。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c7": {
+  "dur": 0.572,
+  "voice": "Autonoe",
+  "text": "アカリ！",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c8": {
+  "dur": 4.588,
+  "voice": "Kore",
+  "text": "ミサキは私を抱きしめて、声をあげて泣いた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c9": {
+  "dur": 3.319,
+  "voice": "Kore",
+  "text": "けんとは、自分からパトカーに乗った。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d1": {
+  "dur": 4.348,
+  "voice": "Kore",
+  "text": "みっかご。スマホの通知は、また止まらなかった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d1b": {
+  "dur": 5.03,
+  "voice": "Kore",
+  "text": "カフェの店長からは、戻っておいでとメッセージが届いた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d2": {
+  "dur": 4.728,
+  "voice": "Schedar",
+  "text": "人違いだったのか。まあ、まぎらわしい写真だったしな。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d3": {
+  "dur": 6.31,
+  "voice": "Kore",
+  "text": "私を犯人だと言った人たちは、投稿を消して、何もなかったことにした。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d4": {
+  "dur": 5.924,
+  "voice": "Kore",
+  "text": "誰も、謝らなかった。みんなもう、次の誰かを探していた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d5": {
+  "dur": 4.247,
+  "voice": "Schedar",
+  "text": "鬼塚の妹は、この女。拡散希望。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d6": {
+  "dur": 4.344,
+  "voice": "Kore",
+  "text": "知らない女の子の写真に、赤い丸がついていた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d7": {
+  "dur": 3.192,
+  "voice": "Kore",
+  "text": "私の指が、拡散ボタンの上で止まった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d8": {
+  "dur": 2.126,
+  "voice": "Kore",
+  "text": "あなたなら、押しますか？",
+  "model": "gemini-3.8-flash-tts"
+ }
+}
