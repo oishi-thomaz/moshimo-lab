@@ -1,0 +1,188 @@
+{
+ "a0": {
+  "dur": 7.324,
+  "voice": "Kore",
+  "text": "通り魔は、鬼塚だった。だからあの人は、迷わず私の家を犯人の家と呼べたんだ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a1": {
+  "dur": 2.791,
+  "voice": "Kore",
+  "text": "この写真があれば、全部ひっくり返せる。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a2": {
+  "dur": 4.415,
+  "voice": "Kore",
+  "text": "私は自分のアカウントで、写真を投稿した。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a3": {
+  "dur": 6.185,
+  "voice": "Schedar",
+  "text": "私は犯人ではありません。後ろに写っている人が、本当の犯人です。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a4": {
+  "dur": 1.361,
+  "voice": "Kore",
+  "text": "でも、返ってきたのは…",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a5": {
+  "dur": 4.705,
+  "voice": "Schedar",
+  "text": "どうせ加工だろ。鬼塚さんに罪を着せるとか、最低。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a6": {
+  "dur": 5.457,
+  "voice": "Kore",
+  "text": "犯人の女の言うことなんて、もう誰も、信じなかった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b1": {
+  "dur": 4.821,
+  "voice": "Autonoe",
+  "text": "アカリ、警察に行こう。本物の写真なら、ちゃんと調べてくれる。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b2": {
+  "dur": 3.429,
+  "voice": "Kore",
+  "text": "ミサキの車で、駅前警察署へ向かった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b3": {
+  "dur": 3.144,
+  "voice": "Kore",
+  "text": "その時、正義の目が投稿した。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b4": {
+  "dur": 5.273,
+  "voice": "Schedar",
+  "text": "犯人の女、駅前警察署に向かっている模様。白い軽自動車。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b5": {
+  "dur": 4.577,
+  "voice": "Kore",
+  "text": "警察署の前では、もう鬼塚の配信が待っていた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b5b": {
+  "dur": 2.454,
+  "voice": "Fenrir",
+  "text": "あっ、白い軽！犯人の女、来ましたー！",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b5c": {
+  "dur": 3,
+  "voice": "Kore",
+  "text": "ミサキはハンドルを切って、その場から逃げた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b6": {
+  "dur": 4.175,
+  "voice": "Autonoe",
+  "text": "なんで…どうして、私たちの居場所が？",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c1": {
+  "dur": 5.636,
+  "voice": "Kore",
+  "text": "その時、ミサキのスマホが鳴った。けんとからだった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c2": {
+  "dur": 5.031,
+  "voice": "Umbriel",
+  "text": "ミサキ、ごめん。俺、金をもらって、部屋にカメラを置いた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c3": {
+  "dur": 6.331,
+  "voice": "Umbriel",
+  "text": "その車にも、俺がジーピーエスを付けてる。でも、人を刺したなんて知らなかったんだ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c4": {
+  "dur": 5.889,
+  "voice": "Umbriel",
+  "text": "鬼塚の撮影データ、全部持ってる。あの夜の映像もある。渡したいんだ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c5": {
+  "dur": 4.876,
+  "voice": "Umbriel",
+  "text": "港の倉庫に来てくれ。ミサキは巻き込みたくない。アカリさん一人で。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c6": {
+  "dur": 4.03,
+  "voice": "Kore",
+  "text": "罠かもしれない。でも、もうこれしかなかった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c7": {
+  "dur": 3.805,
+  "voice": "Kore",
+  "text": "ミサキは、ここにいて。必ず戻るから。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d1": {
+  "dur": 3.146,
+  "voice": "Kore",
+  "text": "車を捨てて、夜の港を歩いた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d2": {
+  "dur": 2.693,
+  "voice": "Kore",
+  "text": "倉庫の中で、けんとが待っていた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d3": {
+  "dur": 0.265,
+  "voice": "Umbriel",
+  "text": "…ごめん。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d4": {
+  "dur": 3.268,
+  "voice": "Kore",
+  "text": "けんとの後ろから、光が向けられた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d5": {
+  "dur": 5.368,
+  "voice": "Fenrir",
+  "text": "はい、犯人確保ー！みなさん、通り魔の女、捕まえましたー！",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d6": {
+  "dur": 6.571,
+  "voice": "Kore",
+  "text": "同時視聴、にじゅうまんにん。画面は、鬼塚を称える声で埋めつくされた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e1": {
+  "dur": 6.853,
+  "voice": "Kore",
+  "text": "鬼塚は私のスマホを奪い、投稿も、あの写真も、全部消した。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e2": {
+  "dur": 2.72,
+  "voice": "Fenrir",
+  "text": "もう、誰もお前を信じない。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "x1": {
+  "dur": 2.173,
+  "voice": "Schedar",
+  "text": "次回。生配信。",
+  "model": "gemini-3.8-flash-tts"
+ }
+}
