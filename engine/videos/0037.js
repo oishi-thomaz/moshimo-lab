@@ -59,10 +59,10 @@ function townWalk(t) {
 
 const SUBS = [
   [2.6, 6.0, 'いつもの夜。<br>気づけば、ずっとスマホ。'],
-  [6.2, 10.1, 'あなたは今日から、<br>1か月スマホを手放す。'],
+  [6.2, 10.1, '1か月、スマホなし。<br>集中力はどう変わる？'],
   [10.1, 14, 'ないのに、何度も<br>ポケットを探してしまう。'],
   [14.2, 18.1, 'スマホでネットを見る時間は、<br>平日1日 約2時間。'],
-  [18.1, 22, 'その2時間が、<br>まるごと空いた。'],
+  [18.1, 22, 'その2時間が空いた。<br>すると、体が変わり始めた。'],
   [22.2, 26.1, '寝る前の画面の光が、<br>消えた。'],
   [26.1, 30, 'スマホのネットを止めた<br>実験では、睡眠も増えた。'],
   [30.2, 34.6, '外を歩く時間、<br>人と会う時間が増えた。'],
@@ -75,16 +75,16 @@ const SUBS = [
 ];
 
 const cd = (left) => { left += 1e-6; return `0:${String(Math.floor(left)).padStart(2, '0')}.${String(Math.floor((left % 1) * 100)).padStart(2, '0')}`; };
-const TV = 1.3;
+function hookCam(t, d = 2.5) { const u = ease(clamp(t / d)); look(lerp(-2.0, -1.9, u), lerp(1.95, 1.9, u), lerp(-1.9, -1.8, u), 0.35, 0.95, 0.6, 50); }
+const TV = 0.5; // v2：0.5秒で消える（冒頭で待たせない）
 function shot0(t) { // hook: phone in your hand vanishes
   living('night'); roomReset(); props.sleeper.visible = false;
   sitPose('phone'); you.userData.phone.visible = t < TV; phoneGlow(t < TV);
+  you.userData.arms[1].rotation.set(-1.75, 0, -0.45); you.userData.head.rotation.x = 0.3; you.userData.phone.scale.setScalar(1.5); // v2：サムネで見えるよう、スマホを顔の前に上げる
   if (t >= TV && !spark.ready) { const v = new THREE.Vector3(); you.userData.phone.getWorldPosition(v); spark.init([v.toArray()], 0.08, 0.5); spark.ready = true; }
   spark.set(t >= TV ? (t - TV) / 1.0 : 0);
-  if (t >= TV) { you.userData.arms[1].rotation.set(-1.25, 0, -0.35); you.userData.head.rotation.x = 0.45; }
   el.flash.style.opacity = t >= TV ? 0.5 * Math.max(0, 1 - (t - TV) / 0.3) : 0;
-  lift(150); sofaCam(t + 2, 8);
-  el.title.style.opacity = 1;
+  lift(-60); hookCam(t); // v2：0秒目サムネ。顔と手のスマホがタイトルの下に来るよう近くから
   setHud('スマホが消えるまで', cd(Math.max(0, TV - t)), 1, { mono: true, color: t < TV ? '#fff' : '#ff6b6b' });
   return room;
 }
@@ -154,7 +154,7 @@ function shot7(t) { // result: calm night, reading, no phone glow
 function shot8(t) { // loop: same framing as hook, hand empty
   living('night'); roomReset(); props.sleeper.visible = false;
   sitPose('phone'); you.userData.phone.visible = false; phoneGlow(false);
-  lift(150); sofaCam(t + 4, 8);
+  lift(-60); hookCam(t + 0.5);
   setHud('スマホが消えるまで', cd(0), 1, { mono: true, color: '#ff6b6b' });
   return room;
 }
@@ -162,17 +162,20 @@ function shot8(t) { // loop: same framing as hook, hand empty
 const shots = [
   { a: 0, b: 2.5, f: shot0 }, { a: 2.5, b: 6, f: shot1 }, { a: 6, b: 14, f: shot2 }, { a: 14, b: 22, f: shot3 },
   { a: 22, b: 30, f: shot4 }, { a: 30, b: 39.2, f: shot5 }, { a: 39.2, b: 48, f: shot6 }, { a: 48, b: 55.5, f: shot7 },
-  { a: 55.5, b: 59.5, f: shot8 }, { a: 59.5, b: 64.5, f: endCard },
+  { a: 55.5, b: 59.5, f: shot8 }, { a: 59.5, b: 65, f: endCard },
 ];
 runStory({
-  shots, subs: SUBS, duration: 64.5,
+  shots, subs: SUBS, duration: 65,
+  cut: [[2.5, 6.0]], // v2：夜にスマホを見続ける いつもの夜（元の2.5〜6秒）を抜いて、消えた直後から本題へ
   meta: {
     id: '0037',
+    v2: true,
+    hookLine: 'あなたのスマホが、手の中から消えた。',
     title: 'スマホを1か月手放したら？',
     titleHtml: 'スマホを1か月<br>手放したら？',
-    mood: 'calm', seed: 37, hits: [1.3, 48.1], risers: [44.0],
+    mood: 'calm', seed: 37, hits: [0.5, 48.1], risers: [44.0],
     impacts: [48.4],
-    sfx: [[1.3, 'poof', 1]],
+    sfx: [[0.5, 'poof', 1]],
     narr: { '95.9%': 'きゅうじゅうごてんきゅうパーセント', '約10歳分': 'やく10さいぶん', '9割': 'きゅうわり' },
     ask: 'あなたは何日、手放せる？',
     caption: 'もしもあなたが、今日からスマホを1か月手放したら？\n日本で13〜79歳のスマホ利用率は95.9%。スマホなどでネットを使う時間は平日1日120.5分（2025年）。1か月なら約60時間が浮く計算（平日平均×30日・単純計算）。\n米国でスマホのネットを2週間止めた実験（467人）では、スマホ画面の時間が1日314分から161分に減り、90.7%の人が気分・心の健康・集中力のどれかで上向いた。集中力の改善は、年齢でいうと約10歳分。睡眠や、外で過ごす時間・人と会う時間も増えた。\n結果：2週間で、9割の人の心か集中力が上向いた。\n\nあなたは何日、手放せる？ コメントで教えて。\n\n出典：総務省 情報通信政策研究所「令和7年度 情報通信メディアの利用時間と情報行動に関する調査」（2026年）、Castelo et al.「Blocking mobile internet on smartphones improves sustained attention, mental health, and subjective well-being」PNAS Nexus（2025年）',
