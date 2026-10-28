@@ -43,7 +43,7 @@ function hideAll() {
 // lawn group spot (close-ups) at around (-4, -4)
 function lawnCast(t, mode) {
   const pos = [[-3.0, -3.2, 2.6], [-4.4, -2.2, 1.2], [-3.7, -1.6, 1.6], [-6.2, -5.0, 0.4], [-1.6, -6.0, -0.6]];
-  D.forEach((d, i) => { d.visible = true; const p = pos[i]; d.position.set(p[0], 0, p[1]); d.rotation.y = p[2]; if (i === 0) deerBow(d, mode === 'bow' ? clamp(Math.sin(t * 3.0) * 1.2) : 0); else if (i === 1 || i === 3) deerGraze(d, 0.8 + Math.sin(t * 2 + i) * 0.2); else deerWalk(d, t * 3 + i, 0.6); });
+  D.forEach((d, i) => { d.visible = true; d.scale.setScalar(1); const p = pos[i]; d.position.set(p[0], 0, p[1]); d.rotation.y = p[2]; if (i === 0) deerBow(d, mode === 'bow' ? clamp(Math.sin(t * 3.0) * 1.2) : 0); else if (i === 1 || i === 3) deerGraze(d, 0.8 + Math.sin(t * 2 + i) * 0.2); else deerWalk(d, t * 3 + i, 0.6); });
   D[0].rotation.y = -0.15;
   tourist.visible = true; tourist.position.set(-3.3, 0, -1.0); tourist.rotation.y = 3.0; tourist.userData.arms[1].rotation.x = -1.1;
   kid.visible = true; kid.position.set(-4.2, 0, -1.3); kid.rotation.y = 2.6; kid.userData.arms[0].rotation.x = -0.4 - Math.sin(t * 4) * 0.2;
@@ -51,14 +51,14 @@ function lawnCast(t, mode) {
 
 const SUBS = [
   [2.6, 6.0, 'いつもの奈良公園。<br>鹿は1,687頭。'],
-  [6.2, 10.1, 'その鹿が一晩で、<br>10倍に増えた。'],
+  [6.2, 10.1, '芝生は消える。<br>でもヤバいのは半年後。'],
   [10.1, 14.0, '公園にいる鹿は、<br>1万6,870頭。'],
   [14.2, 18.1, '芝生は34.5ha。<br>1haに約490頭。'],
-  [18.1, 22.0, '芝生は食べられ、<br>土がむき出しに。'],
+  [18.1, 22.0, '芝生は消え、土がむき出し。<br>鹿が次に向かうのは…'],
   [22.2, 26.1, 'エサを探して、<br>道路にあふれ出す。'],
   [26.1, 30.0, '交差点を渡る鹿は、<br>1時間に約1,550頭。'],
   [30.2, 34.6, '車との事故は、<br>年1,300件に。'],
-  [34.6, 39.0, '1日に3〜4回、<br>どこかでぶつかる。'],
+  [34.6, 39.0, '1日3〜4回、どこかで衝突。<br>次は、人が危ない。'],
   [39.2, 43.6, 'せんべいを持つと、<br>囲まれて動けない。'],
   [43.6, 47.8, 'かまれる・突かれる事故は<br>年1,510件に。'],
   [48.1, 53.8, '結果：鹿によるけがが、<br>1日4件のペースに。'],
@@ -67,13 +67,14 @@ const SUBS = [
 ];
 
 const WIDE = (t, d) => { const u = ease(t / d); look(lerp(0, 3, u), lerp(22, 20, u), lerp(17, 15, u), 0, 0, -18, 55); };
-function shot0(t) { // hook: herd multiplies x10 in 1.5s
+const HOOK = (t, d) => { const u = ease(t / d); look(lerp(0, 1.0, u), lerp(5.6, 6.4, u), lerp(8.2, 7.6, u), 0, 0.4, -16, 55); }; // v2：低めから。手前の鹿を大きく、奥まで鹿で埋まる（サムネ）
+function shot0(t) { // hook: herd multiplies x10 in 0.3〜1.0s（v2：0.6秒以内に増え始める）
   setParkEnv('day'); setLawn(1); hideAll();
-  const k = easeOut(clamp((t - 0.35) / 1.15));
+  const k = easeOut(clamp((t - 0.3) / 0.7));
   herdN(lerp(1687, 16870, k));
-  el.flash.style.opacity = t > 0.35 && t < 0.7 ? 0.35 * (1 - (t - 0.35) / 0.35) : 0;
-  lift(140); WIDE(t, 2.5);
-  el.title.style.opacity = 1;
+  HERD.clear(0.6, -1.6, 2.2); D[0].visible = true; D[0].position.set(0.6, 0, -1.6); D[0].rotation.y = 0.5; D[0].scale.setScalar(1.35); deerWalk(D[0], 0, 0); // v2：手前の主役の鹿（サムネ）
+  el.flash.style.opacity = t > 0.3 && t < 0.65 ? 0.35 * (1 - (t - 0.3) / 0.35) : 0;
+  lift(140); HOOK(t, 2.5);
   setTop('奈良公園の鹿（2026年→10倍）', comma(Math.round(lerp(1687, 16870, k))) + '頭', 1, k >= 1 ? '#ffd166' : '#fff');
   return park;
 }
@@ -86,15 +87,14 @@ function shot1(t) { // everyday close: bow + senbei
   el.title.style.opacity = clamp(1 - (t - 0.3) / 0.5);
   return park;
 }
-function shot2(t) { // +1日 x10
+function shot2(t) { // +1日 x10（v2：冒頭で増えた直後からつながるので、もう10倍のまま）
   setParkEnv('day'); setLawn(1); hideAll();
-  const k = easeOut(clamp((t - 0.2) / 1.6));
-  herdN(lerp(1687, 16870, k));
+  herdN(16870);
   lift(140);
   const u = ease(t / 8);
   look(lerp(-6, 4, u), lerp(25, 22, u), lerp(18, 16, u), 0, 0, -20, 55);
   hudTime('+1日');
-  setTop('奈良公園の鹿（2026年の10倍・単純計算）', comma(countUp(t, 16870, 0.2, 1.6)) + '頭', fade(t, 0.15, 8, 0.25), '#ffd166');
+  setTop('奈良公園の鹿（2026年の10倍・単純計算）', '16,870頭', fade(t, 0.15, 8, 0.25), '#ffd166');
   return park;
 }
 function shot3(t) { // +1週間 lawn bare
@@ -171,7 +171,7 @@ function shot7(t) { // result: dusk wide, bare park, deer everywhere
 }
 function shot8(t) { // loop: hook framing, already x10
   setParkEnv('day'); setLawn(0); hideAll(); herdN(16870);
-  lift(140); WIDE(t * 0.3, 2.5);
+  lift(140); HOOK(t * 0.3, 2.5);
   return park;
 }
 
@@ -182,13 +182,16 @@ const shots = [
 ];
 runStory({
   shots, subs: SUBS, duration: 64.5,
+  cut: [[2.5, 6.0]], // v2：いつもの奈良公園（元の2.5〜6秒）を抜いて、増えた直後から本題へ
   meta: {
     id: '0039',
+    v2: true,
+    hookLine: '奈良の鹿が一晩で、10倍に増えた。',
     title: '奈良の鹿が10倍に増えたら？',
     titleHtml: '奈良の鹿が<br>10倍に増えたら？',
-    mood: 'hopeful', seed: 39, hits: [1.5, 48.1], risers: [6.0], impacts: [6.6, 31.0, 44.2, 48.4],
-    sfx: [[0.4, 'whoosh'], [22.4, 'whoosh'], [30.6, 'alarm']],
-    narr: { '34.5ha': 'さんじゅうよんてんごヘクタール', '1haに約490頭': 'いちヘクタールにやく490とう', '1万6,870頭': 'いちまんろくせんはっぴゃくななじゅうとう', '1日に3〜4回、': 'いちにちにさんかいからよんかい、' },
+    mood: 'hopeful', seed: 39, hits: [1.0, 48.1], risers: [6.0], impacts: [31.0, 44.2, 48.4],
+    sfx: [[0.3, 'whoosh'], [22.4, 'whoosh'], [30.6, 'alarm']],
+    narr: { '34.5ha': 'さんじゅうよんてんごヘクタール', '1haに約490頭': 'いちヘクタールにやく490とう', '1万6,870頭': 'いちまんろくせんはっぴゃくななじゅうとう', '1日3〜4回、': 'いちにちさんかいからよんかい、' },
     ask: '鹿10倍の奈良、行く？行かない？',
     caption: 'もしも奈良公園の鹿が一晩で10倍に増えたら？\n2026年7月の調査で、奈良公園の鹿は1,687頭。1953年の調査開始以来の最多で、5年連続で増えている。\n10倍にすると16,870頭（単純計算）。シバが生えている芝生34.5haに、1haあたり約490頭がひしめく。\n交差点を渡る鹿は1時間に約1,550頭、車との事故は年約1,300件（どちらも今の10倍の単純計算）。\nかまれる・突かれるなどの人身事故は、2024年度の151件（2025年2月末時点）の10倍で年1,510件。1日4件のペースになる（単純計算）。\n奈良のシカは国の天然記念物。せんべい以外の食べ物はあげないで、適度な距離で見守ろう。\n\n鹿10倍の奈良、行く？行かない？ コメントで教えて。\n\n出典：奈良の鹿愛護会「頭数調査」（2026年）、奈良県「『奈良のシカ』と車両との交通事故対策」（2026年）、奈良県「令和6年度の人身事故への対応」（2025年）、奈良県「重点保護地区における『奈良のシカ』生息環境の改善（特にシバ地）について」',
     hashtags: ['もしもラボ', '奈良公園', '鹿', '奈良', '雑学'],
