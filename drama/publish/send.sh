@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # 仕上がった話を投稿サーバーへ送る（drama-out ブランチに置いて、drama-publish を動かす）
 #   bash drama/publish/send.sh kakusan 2
+#   NO_DISPATCH=1 で置くだけ（あとで drama-publish に 1001,1002 のようにまとめて渡す）
 set -euo pipefail
 S="${1:?series}"; N="${2:?no}"; NN=$(printf %02d "$N")
 cd "$(dirname "$0")/../.."
@@ -20,5 +21,7 @@ git -C "$W" add -A "posts/$ID"
 git -C "$W" -c user.name="drama-bot" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" commit -qm "post $ID ${S} ep${NN}" || true
 git -C "$W" push -q origin drama-out
 git worktree remove --force "$W"
-gh api -X POST repos/oishi-thomaz/moshimo-lab/actions/workflows/drama-publish.yml/dispatches -f ref=main -f "inputs[id]=$ID"
-echo "送った：$ID（${S} 第${N}話）"
+if [ -z "${NO_DISPATCH:-}" ]; then
+  gh api -X POST repos/oishi-thomaz/moshimo-lab/actions/workflows/drama-publish.yml/dispatches -f ref=main -f "inputs[id]=$ID"
+  echo "送った：$ID（${S} 第${N}話）"
+else echo "置いた：$ID（${S} 第${N}話）"; fi
