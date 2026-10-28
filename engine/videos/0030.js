@@ -106,14 +106,14 @@ function showCrowd(T, k = 1) {
 
 const SUBS = [
   [2.6, 6.0, '時間を少し戻そう。<br>いつもの夕方の玄関。'],
-  [6.2, 10.0, '日本中の宅配便が、<br>いっせいに止まった。'],
+  [6.2, 10.0, '荷物が届かない。<br>でも本番は1か月後。'],
   [10.1, 14.0, '荷物は、トラックの中で<br>止まったまま。'],
   [14.2, 18.0, '1日で止まる荷物は…'],
   [18.1, 22.0, '約1,378万個（推計）'],
-  [22.2, 26.0, 'ネットで買った物が、<br>何も届かない。'],
+  [22.2, 26.0, 'ネットで買った物が、<br>何も届かない。問題はその量。'],
   [26.1, 30.0, 'ネット通販は、1年で<br>26.1兆円の市場。'],
   [30.2, 34.6, 'モノの買い物の<br>約1割がネット通販。'],
-  [34.6, 39.0, 'その荷物が、<br>家まで来なくなった。'],
+  [34.6, 39.0, 'その荷物が来なくなった。<br>じゃあ、どうする？'],
   [39.2, 43.6, '荷物は、自分で<br>取りに行くしかない。'],
   [43.6, 47.8, '止まった荷物は、1か月で<br>約4.2億個（推計）'],
   [48.1, 52.6, '結果：年50億個の荷物を、<br>自分で運ぶ暮らしになった。'],
@@ -121,14 +121,15 @@ const SUBS = [
   [55.6, 59.4, '今月、荷物は<br>何個届いた？'],
 ];
 
-const hookCam = (t) => { const u = ease(t / 2.5); look(lerp(1.2, 0.9, u), 1.5, lerp(6.6, 6.0, u), 0, 1.1, -1.5, 50); };
-function shot0(t, T) { // hook: parcels on the step vanish at 1.2s
+const hookCam = (t) => { const u = ease(t / 2.5); look(lerp(1.0, 0.8, u), 1.45, lerp(5.3, 4.9, u), 0, 0.95, -1.5, 50); }; // v2：荷物を大きく（サムネ）
+const TV = 0.5; // v2：0.5秒で玄関の荷物が消える（冒頭で待たせない）
+function shot0(t, T) { // hook: parcels on the step vanish at 0.5s
   lift(170);
-  porchBase('dusk', { parcels: T < 1.2, vanOn: false }); canopy.visible = false;
-  stepSpark.set(clamp((T - 1.2) / 1.1));
+  porchBase('dusk', { parcels: T < TV, vanOn: false }); canopy.visible = false;
+  stepSpark.set(clamp((T - TV) / 1.1));
+  el.flash.style.opacity = T >= TV ? 0.45 * Math.max(0, 1 - (T - TV) / 0.3) : 0;
   hookCam(t);
-  el.title.style.opacity = 1;
-  setTop('1日に届く宅配便（2024年度・推計）', '約' + comma(countUp(t, 1378, 0.0, 1.0)) + '万個', 1);
+  setTop('1日に届く宅配便（2024年度・推計）', '約1,378万個', 1); // 0秒目（サムネ）から数字を出しておく
   return porch;
 }
 function shot1(t, T) { // daily: courier carries a parcel from the van to the door
@@ -221,11 +222,14 @@ const shots = [
 ];
 runStory({
   shots, subs: SUBS, duration: 64.5,
+  cut: [[2.5, 6.0]], // v2：いつもの夕方の配達（元の2.5〜6秒）を抜いて、止まった直後から本題へ
   meta: {
     id: '0030',
+    v2: true,
+    hookLine: '日本中の宅配便が、一斉に止まった。',
     title: '宅配便が止まったら？',
     titleHtml: '宅配便が<br>止まったら？',
-    mood: 'mystery', seed: 30, hits: [1.2, 6.0, 48.1], risers: [6.0],
+    mood: 'mystery', seed: 30, hits: [0.5, 48.1], risers: [6.0], sfx: [[0.5, 'poof']],
     ask: '今月、荷物は何個届いた？',
     caption: 'もしも日本中の宅配便が止まったら？\n宅配便は1年で50億3,147万個（2024年度）。1日あたり約1,378万個の荷物が止まり、ネット通販26.1兆円の買い物が家に届かなくなる（推計）。国の統計で計算してみた。\n\n今月、荷物は何個届いた？ コメントで教えて。\n\n出典：国土交通省 令和6年度 宅配便・メール便取扱実績、経済産業省 令和6年度 電子商取引に関する市場調査、国土交通省 持続可能な物流の実現に向けた検討会 最終取りまとめ（2023年8月）',
     hashtags: ['もしもラボ', '宅配便', '物流2024年問題', 'ネット通販', '雑学'],
