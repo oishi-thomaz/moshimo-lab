@@ -1,0 +1,224 @@
+{
+ "o1": {
+  "dur": 5.562,
+  "voice": "Sulafat",
+  "text": "ごぜん、にじ、じゅうさんぷん。息子のハルトから、電話が鳴った。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "o2": {
+  "dur": 6.601,
+  "voice": "Iapetus",
+  "text": "母さん…俺。ごめん…車で、人をはねた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "o3": {
+  "dur": 2.122,
+  "voice": "Sulafat",
+  "text": "言葉が、出なかった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a1": {
+  "dur": 2.918,
+  "voice": "Sulafat",
+  "text": "みやしたさわこ、ごじゅうはっさい。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a2": {
+  "dur": 5.742,
+  "voice": "Sulafat",
+  "text": "夫を亡くして、にねん。この家には、私ひとり。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a3": {
+  "dur": 5.407,
+  "voice": "Sulafat",
+  "text": "ひとり息子のハルトは、東京でAIの会社に勤めている。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a4": {
+  "dur": 3.751,
+  "voice": "Sulafat",
+  "text": "毎晩、電話をくれる優しい子だ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b1": {
+  "dur": 4.979,
+  "voice": "Iapetus",
+  "text": "おばあさんが、急に飛び出してきて…今、相手の家族がここにいる。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b2": {
+  "dur": 3.372,
+  "voice": "Rasalgethi",
+  "text": "お母様ですか。弁護士の、にしむらと申します。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b3": {
+  "dur": 4.23,
+  "voice": "Rasalgethi",
+  "text": "今夜中に示談にすれば、息子さんの事故は表に出ません。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b4": {
+  "dur": 2.57,
+  "voice": "Rasalgethi",
+  "text": "示談金は、さんびゃくまんえんです。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b5": {
+  "dur": 5.783,
+  "voice": "Sulafat",
+  "text": "さんびゃくまんえん。ハルトの人生が、それで守れるなら。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b6": {
+  "dur": 2.238,
+  "voice": "Sulafat",
+  "text": "わかりました。すぐに——",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c1": {
+  "dur": 3.216,
+  "voice": "Sulafat",
+  "text": "その時、もう一本。電話が鳴った。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c2": {
+  "dur": 2.06,
+  "voice": "Sulafat",
+  "text": "画面に出ていた名前は…",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c3": {
+  "dur": 0.547,
+  "voice": "Sulafat",
+  "text": "ハルト。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c4": {
+  "dur": 4.316,
+  "voice": "Iapetus",
+  "text": "母さん！？　今の電話、切って！それ、俺じゃない！",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c5": {
+  "dur": 3.203,
+  "voice": "Iapetus",
+  "text": "俺の声、AIで盗まれてるんだ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d1": {
+  "dur": 4.759,
+  "voice": "Iapetus",
+  "text": "母さん、そっちが偽物だよ！信じてくれよ…！",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d2": {
+  "dur": 4.022,
+  "voice": "Iapetus",
+  "text": "落ち着いて。俺は今、東京の部屋にいる。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d3": {
+  "dur": 5.897,
+  "voice": "Sulafat",
+  "text": "同じ声。同じ話し方。どちらも、ハルトだった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d4": {
+  "dur": 2.662,
+  "voice": "Sulafat",
+  "text": "本物しか知らないことを、聞けばいい。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d5": {
+  "dur": 4.239,
+  "voice": "Sulafat",
+  "text": "ハルト。小さいころ飼ってた犬の名前は？",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d6": {
+  "dur": 0.8,
+  "voice": "Iapetus",
+  "text": "…コテツだろ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d7": {
+  "dur": 2.204,
+  "voice": "Iapetus",
+  "text": "コテツ。茶色い柴犬の。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d8": {
+  "dur": 2.795,
+  "voice": "Sulafat",
+  "text": "どちらも、正解だった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d9": {
+  "dur": 2.258,
+  "voice": "Iapetus",
+  "text": "疑うなら、俺の番号にかけ直して。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d10": {
+  "dur": 3.461,
+  "voice": "Sulafat",
+  "text": "登録してあるハルトの番号に、かけ直した。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d11": {
+  "dur": 5.585,
+  "voice": "Sulafat",
+  "text": "呼び出し音が、鳴り続ける。誰も、出ない。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d12": {
+  "dur": 6.025,
+  "voice": "Rasalgethi",
+  "text": "お母様、時間がありません。相手のご家族が、警察を呼ぶと言っています。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e1": {
+  "dur": 6.657,
+  "voice": "Sulafat",
+  "text": "その時。インターホンが鳴った。ごぜん、にじ、さんじゅういっぷん。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e2": {
+  "dur": 2.524,
+  "voice": "Orus",
+  "text": "夜分にすみません。警察です。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e3": {
+  "dur": 3.03,
+  "voice": "Orus",
+  "text": "息子さんの事故の件で、開けていただけますか。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e4": {
+  "dur": 4.037,
+  "voice": "Sulafat",
+  "text": "電話の向こうで、ふたりのハルトが、同時に叫んだ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e5": {
+  "dur": 1.069,
+  "voice": "Iapetus",
+  "text": "開けちゃダメだ！",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e6": {
+  "dur": 1.228,
+  "voice": "Iapetus",
+  "text": "開けて、母さん！",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "x1": {
+  "dur": 1.892,
+  "voice": "Schedar",
+  "text": "次回。警察官。",
+  "model": "gemini-3.8-flash-tts"
+ }
+}
