@@ -1,0 +1,170 @@
+{
+ "a1": {
+  "dur": 3.724,
+  "voice": "Kore",
+  "text": "倉庫の奥で、私は椅子にしばりつけられた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a2": {
+  "dur": 4.531,
+  "voice": "Kore",
+  "text": "配信が止まると、鬼塚の顔から笑顔が消えた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a3": {
+  "dur": 3.453,
+  "voice": "Fenrir",
+  "text": "あの夜、お前…俺を撮っただろ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a4": {
+  "dur": 3.309,
+  "voice": "Kore",
+  "text": "どうして…どうして、あの人を刺したの？",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a5": {
+  "dur": 3.828,
+  "voice": "Fenrir",
+  "text": "あいつ、俺の動画はやらせだって、ばらそうとしたんだよ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a6": {
+  "dur": 8.251,
+  "voice": "Fenrir",
+  "text": "だから、お前を犯人にした。犯人の女が何を言っても、誰も信じないからな。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a7": {
+  "dur": 3.548,
+  "voice": "Kore",
+  "text": "正義の目は、鬼塚だった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a8": {
+  "dur": 3.497,
+  "voice": "Fenrir",
+  "text": "今から自白配信をやる。これを読め。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a9": {
+  "dur": 3.554,
+  "voice": "Kore",
+  "text": "紙には、私がやりましたと書いてあった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a10": {
+  "dur": 4.331,
+  "voice": "Fenrir",
+  "text": "読まなかったら、あの友達がどうなるか、分かるよな。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a11": {
+  "dur": 2.938,
+  "voice": "Kore",
+  "text": "倉庫の隅で、けんとが目をそらした。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b1": {
+  "dur": 2.027,
+  "voice": "Autonoe",
+  "text": "アカリ、戻ってこない…",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b2": {
+  "dur": 3.634,
+  "voice": "Autonoe",
+  "text": "あの写真さえあれば……待って。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b3": {
+  "dur": 4.011,
+  "voice": "Autonoe",
+  "text": "アカリの写真は、いつも私との共有アルバムに入る。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b4": {
+  "dur": 3.347,
+  "voice": "Autonoe",
+  "text": "あった。にじゅうさんじ、じゅうにふんの、あの写真。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b4b": {
+  "dur": 4.704,
+  "voice": "Autonoe",
+  "text": "でも、今これを出しても…また加工だって言われる。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b5": {
+  "dur": 6.562,
+  "voice": "Schedar",
+  "text": "健人です。港の第3倉庫。アカリさんは、ここにいる。警察を呼んでくれ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b6": {
+  "dur": 4.222,
+  "voice": "Autonoe",
+  "text": "もしもし、警察ですか！通り魔の本当の犯人が、分かりました！",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c1": {
+  "dur": 5.846,
+  "voice": "Fenrir",
+  "text": "みなさん、お待たせしましたー！通り魔の女が、自白しまーす！",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c2": {
+  "dur": 6.15,
+  "voice": "Kore",
+  "text": "カメラを持っているのは、鬼塚。画面に映っているのは、私だけ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c3": {
+  "dur": 5.583,
+  "voice": "Kore",
+  "text": "同時視聴、にじゅうまんにん。みんなが、私の自白を待っている。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c4": {
+  "dur": 3.951,
+  "voice": "Kore",
+  "text": "私は…あの夜、駅前で…",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c5": {
+  "dur": 7.353,
+  "voice": "Kore",
+  "text": "ここで読んだら、本当に終わる。でも今なら、にじゅうまんにんに届く。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c5b": {
+  "dur": 3.289,
+  "voice": "Kore",
+  "text": "カメラの後ろで、けんとが小さくうなずいた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c6": {
+  "dur": 3.525,
+  "voice": "Kore",
+  "text": "犯人は…今カメラを持っている、この人です。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c7": {
+  "dur": 3.795,
+  "voice": "Kore",
+  "text": "おにづかレオ。あの夜、私はこの人を見ました。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c8": {
+  "dur": 2.475,
+  "voice": "Kore",
+  "text": "鬼塚が、刃物を取り出した。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "x1": {
+  "dur": 3.09,
+  "voice": "Schedar",
+  "text": "次回、最終話。拡散希望。",
+  "model": "gemini-3.8-flash-tts"
+ }
+}
