@@ -210,9 +210,9 @@
   "model": "gemini-3.8-flash-tts"
  },
  "e6": {
-  "dur": 1.228,
+  "dur": 1.016,
   "voice": "Iapetus",
-  "text": "開けて、母さん！",
+  "text": "あけて！かあさん！",
   "model": "gemini-3.8-flash-tts"
  },
  "x1": {
