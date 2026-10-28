@@ -2,7 +2,8 @@ import * as THREE from 'three';
 import { rng, clamp, lerp, ease, easeOut, fade, mat, box, comma, canvasTex, makePerson, randPerson, SKIN, HAIR } from '../lib.js';
 import { japan, ll, CITY, setDots, setMapEnv, makeRing, LAND_Y } from '../scenes/japan.js';
 import { stage, setStageColor } from '../scenes/stage.js';
-import { look, lift, runStory, endCard, countUp, makeSparkles, setTop, setHud, el } from '../story.js';
+import { xCountdown } from '../scenes/xbutton.js';
+import { cam, look, lift, runStory, endCard, countUp, makeSparkles, setTop, setHud, el } from '../story.js';
 
 // もしも日本人全員が1円ずつ出したら？（blueprint no 131・日本人全員でシリーズ）
 // 数字
@@ -114,11 +115,20 @@ const rings = [];
 for (const c of ['tokyo', 'osaka', 'nagoya', 'fukuoka', 'sapporo', 'sendai', 'hiroshima']) { const r = makeRing('#ffe08a', 0.8); const v = ll(...CITY[c]); r.position.x = v.x; r.position.z = v.z; r.visible = false; rings.push(r); }
 function ringsAt(u) { rings.forEach((r, i) => { const k = clamp(u - i * 0.05); r.visible = k > 0 && k < 1; r.scale.setScalar(1 + k * 14); r.material.opacity = 0.8 * (1 - k); }); }
 function mapDots(t, pulse = -1, col = '#ffffff') { setDots((i, x, z, q) => { const u = pulse < 0 ? -1 : (t - pulse - q * 0.6) / 0.6; const on = u > 0 && u < 1; return { y: on ? Math.sin(u * Math.PI) * 1.6 : 0, color: on ? '#ffe08a' : col }; }); }
-function mapBase(env = 'day') { setMapEnv(env); setLine(0); head.visible = false; ringsAt(0); }
+function mapBase(env = 'day') { setMapEnv(env); setLine(0); head.visible = false; ringsAt(0); mapCoin.visible = false; mSpark.set(0); }
+// v2：1枚目（サムネ）は日本地図の上に大きな1円玉。0.5秒で地図に落ちて、全国が一斉に光る
+const mapCoin = makeCoin(1); mapCoin.visible = false; japan.add(mapCoin);
+const mSpark = makeSparkles(160, 2.2, 0xffffff); japan.add(mSpark.points);
+const _f = new THREE.Vector3(), _u = new THREE.Vector3(), _q = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), Math.PI / 2);
+function coinOnScreen(ndcY, D, r, spin = 0) { // カメラの前 D の所、画面の高さ ndcY に、半径 r の1円玉を正面向きで置く
+  _f.set(0, 0, -1).applyQuaternion(cam.quaternion); _u.set(0, 1, 0).applyQuaternion(cam.quaternion);
+  mapCoin.position.copy(cam.position).addScaledVector(_f, D).addScaledVector(_u, D * Math.tan(cam.fov * Math.PI / 360) * ndcY);
+  mapCoin.quaternion.copy(cam.quaternion).multiply(_q); mapCoin.rotateY(spin); mapCoin.scale.setScalar(r); mapCoin.visible = true;
+}
 
 const SUBS = [
   [2.6, 6.0, '財布に眠る、<br>1円玉1枚。'],
-  [6.2, 10.1, '日本中の全員が、<br>いっせいに1円を出す。'],
+  [6.2, 10.1, 'たった1円。でも本当に<br>ヤバいのは、1年続けた時。'],
   [10.1, 14, '集まったのは、<br>1億2,269万円。'],
   [14.2, 18.1, '1円玉は1枚1g。<br>全部積み上げると、'],
   [18.1, 22, '重さは約123トン。<br>銀色の山ができた。'],
@@ -140,11 +150,15 @@ const MAP_WIDE = [-8, 300, 95, -4, 0, -30], MAP_WIDE2 = [-4, 285, 85, -4, 0, -30
 
 function stageBase() { setStageColor('#14213a'); bigCoin.visible = false; coinSpark.set(0); setPile(0); scaleMan.visible = false; COUNT.visible = false; KIDS.visible = false; }
 
-function shot0(t) { // hook: map + countdown
-  mapBase('day'); mapDots(t);
+const TP = 0.5; // v2：0.5秒で全員が出す（冒頭で待たせない）
+function shot0(t) { // hook: a big 1-yen coin over the map -> at TP it drops and the whole country lights up
+  mapBase('day'); mapDots(t, TP); ringsAt(clamp((t - TP) / 3));
   mapCam(t, 2.6, MAP_WIDE, MAP_WIDE2);
-  el.title.style.opacity = 1;
-  setHud('全員が1円を出すまで', cd(Math.max(0, 2.5 - t)), 1, { mono: true });
+  if (t < TP + 0.25) { const d = clamp((t - TP) / 0.25); coinOnScreen(0.08 - d * 0.5, 60 + d * d * 200, 5.6, Math.sin(t * 2.4) * 0.35); }
+  if (t >= TP && !mSpark.r) { const tk = ll(...CITY.tokyo); mSpark.init([[tk.x, 6, tk.z]], 10, 18); mSpark.r = true; }
+  mSpark.set(t >= TP ? (t - TP) / 1.2 : 0);
+  el.flash.style.opacity = t >= TP ? 0.5 * Math.max(0, 1 - (t - TP) / 0.3) : 0;
+  setHud('全員が1円を出すまで', xCountdown(TP - t), 1, { mono: true, color: t < TP ? '#fff' : '#ffe08a' });
   return japan;
 }
 function shot1(t) { // a single 1-yen coin
@@ -152,14 +166,13 @@ function shot1(t) { // a single 1-yen coin
   stageBase(); bigCoin.visible = true; coinGrp.position.set(0, 3.2 + Math.sin(t * 2) * 0.1, 0); coinGrp.rotation.set(0, Math.sin(t * 1.2) * 0.45, 0);
   const u = ease(t / 3.5);
   look(lerp(0.8, 0.3, u), lerp(4.2, 4.0, u), lerp(9.5, 8.6, u), 0, 3.2, 0, 50);
-  el.title.style.opacity = clamp(1 - (t - 0.2) / 0.5);
   setHud('全員が1円を出すまで', '0:00.00', 1, { mono: true });
   return stage;
 }
 function shot2(t) { // everyone puts in 1 yen: map pulses
-  mapBase('day'); mapDots(t, 0.3); ringsAt(clamp((t - 0.3) / 3));
+  mapBase('day'); mapDots(t, 0.3); ringsAt(clamp((t + 2.0) / 3)); // v2：冒頭（0.5秒）の波紋の続き
   const tk = ll(...CITY.tokyo);
-  mapCam(t, 8, [-6, 240, 80, -4, 0, -25], [tk.x + 20, 90, tk.z + 70, tk.x - 4, 0, tk.z - 4]);
+  mapCam(t, 8, MAP_WIDE2, [tk.x + 20, 90, tk.z + 70, tk.x - 4, 0, tk.z - 4]);
   setHud('全員が出した', '+0秒', 1);
   setTop('集まったお金（2026年10月の人口）', okuMan(countUp(t, POP, 4.15, 1.3)) + '円', fade(t, 4.1, 8, 0.25), GOLD);
   return japan;
@@ -221,7 +234,8 @@ function shot7(t) { // result: kids with lunch trays
 function shot8(t) { // loop to the opening map
   mapBase('day'); mapDots(t);
   mapCam(t, 4, [-10, 306, 98, -4, 0, -30], MAP_WIDE);
-  setHud('全員が1円を出すまで', '0:03.00', 1, { mono: true });
+  coinOnScreen(0.08, 60, 5.6 * clamp(t / 0.6), Math.sin(t * 2.4) * 0.35); // v2：冒頭と同じ1円玉が戻ってきてループ
+  setHud('全員が1円を出すまで', xCountdown(TP), 1, { mono: true });
   return japan;
 }
 
@@ -233,14 +247,17 @@ const shots = [
 void box; void makeSparkles;
 runStory({
   shots, subs: SUBS, duration: 64.5,
+  cut: [[2.5, 6.0]], // v2：財布の1円玉（元の2.5〜6秒）を抜いて、出した直後から本題へ
   meta: {
     id: '0131',
+    v2: true,
+    hookLine: '日本中の全員が、1円ずつ出した。',
     series: '日本人全員で',
     hookType: 'H1', cat: '全員が同時に・極端な数字',
     title: '日本人全員が1円ずつ出したら？',
     titleHtml: '日本人全員が<br>1円ずつ出したら？',
-    mood: 'hopeful', seed: 131, hits: [6.3, 48.1], risers: [39.2], impacts: [10.2, 18.2, 26.2, 43.7],
-    sfx: [[2.5, 'whoosh'], [6.4, 'meter', 0.3], [22.3, 'whoosh'], [34.7, 'meter', 0.5]],
+    mood: 'hopeful', seed: 131, hits: [0.5, 48.1], risers: [39.2], impacts: [10.2, 18.2, 26.2, 43.7],
+    sfx: [[0.5, 'poof'], [6.4, 'meter', 0.3], [22.3, 'whoosh'], [34.7, 'meter', 0.5]],
     narr: { '1億2,269万円': '1億2269万円', '123トン': '123トン', '2,454km': '2454キロ', '3.9年': '3.9年', '448億円': '448億円', '87万人': '87万人', '1g': '1グラム' },
     ask: '次に日本人全員でやってほしいのは？',
     caption: 'もしも日本人全員が1円ずつ出したら？\n日本の人口は1億2,269万人（2026年10月の概算）。全員が1円玉を1枚出すと、1億2,269万円。\n1円玉は1枚1.00g・直径2cm。全部集めると重さは約123トン、1列に並べると2,454km（単純計算）。北海道の北の端から鹿児島までを直線で結んでも約2,240kmなので、それを越える長さ。\n1秒に1枚、休まず数えても、数え終わるまで約3.9年（単純計算）。\nこれを毎日1年続けると、約448億円（単純計算）。公立小学校の給食費は月平均4,688円（2023年度、年額を11か月で割った額）なので、小学生約87万人の給食1年分になる（推計）。\n\n結果：1人1日1円で、小学生87万人の給食1年分。1円も、全員なら大金。\n\n次に日本人全員でやってほしいのは？ コメントで教えて。\n\n出典：総務省統計局 人口推計（2026年10月1日現在 概算値）、財務省 通常貨幣一覧、文部科学省 令和5年度学校給食費調査',
