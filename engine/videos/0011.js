@@ -40,7 +40,7 @@ function mapDots(heat, night) {
 
 const SUBS = [
   [2.6, 6.0, 'これは、国が公表している<br>被害想定をもとにした話。'],
-  [6.2, 10.1, '静岡から九州の沖で、<br>巨大地震。'],
+  [6.2, 10.1, '国の被害想定で見る。<br>カギは、最初の数分。'],
   [10.1, 14, '10県149の市町村で、<br>震度7の想定。'],
   [14.2, 18.1, '早い所では、<br>もう津波がとどく。'],
   [18.1, 22, '高い所では、<br>最大約34mの想定。'],
@@ -56,11 +56,11 @@ const SUBS = [
 ];
 
 function mapCam(t, a, b, dur, shakeK = 0) { const u = ease(t / dur); const [jx, jz] = jitter(t, shakeK); L(lerp(a[0], b[0], u) + jx, lerp(a[1], b[1], u), lerp(a[2], b[2], u) + jz, lerp(a[3], b[3], u) + jx, 0, lerp(a[4], b[4], u) + jz, 50); }
-function shot0(t, T) { // hook: big number, the map begins to shake at 1.2
-  setMapEnv('day'); mapDots(0, false); faultM.opacity = t > 1.2 ? 0.9 : 0; rings(quakeRings, 0, 1); rings(waveRings, 0, 1); pin.visible = false;
-  rings(quakeRings, t > 1.2 ? (t - 1.2) / 1.5 : 0, 40);
-  mapCam(t, [-14, 170, 40, -14, -20], [-14, 160, 36, -14, -20], 2.6, t > 1.2 ? 1.2 : 0);
-  el.title.style.opacity = 1;
+const TQ = 0.5; // v2：0.5秒で揺れ始める（冒頭で待たせない）
+function shot0(t, T) { // hook: big number, the map begins to shake at 0.5
+  setMapEnv('day'); mapDots(0, false); faultM.opacity = t > TQ ? 0.9 : 0.45; // 0秒目（サムネ）から震源の線をうっすら見せる rings(quakeRings, 0, 1); rings(waveRings, 0, 1); pin.visible = false;
+  rings(quakeRings, t > TQ ? (t - TQ) / 1.5 : 0, 40);
+  mapCam(t, [-14, 170, 52, -14, -8], [-14, 160, 48, -14, -8], 2.6, t > TQ ? 1.2 : 0); // v2：日本と震源をタイトルの下に大きく
   setHud('最大想定の死者', '約29.8万人', 1, { color: '#ff8a7a' });
   return japan;
 }
@@ -73,7 +73,7 @@ function shot1(t, T) { // calm everyday street
 }
 function shot2(t, T) { // +0s fault ruptures, shaking spreads
   setMapEnv('day'); faultM.opacity = 0.9; mapDots(clamp(t / 3), false); rings(quakeRings, clamp(t / 3.5), 45); rings(waveRings, 0, 1); pin.visible = false;
-  mapCam(t, [-14, 175, 45, -14, -18], [-16, 150, 40, -16, -16], 8, Math.max(0, 1.4 - t * 0.18));
+  mapCam(t, [-14, 165, 50, -14, -9], [-16, 150, 40, -16, -16], 8, Math.max(0, 1.4 - t * 0.18));
   hudTime('+0秒');
   setTop('震度7になる市町村（2025年想定）', countUp(t, 149) + '市町村', fade(t, 0.15, 8, 0.25));
   return japan;
@@ -119,7 +119,7 @@ function shot7(t, T) { // result: calm overview
 }
 function shot8(t, T) { // loop: like the opening map
   setMapEnv('day'); mapDots(0, false); faultM.opacity = 0; rings(quakeRings, 0, 1); rings(waveRings, 0, 1); pin.visible = false;
-  mapCam(t, [-14, 172, 41, -14, -20], [-14, 170, 40, -14, -20], 4);
+  mapCam(t, [-14, 172, 53, -14, -8], [-14, 170, 52, -14, -8], 4);
   setHud('最大想定の死者', '約29.8万人', 1, { color: '#ff8a7a' });
   setTop('今後30年以内の発生確率（地震本部）', '60〜90%程度以上', fade(t, 0.15, 4, 0.25));
   return japan;
@@ -132,11 +132,14 @@ const shots = [
 ];
 runStory({
   shots, subs: SUBS, duration: 64.5, camera: cityCam,
+  cut: [[2.5, 6.0]], // v2：いつもの街（元の2.5〜6秒）を抜いて、揺れた直後から本題へ
   meta: {
     id: '0011',
+    v2: true,
+    hookLine: '南海トラフで、巨大地震が起きた。',
     title: '南海トラフ巨大地震が起きたら？',
-    titleHtml: '南海トラフ巨大地震が<br>起きたら？',
-    mood: 'calm', seed: 12, hits: [1.2, 6.2], risers: [1.2],
+    titleHtml: '南海トラフ地震が<br>起きたら？', // v2：大きく出すので2行・1行9字以内に
+    mood: 'calm', seed: 12, hits: [0.5, 6.2], risers: [6.0],
     ask: 'あなたの家の避難場所、すぐ言える？',
     caption: 'もしも南海トラフ巨大地震が起きたら？\n国（内閣府）が2025年3月に公表した被害想定をもとに、地震から1週間を淡々とシミュレーション。死者は最大約29.8万人の想定ですが、全員がすぐに避難を始めれば津波の死者は約7割減るとされています。\n\nあなたの家の避難場所、すぐ言える？ コメントで教えて。\n\n出典：内閣府 中央防災会議 南海トラフ巨大地震の被害想定（2025年3月）・広報ぼうさい、地震調査研究推進本部（2025年9月）',
     hashtags: ['もしもラボ', '南海トラフ', '防災', '地震', '備え'],
