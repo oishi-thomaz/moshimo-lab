@@ -86,14 +86,14 @@ function crowdOn(on) { crowd.g.visible = on; }
 
 const SUBS = [
   [2.6, 6.0, 'いつもの朝。<br>お弁当工場のライン。'],
-  [6.2, 10.0, '日本で働く外国人が、<br>いっせいに帰国した。'],
+  [6.2, 10.0, 'まず困るのは、<br>毎日のお弁当だった。'],
   [10.1, 13.9, 'いちばん多いのは<br>工場で働く人。'],
   [14.2, 18.0, 'そのうち食べ物の工場は<br>20万人をこえる。'],
-  [18.1, 21.9, 'おかずを詰める人が<br>いない場所ができた。'],
+  [18.1, 21.9, 'おかずを詰める人がいない。<br>同じことが、街中で。'],
   [22.2, 26.0, 'お店でも、<br>レジに立つ人が消えた。'],
-  [26.1, 29.9, '小売・卸だけで<br>34万人。'],
+  [26.1, 29.9, '小売・卸だけで34万人。<br>でも、まだ序の口。'],
   [30.2, 34.6, '工事現場、飲食店、介護。<br>あらゆる職場から。'],
-  [34.6, 38.9, '外国人を雇う職場は、<br>37万か所をこえる。'],
+  [34.6, 38.9, '外国人を雇う職場は<br>37万か所超え。次は畑。'],
   [39.2, 43.6, '畑でも、<br>収穫する人が消えた。'],
   [43.6, 47.8, '実ったいちごが、<br>畑に残された。'],
   [48.1, 52.6, '結果：37万か所の職場から、<br>257万人の人手が消えた。'],
@@ -102,11 +102,11 @@ const SUBS = [
 ];
 
 // ---------- shots ----------
-function shot0(t, T) { // hook: giant number + some workers vanish at 1.2s
-  factoryAt(T, { tv: 1.2, signOn: false });
+function shot0(t, T) { // hook: giant number + some workers vanish at 0.5s（v2：0.6秒以内に消える）
+  factoryAt(T, { tv: 0.5, signOn: false });
+  el.flash.style.opacity = T >= 0.5 ? 0.45 * Math.max(0, 1 - (T - 0.5) / 0.3) : 0;
   const u = ease(T / 2.5);
   look(lerp(-1.2, -0.6, u), 3.0, lerp(6.6, 6.2, u), 0, 1.2, -1.6, 50);
-  el.title.style.opacity = 1;
   setTop('日本で働く外国人（2025年10月末）', '257万1,037人', 1);
   return factory;
 }
@@ -117,8 +117,8 @@ function shot1(t, T) { // daily (rewind): everyone working
   look(lerp(3.5, 2.2, u), lerp(2.4, 2.6, u), lerp(4.2, 4.6, u), lerp(1.0, 0.4, u), 1.1, -1.4, 50);
   return factory;
 }
-function shot2(t, T) { // +1min: they vanish, belt keeps going
-  factoryAt(t, { tv: 0.4 });
+function shot2(t, T) { // +1min: they are already gone (v2：冒頭の続き。ベルトもそのまま流れ続ける)
+  factoryAt(t + 2.5, { tv: 0.5, signOn: false });
   const u = ease(t / 8);
   look(lerp(-0.6, 0.6, u), lerp(3.0, 3.4, u), lerp(6.4, 7.0, u), 0, 1.1, -1.8, 50);
   hudTime('+1分');
@@ -202,11 +202,14 @@ const shots = [
 ];
 runStory({
   shots, subs: SUBS, duration: 64.5, dim: f => f === shot4 || f === shot6,
+  cut: [[2.5, 6.0]], // v2：いつもの朝のライン（元の2.5〜6秒）を抜いて、消えた直後から本題へ
   meta: {
     id: '0029',
+    v2: true,
+    hookLine: '日本で働く外国人が、一斉に帰国した。',
     title: '外国人労働者257万人が一斉に帰国したら？',
-    titleHtml: '外国人労働者257万人が<br>一斉に帰国したら？',
-    mood: 'tension', seed: 29, hits: [1.2, 6.4, 48.1], risers: [6.0],
+    titleHtml: '外国人労働者が<br>一斉に帰国したら？', // v2：大きく出すので2行・1行9字以内に（人数は下の大きな数字で見せる）
+    mood: 'tension', seed: 29, hits: [0.5, 48.1], risers: [6.0], sfx: [[0.5, 'poof']],
     ask: '職場に外国人の同僚いる？',
     narr: { '6万4,826人': '6万4826人' },
     caption: 'もしも日本で働く外国人257万人が一斉に帰国したら？\n2025年10月末、日本で働く外国人は257万1,037人で過去最多。いちばん多いのは製造業の63万5,075人で、うち食料品の工場は20万3,834人。外国人を雇う職場は37万1,215か所。工場、お店、畑の人手がどこで消えるのか、厚生労働省の統計で見てみた。5年前（2021年）は172万7,221人だった。\n\n職場に外国人の同僚いる？ コメントで教えて。\n\n出典：厚生労働省「外国人雇用状況」の届出状況まとめ（令和7年10月末時点）',
