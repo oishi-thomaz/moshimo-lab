@@ -24,11 +24,12 @@ import { lift, look, runStory, endCard, countUp, makeSparkles, setTop, setHud, e
 
 const GREEN = '#7ff0c8', RED = '#ff5a4f', GOLD = '#ffe08a', BLUE = '#7fd4ff';
 const NAMES = ['テレビ', '電子レンジ', '洗濯機', '冷蔵庫', 'エアコン'];
-const VANISH = [7.4, 19.6, 31.4, 43.6, 59.8];
+const VANISH = [0.5, 19.6, 31.4, 43.6, 59.8]; // v2：テレビは冒頭の0.5秒で台から消える（リビングの場面は消えた後から始まる）
 const RISE = [14.8, 27.0, 39.2, 55.4, 79.6];
 const LEVEL = [0.05, 0.25, 0.5, 0.8, 1.06];
 const WORD = ['ほぼゼロ', '小', '中', '大', '危険'];
 function lineupState(T) {
+  aSpark.set(0); // v2：冒頭のテレビの光は shot0 だけで出す
   for (let i = 0; i < 5; i++) {
     const show = T < VANISH[i] ? 1 : 0;
     const k = easeOut(clamp((T - RISE[i]) / (i === 4 ? 1.8 : 1.4)));
@@ -103,7 +104,7 @@ function mapHeat(t, k, zoomTokyo = false) {
 
 const SUBS = [
   [2.6, 6.4, '5つの家電から、<br>1つだけ消してみる。'],
-  [6.6, 10.5, 'まずはテレビ。<br>リビングから消えた。'],
+  [6.6, 10.5, 'まずはテレビ。でも1つ、<br>命に関わる家電がある。'],
   [10.6, 14.5, 'でもネットの時間は、<br>もうテレビより長い。'],
   [14.6, 18.4, 'ニュースも動画も、<br>スマホで見られる。'],
   [18.6, 22.5, '次は電子レンジ。<br>台所から消えた。'],
@@ -134,7 +135,14 @@ function meterShot(i) {
     return aLineup;
   };
 }
-function shot0(t, T) { lift(320); lineupState(T); lineCam(t, 2.5); el.title.style.opacity = 1; return aLineup; }
+function hookCam(t, d) { const u = ease(clamp(t / d)); look(lerp(-0.45, -0.3, u), lerp(3.2, 3.1, u), lerp(10.9, 10.5, u), -0.15, 1.15, -0.6, 50); }
+const aSpark = makeSparkles(160, 0.09); aLineup.add(aSpark.points); aSpark.init([[-2.2, 0.55, 0], [-2.2, 0.85, 0], [-2.0, 0.7, 0]], 0.4, 0.9);
+function shot0(t, T) { // v2 hook: 5つの家電が並び、0.5秒でテレビが消える
+  lift(170); lineupState(T); hookCam(t, 2.5); // 0秒目サムネ：5つ全部が見えるよう正面から、タイトルとバッジの下に
+  aSpark.set(t >= VANISH[0] ? (t - VANISH[0]) / 1.2 : 0);
+  el.flash.style.opacity = t >= VANISH[0] ? 0.35 * Math.max(0, 1 - (t - VANISH[0]) / 0.3) : 0;
+  return aLineup;
+}
 function shot1(t, T) { lift(320); lineupState(T); lineCam(t + 2.5, 6.4); el.title.style.opacity = clamp(1 - (t - 0.3) / 0.5); return aLineup; }
 function shotTV(t, T) { // living room TV vanishes; then the phone
   lift(240); hideAll();
@@ -246,7 +254,7 @@ function shotResult(t, T) {
   else setTop('熱中症の死者（全国・2024年）', '2,160人', fade(t, 5.8, 8, 0.2), RED);
   return aLineup;
 }
-function shotLoop(t, T) { lift(320); lineupState(T); lineCam(t, 3.7); return aLineup; }
+function shotLoop(t, T) { lift(170); lineupState(T); hookCam(t, 3.7); return aLineup; }
 
 const shots = [
   { a: 0, b: 2.5, f: shot0 }, { a: 2.5, b: 6.4, f: shot1 },
@@ -260,15 +268,18 @@ const shots = [
 void glow; void makeTV; void makeFridge; void makeWasher;
 runStory({
   shots, subs: SUBS, duration: 99.9,
+  cut: [[2.5, 6.4]], // v2：5つ並べて説明する場面（元の2.5〜6.4秒）を抜いて、テレビが消えた直後から本題へ
   meta: {
     id: '0721',
+    v2: true,
+    hookLine: '家電が1つ、家から消えた。',
     series: 'ヤバい順',
     hookType: 'H5', cat: '身近なもの・インフラ',
     title: '1つ消えたら、生活が一番ヤバい家電はどれ？',
     titleHtml: '<span style="font-size:.84em">1つ消えたら、生活が</span><br>一番ヤバい家電は？',
-    mood: 'mystery', seed: 721, hits: [59.8, 83.5], risers: [59.0, 83.3],
+    mood: 'mystery', seed: 721, hits: [0.5, 59.8, 83.5], risers: [59.0, 83.3],
     impacts: [22.7, 51.1, 63.3, 75.3, 79.5, 83.5],
-    sfx: [[0.3, 'whoosh'], [7.4, 'poof'], [15.0, 'meter', 0.05], [19.6, 'poof'], [27.2, 'meter', 0.25], [31.4, 'poof'], [34.9, 'bubble'], [39.4, 'meter', 0.5],
+    sfx: [[0.5, 'poof'], [15.0, 'meter', 0.05], [19.6, 'poof'], [27.2, 'meter', 0.25], [31.4, 'poof'], [34.9, 'bubble'], [39.4, 'meter', 0.5],
       [43.6, 'poof'], [51.5, 'buzz'], [55.6, 'meter', 0.8], [59.8, 'poof'], [63.4, 'alarm'], [79.8, 'meter', 1.0]],
     narr: { '24.6kg': '24.6キロ', '10℃': '10度', '2.5万人': '2万5千人', '10万人': '10万人', '181人': '181人', '約8割': '約8割', '2,160人': '2160人' },
     ask: '次にランキングしてほしいものは？',
