@@ -73,13 +73,13 @@ function stageMode(m) { RICE.visible = m === 'rice'; DAYS.visible = m === 'days'
 
 const SUBS = [
   [2.6, 6.0, '起きてから寝るまで、<br>スマホを見続ける毎日。'],
-  [6.2, 10.1, '頭の重さは、まっすぐなら<br>約5kg。'],
+  [6.2, 10.1, 'まっすぐなら頭は約5kg。<br>でも問題は角度だった。'],
   [10.1, 14, '60度うつむくと、<br>首には約27kgの負担。'],
   [14.2, 18.1, '27kgは、お米5kg袋の<br>5袋分以上。'],
-  [18.1, 22, 'それを、毎日8時間<br>首で支え続ける。'],
+  [18.1, 22, 'それを毎日8時間。<br>しかも首だけじゃない。'],
   [22.2, 26.1, '高校生の7割は、<br>裸眼視力が1.0未満。'],
   [26.1, 30, '画面を長く見る子どもは、<br>近視になりやすさ約1.8倍。'],
-  [30.2, 34.6, '8時間×365日は、<br>2,920時間。'],
+  [30.2, 34.6, '8時間×365日は2,920時間。<br>何日分になる？'],
   [34.6, 39, 'まるまる122日分、<br>スマホを見ていた計算だ。'],
   [39.2, 43.6, '起きている時間の、<br>ちょうど半分。'],
   [43.6, 47.8, 'その間ずっと、<br>首はうつむいたまま。'],
@@ -89,32 +89,36 @@ const SUBS = [
 ];
 
 const hms = (s) => { s = Math.max(0, s); const h = Math.floor(s / 3600), m = Math.floor(s / 60) % 60, x = Math.floor(s) % 60; return `${h}:${String(m).padStart(2, '0')}:${String(x).padStart(2, '0')}`; };
+const TP = 0.5;
+// v2：1枚目（サムネ）で頭と kg の札がタイトルにかからないよう、少し引いて横から
+const HOOK_LIFT = 150;
+function hookCam(t, d) { const u = ease(t / d); look(lerp(-3.4, -3.25, u), lerp(1.75, 1.7, u), lerp(-0.7, -0.75, u), 0.3, 1.3, 0.5, 54); }
 function shot0(t) { // hook: screen-time clock runs, the head bends forward, the neck turns red
-  lift(150);
+  lift(HOOK_LIFT);
   sofa('evening', { ceil: 7, hemi: 0.9 });
-  const k = ease(clamp(t / 1.5)); sit(t, k);
-  neckMark(Math.round(lerp(5, 27, k)) + 'kg', clamp((t - 0.3) / 0.3));
-  sideCam(t, 2.5, [-2.9, 1.75, 0.5], [-2.75, 1.7, 0.5]);
-  el.title.style.opacity = 1;
-  setHud('スマホを見た時間', hms(Math.pow(t / 2.5, 1.6) * 8 * 3600), 1, { mono: true, color: t > 1.5 ? '#ff8a7a' : '#fff' });
+  // v2：0秒目は頭まっすぐ（5kg）。0.5秒で8時間に届いて、頭がガクッと前へ（27kg）
+  const k = ease(clamp((t - (TP - 0.3)) / 0.3)); sit(t, k);
+  neckMark(Math.round(lerp(5, 27, k)) + 'kg', 1);
+  el.flash.style.opacity = t >= TP ? 0.4 * Math.max(0, 1 - (t - TP) / 0.3) : 0;
+  hookCam(t, 2.5);
+  setHud('スマホを見た時間', hms(t < TP ? Math.pow(t / TP, 1.6) * 8 * 3600 : 8 * 3600 + (t - TP) * 60), 1, { mono: true, color: t >= TP ? '#ff8a7a' : '#fff' });
   return room;
 }
 function shot1(t) { // everyday: on the sofa, scrolling
   lift(150);
   sofa('evening', { ceil: 7, hemi: 0.9 }); sit(t, 0.75 + Math.sin(t * 0.8) * 0.05);
   frontCam(t, 3.5, [-2.3, 1.9, -2.2], [-1.9, 1.85, -2.4]);
-  el.title.style.opacity = clamp(1 - (t - 0.2) / 0.5);
   setHud('スマホを見た時間', hms(3600 + t * 900), 1, { mono: true });
   return room;
 }
 function shot2(t) { // +1時間: side view, head straight → 60 degrees, kg tag 5 → 27
   lift(150);
   sofa('evening', { ceil: 7, hemi: 0.9 });
-  const k = t < 4.1 ? 0 : ease(clamp((t - 4.1) / 1.2)); sit(t, k);
+  const k = t < 0.8 ? 1 - ease(t / 0.8) : t < 4.1 ? 0 : ease(clamp((t - 4.1) / 1.2)); sit(t, k); // v2：冒頭でうつむいた頭を、いったん起こしてから説明
   neckMark(Math.round(lerp(5, 27, k)) + 'kg', 1);
   sideCam(t, 8, [-2.9, 1.75, 0.5], [-2.6, 1.65, 0.45]);
   hudTime('+1時間');
-  setTop(t < 4.1 ? '頭の重さ（まっすぐ・2014年）' : '首にかかる重さ（60度うつむく・2014年）', '約' + Math.round(lerp(5, 27, k)) + 'kg', fade(t, 0.3, 8, 0.25), t < 4.1 ? GREEN : RED);
+  setTop(t < 4.1 ? '頭の重さ（まっすぐ・2014年）' : '首にかかる重さ（60度うつむく・2014年）', '約' + Math.round(lerp(5, 27, k)) + 'kg', fade(t, 0.85, 8, 0.25), t < 4.1 ? GREEN : RED); // v2：頭を起こし切ってから 5kg を出す
   return room;
 }
 function shot3(t) { // +1日: stage, the bent figure = 5.4 bags of rice
@@ -165,9 +169,9 @@ function shot7(t) { // result: the year view again, 122 lit
   return stage;
 }
 function shot8(t) { // loop: back to the side view, head starting to bend
-  lift(150);
-  sofa('evening', { ceil: 7, hemi: 0.9 }); sit(t, 0.1); neckMark('5kg', 1);
-  sideCam(t + 0.5, 4.5, [-2.9, 1.75, 0.5], [-2.75, 1.7, 0.5]);
+  lift(HOOK_LIFT);
+  sofa('evening', { ceil: 7, hemi: 0.9 }); sit(t, 0); neckMark('5kg', 1);
+  hookCam(t + 0.5, 4.5); // v2：冒頭（サムネ）と同じ構図・頭まっすぐ・5kg に戻してループ
   setHud('スマホを見た時間', hms(0), 1, { mono: true });
   return room;
 }
@@ -179,15 +183,18 @@ const shots = [
 ];
 runStory({
   shots, subs: SUBS, duration: 64.5,
+  cut: [[2.5, 6.0]], // v2：ソファでスクロールする日常（元の2.5〜6秒）を抜いて、うつむいた直後から本題へ
   meta: {
     id: '0735',
+    v2: true,
+    hookLine: 'うつむいた首に、27kgがのしかかった。',
     series: '人体の限界',
     hookType: 'H4',
     cat: '体・健康',
     title: '毎日スマホを8時間見続けたら？',
     titleHtml: '毎日スマホを<br>8時間見続けたら？',
-    mood: 'tension', seed: 735, hits: [1.5, 48.1], risers: [30.2], impacts: [11.0, 18.4, 35.0],
-    sfx: [[1.5, 'meter', 0.45]],
+    mood: 'tension', seed: 735, hits: [0.5, 48.1], risers: [30.2], impacts: [11.0, 18.4, 35.0],
+    sfx: [[0.5, 'meter', 0.45]],
     narr: { '約5kg': 'やく5キロ', '約27kg': 'やく27キロ', '27kg': '27キロ', 'お米5kg袋': 'お米5キロぶくろ', '1.0未満': '1.0みまん', '約1.8倍': 'やく1.8ばい', '8時間×365日': '8時間かける365日', '2,920時間': '2920時間', '60度': '60ど' },
     ask: 'あなたの1日のスマホ時間は？',
     caption: 'もしも毎日スマホを8時間見続けたら、体はどうなる？\n頭の重さは、まっすぐなら約5kg。でも60度うつむくと、首には約27kgの負担がかかる（2014年の研究）。お米5kg袋の5袋分以上を、毎日8時間首で支える計算。\n目も近くを見続ける。高校生の71.51%は裸眼視力が1.0未満（2025年度 学校保健統計）。スマホとパソコンの画面を長く見る子どもは、近視のなりやすさ（オッズ比）が約1.8倍という分析もある（2021年）。\n8時間×365日は2,920時間。まるまる約122日分で、1日16時間起きているとすれば起きている時間の半分（単純計算）。\n頭を起こせば首の負担は約5kg。\n\nあなたの1日のスマホ時間は？ コメントで教えて。\n\n出典：Hansraj, Surgical Technology International（2014年）、文部科学省 学校保健統計調査（2025年度）、Foreman ほか The Lancet Digital Health（2021年）',
