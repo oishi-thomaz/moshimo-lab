@@ -55,7 +55,7 @@ const SHOTS = [
 
   // ── 1. 証拠を出す
   { at: 'a0', draw(g, lt, D, S) {
-    night(g); phoneFrame(g, 110, 220, 860, 1180, (p, w, h) => liveView(p, 0, 0, w, h, { t: lt, viewers: 120000, video: (q, vw, vh) => onizukaCam(q, vw, vh, lt) }));
+    night(g); phoneFrame(g, 110, 220, 860, 1180, (p, w, h) => liveView(p, 0, 0, w, h, { chatBottom: 340, chatMax: 4, t: lt, viewers: 120000, video: (q, vw, vh) => onizukaCam(q, vw, vh, lt) }));
     const a = inv(S.L('a0') + 2.4, S.L('a0') + 2.8, lt); g.save(); g.globalAlpha = a; g.lineWidth = 8; g.strokeStyle = K.orange; rr(g, 120, 316, 840, 72, 14); g.stroke(); g.restore();
     text(g, '今朝の配信', 540, 170, { size: 36, color: '#c9ccd6' });
   } },
@@ -76,7 +76,7 @@ const SHOTS = [
   { at: 'b3', draw(g, lt, D, S) { night(g); const v = noise1(lt * 50, 2) * 6; face(g, 'akari', lt, D, S, [], { eyes: 'wide', brow: -0.5, mouth: 'line', lightFrom: 'right', phoneLight: true, x: 540 + v }); } },
   { at: 'b4', draw(g, lt, D, S) { night(g); eyePost(g, 340, '犯人の女、駅前警察署に向かっている模様。\n白い軽自動車。#拡散希望', { img: (p, w, h) => carPhoto(p, w, h), imgH: 460, rt: ramp(lt, 0.2, D + 3, 200, 8000), likes: ramp(lt, 0.2, D + 3, 400, 12000), views: ramp(lt, 0.2, D + 3, 9000, 300000) }); } },
   { at: 'b5', draw(g, lt, D, S) { g.save(); cam(g, { x: 540, y: 1150, z: slow(lt, D + 2, 1.0, 1.08) }); policeFront(g, { t: lt }); g.restore(); } },
-  { at: 'b5b', draw(g, lt, D, S) { night(g); phoneFrame(g, 110, 200, 860, 1180, (p, w, h) => liveView(p, 0, 0, w, h, { t: lt, viewers: ramp(lt, 0, D + 2, 150000, 170000), title: 'ジャスティス鬼塚【生】通り魔の女、警察署に来るか!?', video: (q, vw, vh) => onizukaCam(q, vw, vh, lt, { bg: 'night', place: 'police', point: inv(0.2, 0.5, lt) }), comments: [['名無し', 'きたあああ'], ['ゆう', '白い軽だ！'], ['k_k', '逃がすな'], ['みー', '鬼塚さん走って']].map(([n, s], i) => ({ t: 0.4 + i * 0.4, name: n, text: s, av: i + 2 })) })); } },
+  { at: 'b5b', draw(g, lt, D, S) { night(g); phoneFrame(g, 110, 200, 860, 1180, (p, w, h) => liveView(p, 0, 0, w, h, { chatBottom: 340, chatMax: 4, t: lt, viewers: ramp(lt, 0, D + 2, 150000, 170000), title: 'ジャスティス鬼塚【生】通り魔の女、警察署に来るか!?', video: (q, vw, vh) => onizukaCam(q, vw, vh, lt, { bg: 'night', place: 'police', point: inv(0.2, 0.5, lt) }), comments: [['名無し', 'きたあああ'], ['ゆう', '白い軽だ！'], ['k_k', '逃がすな'], ['みー', '鬼塚さん走って']].map(([n, s], i) => ({ t: 0.4 + i * 0.4, name: n, text: s, av: i + 2 })) })); } },
   { at: 'b5c', draw(g, lt, D, S) { g.save(); cam(g, { x: 540, y: 1200, z: 1.0 }); nightDrive(g, { t: lt, fast: 1 }); g.restore(); } },
   { at: 'b6', finish: { vignette: 0.7 }, draw(g, lt, D, S) { night(g); face(g, 'misaki', lt, D, S, ['b6'], { eyes: 'wide', brow: -0.8, mouth: 'line', lightFrom: 'left' }); } },
 
@@ -99,7 +99,7 @@ const SHOTS = [
     g.save(); g.globalAlpha = inv(0.8, 1.6, lt); figure(g, { ...P.onizuka }, { x: 400, y: 1600, s: 1.35, arms: [10, 0, 150, -40], eyes: 'wide', mouth: 'smile', brow: 0.4 }); g.restore();
     g.restore(); sfxText(g, 'パッ', 540, 420, { size: 130, color: '#fff', alpha: inv(0.6, 0.8, lt) * (1 - inv(1.6, 2.0, lt)), rot: -0.08 });
   } },
-  { at: 'd5', draw(g, lt, D, S) { night(g); phoneFrame(g, 60, 160, 960, 1300, (p, w, h) => liveView(p, 0, 0, w, h, { t: lt, viewers: ramp(lt, 0, D + 2, 120000, 200000), title: 'ジャスティス鬼塚【生】通り魔の女、ついに確保！', video: (q, vw, vh) => captureCam(q, vw, vh, lt), comments: PRAISE.slice(0, 6).map(([n, s], i) => ({ t: 0.6 + i * 0.4, name: n, text: s, av: i + 2 })) }), { rot: noise1(lt * 8, 3) * 0.015 }); } },
+  { at: 'd5', draw(g, lt, D, S) { night(g); phoneFrame(g, 60, 160, 960, 1300, (p, w, h) => liveView(p, 0, 0, w, h, { chatBottom: 340, chatMax: 4, t: lt, viewers: ramp(lt, 0, D + 2, 120000, 200000), title: 'ジャスティス鬼塚【生】通り魔の女、ついに確保！', video: (q, vw, vh) => captureCam(q, vw, vh, lt), comments: PRAISE.slice(0, 6).map(([n, s], i) => ({ t: 0.6 + i * 0.4, name: n, text: s, av: i + 2 })) }), { rot: noise1(lt * 8, 3) * 0.015 }); } },
   { at: 'd6', draw(g, lt, D, S) {
     bg(g, '#120806', '#060304'); bigCounter(g, 540, 400, ramp(lt, 0, 1.6, 190000, 200000), { label: '同時視聴', size: 140 });
     const R = rng(12); for (let i = 0; i < 24; i++) { const t0 = 0.3 + i * 0.13, a = inv(t0, t0 + 0.2, lt); if (a <= 0) continue; const col = i % 2, row = Math.floor(i / 2); text(g, PRAISE[(i * 3) % PRAISE.length][1], 290 + col * 500 + (R() - 0.5) * 40, 640 + row * 50 + col * 25, { size: 32 + R() * 6, color: i % 5 === 0 ? K.orange : '#e9edf3', alpha: a * 0.9 }); }

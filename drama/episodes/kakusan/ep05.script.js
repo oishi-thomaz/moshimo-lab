@@ -58,5 +58,5 @@ export const LINES = [
   { beat: 'turn', dur: 1.6 },
   { id: 'd8', who: 'A', text: 'あなたなら、[[r:押しますか？]]', style: As('画面の向こうの人に、静かに、まっすぐ問いかける。'), gap: 1.4 },
 
-  { beat: 'end', dur: 0.3 },
+  { beat: 'end', dur: 4.5 },
 ];

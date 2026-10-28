@@ -79,7 +79,7 @@ export function phoneFrame(g, x, y, w, h, draw, { rot = 0 } = {}) {
   g.restore();
 }
 // 生配信の画面（video=映像を描く関数、comments=[{t,name,text}]）
-export function liveView(g, x, y, w, h, { t = 0, viewers = 0, video, comments = [], title = 'ジャスティス鬼塚【生】通り魔の犯人の家に突撃' } = {}) {
+export function liveView(g, x, y, w, h, { t = 0, viewers = 0, video, comments = [], title = 'ジャスティス鬼塚【生】通り魔の犯人の家に突撃', chatBottom = 70, chatMax = 6 } = {}) {
   g.save(); rr(g, x, y, w, h, 30); g.clip();
   g.fillStyle = '#000'; g.fillRect(x, y, w, h);
   if (video) { g.save(); g.translate(x, y); video(g, w, h); g.restore(); }
@@ -89,9 +89,9 @@ export function liveView(g, x, y, w, h, { t = 0, viewers = 0, video, comments = 
   fillRR(g, x + 165, y + 30, 230, 56, 10, 'rgba(0,0,0,.55)'); text(g, `視聴 ${short(viewers)}`, x + 280, y + 59, { size: 32, color: '#fff', weight: 800 });
   text(g, title, x + 30, y + 130, { size: 30, color: '#fff', align: 'left', weight: 800 });
   // コメント（下から積む）
-  const shown = comments.filter(c => t >= c.t).slice(-6);
+  const shown = comments.filter(c => t >= c.t).slice(-chatMax);
   shown.forEach((c, i) => {
-    const k = shown.length - 1 - i, yy = y + h - 70 - k * 76, a = clamp((t - c.t) / 0.2);
+    const k = shown.length - 1 - i, yy = y + h - chatBottom - k * 76, a = clamp((t - c.t) / 0.2);
     g.save(); g.globalAlpha = a * (1 - k * 0.1);
     avatar(g, c.av ?? (i + 2), x + 60, yy, 24);
     text(g, c.name, x + 100, yy - 14, { size: 24, color: '#c9d0dc', align: 'left', weight: 500 });

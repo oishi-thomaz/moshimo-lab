@@ -18,7 +18,7 @@ const ramp = (lt, a, b, n0, n1) => lerp(n0, n1, easeOut(inv(a, b, lt)));
 const recapTag = (g, a = 1) => { g.save(); g.globalAlpha = a; fillRR(g, 60, 90, 230, 64, 32, 'rgba(10,12,18,.85)'); text(g, '前回', 175, 123, { size: 34, color: K.orange2 }); g.restore(); };
 const knife = (g, x, y, rot, s = 1, a = 0.6) => { g.save(); g.translate(x, y); g.rotate(rot); g.scale(s, s); line(g, 0, 140, 0, 0, 60, '#1a1a1e'); poly(g, [[-22, 0], [22, 0], [6, -330], [-2, -340]], '#dfe6ee'); g.save(); g.globalCompositeOperation = 'lighter'; glow(g, 0, -200, 160, 'rgba(230,240,255,1)', a); g.restore(); g.restore(); };
 function confessCam(g, w, h, t, { talk = 0 } = {}) { g.save(); g.scale(w / 1080, h / 1920); warehouse(g, { t, lamp: 1, ring: 0.3 }); g.save(); cam(g, { x: 540, y: 1150, z: 1.25 }); tiedChair(g, 540, 1700, 1.3, { eyes: 'normal', brow: -0.2, talk }); g.restore(); g.restore(); }
-const MISAKI_POST = 'これは事件の夜、23時12分に撮られた写真です。\n後ろに写っているのは、鬼塚レオ。#拡散希望';
+const MISAKI_POST = 'これは事件の夜、23時12分に撮られた写真です。\n後ろに写っているのは、鬼塚レオ。\n#拡散希望';
 const FLIP = [['名無し', 'これ、本物じゃないか'], ['ゆう', 'さっきの配信、本当だったんだ'], ['あやの', '鬼塚の顔、写ってる…'], ['k_k', '拡散します'], ['しゅん', '鬼塚が犯人？'], ['みー', '拡散希望'], ['正義マン', '警察まだ？'], ['ぽぽ', 'アカリさん無事？']];
 const AFTER = [['名無し', '人違いだったのか'], ['k_k', 'まあ、まぎらわしい写真だったしな'], ['正義マン', '鬼塚信じてたのに'], ['ゆう', 'まあ仕方ないよね']];
 
@@ -33,7 +33,7 @@ export function cover(g, lt = 9) {
 
 const SHOTS = [
   // ── 前回
-  { at: 'recap', draw(g, lt, D, S) { dark(g); phoneFrame(g, 60, 160, 960, 1300, (p, w, h) => liveView(p, 0, 0, w, h, { t: lt, viewers: 230000, title: 'ジャスティス鬼塚【生】通り魔の女、自白配信', video: (q, vw, vh) => confessCam(q, vw, vh, lt, { talk: talking(lt, S, ['r1']) * 0.4 }), comments: [['名無し', 'え？'], ['k_k', '鬼塚？']].map(([n, s], i) => ({ t: 0.6 + i * 0.6, name: n, text: s, av: i + 2 })) })); recapTag(g); } },
+  { at: 'recap', draw(g, lt, D, S) { dark(g); phoneFrame(g, 60, 160, 960, 1300, (p, w, h) => liveView(p, 0, 0, w, h, { chatBottom: 340, chatMax: 4, t: lt, viewers: 230000, title: 'ジャスティス鬼塚【生】通り魔の女、自白配信', video: (q, vw, vh) => confessCam(q, vw, vh, lt, { talk: talking(lt, S, ['r1']) * 0.4 }), comments: [['名無し', 'え？'], ['k_k', '鬼塚？']].map(([n, s], i) => ({ t: 0.6 + i * 0.6, name: n, text: s, av: i + 2 })) })); recapTag(g); } },
   { at: 'r2', finish: { vignette: 0.85 }, draw(g, lt, D, S) { dark(g); g.save(); cam(g, { x: 540, y: 820, z: 1.1 }); close(g, P.onizuka, { y: 760, s: 4.0, eyes: 'narrow', brow: 1, mouth: 'grit', lightFrom: 'left' }); g.restore(); knife(g, 760, 1350, -0.6); mood(g, { red: 0.15 }); recapTag(g, 1 - inv(D - 0.3, D, lt)); } },
   { at: 'title', noSubs: true, finish: { vignette: 0.55, grainA: 0.1 }, draw(g, lt) { bg(g, '#030305', '#08090e'); cover(g, lt); } },
 
@@ -52,14 +52,14 @@ const SHOTS = [
   { at: 'a4', draw(g, lt, D, S) { droppedPhone(g, { t: lt }); } },
 
   // ── 2. #拡散希望
-  { at: 'b1', draw(g, lt, D, S) { night(g); face(g, 'misaki', lt, D, S, [], { eyes: 'narrow', brow: -0.6, mouth: 'line', phoneLight: true, lightFrom: 'right' }); g.save(); g.translate(540, 1500); fillRR(g, -180, -60, 360, 120, 20, '#0d0e12'); g.restore(); } },
+  { at: 'b1', draw(g, lt, D, S) { night(g); face(g, 'misaki', lt, D, S, [], { eyes: 'narrow', brow: -0.6, mouth: 'line', phoneLight: true, lightFrom: 'right' }); } },
   { at: 'b2', draw(g, lt, D, S) { night(g); postCard(g, 60, 280, 960, { name: 'ミサキ', handle: '@misaki_s', avatar: 4, text: MISAKI_POST, img: (p, w, h) => selfiePhoto(p, w, h), imgH: 500, rt: ramp(lt, 0.4, D + 4, 10, 52000), likes: ramp(lt, 0.4, D + 4, 20, 90000), views: ramp(lt, 0.4, D + 4, 300, 2400000), time: 'たった今' }); } },
   { at: 'b2b', draw(g, lt, D, S) { bg(g); for (let i = 0; i < 3; i++) { const a = inv(0.2 + i * 0.7, 0.4 + i * 0.7, lt); if (a <= 0) continue; g.save(); g.globalAlpha = a; postCard(g, 60 + (i % 2) * 20, 240 + i * 300, 940, { name: FLIP[i][0], handle: '@' + ['nanashi', 'yu_u', 'ayano', 'k_k'][i], avatar: i + 2, text: FLIP[i][1], rt: 2000 + i * 900, likes: 9000 + i * 1200, views: 300000, time: '1分' }); g.restore(); } } },
   { at: 'b3', draw(g, lt, D, S) {
     bg(g, '#1a0c06', '#0a0504'); const n = ramp(lt, 0, D + 1, 52000, 1200000);
     g.save(); g.globalCompositeOperation = 'lighter'; glow(g, 540, 820, 900, 'rgba(255,106,43,1)', 0.15 + 0.25 * inv(0, D, lt)); g.restore();
     bigCounter(g, 540, 820, n, { size: 200 });
-    const R = rng(21); for (let i = 0; i < 20; i++) { const t0 = 0.4 + i * 0.18, a = inv(t0, t0 + 0.2, lt); if (a <= 0) continue; text(g, FLIP[i % FLIP.length][1], 200 + R() * 680, 1020 + R() * 120 + (i % 2) * 0, { size: 28 + R() * 14, color: '#f4e4da', alpha: a * 0.8 }); }
+    const R = rng(21); for (let i = 0; i < 12; i++) { const t0 = 0.4 + i * 0.3, a = inv(t0, t0 + 0.2, lt); if (a <= 0) continue; const col = i % 2, row = Math.floor(i / 2); text(g, FLIP[i % FLIP.length][1], 290 + col * 500 + (R() - 0.5) * 30, 1420 + row * 64 + col * 30, { size: 32 + R() * 6, color: i % 4 === 0 ? K.orange : '#f4e4da', alpha: a * 0.9 }); }
   } },
   { at: 'storm', draw(g, lt, D, S) { bg(g); trendList(g, 60, 320, 960, [{ name: '#拡散希望', n: 1200000, hot: true, t: 0.1 }, { name: '鬼塚レオ', n: 840000, t: 0.4 }, { name: '通り魔 真犯人', n: 520000, t: 0.7 }, { name: '自白配信', n: 310000, t: 1.0 }], lt); } },
 
@@ -91,7 +91,7 @@ const SHOTS = [
   // ── 4. その後
   { at: 'd1', draw(g, lt, D, S) {
     g.save(); cam(g, { x: 540, y: 960, z: slow(lt, D + 3, 1.0, 1.05) });
-    phoneFrame(g, 140, 160, 800, 1580, (p, w, h) => {
+    phoneFrame(g, 140, 250, 800, 1500, (p, w, h) => {
       vgrad(p, 0, 0, w, h, [[0, '#2a3446'], [1, '#141a26']]); text(p, '9:15', w / 2, 230, { size: 170, color: '#f1f3f8', weight: 500 });
       const L = ['新しいフォロワー 2,400人', 'あなたがメンションされました', '取材のお願い', 'あなたの写真が引用されました'];
       const n = Math.min(L.length, Math.floor(lt * 2.5));
