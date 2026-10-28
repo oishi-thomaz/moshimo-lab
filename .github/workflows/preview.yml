@@ -1,0 +1,47 @@
+name: preview
+
+# 確認用の書き出し。VPS へのアップロードや LINE の承認依頼はせず、mp4 とサムネを Actions の成果物（artifact）に置くだけ
+on:
+  workflow_dispatch:
+    inputs:
+      id:
+        description: '書き出す動画の番号'
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  preview:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: System packages (ffmpeg, Japanese fonts)
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg fonts-noto-cjk
+          pip install --quiet numpy scipy
+      - name: Node packages
+        run: npm ci --no-audit --no-fund
+      - name: Narration cache
+        uses: actions/cache@v4
+        with:
+          path: cache/narr
+          key: narr-preview-${{ github.run_id }}
+          restore-keys: narr-
+      - name: Build video
+        env:
+          CHROME_PATH: /usr/bin/google-chrome
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: bash tools/build.sh "${{ github.event.inputs.id }}"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: preview-${{ github.event.inputs.id }}
+          path: |
+            out/${{ github.event.inputs.id }}.mp4
+            out/${{ github.event.inputs.id }}_cover.jpg
+          retention-days: 7
