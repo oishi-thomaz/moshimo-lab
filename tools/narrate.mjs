@@ -37,11 +37,14 @@ function speak(html) {
   for (const [re, v] of READ) s = s.replace(re, v);
   return s.trim();
 }
-const STYLE = 'Calm Japanese documentary narrator. Clear, natural pacing, slightly brisk, no exaggeration.';
+const V2 = !!meta.v2; // 2026/10/28〜 TikTok基準：0秒目から掴む、全体をテンポよく
+const STYLE = V2 ? 'Lively Japanese narrator building suspense. Brisk, engaging pacing with clear diction, no shouting.'
+  : 'Calm Japanese documentary narrator. Clear, natural pacing, slightly brisk, no exaggeration.';
 const lines = [];
 const subs = meta.subs || [];
 const firstSub = subs.length ? subs[0][0] : 2.5;
-lines.push({ t: 0.2, end: firstSub - 0.05, text: speak(meta.titleHtml || meta.title || ''), style: 'Calm Japanese documentary narrator asking an intriguing question, quietly.' });
+if (V2) lines.push({ t: 0.0, end: firstSub - 0.05, text: speak(meta.hookLine || meta.titleHtml || meta.title || ''), style: 'Japanese narrator grabbing attention in the very first second. Urgent, intriguing and punchy, but clear.' });
+else lines.push({ t: 0.2, end: firstSub - 0.05, text: speak(meta.titleHtml || meta.title || ''), style: 'Calm Japanese documentary narrator asking an intriguing question, quietly.' });
 subs.forEach(([a, b, txt], i) => {
   const s = String(txt);
   const style = s.startsWith('結果') ? 'Calm Japanese documentary narrator. Take a short beat, then state the result clearly and firmly.'

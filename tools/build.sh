@@ -32,7 +32,8 @@ else
     -filter_complex "[1:a][2:a]amix=inputs=2:normalize=0[m];[m]loudnorm=I=-15:TP=-1.5:LRA=9[a]" -map 0:v -map "[a]" \
     -c:v copy -c:a aac -b:a 192k -ar 48000 -shortest -movflags +faststart "out/${ID}.mp4"
 fi
-# cover image for the approval message (first frame with the title)
-ffmpeg -v error -y -ss 1.2 -i "out/${ID}.mp4" -frames:v 1 -q:v 3 "out/${ID}_cover.jpg"
+# cover image（0秒目＝サムネイル。v2 の動画は0秒目がサムネになるように作っている）
+if grep -q "v2: *true" "engine/videos/${ID}.js"; then CT=0; else CT=1.2; fi
+ffmpeg -v error -y -ss $CT -i "out/${ID}.mp4" -frames:v 1 -q:v 3 "out/${ID}_cover.jpg"
 rm -rf "out/${ID}_video.mp4" "out/${ID}_bgm.wav" "out/${ID}_narr.wav" "out/${ID}_narr" "out/${ID}_sfx.wav" out/${ID}_*_trim.wav
 echo "built out/${ID}.mp4"

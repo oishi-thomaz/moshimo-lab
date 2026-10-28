@@ -26,8 +26,26 @@ function endCard(t) {
   return null;
 }
 
-function runStory({ shots, subs, meta, duration, camera = cam, dim = () => false }) {
-  window.renderAt = function (T) {
+// cut: [[from, to], ...]（元の作りの秒）を丸ごと飛ばす。v2 で古い動画の「いつもの日常」などを抜くとき用。
+// 字幕・効果音・BGMの強調の秒も一緒にずらし、長さ（duration）も短くなる。
+function makeCut(cut) {
+  const cs = (cut || []).slice().sort((a, b) => a[0] - b[0]);
+  const src = (T) => { let x = T; for (const [a, b] of cs) if (x >= a) x += b - a; return x; };   // 出来上がりの秒 → 元の秒
+  const out = (S) => { let d = 0; for (const [a, b] of cs) { if (S >= b) d += b - a; else if (S > a) return null; } return Math.round((S - d) * 100) / 100; }; // 元の秒 → 出来上がり（切った所は null）
+  const total = cs.reduce((n, [a, b]) => n + (b - a), 0);
+  return { src, out, total, on: cs.length > 0 };
+}
+function runStory({ shots, subs, meta, duration, camera = cam, dim = () => false, cut }) {
+  const C = makeCut(cut);
+  if (C.on) {
+    subs = subs.map(([a, b, txt]) => { const a2 = C.out(a), b2 = C.out(b); return a2 == null || b2 == null ? null : [a2, b2, txt]; }).filter(Boolean);
+    const m1 = (arr) => (arr || []).map(C.out).filter(x => x != null);
+    meta = { ...meta, hits: m1(meta.hits), risers: m1(meta.risers), impacts: m1(meta.impacts),
+      sfx: (meta.sfx || []).map(([t, ...r]) => { const t2 = C.out(t); return t2 == null ? null : [t2, ...r]; }).filter(Boolean) };
+    duration -= C.total;
+  }
+  window.renderAt = function (T0) {
+    const T = C.src(T0);
     const s = shots.find(x => T >= x.a && T < x.b) || shots[shots.length - 1];
     el.end.style.opacity = 0; el.title.style.opacity = 0; el.flash.style.opacity = 0;
     setTop('', '', 0); setHud('', '', 0);
@@ -35,7 +53,9 @@ function runStory({ shots, subs, meta, duration, camera = cam, dim = () => false
     dimEl().style.opacity = dim(s.f) ? 1 : 0;
     el.logo.style.visibility = 'visible';
     const scn = s.f(T - s.a, T);
-    setSub(T, subs);
+    // v2（2026/10/28〜 TikTok基準の冒頭）：0秒目はサムネイル。タイトルは全動画同じ位置に 0〜1.4秒出して 1.9秒で消す（ショット側では出さない）
+    if (meta.v2) el.title.style.opacity = T0 < 1.4 ? 1 : clamp((1.9 - T0) / 0.5);
+    setSub(T0, subs);
     if (LIFT) camera.setViewOffset(1080, 1920, 0, LIFT, 1080, 1920); else if (camera.view && camera.view.enabled) camera.clearViewOffset();
     if (scn) renderer.render(scn, camera);
     else { renderer.setClearColor(0x07090d, 1); renderer.clear(); }

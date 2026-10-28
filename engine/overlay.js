@@ -41,7 +41,9 @@ const roll = (u, target) => target * easeOut(u);
 function setupCards(meta) {
   // meta.series：柱シリーズ名（plan/STRATEGY.md）。表紙にバッジ、まとめカードにフォローの一言を出す
   const badge = meta.series ? `<div class="badge sans">${esc(meta.series)}シリーズ</div>` : '';
-  document.getElementById('title').innerHTML = badge + hang(meta.titleHtml || meta.title || '');
+  // v2：タイトルはインスタ・TikTok の一覧（縦3:4に切り抜かれる）でも切れない位置に大きく。シリーズのバッジはタイトルの下
+  if (meta.v2) document.body.classList.add('v2');
+  document.getElementById('title').innerHTML = meta.v2 ? hang(meta.titleHtml || meta.title || '') + badge : badge + hang(meta.titleHtml || meta.title || '');
   document.querySelector('#end .t').innerHTML = hang(meta.titleHtml || meta.title || '');
   document.querySelector('#end .s').innerHTML = hang((meta.endStats || []).map(([l, v, y]) => `${esc(l)}<b>${esc(v)}</b>${y ? '（' + esc(y) + '）' : ''}`).join('<br>'));
   document.querySelector('#end .ask').innerHTML = meta.ask ? hang(esc(meta.ask)) + '<small>コメントで教えて</small>' : '';

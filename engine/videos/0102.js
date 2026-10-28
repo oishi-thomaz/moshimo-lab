@@ -55,7 +55,7 @@ const hSpark = makeSparkles(120, 0.2); highway.add(hSpark.points); hSpark.init([
 
 const SUBS = [
   [2.6, 6.0, '時間を少し戻そう。<br>いつもの朝のゴミ置き場。'],
-  [6.2, 10.1, '日本中のカラスが、<br>一斉に消えた。'],
+  [6.2, 10.1, 'ゴミ荒らしは消える。<br>でもヤバいのは1年後。'],
   [10.1, 14, '東京都はこれまでに、<br>約25万羽を捕まえてきた。'],
   [14.2, 18.1, '都内のカラスは、2001年度<br>から約8割減っていた。'],
   [18.1, 22, 'それが、ついにゼロ。<br>ゴミ荒らしも消えた。'],
@@ -70,7 +70,7 @@ const SUBS = [
   [56.2, 59.4, '次に消してほしい<br>嫌われ者は？'],
 ];
 
-const TP = 1.4;
+const TP = 0.5; // v2：0.5秒で押す（冒頭で待たせない）
 function townEnv() { setTownEnv('day'); }
 function hookCam(t, d = 2.5) { const u = ease(t / d); look(lerp(0.4, 0.6, u), lerp(1.9, 1.85, u), lerp(8.7, 8.5, u), 3.9, 0.8, 6.3, 50); }
 function shot0(t) { // hook: crows pecking garbage, red button countdown -> press
@@ -100,11 +100,10 @@ function shot1(t) { // everyday: crows tear the bags, a walker steps around
 function shot2(t) { // +1秒: crows vanish at the garbage spot
   lift(150);
   townEnv(); btn.userData.press(1); garb.userData.scatter(0.6); walker.visible = false;
-  const tv = 0.6;
+  const tv = 0; // v2：冒頭で押した直後からつながるので、カラスはもう消えている（消えた跡の光だけ）
   crowsAt(t + 6, t < tv ? 5 : 0);
   if (t >= tv && !gSpark.r1) { gSpark.init(crows.map(wp), 0.3, 0.9); gSpark.r1 = true; }
   gSpark.set(t >= tv ? (t - tv) / 1.3 : 0);
-  el.flash.style.opacity = t >= tv ? 0.4 * Math.max(0, 1 - (t - tv) / 0.3) : 0;
   const u = ease(t / 8);
   look(lerp(0.9, 0.0, u), lerp(2.2, 4.0, u), lerp(11.0, 13.5, u), 4.4, 0.5, 6.8, 50);
   hudTime('+1秒');
@@ -180,15 +179,18 @@ const shots = [
 ];
 runStory({
   shots, subs: SUBS, duration: 64.5,
+  cut: [[2.5, 6.0]], // v2：いつもの朝（元の2.5〜6秒）を抜いて、押した直後から本題へ
   meta: {
     id: '0102',
+    v2: true,
+    hookLine: '日本中のカラスが、一斉に消えた。',
     series: '絶滅ボタン',
     hookType: 'H5',
     cat: '生き物・動物',
     title: '日本中のカラスが消えたら？',
     titleHtml: '日本中のカラスが<br>消えたら？',
-    mood: 'mystery', seed: 102, hits: [1.4, 48.1], risers: [6.0], impacts: [27.2, 44.4],
-    sfx: [[1.4, 'poof'], [6.6, 'poof'], [23.0, 'poof'], [40.0, 'poof'], [2.7, 'caw'], [0.3, 'caw']],
+    mood: 'mystery', seed: 102, hits: [0.5, 48.1], risers: [6.0], impacts: [27.2, 44.4],
+    sfx: [[0.5, 'poof'], [23.0, 'poof'], [40.0, 'poof'], [0.1, 'caw']],
     narr: { '25万羽': '25まんわ', '13.4億円': '13.4おくえん', '13億円': '13おくえん', '7万件': '7まんけん', '8割': 'はちわり', 'カラス絶滅ボタン': 'カラスぜつめつボタン' },
     ask: '次に消してほしい嫌われ者は？',
     caption: 'もしも日本中のカラスが一瞬で消えたら？\n東京都はこれまでにカラスを約25万羽捕まえてきて、都内のカラスは2001年度から約8割減った（2024年度）。それがゼロになれば、朝のゴミ荒らしも消える。\n畑では、カラスによる野菜や果物の被害が1年で約13.4億円（2022年度）。鳥による被害のほぼ半分（49%）がカラスだった。その被害がまるごと消える。\nでもカラスは、動物の死がいを食べる掃除屋でもある。国道だけでも、動物が車にはねられる事故は年約7万件（2022年度）。\n結果、畑の被害13億円は消えるけど、街の掃除屋もいなくなる。\n\n次に消してほしい嫌われ者は？ コメントで教えて。\n\n出典：東京都環境局 カラス対策（令和6年度）、農林水産省 野生鳥獣被害防止マニュアル 鳥類編（2022年度の被害）、国土交通省 報道発表（2022年度のロードキル）',
