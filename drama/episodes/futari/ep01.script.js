@@ -66,7 +66,7 @@ export const LINES = [
   { id: 'e4', who: 'S', text: '電話の向こうで、2人のハルトが／同時に叫んだ。', read: '電話の向こうで、ふたりのハルトが、同時に叫んだ。', gap: 0.3 },
   { beat: 'turn', dur: 0.6 },
   { id: 'e5', who: 'H2', text: '[[r:開けちゃダメだ！]]', style: Hs('叫ぶように、強く。'), gap: 0.1 },
-  { id: 'e6', who: 'H1', text: '[[r:開けて、母さん！]]', style: Hs('泣き叫ぶように。'), gap: 1.0 },
+  { id: 'e6', who: 'H1', text: '[[r:開けて、母さん！]]', read: 'あけて！かあさん！', style: Hs('泣き叫ぶように。最初の「あ」からはっきり発音する。'), gap: 1.0 },
 
   { beat: 'end', dur: 0.3 },
   { id: 'x1', who: 'X', text: '', read: '次回。警察官。', gap: 2.8 },
