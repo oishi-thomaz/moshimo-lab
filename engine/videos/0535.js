@@ -46,7 +46,7 @@ function traffic(T, ts, { haz = 0 } = {}) {
 // hero truck for the hook / loop
 const HERO = makeTruck({ kind: 'box', color: '#f4f1ea', cab: '#f4f1ea' }); HERO.position.set(0, 0, 9.0); highway.add(HERO);
 const heroSpark = makeSparkles(220, 0.12); highway.add(heroSpark.points);
-const heroCam = (hx, t) => look(hx + 10.5 + t * 0.3, 4.2, 9.0 + 12.5, hx + 3.0, 2.0, 9.0, 44);
+const heroCam = (hx, t, ty = 2.0) => look(hx + 10.5 + t * 0.3, 4.2, 9.0 + 12.5, hx + 3.0, ty, 9.0, 44);
 
 // ---------- warehouse crates ----------
 const piles = DOCKS.slice(1, 7).map((d, i) => { const p = makeCratePile(80, 20 + i, { cols: 5, rows: 4 }); p.position.set(WAREHOUSE.position.x + d.x - 2.0, 1.2, WAREHOUSE.position.z + d.z - 2.9); highway.add(p); return p; });
@@ -86,12 +86,12 @@ const gTruck = makeTruck({ kind: 'garbage', color: '#e9ecef', cab: '#e9ecef', dr
 
 const SUBS = [
   [2.6, 6.0, '時間を少し戻そう。<br>いつもの朝の高速道路。'],
-  [6.2, 10.1, 'ハンドルを握る人が、<br>一斉に消えた。'],
+  [6.2, 10.1, '荷物が止まる。<br>でもヤバいのは3日後。'],
   [10.1, 14, '国内の荷物の9割以上は、<br>トラックが運んでいる。'],
-  [14.2, 18.1, '倉庫の前には、出ていけない<br>荷物が積み上がる。'],
+  [14.2, 18.1, '倉庫の前に、出ていけない<br>荷物の山。その量は…'],
   [18.1, 22, '1日に運ぶはずだった荷物は、<br>約1,066万トン。'],
   [22.2, 26.1, 'スーパーには、<br>朝の便が届かない。'],
-  [26.1, 30, '1人あたり、毎日約86kgの<br>荷物が止まった計算。'],
+  [26.1, 30, '1人毎日約86kgの計算。<br>次に来なくなるのは…'],
   [30.2, 34.6, 'ごみ収集車も、<br>もう来ない。'],
   [34.6, 39, '家から出るごみは、<br>1人1日851g。'],
   [39.2, 43.6, '棚は空のまま、<br>ごみだけが増えていく。'],
@@ -101,17 +101,17 @@ const SUBS = [
   [56.2, 59.4, 'あなたが一番困る、<br>届かない物は？'],
 ];
 
-const TV = 1.2; // driver vanish (hook)
+const TV = 0.5; // driver vanish (hook)（v2：0.6秒以内に消える）
 function shot0(t) { // hook: hero truck driving, driver vanishes
   setHighwayEnv('day');
   traffic(t + 30, -1);
+  for (const v of TR) if (v.truck) v.g.userData.setDriver(t < TV); // v2：まわりのトラックの運転手も一斉に消える
   const hx = -20 + t * 9;
   HERO.position.x = hx; HERO.userData.roll(hx); HERO.userData.setDriver(t < TV); HERO.userData.setHazard(t > TV + 0.2 && Math.floor(t * 2.4) % 2 === 0);
   if (t >= TV && !heroSpark.ready) { const p = HERO.userData.cabPos.clone(); HERO.localToWorld(p); heroSpark.init([p.toArray()], 0.6, 1.2); heroSpark.ready = true; }
   heroSpark.set(t >= TV ? (t - TV) / 1.0 : 0);
   el.flash.style.opacity = t >= TV ? 0.5 * Math.max(0, 1 - (t - TV) / 0.3) : 0;
-  lift(40); heroCam(hx, t);
-  el.title.style.opacity = 1;
+  lift(40); heroCam(hx, t, 3.1); // v2：運転席がタイトルの下に来るように
   return highway;
 }
 function shot1(t) { // everyday: wide view, all moving
@@ -184,7 +184,7 @@ function shot8(t) { // loop: same framing as the hook, empty cab, hazards
   setHighwayEnv('day'); HERO.visible = true; warehouseOn(false); heroSpark.set(0);
   traffic(44, 10, { haz: 1 });
   const hx = -20 + 0.6 * 9; HERO.position.x = hx; HERO.userData.setDriver(false); HERO.userData.setHazard(Math.floor(t * 2.4) % 2 === 0);
-  lift(40); heroCam(hx, 0.3 + t * 0.2);
+  lift(40); heroCam(hx, 0.3 + t * 0.2, 3.1);
   if (t < 0.6) setTop('2030年度の輸送力不足（政府の検討会・2023年試算）', '34.1%', fade(t + 55.5, 53.9, 56.1, 0.2), '#ff8a7a');
   return highway;
 }
@@ -201,12 +201,15 @@ const shots = [
 shots.forEach(s => { const f = s.f; s.f = (t, T) => { NOW = T; reset(f); return f(t, T); }; });
 runStory({
   shots, subs: SUBS, duration: 64.5,
+  cut: [[2.5, 6.0]], // v2：いつもの朝の高速道路（元の2.5〜6秒）を抜いて、消えた直後から本題へ
   meta: {
     id: '0535',
+    v2: true,
+    hookLine: 'トラックのドライバーが、一斉に消えた。',
     title: '日本中のトラックドライバーが消えたら？',
-    titleHtml: 'トラックドライバーが<br>消えたら？',
-    mood: 'tension', seed: 535, hits: [1.2, 48.1], risers: [6.0], impacts: [10.1, 26.1],
-    sfx: [[1.2, 'poof'], [6.3, 'alarm'], [30.4, 'caw'], [39.4, 'meter', 0.5]],
+    titleHtml: 'トラック運転手が<br>消えたら？', // v2：大きく出すので2行・1行9字以内に
+    mood: 'tension', seed: 535, hits: [0.5, 48.1], risers: [6.0], impacts: [10.1, 26.1],
+    sfx: [[0.5, 'poof'], [6.3, 'alarm'], [30.4, 'caw'], [39.4, 'meter', 0.5]],
     narr: { '1人1日851g': 'ひとり いちにち はっぴゃくごじゅういちグラム', '約86kg': 'やく はちじゅうろくキロ', '34%': 'さんじゅうよんパーセント', '2030年': 'にせんさんじゅうねん', '9割': 'きゅうわり' },
     ask: 'あなたが一番困る、届かない物は？',
     caption: 'もしも日本中のトラックドライバーが一斉に消えたら？\n国内の荷物の91.9%（2023年度・トン数）はトラックが運んでいる。運転する人がいなくなると、1日に約1,066万トンの荷物が止まる（単純計算）。1人あたりにすると毎日約86kg（単純計算）。\n倉庫の前には荷物が積み上がり、スーパーには朝の便が届かない。ごみ収集車も来なくなり、家から出る1人1日851gのごみがたまっていく。1週間で止まる荷物は約7,460万トン（単純計算）。\n結果、食べ物も日用品も届かない暮らしになる。そして現実でも、2030年度には輸送力の34.1%が足りなくなる可能性があると試算されている（物流の2024年問題）。\n\nあなたが一番困る、届かない物は？ コメントで教えて。\n\n出典：国土交通省 道路統計年報2025（輸送機関別輸送量 令和5年度）、総務省 人口推計（2023年10月1日）、環境省 一般廃棄物の排出及び処理状況等（令和5年度）、持続可能な物流の実現に向けた検討会（2023年）\n（単純計算）自動車の年間輸送量38.9億トン÷365日、÷総人口1億2435万人',
