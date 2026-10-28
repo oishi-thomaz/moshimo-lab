@@ -107,17 +107,17 @@ function setCrates(k) { crates.forEach(c => c.visible = c.userData.k < k); }
 function hideAll() { setArcs(0, 0); }
 
 const cd = (left) => { left += 1e-6; return `0:${String(Math.floor(left)).padStart(2, '0')}.${String(Math.floor((left % 1) * 100)).padStart(2, '0')}`; };
-const TV = 1.4;
+const TV = 0.5; // v2：0.5秒で消える（冒頭で待たせない）
 const oku = v => (v >= 10000 ? Math.floor(v / 10000) + '兆' + comma(v % 10000) : comma(v)) + '億円';
 const HOOK = (t, d = 2.5) => { const u = ease(t / d); look(lerp(1.9, 1.7, u), lerp(1.75, 1.65, u), lerp(1.3, 1.0, u), TBL.x, TBL.y + 0.15, TBL.z, 50); };
 
 const SUBS = [
   [2.6, 6.0, 'いつもの冬。<br>お礼の品が届いた。'],
-  [6.2, 10.1, 'ふるさと納税が、<br>この世から消えた。'],
+  [6.2, 10.1, '返礼品は消えた。<br>でも、払う税金は…？'],
   [10.1, 14.0, '止まった寄付は、<br>年1兆3,314億円。'],
   [14.2, 18.1, '使っていた人は、<br>1,151万人。'],
   [18.1, 22.0, '寄付は年5,963万件。<br>それがゼロに。'],
-  [22.2, 26.1, '地方の農家や工場から、<br>注文が消える。'],
+  [22.2, 26.1, '困るのは地方。農家や<br>工場から注文が消える。'],
   [26.1, 30.0, 'お礼の品の仕入れは、<br>年3,528億円。'],
   [30.2, 34.6, '経費を引いて地方に残った<br>6,932億円も消える。'],
   [34.6, 39.0, '住んでいる町には、<br>住民税9,524億円が戻る。'],
@@ -132,8 +132,7 @@ function shot0(t) { // hook: countdown, gift box vanishes at 1.4
   home('day'); gift.visible = t < TV;
   giftSpark.set(t >= TV ? (t - TV) / 0.9 : 0);
   el.flash.style.opacity = t >= TV ? 0.5 * Math.max(0, 1 - (t - TV) / 0.3) : 0;
-  lift(160); HOOK(t);
-  el.title.style.opacity = 1;
+  lift(50); HOOK(t); // v2：0秒目サムネ。箱の中身がタイトルのバッジにかからないよう下げる
   setHud('ふるさと納税がなくなるまで', cd(Math.max(0, TV - t)), 1, { mono: true, color: t < TV ? '#fff' : '#ff6b6b' });
   return room;
 }
@@ -217,7 +216,7 @@ function shot7(t) { // result: evening, empty table, family
 }
 function shot8(t) { // loop: hook framing, table already empty
   home('day'); gift.visible = false;
-  lift(160); HOOK(t + 0.4, 4.4);
+  lift(50); HOOK(t + 0.4, 4.4);
   setHud('ふるさと納税がなくなるまで', cd(TV), 1, { mono: true });
   return room;
 }
@@ -226,18 +225,21 @@ function scnOff(f) { HOME.visible = [shot0, shot1, shot6, shot7, shot8].includes
 const shots = [
   { a: 0, b: 2.5, f: shot0 }, { a: 2.5, b: 6, f: shot1 }, { a: 6, b: 14, f: shot2 }, { a: 14, b: 22, f: shot3 },
   { a: 22, b: 30, f: shot4 }, { a: 30, b: 39.2, f: shot5 }, { a: 39.2, b: 48, f: shot6 }, { a: 48, b: 55.5, f: shot7 },
-  { a: 55.5, b: 59.5, f: shot8 }, { a: 59.5, b: 64.5, f: endCard },
+  { a: 55.5, b: 59.5, f: shot8 }, { a: 59.5, b: 65, f: endCard },
 ];
 shots.forEach(s => { const f = s.f; s.f = (t, T) => { scnOff(f); return f(t, T); }; });
 runStory({
-  shots, subs: SUBS, duration: 64.5,
+  shots, subs: SUBS, duration: 65,
+  cut: [[2.5, 6.0]], // v2：家族で箱を開ける いつもの冬（元の2.5〜6秒）を抜いて、消えた直後から本題へ
   meta: {
     id: '0040',
+    v2: true,
+    hookLine: 'ふるさと納税が、この世から消えた。',
     series: 'お財布のもしも',
     title: 'ふるさと納税がなくなったら？',
     titleHtml: 'ふるさと納税が<br>なくなったら？',
-    mood: 'emotional', seed: 40, hits: [1.4, 48.1], risers: [6.0], impacts: [10.6, 26.6, 44.0, 48.4],
-    sfx: [[1.4, 'poof'], [15.0, 'poof'], [22.8, 'whoosh']],
+    mood: 'emotional', seed: 40, hits: [0.5, 48.1], risers: [6.0], impacts: [10.6, 26.6, 44.0, 48.4],
+    sfx: [[0.5, 'poof'], [15.0, 'poof'], [22.8, 'whoosh']],
     narr: { '1兆3,314億円': 'いっちょうさんぜんさんびゃくじゅうよんおくえん', '1,151万人': 'せんひゃくごじゅういちまんにん', '5,963万件': 'ごせんきゅうひゃくろくじゅうさんまんけん', '3.1万円分': 'さんてんいちまんえんぶん', '3万円分': 'さんまんえんぶん' },
     ask: 'ふるさと納税、続けてほしい？',
     caption: 'もしもふるさと納税が明日なくなったら？\n2025年度の寄付は1兆3,314億円、5,963万件。2025年の寄付で住民税の控除を受けた人は1,151万人。\nなくなると、地方の農家や工場へのお礼の品の注文（年3,528億円）が消え、経費を引いて地方に残っていた6,932億円（単純計算）も消える。\nその分、住んでいる町には住民税9,524億円が戻る。払う税金はほぼ同じで、お礼の品だけがなくなる。\n返礼品の仕入れ額を控除を受けた人数で割ると、1人あたり年約3.1万円分（単純計算）。\nちなみに寄付の47.9%は、返礼品や送料・仲介サイトなどの募集の経費だった。\n\nふるさと納税、続けてほしい？ コメントで教えて。\n\n出典：総務省「ふるさと納税に関する現況調査結果（令和8年度実施）」（2026年7月31日）',
