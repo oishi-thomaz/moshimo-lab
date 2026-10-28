@@ -50,7 +50,7 @@ function sparkFor(tv) {
   s.init(peds.filter(w => w.q < 0.5).map(w => { const [x, z] = pedAt(w, tv); return [x, 1.0, z]; }), 0.8, 2.5);
   return s;
 }
-const SP0 = 1.2, SP2 = 6.6;
+const SP0 = 0.5, SP2 = 6.6; // v2：0.5秒で半分が消える
 const spark0 = sparkFor(SP0), spark2 = sparkFor(SP2);
 const sparkSm = makeSparkles(500, 0.12); city.add(sparkSm.points);
 sparkSm.init(peds.filter(w => w.q < 0.5).map(w => { const [x, z] = pedAt(w, SP2); return [x, 1.0, z]; }), 0.4, 1.2);
@@ -70,14 +70,14 @@ function mapDots(gone, color = '#ffffff') { setDots((i, x, z, q) => ({ hide: q <
 
 const SUBS = [
   [2.6, 6.0, 'いつもの朝の交差点。<br>人であふれている。'],
-  [6.2, 10.1, '日本の人口が、<br>一瞬で半分になった。'],
+  [6.2, 10.1, 'これ、ただの空想じゃない。<br>国の推計に答えがある。'],
   [10.1, 14, '1億2,265万人が、<br>約6,133万人に。'],
   [14.2, 18.1, '交差点は、<br>人がまばらに。'],
   [18.1, 22, '1年に減る人数の、<br>約114年分（計算）。'],
-  [22.2, 26.1, '夜の住宅街。<br>明かりの消えた家。'],
+  [22.2, 26.1, '夜の住宅街。明かりの<br>消えた家は、もう今ある。'],
   [26.1, 30, '空き家は今でも<br>900万戸（2023年）。'],
   [30.2, 34.6, '国の推計では、<br>2070年に8,700万人。'],
-  [34.6, 39, '今より約3,600万人<br>少ない。'],
+  [34.6, 39, '今より約3,600万人少ない。<br>でも、まだ終わらない。'],
   [39.2, 43.6, 'そして2100年には、<br>6,278万人。'],
   [43.6, 47.8, '今の約半分になる<br>見込みだ。'],
   [48.1, 52.6, '結果：人口は約6,133万人。<br>2100年ごろの推計に近い。'],
@@ -87,8 +87,7 @@ const SUBS = [
 
 function shot0(t, T) { // hook: aerial crowd, half vanish at 1.2s
   cityBase('day'); crowd(T, SP0); noSpark(); spark0.set(clamp((T - SP0) / 1.1));
-  lift(170); aerial(t, T, -0.6, 36);
-  el.title.style.opacity = 1;
+  lift(-80); aerial(t, T, -0.6, 32, 22); // v2：交差点の人の群れをタイトルの下に大きく
   el.flash.style.opacity = 0.5 * clamp(1 - Math.abs(T - SP0) / 0.12);
   return city;
 }
@@ -96,16 +95,14 @@ function shot1(t, T) { // everyday: street level, everyone there
   cityBase('day'); crowd(T, null); noSpark();
   lift(230); const u = ease(t / 3.5);
   L(CX + lerp(15, 14, u), 6.5, CZ + lerp(17, 16, u), CX, 0.6, CZ, 50);
-  el.title.style.opacity = clamp(1 - (t - 0.3) / 0.5);
   return city;
 }
-function shot2(t, T) { // +0s half vanish at street level
-  cityBase('day'); crowd(T, SP2); noSpark(); spark2.set(clamp((T - SP2) / 1.2));
+function shot2(t, T) { // +0s street level（v2：冒頭の0.5秒でもう消えているので、半分はいないまま。もう一度消す演出はしない）
+  cityBase('day'); crowd(T, 0); noSpark();
   lift(230); const u = ease(t / 8);
   L(CX + lerp(14, 12.5, u), lerp(6.5, 7.5, u), CZ + lerp(16, 14.5, u), CX, 0.6, CZ, 50);
-  el.flash.style.opacity = 0.45 * clamp(1 - Math.abs(T - SP2) / 0.12);
   hudTime('+0秒');
-  if (t < 4.1) setTop('日本の総人口（2026年9月）', (() => { const v = countUp(t, POP); return `${Math.floor(v / 10000)}億${comma(v % 10000)}万人`; })(), fade(t, 0.15, 8, 0.25));
+  if (t < 4.1) setTop('日本の総人口（2026年9月）', (() => { const v = countUp(t, POP); return v < 10000 ? `${comma(v)}万人` : `${Math.floor(v / 10000)}億${comma(v % 10000)}万人`; })(), fade(t, 0.15, 8, 0.25));
   else { const v = Math.round(lerp(POP, HALF, easeOut(clamp((t - 4.2) / 1.4)))); setTop('半分になると（計算）', (v >= 10000 ? `${Math.floor(v / 10000)}億${comma(v % 10000)}` : '約' + comma(v)) + '万人', fade(t, 0.15, 8, 0.25), '#ff8a7a'); }
   return city;
 }
@@ -157,15 +154,18 @@ function shot8(t, T) { // loop: like the hook, result state
 const shots = [
   { a: 0, b: 2.5, f: shot0 }, { a: 2.5, b: 6, f: shot1 }, { a: 6, b: 14, f: shot2 }, { a: 14, b: 22, f: shot3 },
   { a: 22, b: 30, f: shot4 }, { a: 30, b: 39.2, f: shot5 }, { a: 39.2, b: 48, f: shot6 }, { a: 48, b: 55.5, f: shot7 },
-  { a: 55.5, b: 59.5, f: shot8 }, { a: 59.5, b: 64.5, f: endCard },
+  { a: 55.5, b: 59.5, f: shot8 }, { a: 59.5, b: 65, f: endCard },
 ];
 runStory({
-  shots, subs: SUBS, duration: 64.5, camera: cityCam,
+  shots, subs: SUBS, duration: 65, camera: cityCam,
+  cut: [[2.5, 6.0]], // v2：いつもの朝の交差点（元の2.5〜6秒）を抜いて、消えた直後から本題へ
   meta: {
     id: '0023',
+    v2: true,
+    hookLine: '日本の人口が、一瞬で半分になった。',
     title: '日本の人口が半分になったら？',
     titleHtml: '日本の人口が<br>半分になったら？',
-    mood: 'mystery', seed: 23, hits: [1.2, 6.6, 48.1], risers: [6.0],
+    mood: 'mystery', seed: 23, hits: [0.5, 48.1], risers: [6.0],
     ask: '人口半分の日本、住みたい？',
     caption: 'もしも日本の人口1億2,265万人が、一瞬で半分の約6,133万人になったら？\n交差点、住宅街、そして日本地図で見てみた。国の将来推計（中位）では2070年に8,700万人、2100年に6,278万人。人口が半分の日本は、空想ではなく約74年後の推計に近い姿。\n\n人口半分の日本、住みたい？ コメントで教えて。\n\n出典：総務省 人口推計（2026年9月概算）、国立社会保障・人口問題研究所 日本の将来推計人口（令和5年推計）、総務省 令和5年住宅・土地統計調査',
     hashtags: ['もしもラボ', '人口減少', '少子化', '日本の未来', '雑学'],
