@@ -118,3 +118,14 @@ VPS が毎時5分にインスタ・YouTube・TikTok の数字を記録して、�
    5. Sandbox の Client key と Client secret を LINE で TikTok設定 クライアントキー シークレット と送る → 届いたリンクを開いて許可
 
 LINEのコマンド：解析（直近24時間の数字）／解析設定／インスタトークン ○○／YouTube再接続／TikTok／TikTok設定 ○○ ○○
+
+## いつわ劇場（ドラマ）の投稿サーバー
+
+もしもラボと同じVPSで、別のサービス（itsuwa・ポート8788・URL /itsuwa/）として動かしている。もしもラボのサーバーには触らない。
+
+- 入れ方：VPSで `curl -fsSL https://raw.githubusercontent.com/oishi-thomaz/moshimo-lab/main/server/install-itsuwa.sh -o install-itsuwa.sh && sudo bash install-itsuwa.sh`（更新も同じ。設定 /etc/itsuwa.env は残る）
+- LINE：いつわ劇場通知（別の公式アカウント）。承認カードは動画が届いたらすぐ送る
+- 投稿：承認すると毎日20:00にインスタとYouTubeへ公開。同時にTikTokアプリの下書き（受信箱）へ動画を送り、TikTok用のキャプションをLINEに送る（TikTokはアプリで貼って投稿）
+- TikTok：TikTok for Developers のアプリ いつわ劇場（Sandbox itsuwa、スコープ user.info.basic・video.upload）
+- 1話を送る：`bash drama/publish/send.sh kakusan 3`（drama-out ブランチに置いて drama-publish を動かす。番号は 2000＋話数）
+- キャプション：drama/episodes/<作品>/captions.js
