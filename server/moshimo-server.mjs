@@ -190,7 +190,8 @@ function postedText(id, r) {
   return text([`投稿した：${id} ${m.title || ''}`, l('インスタ', r.ig), l('YouTube', r.yt), l('TikTok', r.tt)].filter(Boolean).join('\n'));
 }
 // TikTok の下書きに送ったときの案内（キャプションはコピーしやすいように吹き出しを分ける）
-const ttCaption = id => { const m = meta(id); return String(m.ttCaption || captionText(id)).trim(); };
+// TikTok はタイトルとハッシュタグだけ（本文を入れるとオチがわかるので入れない。2026/10/28 ゆうと）
+const ttCaption = id => { const m = meta(id); if (m.ttCaption) return String(m.ttCaption).trim(); return [m.title || '', (m.hashtags || []).slice(0, 5).map(h => '#' + h).join(' ')].filter(Boolean).join('\n').trim(); };
 const ttGuide = id => [text(`TikTokの下書きに ${meta(id).title || id} を送った。TikTokアプリの受信箱の通知を開いて、次の吹き出しのキャプションを貼って投稿して。`), text(ttCaption(id) || '（キャプションなし）')];
 async function pushPosted(id, r) {
   const failed = (r.ig && !r.ig.ok) || (r.yt && !r.yt.ok && !r.yt.skip) || (r.tt && !r.tt.ok);
