@@ -42,13 +42,13 @@ function showCrowd(v) { crowd.g.visible = v; }
 
 const SUBS = [
   [2.6, 6.0, 'いつもの新生児室。<br>今日も赤ちゃんが眠る。'],
-  [6.2, 10.0, 'その日から、赤ちゃんが<br>1人も生まれない。'],
+  [6.2, 10.0, 'でも本当の衝撃は、<br>あとから来る数字。'],
   [10.1, 14.0, '本当なら1日に<br>約1,839人（推計）。'],
   [14.2, 18.0, '日本中で、<br>産声が聞こえない。'],
   [18.1, 22.0, '1か月で約5.6万人が<br>生まれない（推計）。'],
   [22.2, 26.0, 'でも、亡くなる人の数は<br>いつも通り。'],
   [26.1, 30.0, '2025年は1年で<br>約159万人が亡くなった。'],
-  [30.2, 34.6, '減る一方で、<br>増える人はゼロ。'],
+  [30.2, 34.6, '減る一方で、増える人はゼロ。<br>半年後、どうなる？'],
   [34.6, 39.0, '半年で約79万人<br>減る計算（推計）。'],
   [39.2, 43.6, '1年で生まれるはずだった<br>赤ちゃんたち。'],
   [43.6, 47.8, '2025年の出生数は<br>67万1,270人。'],
@@ -60,17 +60,19 @@ const SUBS = [
 const cd = (left) => `0:${String(Math.max(0, Math.floor(left))).padStart(2, '0')}.${String(Math.floor((Math.max(0, left) % 1) * 100)).padStart(2, '0')}`;
 const camHome = (u) => { lift(240); look(lerp(0.5, -0.2, u), lerp(5.2, 5.0, u), lerp(5.6, 5.3, u), 0, 0.5, -1.4, 55); };
 
-function shot0(t, T) { // hook: babies sleeping, countdown
-  setNurseryLight('day'); setBabies(() => 1); nurse.visible = false; spark.set(0);
-  camHome(ease(t / 6));
-  el.title.style.opacity = 1;
-  setHud('赤ちゃんが生まれなくなるまで', cd(3 - T), 1, { mono: true });
+const TP = 0.5; // v2：0.5秒でカウントダウンが0になり、生まれた赤ちゃん 0人 がドンと出る
+function shot0(t, T) { // hook (v2): babies sleeping, countdown hits 0 at 0.5s
+  setNurseryLight('day'); setBabies(() => 1); spark.set(0);
+  nurse.visible = true; nurse.position.set(1.5, 0, -3.05); nurse.rotation.y = -0.4; poseWalk(nurse, 0, 0); // shot2 と同じ立ち位置（つながり）
+  camHome(ease(t / 6)); lift(20); // v2：ベビーコットと看護師をタイトルの下に
+  el.flash.style.opacity = t >= TP ? 0.5 * Math.max(0, 1 - (t - TP) / 0.3) : 0;
+  setHud('赤ちゃんが生まれなくなるまで', cd(TP - t), 1, { mono: true, color: t < TP ? '#fff' : '#ff6b6b' });
+  if (t >= TP) setTop('この日に生まれた赤ちゃん', '0人', 1, '#ff8a7a');
   return nursery;
 }
 function shot1(t, T) { // daily life, countdown reaches 0 at 3s
   setNurseryLight('day'); setBabies(() => 1); spark.set(0);
   const w = clamp((t - 0.6) / 2.9); nurse.visible = true; nurse.position.set(lerp(-3.0, 1.5, ease(w)), 0, -3.05); nurse.rotation.y = Math.PI / 2; poseWalk(nurse, t * 7, w < 0.98 ? 1 : 0);
-  el.title.style.opacity = clamp(1 - (t - 0.3) / 0.5);
   camHome(ease(T / 6));
   setHud('赤ちゃんが生まれなくなるまで', cd(3 - T), T < 3.4 ? 1 : clamp(1 - (T - 3.4) / 0.3), { mono: true });
   return nursery;
@@ -83,7 +85,7 @@ function shot2(t, T) {
   const kk = Math.floor(clamp((t - 1.2) / 1.3, 0, 3.99)); const tl = (t - 1.2 - kk * 1.3) / 0.9;
   if (t > 1.2 && tl < 1) { const c = COTS[LEAVE[kk]]; spark.init([[c.x, 0.9, c.z]], 0.3, 0.8); spark.set(clamp(tl)); } else spark.set(0);
   const u = ease(t / 8);
-  lift(240); look(lerp(-0.6, 0.4, u), lerp(4.9, 5.1, u), lerp(5.2, 4.9, u), 0, 0.5, -1.4, 55);
+  lift(lerp(20, 240, ease(clamp(t / 1.5)))); look(lerp(-0.6, 0.4, u), lerp(4.9, 5.1, u), lerp(5.2, 4.9, u), 0, 0.5, -1.4, 55); // v2：冒頭（lift 20）からなめらかに
   hudTime('+1日');
   setTop('1日に生まれる赤ちゃん（2025年・推計）', '約' + comma(countUp(t, 1839)) + '人', fade(t, 0.15, 8, 0.25));
   return nursery;
@@ -139,22 +141,25 @@ function shot7(t, T) { // result: empty nursery at night
 function shot8(t, T) { // loop: same framing as the hook, nursery stays empty
   setNurseryLight('day'); setBabies(() => 0); spark.set(0); nurse.visible = false;
   camHome(ease(t / 6) * 0.3);
-  setHud('赤ちゃんが生まれなくなるまで', '0:03.00', 1, { mono: true });
+  setHud('赤ちゃんが生まれなくなるまで', cd(TP), 1, { mono: true });
   return nursery;
 }
 
 const shots = [
   { a: 0, b: 2.5, f: shot0 }, { a: 2.5, b: 6, f: shot1 }, { a: 6, b: 14, f: shot2 }, { a: 14, b: 22, f: shot3 },
   { a: 22, b: 30, f: shot4 }, { a: 30, b: 39.2, f: shot5 }, { a: 39.2, b: 48, f: shot6 }, { a: 48, b: 55.5, f: shot7 },
-  { a: 55.5, b: 59.5, f: shot8 }, { a: 59.5, b: 64.5, f: endCard },
+  { a: 55.5, b: 59.5, f: shot8 }, { a: 59.5, b: 65, f: endCard },
 ];
 runStory({
-  shots, subs: SUBS, duration: 64.5,
+  shots, subs: SUBS, duration: 65,
+  cut: [[2.5, 6.0]], // v2：いつもの新生児室（元の2.5〜6秒）を抜いて、0人になった直後から本題へ
   meta: {
     id: '0017',
+    v2: true,
+    hookLine: '赤ちゃんが、1人も生まれなくなった。',
     title: '1年間、赤ちゃんが1人も生まれなかったら？',
-    titleHtml: '1年間、赤ちゃんが<br>1人も生まれなかったら？',
-    mood: 'emotional', seed: 17, hits: [3.0, 48.1], risers: [6.0],
+    titleHtml: '1年間、赤ちゃんが<br>生まれなかったら？', // v2：タイトルは1行9字まで（大きく出すため）
+    mood: 'emotional', seed: 17, hits: [0.5, 48.1], risers: [6.0],
     ask: 'あなたは何人きょうだい？',
     narr: { '1,839人': '1839人', '67万1,270人': '67万1270人' },
     caption: 'もしも1年間、日本で赤ちゃんが1人も生まれなかったら？\n2025年に生まれた赤ちゃんは67万1,270人（過去最少）。亡くなった人は158万9,533人。出生がゼロなら、1年で人口は約159万人減る計算（推計・出入国は含まない）。現実の2025年も、自然減は約92万人。厚生労働省の人口動態統計（確定数）で計算してみた。\n\nあなたは何人きょうだい？ コメントで教えて。\n\n出典：厚生労働省 令和7年(2025)人口動態統計（確定数）の概況',
