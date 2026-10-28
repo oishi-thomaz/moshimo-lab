@@ -62,7 +62,7 @@ const isHK = (x, z) => z < HKZ && x > ll(139.3, 42).x;
 
 const SUBS = [
   [2.6, 6.0, 'いつもの夕方。<br>夕ごはんを温める時間。'],
-  [6.2, 10.1, '日本中の家で、<br>いっせいにスタート！'],
+  [6.2, 10.1, 'チンが終わる前に、<br>日本中が暗くなるかも。'],
   [10.1, 14, '電子レンジ1台は、<br>約1,400W。'],
   [14.2, 18.1, '5,570万世帯で、<br>同時に動かすと…'],
   [18.1, 22, '約7,800万kWが、<br>一瞬で上乗せ。'],
@@ -80,11 +80,13 @@ const SUBS = [
 const cd = (left) => { left += 1e-6; return `0:${String(Math.floor(left)).padStart(2, '0')}.${String(Math.floor((left % 1) * 100)).padStart(2, '0')}`; };
 function offAll(f) { K.visible = (f === shot0 || f === shot1 || f === shot2 || f === shot8); barsOn(f === shot4); }
 function hookCam(t, d = 2.5) { const u = ease(t / d); look(MW.x + lerp(0.9, 0.7, u), MW.y + lerp(0.75, 0.65, u), MW.z + lerp(1.7, 1.45, u), MW.x - 0.02, MW.y + 0.1, MW.z, 50); }
-function shot0(t) { // hook: microwave close-up, countdown to the national "start"
-  kitchen(); cook.visible = false; setMW(false, 0, t);
+const TP = 0.5; // v2：0.5秒でスタート（冒頭で待たせない）
+function shot0(t) { // hook: microwave close-up, countdown hits 0 at 0.5s and it turns on
+  lift(-50); // v2：0秒目サムネ。レンジをタイトルのバッジから離す
+  kitchen(); cook.visible = false; setMW(t >= TP, 120 - Math.max(0, t - TP), t);
   hookCam(t);
-  el.title.style.opacity = 1;
-  setHud('全国いっせいにチンまで', cd(Math.max(0, 2.5 - t)), 1, { mono: true });
+  el.flash.style.opacity = t >= TP ? 0.4 * Math.max(0, 1 - (t - TP) / 0.3) : 0;
+  setHud('全国いっせいにチンまで', cd(Math.max(0, TP - t)), 1, { mono: true, color: t < TP ? '#fff' : '#ff6b6b' });
   return room;
 }
 function shot1(t) { // everyday: someone puts a dish in
@@ -99,7 +101,7 @@ function shot1(t) { // everyday: someone puts a dish in
 }
 function shot2(t) { // +0秒: microwave on
   lift(80);
-  kitchen(); cook.visible = false; setMW(true, Math.max(0, 120 - t), t);
+  kitchen(); cook.visible = false; setMW(true, Math.max(0, 118 - t), t); // v2：冒頭の0.5秒でスタートした続き
   cook.userData.arms.forEach(a => a.rotation.x = 0);
   const u = ease(t / 8);
   look(MW.x + lerp(1.2, 0.8, u), MW.y + lerp(0.9, 0.7, u), MW.z + lerp(2.4, 1.8, u), MW.x - 0.05, MW.y + 0.15, MW.z, 50);
@@ -158,29 +160,33 @@ function shot7(t) { // result: town at night, blackout, people puzzled
   return town;
 }
 function shot8(t) { // loop: microwave close-up, countdown
+  lift(-50);
   kitchen(); cook.visible = false; setMW(false, 0, t);
   hookCam(t + 0.3, 4.5);
-  setHud('全国いっせいにチンまで', cd(2.5), 1, { mono: true });
+  setHud('全国いっせいにチンまで', cd(TP), 1, { mono: true });
   return room;
 }
 
 const shots = [
   { a: 0, b: 2.5, f: shot0 }, { a: 2.5, b: 6, f: shot1 }, { a: 6, b: 14, f: shot2 }, { a: 14, b: 22, f: shot3 },
   { a: 22, b: 30, f: shot4 }, { a: 30, b: 39.2, f: shot5 }, { a: 39.2, b: 48, f: shot6 }, { a: 48, b: 55.5, f: shot7 },
-  { a: 55.5, b: 59.5, f: shot8 }, { a: 59.5, b: 64.5, f: endCard },
+  { a: 55.5, b: 59.5, f: shot8 }, { a: 59.5, b: 65, f: endCard },
 ];
 shots.forEach(s => { const f = s.f; s.f = (t, T) => { offAll(f); return f(t, T); }; });
 runStory({
-  shots, subs: SUBS, duration: 64.5,
+  shots, subs: SUBS, duration: 65,
+  cut: [[2.5, 6.0]], // v2：夕ごはんを入れる いつもの夕方（元の2.5〜6秒）を抜いて、スタート直後から本題へ
   meta: {
     id: '0103',
+    v2: true,
+    hookLine: '日本中のレンジが、一斉に動き出した。',
     series: '日本人全員で',
     hookType: 'H1',
     cat: '全員が同時に・極端な数字',
     title: '日本中の家で同時に電子レンジを使ったら？',
     titleHtml: '日本中の家で同時に<br>レンジを使ったら？',
-    mood: 'tension', seed: 103, hits: [6.2, 48.1], risers: [2.5], impacts: [18.3, 39.4],
-    sfx: [[6.3, 'alarm'], [30.4, 'meter', 0.7], [40.0, 'poof']],
+    mood: 'tension', seed: 103, hits: [0.5, 48.1], risers: [2.5], impacts: [18.3, 39.4],
+    sfx: [[0.5, 'alarm'], [30.4, 'meter', 0.7], [40.0, 'poof']],
     narr: { '1,400W': '1400ワット', '7,800万kW': '7800万キロワット', '5,570万世帯': '5570万世帯', '45時間': 'よんじゅうごじかん' },
     ask: '次に全員で同時にやってほしいのは？',
     caption: 'もしも日本中の家で、夕ごはんの時間に一斉に電子レンジを使ったら？\n日本の世帯は5,570万（2020年）。電子レンジ1台はおよそ1,400W。全世帯で同時に動かすと、約7,800万kWが一瞬で上乗せされる（単純計算）。これは2025年の夏、日本で一番電気を使った時間（1億6,260万kW）の約半分。\n使う電気が作る電気を超えると周波数が下がり、下がりすぎると発電機は壊れないように自動で止まる。2018年の北海道では、これで全域の最大約295万戸が停電し、全部に電気が戻るまで約45時間かかった。\n温めるのは、時間をずらして。\n\n次に全員で同時にやってほしいのは？ コメントで教えて。\n\n出典：総務省 令和2年国勢調査、東京都 家庭の省エネハンドブック（資源エネルギー庁調べ他）、電力広域的運営推進機関（2025年度夏季実績・暫定）、内閣府 令和元年版防災白書',
