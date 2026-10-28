@@ -12,9 +12,9 @@
   "model": "gemini-3.8-flash-tts"
  },
  "h3": {
-  "dur": 5.983,
+  "dur": 3.22,
   "voice": "Sulafat",
-  "text": "同じ声の息子から、にほんの電話。どちらかが、偽物だ。",
+  "text": "息子が、ふたりいる。どちらかが、偽物だ。",
   "model": "gemini-3.8-flash-tts"
  },
  "o1": {
