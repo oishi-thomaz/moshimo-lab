@@ -206,5 +206,6 @@ export function workoutVideo(cfg) {
     { a: 55.5, b: 59.5, f: shot8 }, { a: 59.5, b: 64.5, f: endCard },
   ];
   shots.forEach(s => { const f = s.f; s.f = (t, T) => { scenesOff(); return f(t, T); }; });
-  runStory({ shots, subs: cfg.subs, duration: 64.5, meta: { id: cfg.id, title: cfg.title, titleHtml: cfg.titleHtml, hookType: 'H4', cat: '体・健康', ...cfg.meta } });
+  // cfg.cut / cfg.duration：v2 で冒頭の日常を抜くとき用（runStory の cut と同じ。2026/10/28〜）
+  runStory({ shots, subs: cfg.subs, duration: cfg.duration || 64.5, cut: cfg.cut, meta: { id: cfg.id, title: cfg.title, titleHtml: cfg.titleHtml, hookType: 'H4', cat: '体・健康', ...cfg.meta } });
 }
