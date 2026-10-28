@@ -1,5 +1,6 @@
-import { comma } from '../lib.js';
-import { countUp } from '../story.js';
+import { comma, clamp, ease, renderer } from '../lib.js';
+import { countUp, setHud, el, cam } from '../story.js';
+import { town } from '../scenes/town.js';
 import { workoutVideo } from '../scenes/workout.js';
 
 // もしも毎日8,000歩を30日続けたら？（0531 腕立て100回の派生）
@@ -18,12 +19,12 @@ workoutVideo({
   title: '毎日8,000歩を30日続けたら？', titleHtml: '毎日8,000歩を<br>30日続けたら？',
   counter: { label: '今日の歩数', total: 8000, perSec: 600, fmt: n => `${comma(Math.floor(n))} 歩` },
   subs: [
-    [3.6, 6.0, '毎日ほとんど<br>歩かないあなた。'],
-    [6.2, 10.1, '1日目。8,000歩を<br>歩いてみる。'],
+    [3.6, 6.0, '毎日ほとんど<br>歩かないあなた。'], // v2：cut で抜ける
+    [6.2, 10.1, '体に効くのは何歩から？<br>答えは意外と少ない。'],
     [10.1, 14, '健康には1万歩、<br>と思ってない？'],
     [14.2, 18.1, 'その始まりは1965年。<br>日本の歩数計の名前。'],
     [18.1, 22, '覚えやすい数字で、<br>研究の裏付けはなかった。'],
-    [22.2, 26.1, '20日で、<br>合計16万歩。'],
+    [22.2, 26.1, '20日で、合計16万歩。<br>体に起きた変化は？'],
     [26.1, 30, '7,000歩で、死亡リスクが<br>50〜70%低かった。'],
     [30.2, 34.6, '30日で24万歩。<br>約168km。'],
     [34.6, 39, '1万歩をこえても、<br>効果はほぼ増えなかった。'],
@@ -42,7 +43,9 @@ workoutVideo({
     s7: [[0, 3.6, '死亡リスク（7,000歩以上）', '半分以下', G], [3.6, 7.5, 'うつ（7,500歩以上）', '43%少ない', G]],
   },
   meta: {
-    mood: 'hopeful', seed: 613, hits: [6.2, 30.2, 48.1], risers: [22.0], impacts: [10.1, 26.1, 30.2, 34.6, 39.2, 43.6, 48.4],
+    v2: true,
+    hookLine: '毎日8,000歩を、30日歩ききった。',
+    mood: 'hopeful', seed: 613, hits: [0.5, 6.2, 30.2, 48.1], risers: [22.0], impacts: [10.1, 26.1, 30.2, 34.6, 39.2, 43.6, 48.4],
     sfx: [[0.2, 'whoosh'], [30.4, 'meter', 1.0], [39.4, 'bubble'], [44.0, 'bubble']],
     narr: { '8,000歩': 'はっせんぽ', '1万歩': 'いちまんぽ', '1965年': '1965年', '16万歩': 'じゅうろくまんぽ', '24万歩': 'にじゅうよんまんぽ', '168km': '168キロ', '50〜70%': '50から70パーセント', '7,000歩': 'ななせんぽ', '7,500歩': 'ななせんごひゃっぽ' },
     ask: 'あなたは1万歩派？ 7,000歩派？',
@@ -52,3 +55,31 @@ workoutVideo({
     sources: '出典：Paluch et al. JAMA Netw Open（2021年）、<br>Jimenez-Lopez et al. JAMA Netw Open（2024年）、<br>Popular Science、厚生労働省',
   },
 });
+
+// ---------- v2（2026/10/28〜 TikTok基準の冒頭） ----------
+// workoutVideo（scenes/workout.js）は runStory に cut を渡せないので、ここで時間をつなぎ替える。
+//  ・出来上がりの 0〜2.5秒：元の shot0 を 0.28秒から再生（0秒目＝サムネで大きく踏み出している所）。0.5秒で 30日の合計 24万歩 がドン
+//    （人がタイトルにかからないよう、絵を少し下げて描き直す）
+//  ・2.5秒〜：元の 6.0秒〜（いつもの日常＝元の 2.5〜6秒 を抜く）
+//  字幕・効果音・BGMの強調の秒と長さは、runStory の cut と同じやり方でずらす
+{
+  const CUT = [2.5, 6.0], D = CUT[1] - CUT[0], TP = 0.5;
+  const out = (S) => (S >= CUT[1] ? Math.round((S - D) * 100) / 100 : S > CUT[0] ? null : S);
+  const r0 = window.renderAt;
+  window.renderAt = function (T0) {
+    const ok = r0(T0 < CUT[0] ? 0.28 + T0 * 0.89 : T0 + D);
+    el.title.style.opacity = T0 < 1.4 ? 1 : clamp((1.9 - T0) / 0.5);
+    if (T0 < CUT[0]) {
+      setHud('30日の歩数（合計）', comma(Math.round(240000 * ease(clamp(T0 / TP)))) + ' 歩', 1, { mono: true, color: T0 < TP ? '#fff' : '#ffd166' });
+      el.flash.style.opacity = T0 >= TP ? 0.4 * Math.max(0, 1 - (T0 - TP) / 0.3) : 0;
+      cam.setViewOffset(1080, 1920, 0, 40, 1080, 1920); renderer.render(town, cam);
+    }
+    return ok;
+  };
+  const M = window.META, m1 = (a) => (a || []).map(out).filter((x) => x != null);
+  window.META = { ...M,
+    subs: M.subs.map(([a, b, x]) => { const a2 = out(a), b2 = out(b); return a2 == null || b2 == null ? null : [a2, b2, x]; }).filter(Boolean),
+    hits: m1(M.hits), risers: m1(M.risers), impacts: m1(M.impacts),
+    sfx: (M.sfx || []).map(([t, ...r]) => { const t2 = out(t); return t2 == null ? null : [t2, ...r]; }).filter(Boolean) };
+  window.DURATION = 61.5; // 元の64.5秒 − 3.5秒 ＋ まとめカードを0.5秒のばす（61秒をこえるように）
+}
