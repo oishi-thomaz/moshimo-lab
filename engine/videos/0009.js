@@ -3,7 +3,7 @@ import { rng, clamp, lerp, ease, easeOut, easeBack, fade, mat, box, comma, makeP
 import { city, cam as cityCam, setEnv, setStore, setStoreLights, updateCars, parked, setBurst, ghost, ghostScr, ghostFill } from '../city.js';
 import { room, setRoom, setLight, props } from '../scenes/room.js';
 import { japan, setDots, setMapEnv } from '../scenes/japan.js';
-import { look, cam, runStory, endCard, hudTime, countUp, makeSparkles, setTop, setHud, el } from '../story.js';
+import { lift, look, cam, runStory, endCard, hudTime, countUp, makeSparkles, setTop, setHud, el } from '../story.js';
 
 // もしも日本から女性が全員消えたら？
 // 数字：総人口 1億2,265万人・男性5,968万人・女性6,297万人（総務省 人口推計 2026年9月1日概算）
@@ -62,13 +62,13 @@ const qAt = (q, p, t, t0, y = 2.25) => { q.visible = t > t0; q.position.set(p.po
 
 const SUBS = [
   [2.6, 6.0, 'いつもの昼の街。<br>男の人と、女の人。'],
-  [6.2, 10.1, '日本の女性<br>6,297万人が消えた。'],
-  [10.1, 14, '人口の、<br>半分以上。'],
+  [6.2, 10.1, '最初に止まるのは、<br>街じゃなく病院。'],
+  [10.1, 14, '女性は6,297万人。<br>人口の、半分以上。'],
   [14.2, 18.1, '病院から<br>看護師の9割が消えた。'],
   [18.1, 22, '124万人以上の看護師が、<br>いない。'],
-  [22.2, 26.1, '介護の現場も人が足りない。'],
+  [22.2, 26.1, '次に崩れるのは、<br>介護の現場。'],
   [26.1, 30, '訪問介護の8割以上を、<br>女性が担っていた。'],
-  [30.2, 34.6, '家事と育児が<br>一気にのしかかる。'],
+  [30.2, 34.6, '家事と育児が一気に<br>のしかかる。でも本番は1年後。'],
   [34.6, 39, '子育て中の妻は1日約7時間半、<br>夫は約2時間だった。'],
   [39.2, 43.6, '生まれる赤ちゃんは0人。'],
   [43.6, 47.8, '前の年は、<br>67万1,270人だった。'],
@@ -78,26 +78,26 @@ const SUBS = [
 ];
 
 const cd = (left) => `0:${String(Math.floor(left)).padStart(2, '0')}.${String(Math.floor((left % 1) * 100)).padStart(2, '0')}`;
-function shot0(t, T) { // hook: countdown over the map
-  setMapEnv('day'); setDots((i, x, z, q) => ({ color: i % 2 ? '#7fb6ff' : '#ff9ab8' }));
-  const u = ease(t / 2.6);
-  L(lerp(-8, -4, u), lerp(300, 285, u), lerp(95, 85, u), -4, 0, -30, 50);
-  el.title.style.opacity = 1;
-  setHud('女性が消えるまで', cd(6 - T), 1, { mono: true });
-  return japan;
+const TP = 0.5; // v2：0.5秒で女性が消える（冒頭で待たせない）
+function hookCam(t, d = 2.5) { const u = ease(t / d); L(lerp(5.6, 6.0, u), lerp(2.0, 2.2, u), lerp(13.6, 14.6, u), 6.0, 2.3, 2, 58); }
+function shot0(t, T) { // hook (v2): the street, countdown hits 0 at 0.5s and every woman vanishes
+  gStreet.visible = true; cityBase(); streetAt(t + 6.0 - TP, 6.0);
+  if (t >= TP && !streetSpark.ok) { streetSpark.init(peds.filter(w => w.f).map(w => [w.p.position.x, 1.2, w.p.position.z]), 0.8, 1.4); streetSpark.ok = true; }
+  streetSpark.set(t >= TP ? (t - TP) / 1.4 : 0);
+  el.flash.style.opacity = t >= TP ? 0.5 * Math.max(0, 1 - (t - TP) / 0.3) : 0;
+  lift(320); hookCam(t);
+  setHud('女性が消えるまで', cd(Math.max(0, TP - t)), 1, { mono: true, color: t < TP ? '#fff' : '#ff6b6b' });
+  return city;
 }
 function shot1(t, T) { // everyday street
   gStreet.visible = true; cityBase(); streetAt(T); streetSpark.set(0);
   const u = ease(t / 3.5);
   L(lerp(-1, 0, u), lerp(2.3, 2.4, u), lerp(18, 17, u), 0, 2.9, 2, 58);
-  el.title.style.opacity = clamp(1 - (t - 2.8) / 0.5);
   setHud('女性が消えるまで', cd(Math.max(0, 6 - T)), 1, { mono: true });
   return city;
 }
-function shot2(t, T) { // +1min women vanish
-  gStreet.visible = true; cityBase(); streetAt(T, 6.0);
-  if (!streetSpark.ok) { streetSpark.init(peds.filter(w => w.f).map(w => [w.p.position.x, 1.2, w.p.position.z]), 0.8, 1.4); streetSpark.ok = true; }
-  streetSpark.set(clamp(t / 1.4)); el.flash.style.opacity = 0.5 * Math.max(0, 1 - t / 0.3);
+function shot2(t, T) { // +1min: the women are already gone (v2：冒頭の0.5秒で消えた続き。光と白い光はもう出さない)
+  gStreet.visible = true; cityBase(); streetAt(T + 2.0, 6.0); streetSpark.set(0);
   const u = ease(t / 8);
   L(lerp(0, 1, u), lerp(2.4, 2.8, u), lerp(17, 16, u), 0, 2.9, 2, 58);
   hudTime('+1分');
@@ -147,26 +147,28 @@ function shot7(t, T) { // result: night map, half the dots
   setTop('残った人口（2026年9月の男性人口）', comma(countUp(t, 5968, 0.2, 1.2)) + '万人', fade(t, 0.15, 7.5, 0.25));
   return japan;
 }
-function shot8(t, T) { // loop
-  setMapEnv('day'); setDots((i, x, z, q) => ({ color: i % 2 ? '#7fb6ff' : '#ff9ab8' }));
-  const u = ease(t / 4);
-  L(lerp(-10, -8, u), lerp(306, 300, u), lerp(98, 95, u), -4, 0, -30, 50);
-  setHud('女性が消えるまで', '0:06.00', 1, { mono: true });
-  return japan;
+function shot8(t, T) { // loop (v2)：冒頭と同じ街。みんな歩いていて、カウントダウンは 0:00.50
+  gStreet.visible = true; cityBase(); streetAt(t + 1.5); streetSpark.set(0); // 4秒後に冒頭（6.0-TP）と同じ並びになる
+  lift(320); hookCam(t + 0.5, 4.5);
+  setHud('女性が消えるまで', cd(TP), 1, { mono: true });
+  return city;
 }
 
 const shots = [
   { a: 0, b: 2.5, f: shot0 }, { a: 2.5, b: 6, f: shot1 }, { a: 6, b: 14, f: shot2 }, { a: 14, b: 22, f: shot3 },
   { a: 22, b: 30, f: shot4 }, { a: 30, b: 39.2, f: shot5 }, { a: 39.2, b: 48, f: shot6 }, { a: 48, b: 55.5, f: shot7 },
-  { a: 55.5, b: 59.5, f: shot8 }, { a: 59.5, b: 64.5, f: endCard },
+  { a: 55.5, b: 59.5, f: shot8 }, { a: 59.5, b: 65, f: endCard },
 ];
 runStory({
-  shots, subs: SUBS, duration: 64.5, camera: cityCam,
+  shots, subs: SUBS, duration: 65, camera: cityCam,
+  cut: [[2.5, 6.0]], // v2：いつもの昼の街（元の2.5〜6秒）を抜いて、消えた直後から本題へ
   meta: {
     id: '0009',
+    v2: true,
+    hookLine: '日本から女性が、一人残らず消えた。',
     title: '日本から女性が全員消えたら？',
     titleHtml: '日本から女性が<br>全員消えたら？',
-    mood: 'mystery', seed: 10, hits: [6.0, 48.1], risers: [6.0],
+    mood: 'mystery', seed: 10, hits: [0.5, 48.1], risers: [6.0], sfx: [[0.5, 'poof']],
     ask: 'あなたの家の家事分担は何対何？',
     caption: 'もしも日本から女性6,297万人が一瞬で消えたら？\n看護師の91.3%、訪問介護員の83.0%が女性。病院、介護、家事と育児、そして出生数はどうなるのか。公式統計でシミュレーション。\n\nあなたの家の家事分担は何対何？ コメントで教えて。\n\n出典：総務省 人口推計（2026年9月概算）・令和3年社会生活基本調査、厚生労働省 令和6年衛生行政報告例・令和7年人口動態統計（確定数）、介護労働安定センター 令和7年度介護労働実態調査',
     hashtags: ['もしもラボ', 'もしもシリーズ', '看護師', '少子化', '雑学'],
