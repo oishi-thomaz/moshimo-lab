@@ -66,33 +66,32 @@ function setBars(k, show = true) { bars.forEach((b, i) => { const v = YEARS[i][1
 
 const SUBS = [
   [2.6, 6.0, '時間を少し戻そう。<br>旅先のホテルの夜。'],
-  [6.2, 10.1, '世界中のトコジラミが、<br>一斉に消えた。'],
+  [6.2, 10.1, '血を吸う虫が消えた。<br>でも一番の変化は別にある。'],
   [10.1, 14, '東京都への相談は、<br>2023年度に過去最多だった。'],
-  [14.2, 18.1, 'まず、夜に血を吸われる<br>心配が消えた。'],
+  [14.2, 18.1, 'まず、夜に血を吸われる<br>心配が消えた。でも本題は次。'],
   [18.1, 22, 'トコジラミがいる家の人は、<br>睡眠の不調が約5倍だった。'],
   [22.2, 26.1, '殺虫剤が効きにくい<br>トコジラミも、もういない。'],
   [26.1, 30, '効きにくい地域では、<br>3日後に死んだのは3.3%。'],
   [30.2, 34.6, 'じゃあ、困る生き物は？'],
   [34.6, 39, 'トコジラミは、<br>病気をうつすと知られていない。'],
-  [39.2, 43.6, '東京都の相談は、<br>15年で約3倍に増えていた。'],
+  [39.2, 43.6, '東京都の相談は15年で約3倍。<br>それが、どうなるか。'],
   [43.6, 47.8, 'その相談の電話が、<br>鳴らなくなった。'],
   [48.1, 53.8, '結果：病気はうつさない虫。<br>消えたのは、かゆみと不眠。'],
   [53.9, 56.1, '血だけを飲む虫だった。'],
   [56.2, 59.4, '次に絶滅ボタンを<br>押したい生き物は？'],
 ];
 
-const TP = 1.4;
+const TP = 0.5; // v2：0.5秒で押す（冒頭で待たせない）
 function btnState(t) { const h = xHook(t, TP); btn.userData.press(h.press); btn.userData.hand(h.hand); }
 function hookCam(t, d = 2.5) { const u = ease(t / d); look(lerp(0.55, 0.5, u), lerp(1.75, 1.7, u), lerp(0.05, -0.1, u), 1.4, 0.9, -1.5, 50); }
 function shot0(t) { // hook: bed bugs on the white sheet by the pillow, red button on the nightstand
-  lift(260);
+  lift(0);
   hotel('evening', { ceil: 8, hemi: 0.95, lamp: 1.2 }); lamp.position.set(0.3, 1.3, -2.4);
   btn.userData.labelOn(false); btnState(t); throwB.visible = false;
   closeBugs(t, t < TP); seamBugs.set(t < TP ? 120 : 0, t, 0.6);
   hookSpark.set(t >= TP ? (t - TP) / 0.9 : 0);
   el.flash.style.opacity = t >= TP ? 0.55 * Math.max(0, 1 - (t - TP) / 0.3) : 0;
   hookCam(t);
-  el.title.style.opacity = 1;
   setHud('絶滅ボタンを押すまで', xCountdown(TP - t), 1, { mono: true, color: t < TP ? '#fff' : '#ff6b6b' });
   return room;
 }
@@ -103,16 +102,14 @@ function shot1(t) { // everyday: traveler arrives, the bugs hide in the sheet by
   hotel('evening', { ceil: 8, hemi: 0.95, lamp: 1.2 }); lamp.position.set(0.3, 1.3, -2.4); btn.userData.labelOn(false); btn.userData.press(0); btn.userData.hand(0);
   closeBugs(t + 3, true); seamBugs.set(120, t + 3, 0.6); travPose(t);
   roomCam(t, 3.5, [-1.4, 2.3, 1.5], [-1.1, 2.2, 1.1]);
-  el.title.style.opacity = clamp(1 - (t - 0.2) / 0.5);
   return room;
 }
 function shot2(t) { // +1秒: all gone
   lift(220);
   hotel('evening', { ceil: 8, hemi: 0.95, lamp: 1.2 }); lamp.position.set(0.3, 1.3, -2.4); btn.userData.labelOn(false); btn.userData.press(1); btn.userData.hand(0);
-  const tv = 0.6;
+  const tv = 0; // v2：冒頭で押した直後からつながるので、虫はもう消えている（消えた跡の光だけ）
   closeBugs(t + 6, t < tv); seamBugs.set(t < tv ? 120 : 0, t + 6, 0.6); travPose(t);
   bugSpark.set(t >= tv ? (t - tv) / 1.3 : 0);
-  el.flash.style.opacity = t >= tv ? 0.4 * Math.max(0, 1 - (t - tv) / 0.3) : 0;
   roomCam(t, 8, [-1.1, 2.2, 1.1], [-0.7, 2.5, 1.8]);
   hudTime('+1秒');
   setTop('東京都のトコジラミ相談（2023年度・過去最多）', countUp(t, 537, 1.2, 1.2) + '件', fade(t, 1.15, 8, 0.25));
@@ -178,19 +175,22 @@ function shot8(t) { // loop: the red button on the nightstand, clean sheet
 const shots = [
   { a: 0, b: 2.5, f: shot0 }, { a: 2.5, b: 6, f: shot1 }, { a: 6, b: 14, f: shot2 }, { a: 14, b: 22, f: shot3 },
   { a: 22, b: 30.2, f: shot4 }, { a: 30.2, b: 39.2, f: shot5 }, { a: 39.2, b: 48, f: shot6 }, { a: 48, b: 55.5, f: shot7 },
-  { a: 55.5, b: 59.5, f: shot8 }, { a: 59.5, b: 64.5, f: endCard },
+  { a: 55.5, b: 59.5, f: shot8 }, { a: 59.5, b: 65, f: endCard },
 ];
 runStory({
-  shots, subs: SUBS, duration: 64.5,
+  shots, subs: SUBS, duration: 65,
+  cut: [[2.5, 6.0]], // v2：旅先のホテルの夜（元の2.5〜6秒）を抜いて、押した直後から本題へ
   meta: {
     id: '0709',
+    v2: true,
+    hookLine: '世界中のトコジラミが、一斉に消えた。',
     series: '絶滅ボタン',
     hookType: 'H5',
     cat: '生き物・動物',
     title: '世界中のトコジラミが絶滅したら？',
-    titleHtml: '世界中のトコジラミが<br>絶滅したら？',
-    mood: 'hopeful', seed: 709, hits: [1.4, 48.1], risers: [6.0], impacts: [18.6, 26.6, 39.6],
-    sfx: [[1.4, 'poof'], [6.6, 'poof'], [2.6, 'skitter']],
+    titleHtml: '世界のトコジラミが<br>絶滅したら？',
+    mood: 'hopeful', seed: 709, hits: [0.5, 48.1], risers: [6.0], impacts: [18.6, 26.6, 39.6],
+    sfx: [[0.5, 'poof'], [0.0, 'skitter']],
     narr: { '3.3%': '3.3パーセント', '約5倍': 'やく5ばい', '約3倍': 'やく3ばい', 'トコジラミ絶滅ボタン': 'トコジラミぜつめつボタン', '2023年度': '2023年度' },
     ask: '次に絶滅ボタンを押したい生き物は？',
     caption: 'もしも世界中のトコジラミ（南京虫）が一瞬で絶滅したら？\n東京都に寄せられたトコジラミの相談は、2023年度に537件で過去最多。2009年度の165件から、2024年度は486件と15年で約3倍に増えている。\nトコジラミがいる家の人は、いない人より睡眠の不調が約5倍（2012年の調査）。\nしかも殺虫剤が効きにくい。ピレスロイド系の殺虫剤を処理して3日後に死んだのが3.3〜6.7%しかいない地域もあった（2024年の資料）。\nじゃあ消えて困る生き物は？ トコジラミは病気をうつすことは知られていない（米EPA）。\n結果、消えたのは、かゆみと眠れない夜。\n\n次に絶滅ボタンを押したい生き物は？ コメントで教えて。\n\n出典：東京都保健医療局「知っていますか？トコジラミ」、Susser ほか BMJ Open（2012年）、日本環境衛生センター 橋本知幸（厚生労働省 研修会資料 2024年）、米国環境保護庁 EPA',
