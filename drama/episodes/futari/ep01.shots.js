@@ -35,7 +35,7 @@ export function cover(g, lt = 9) {
 
 const SHOTS = [
   // ── 冒頭：いきなり2本の電話（1フレーム目から「ハルト」が2つ鳴っている）
-  { at: 'cold', finish: { vignette: 0.6 }, draw(g, lt, D) { phone(g, lt, D, (p, w, h) => twoLines(p, w, h, { t: lt, active: 1, sec1: 48, sec2: 0, alarm: 1 }), { z0: 1.06, z1: 1.06 }); mood(g, { red: 0.12 }); } },
+  { at: 'cold', off: -0.3, finish: { vignette: 0.6 }, draw(g, lt, D) { phone(g, lt, D, (p, w, h) => twoLines(p, w, h, { t: lt, active: 1, sec1: 48, sec2: 0, alarm: 1 }), { z0: 1.06, z1: 1.06 }); mood(g, { red: 0.12 }); } },
   { at: 'h1', finish: { vignette: 0.6 }, draw(g, lt, D) { phone(g, lt, D, (p, w, h) => twoLines(p, w, h, { t: lt, active: 1, sec1: 48, sec2: 0, alarm: 1 }), { z0: 1.06, z1: 1.12 }); mood(g, { red: 0.12 * (1 - inv(0, 0.6, lt)) }); } },
   { at: 'h2', finish: { vignette: 0.6 }, draw(g, lt, D) { phone(g, lt, D, (p, w, h) => twoLines(p, w, h, { t: lt, active: 2, sec1: 50, sec2: 2, alarm: 1 }), { z0: 1.12, z1: 1.18 }); } },
   { at: 'h3', finish: { vignette: 0.7 }, draw(g, lt, D, S) { dark(g); speedLines(g, 540, 760, { inner: 470, t: lt, color: 'rgba(200,255,220,.16)' }); g.save(); cam(g, { x: 540, y: 800, z: slow(lt, D, 1.0, 1.1) }); close(g, P.sawako, { y: 780, s: 4.0, eyes: 'wide', brow: -0.6, mouth: 'line', lightFrom: 'left', phoneLight: true }); g.restore(); } },
