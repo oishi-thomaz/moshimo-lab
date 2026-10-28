@@ -345,6 +345,12 @@ async function onLineWebhook(req, res) {
     else if (ev.type === 'message' && ev.message.type === 'text' && /^(youtube|ユーチューブ)/i.test(ev.message.text.trim())) {
       await reply(ev.replyToken, text(ytCommand(ev.message.text.trim())));
     }
+    else if (ev.type === 'message' && ev.message.type === 'text' && /^(tiktok|ティックトック)\s*下書き/i.test(ev.message.text.trim())) {
+      // 「TikTok下書き 0620」：その回を TikTok の下書き（受信箱）へ送り直す。結果とキャプションは pushPosted で届く
+      const id = (ev.message.text.match(/\d{4}/) || [])[0];
+      if (!id || !validId(id) || !fs.existsSync(path.join(MEDIA, `${id}.mp4`))) { await reply(ev.replyToken, text('TikTok下書き 0620 のように番号をつけて送って（VPSに動画がある回だけ）')); }
+      else { const prev = state.items[id] && state.items[id].tt; await reply(ev.replyToken, text(`${id} をTikTokの下書きに送る${prev ? `（前回：${prev.ok ? '送信済み' : prev.error}）` : ''}`)); if (state.items[id] && state.items[id].tt) delete state.items[id].tt; const tr = await tiktokDraft(id); await pushPosted(id, { tt: tr }); }
+    }
     else if (ev.type === 'message' && ev.message.type === 'text' && /^(tiktok|ティックトック)/i.test(ev.message.text.trim())) {
       await reply(ev.replyToken, text(ttCommand(ev.message.text.trim())));
     }
@@ -987,7 +993,7 @@ function readSnaps(since) {
 }
 function exportData(hours) {
   const now = Date.now();
-  const items = Object.fromEntries(Object.entries(state.items).map(([id, i]) => { const m = meta(id); return [id, { status: i.status, title: m.title || '', ask: m.ask || '', hashtags: m.hashtags || [], mediaId: i.mediaId || '', permalink: i.permalink || '', publishedAt: i.publishedAt || 0, publishAt: i.publishAt || 0, yt: i.yt && i.yt.videoId ? i.yt.videoId : '' }]; }));
+  const items = Object.fromEntries(Object.entries(state.items).map(([id, i]) => { const m = meta(id); return [id, { status: i.status, tt: i.tt ? { ok: !!i.tt.ok, error: i.tt.error || '', status: i.tt.status || '', at: i.tt.at || 0 } : undefined, ttNow: !!i.ttNow, title: m.title || '', ask: m.ask || '', hashtags: m.hashtags || [], mediaId: i.mediaId || '', permalink: i.permalink || '', publishedAt: i.publishedAt || 0, publishAt: i.publishAt || 0, yt: i.yt && i.yt.videoId ? i.yt.videoId : '' }]; }));
   return {
     now, items, snaps: readSnaps(now - hours * 3600e3),
     igDays: state.an.igDays || {}, ytAnalytics: state.an.ytA || null, ytAnalyticsError: state.an.ytAerr || '',
