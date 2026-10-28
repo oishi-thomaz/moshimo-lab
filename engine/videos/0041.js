@@ -83,12 +83,12 @@ const KC = 0.0026; // m per kcal
 // ---------- text ----------
 const SUBS = [
   [2.6, 6.0, '時間を少し戻そう。<br>いつもの田んぼの朝。'],
-  [6.2, 10.1, '日本中の田畑から、<br>農家が一斉に消えた。'],
+  [6.2, 10.1, '田んぼが止まる。<br>でもヤバいのは1年後。'],
   [10.1, 14, '7割は65歳以上の<br>ベテランだった。'],
   [14.2, 18.1, '野菜売り場から、<br>国産が消えていく。'],
-  [18.1, 22, '野菜は重さで77%が<br>国産だった。'],
+  [18.1, 22, '野菜は重さで77%が国産。<br>次に消えるのは…'],
   [22.2, 26.1, '卵は96%が国産。<br>ケースがほぼ空に。'],
-  [26.1, 30, '食べ物の金額では、<br>66%が国産だった。'],
+  [26.1, 30, '食べ物の金額では、<br>66%が国産。次は主食。'],
   [30.2, 34.6, '新米が、もう届かない。<br>お米は95%が国産。'],
   [34.6, 39, '田んぼは草におおわれ、<br>荒れ地に戻っていく。'],
   [39.2, 43.6, '1人が1日に食べる量は<br>2,237kcalあった。'],
@@ -99,17 +99,16 @@ const SUBS = [
 ];
 
 const cd = (left) => { left += 1e-6; return `0:${String(Math.floor(left)).padStart(2, '0')}.${String(Math.floor((left % 1) * 100)).padStart(2, '0')}`; };
-const TP = 1.4;
+const TP = 0.5; // v2：0.5秒で消える（冒頭で待たせない）
 function farmBase(env = 'day') { setFarmEnv(env); setRice(0.45, 0); setVeg(1); setWeeds(0); hatsOn(false); fSpark.set(0); }
 function hookCam(t, d = 2.5) { const u = ease(t / d); look(lerp(-4.6, -5.0, u), lerp(4.4, 4.2, u), lerp(0.6, 0.0, u), -10.2, 0.6, -9.6, 50); }
 function shot0(t) { // hook: farmers working, countdown, vanish at 1.4
-  lift(170); farmBase('day');
+  lift(100); farmBase('day'); // v2：農家がタイトルの下に入るように少し下げる
   farmersOn(t < TP, t + 3); setTractor(t < TP ? 10 + t * 2.2 : 10 + TP * 2.2);
   if (t >= TP && !fSpark.ready) { fSpark.init(farmers.map(p => [p.position.x, 1.2, p.position.z]), 0.8, 1.6); fSpark.ready = true; }
   fSpark.set(t >= TP ? (t - TP) / 1.0 : 0); hatsOn(t >= TP);
   el.flash.style.opacity = t >= TP ? 0.5 * Math.max(0, 1 - (t - TP) / 0.3) : 0;
   hookCam(t);
-  el.title.style.opacity = 1;
   setHud('農家が消えるまで', cd(Math.max(0, TP - t)), 1, { mono: true, color: t < TP ? '#fff' : '#ff6b6b' });
   return farm;
 }
@@ -197,7 +196,7 @@ function shot7(t) { // result: dinner table with domestic dishes vanishing
   return room;
 }
 function shot8(t) { // loop: same composition as hook, result state (no farmers, weeds)
-  lift(170); setFarmEnv('day'); setRice(0.15, 0.3); setVeg(0); setWeeds(1); farmersOn(false); hatsOn(true); setTractor(10 + TP * 2.2); fSpark.set(0);
+  lift(100); setFarmEnv('day'); setRice(0.15, 0.3); setVeg(0); setWeeds(1); farmersOn(false); hatsOn(true); setTractor(10 + TP * 2.2); fSpark.set(0);
   hookCam(t + 0.5, 4.5);
   setHud('農家が消えるまで', cd(0), 1, { mono: true, color: '#ff6b6b' });
   return farm;
@@ -212,12 +211,15 @@ const shots = [
 shots.forEach(s => { const f = s.f; s.f = (t, T) => { resetAll(f); return f(t, T); }; });
 runStory({
   shots, subs: SUBS, duration: 64.5,
+  cut: [[2.5, 6.0]], // v2：いつもの田んぼの朝（元の2.5〜6秒）を抜いて、消えた直後から本題へ
   meta: {
     id: '0041',
+    v2: true,
+    hookLine: '日本中の農家が、一斉に消えた。',
     title: '日本中の農家が消えたら？',
     titleHtml: '日本中の農家が<br>消えたら？',
-    mood: 'tension', seed: 41, hits: [1.4, 48.1], risers: [6.0, 39.2], impacts: [44.0, 48.4],
-    sfx: [[1.4, 'poof'], [14.8, 'whoosh'], [22.6, 'whoosh'], [32.6, 'alarm'], [48.8, 'poof'], [35.0, 'meter', 0.5]],
+    mood: 'tension', seed: 41, hits: [0.5, 48.1], risers: [6.0, 39.2], impacts: [44.0, 48.4],
+    sfx: [[0.5, 'poof'], [14.8, 'whoosh'], [22.6, 'whoosh'], [32.6, 'alarm'], [48.8, 'poof'], [35.0, 'meter', 0.5]],
     narr: { '2,237kcal': 'にせんにひゃくさんじゅうななキロカロリー', '77%': 'ななじゅうななパーセント', '96%': 'きゅうじゅうろくパーセント', '66%': 'ろくじゅうろくパーセント', '95%': 'きゅうじゅうごパーセント', '24%': 'にじゅうよんパーセント', '田畑': 'たはた', '7割': 'ななわり', '3分の2': 'さんぶんのに', '新米': 'しんまい' },
     ask: '国産で一番なくなると困る食べ物は？',
     caption: 'もしも日本中の農家が一斉に消えたら？\n田んぼと畑を支える基幹的農業従事者は103万6千人（2025年）。そのうち69.6%が65歳以上で、5年で24%減った。\n国産の割合は、重さで野菜77%・卵96%・お米95%（2025年度）。食べ物の金額では66%が国産。\nいま1人が1日に食べる量（供給熱量）は2,237kcal。農家がつくる分が消えて、今の輸入量のままだと残るのは約1,229kcal（単純計算：輸入飼料で育てた国産の肉や卵も含めて、魚以外の国産分を引いた値）。生活に必要とされる1,850kcalの約3分の2しかない。\n結果、毎日の食事は必要な量の3分の2だけになる。\n\n国産で一番なくなると困る食べ物は？ コメントで教えて。\n\n出典：農林水産省「2025年農林業センサス 結果の概要（確定値）」（2026年3月）、農林水産省「令和7年度 食料自給率・食料需給表」（2026年8月）',
