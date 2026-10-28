@@ -63,15 +63,15 @@ const spark = makeSparkles(120, 0.12, 0xffe6a0); stage.add(spark.points); spark.
 
 const SUBS = [
   [2.6, 6.0, '1日1,000円。<br>月3万円を積み立てる。'],
-  [6.2, 10.1, '1年で積み立てたお金は<br>36万円。'],
+  [6.2, 10.1, '1日1,000円。でも増え方が<br>変わるのは後半から。'],
   [10.1, 14, '年3%で増えると仮定して、<br>国と同じ方法で試算する。'],
   [14.2, 18.1, '10年で元本360万円。<br>試算では約418万円。'],
-  [18.1, 22, '増えた分は約58万円。<br>まだ小さい。'],
+  [18.1, 22, '増えた分は約58万円。<br>まだ小さい。本番はここから。'],
   [22.2, 26.1, '20年で元本720万円。<br>試算では約981万円。'],
   [26.1, 30, '増えた分が、さらに<br>増えた分を生み始める。'],
   [30.2, 34.6, '30年で元本1,080万円。'],
   [34.6, 39, '試算では約1,736万円。<br>元本の約1.6倍。'],
-  [39.2, 43.6, 'ふつうの口座なら、<br>利益に約20%の税金。'],
+  [39.2, 43.6, 'でも、ふつうの口座なら<br>利益に約20%の税金。'],
   [43.6, 47.8, '国のNISAなら、この<br>約133万円がかからない。'],
   [48.1, 53.8, '結果：30年で元本1,080万円が、<br>試算で約1,736万円になった。'],
   [53.9, 56.1, 'ただし、元本保証はない。'],
@@ -80,12 +80,13 @@ const SUBS = [
 
 const yen = (man) => man >= 10000 ? (man / 10000).toFixed(0) + '億円' : '約' + Math.round(man).toLocaleString('en-US') + '万円';
 function stageCam(t, d, a, b, tg = [0, 3.6, 0]) { const u = ease(t / d); look(lerp(a[0], b[0], u), lerp(a[1], b[1], u), lerp(a[2], b[2], u), ...tg, 50); }
-function shot0(t) { // hook: coin stacks grow fast, months counter
-  setStageColor('#14213a'); stageMode('coins'); setStacks(clamp(t / 2.4));
+const TP = 0.6; // v2：0.6秒で30年（360か月）までいっきに積み上がる
+const S0 = 0.35; // 0秒目（サムネ）から硬貨の山が見えている量
+function shot0(t) { // hook: coin stacks shoot up, months counter 1 -> 360 by 0.6s
+  setStageColor('#14213a'); stageMode('coins'); setStacks(lerp(S0, 1, ease(clamp(t / TP))));
   stageCam(t, 2.5, [0, 5.0, 13.5], [0, 4.8, 12.5], [0, 2.2, 0]);
   lift(260);
-  el.title.style.opacity = 1;
-  setHud('積み立て', Math.min(360, Math.floor(Math.pow(t / 2.5, 1.5) * 360)) + 'か月目', 1, { mono: true, color: t > 1.4 ? GOLD : '#fff' });
+  setHud('積み立て', Math.max(1, Math.min(360, Math.floor(ease(clamp(t / TP)) * 360))) + 'か月目', 1, { mono: true, color: t >= TP ? GOLD : '#fff' });
   return stage;
 }
 function shot1(t) { // everyday: dropping coins in a jar at home
@@ -93,7 +94,6 @@ function shot1(t) { // everyday: dropping coins in a jar at home
   living('day', { ceil: 5, hemi: 1.05 }); you.visible = true; cal.visible = true; cal.userData.set('1か月目');
   drop(t, 0.15 + t * 0.03);
   const u = ease(t / 3.5); look(lerp(-0.7, -0.5, u), lerp(1.6, 1.55, u), lerp(1.5, 1.2, u), 0.9, 0.95, -1.2, 50);
-  el.title.style.opacity = clamp(1 - (t - 0.2) / 0.5);
   setHud('1日', '1,000円', 1);
   return room;
 }
@@ -152,29 +152,32 @@ function shot7(t) { // result: wide on all three columns
   return stage;
 }
 function shot8(t) { // loop: coins stage, like the hook
-  setStageColor('#14213a'); stageMode('coins'); setStacks(0.18);
+  setStageColor('#14213a'); stageMode('coins'); setStacks(S0);
   stageCam(t + 0.5, 4.5, [0, 5.0, 13.5], [0, 4.8, 12.5], [0, 2.2, 0]);
   lift(260);
-  setHud('積み立て', '0か月目', 1, { mono: true });
+  setHud('積み立て', '1か月目', 1, { mono: true });
   return stage;
 }
 
 const shots = [
   { a: 0, b: 2.5, f: shot0 }, { a: 2.5, b: 6, f: shot1 }, { a: 6, b: 14.1, f: shot2 }, { a: 14.1, b: 22.1, f: shot3 },
   { a: 22.1, b: 30.2, f: shot4 }, { a: 30.2, b: 39.2, f: shot5 }, { a: 39.2, b: 48, f: shot6 }, { a: 48, b: 55.5, f: shot7 },
-  { a: 55.5, b: 59.5, f: shot8 }, { a: 59.5, b: 64.5, f: endCard },
+  { a: 55.5, b: 59.5, f: shot8 }, { a: 59.5, b: 65, f: endCard },
 ];
 runStory({
-  shots, subs: SUBS, duration: 64.5,
+  shots, subs: SUBS, duration: 65,
+  cut: [[2.5, 6.0]], // v2：家で小銭を貯める日常（元の2.5〜6秒）を抜いて、+1年から本題へ
   meta: {
     id: '0047',
+    v2: true,
+    hookLine: '毎月3万円を、30年積み立て続けた。',
     series: 'お財布のもしも',
     hookType: 'H6',
     cat: 'お金・経済',
     title: '毎月3万円を30年積み立て続けたら？',
     titleHtml: '毎月3万円を30年<br>積み立て続けたら？',
-    mood: 'hopeful', seed: 47, hits: [1.4, 48.1], risers: [30.2], impacts: [18.5, 35.0, 44.0],
-    sfx: [[1.4, 'whoosh']],
+    mood: 'hopeful', seed: 47, hits: [0.6, 48.1], risers: [30.2], impacts: [18.5, 35.0, 44.0],
+    sfx: [[0.0, 'whoosh']],
     narr: { '1,000円': '千円', '36万円': '36万円', '年3%': 'ねん3パーセント', '約418万円': 'やく418万円', '約58万円': 'やく58万円', '約981万円': 'やく981万円', '1,080万円': '1080万円', '約1,736万円': 'やく1736万円', '約1.6倍': 'やく1.6ばい', '約20%': 'やく20パーセント', '約133万円': 'やく133万円', 'NISA': 'ニーサ' },
     ask: '毎月いくらなら続けられる？',
     caption: 'もしも毎月3万円を30年積み立て続けたら？\n1日1,000円、月3万円。1年で積み立てたお金（元本）は36万円。\n年3%で増えると仮定して、金融庁のNISA資料と同じ方法で試算すると、10年で元本360万円→約418万円、20年で元本720万円→約981万円、30年で元本1,080万円→約1,736万円。増えた分は約656万円で、元本の約1.6倍。\nふつうの口座なら利益に20.315%の税金がかかり、約133万円（単純計算）。NISAのつみたて投資枠（年120万円まで）なら非課税。\nただし元本保証はない。年3%は仮定の数字で、将来の運用成果を保証するものではない。手数料は考えていない。特定の商品をすすめるものではない。\n\n毎月いくらなら続けられる？ コメントで教えて。\n\n出典：金融庁「NISAを知る」（2024年6月）の試算方法、税率は上場株式等の譲渡所得等の税率（所得税・復興特別所得税15.315%＋住民税5%）',
