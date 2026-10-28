@@ -1,5 +1,6 @@
-import { comma } from '../lib.js';
-import { countUp } from '../story.js';
+import { comma, clamp, ease, renderer } from '../lib.js';
+import { countUp, setHud, el, cam } from '../story.js';
+import { room } from '../scenes/room.js';
 import { workoutVideo } from '../scenes/workout.js';
 
 // もしも腹筋100回を30日続けたら？（0531 腕立て100回の派生）
@@ -16,14 +17,14 @@ workoutVideo({
   title: '腹筋100回を30日続けたら？', titleHtml: '腹筋100回を<br>30日続けたら？',
   counter: { label: '今日の腹筋', total: 100, perSec: 1.0, fmt: n => `${Math.floor(n)} / 100` },
   subs: [
-    [3.6, 6.0, '運動は、ほとんど<br>していないあなた。'],
-    [6.2, 10.1, '1日目。100回を<br>20回×5セットで。'],
+    [3.6, 6.0, '運動は、ほとんど<br>していないあなた。'], // v2：cut で抜ける
+    [6.2, 10.1, 'お腹は割れたのか？<br>答えは意外な場所にあった。'],
     [10.1, 14, '実は腹筋は、<br>誰でも割れている。'],
     [14.2, 18.1, '見えないのは、<br>上に脂肪がのってるだけ。'],
     [18.1, 22, '2日目。笑うだけで<br>お腹が痛い。'],
     [22.2, 26.1, '腹筋を6週間続けた研究。<br>回数は大きく伸びた。'],
     [26.1, 30, '何もしない人32回、<br>続けた人は47回。'],
-    [30.2, 34.6, '30日で、合計<br>3,000回に到達。'],
+    [30.2, 34.6, '30日で、合計3,000回。<br>さあ、お腹は割れた？'],
     [34.6, 39, 'でも、お腹の脂肪は<br>減らなかった。'],
     [39.2, 43.6, '腹筋だけでは、<br>お腹はへこまない。'],
     [43.6, 47.8, 'それでも筋トレで、<br>うつの症状は軽くなる。'],
@@ -41,7 +42,9 @@ workoutVideo({
     s7: [[0, 3.6, 'お腹の筋肉', '強くなる', G], [3.6, 7.5, 'お腹の脂肪', 'そのまま', R]],
   },
   meta: {
-    mood: 'hopeful', seed: 612, hits: [6.2, 34.6, 48.1], risers: [30.0], impacts: [10.1, 26.1, 33.0, 34.6, 39.2, 48.4],
+    v2: true,
+    hookLine: '腹筋100回を、30日やりきった。',
+    mood: 'hopeful', seed: 612, hits: [0.5, 6.2, 34.6, 48.1], risers: [30.0], impacts: [10.1, 26.1, 33.0, 34.6, 39.2, 48.4],
     sfx: [[0.2, 'whoosh'], [30.4, 'meter', 1.0], [34.8, 'buzz'], [44.0, 'bubble']],
     narr: { '20回×5セット': 'にじゅっかいを、ごセット', '34.6%': 'さんじゅうよんてんろくパーセント', '3,000回': 'さんぜんかい', '32回': 'さんじゅうにかい', '47回': 'よんじゅうななかい' },
     ask: '腹筋割れてる人、正直なにした？',
@@ -51,3 +54,31 @@ workoutVideo({
     sources: '出典：Vispute et al. JSCR（2011年）、<br>Gordon et al. JAMA Psychiatry（2018年）',
   },
 });
+
+// ---------- v2（2026/10/28〜 TikTok基準の冒頭） ----------
+// workoutVideo（scenes/workout.js）は runStory に cut を渡せないので、ここで時間をつなぎ替える。
+//  ・出来上がりの 0〜2.5秒：元の shot0 を 0.35秒から再生（0秒目＝サムネで体を半分起こしている所）。0.5秒で 30日の合計 3,000回 がドン
+//  ・2.5秒〜：元の 6.0秒〜（いつもの日常＝元の 2.5〜6秒 を抜く）
+//  （0〜2.5秒は頭が左で切れないよう、絵を右へずらして描き直す）
+//  字幕・効果音・BGMの強調の秒と長さは、runStory の cut と同じやり方でずらす
+{
+  const CUT = [2.5, 6.0], D = CUT[1] - CUT[0], TP = 0.5;
+  const out = (S) => (S >= CUT[1] ? Math.round((S - D) * 100) / 100 : S > CUT[0] ? null : S);
+  const r0 = window.renderAt;
+  window.renderAt = function (T0) {
+    const ok = r0(T0 < CUT[0] ? 0.35 + T0 * 0.86 : T0 + D);
+    el.title.style.opacity = T0 < 1.4 ? 1 : clamp((1.9 - T0) / 0.5);
+    if (T0 < CUT[0]) {
+      setHud('30日の腹筋（合計）', comma(Math.round(3000 * ease(clamp(T0 / TP)))) + '回', 1, { mono: true, color: T0 < TP ? '#fff' : '#ffd166' });
+      el.flash.style.opacity = T0 >= TP ? 0.4 * Math.max(0, 1 - (T0 - TP) / 0.3) : 0;
+      cam.setViewOffset(1080, 1920, -150, 90, 1080, 1920); renderer.render(room, cam); // 頭が左で切れないよう、絵を右へ150pxずらして描き直す
+    }
+    return ok;
+  };
+  const M = window.META, m1 = (a) => (a || []).map(out).filter((x) => x != null);
+  window.META = { ...M,
+    subs: M.subs.map(([a, b, x]) => { const a2 = out(a), b2 = out(b); return a2 == null || b2 == null ? null : [a2, b2, x]; }).filter(Boolean),
+    hits: m1(M.hits), risers: m1(M.risers), impacts: m1(M.impacts),
+    sfx: (M.sfx || []).map(([t, ...r]) => { const t2 = out(t); return t2 == null ? null : [t2, ...r]; }).filter(Boolean) };
+  window.DURATION = 61.5; // 元の64.5秒 − 3.5秒 ＋ まとめカードを0.5秒のばす（61秒をこえるように）
+}
