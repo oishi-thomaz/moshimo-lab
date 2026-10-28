@@ -1,5 +1,6 @@
 // いつわ劇場「ホワイト案件」の画づくり：夜の黒紺＋赤一色、スクリーントーン、頭身高めのキャラ、チャット、タイマー、コマ割り
 import { W, H, clamp, lerp, inv, ease, easeOut, back, rng, noise1, rr, fillRR, circ, ell, poly, line, vgrad, glow, rgba, mix, FONT, SERIF } from './core.js';
+import { isHair2, hairBack2, hairFront2 } from './hair2.js';
 
 export const C = {
   ink: '#07080d', navy: '#10162a', navy2: '#1a2340', navy3: '#25304f', cold: '#8ea3c0', fog: '#c9d3e2',
@@ -108,7 +109,7 @@ function hairFront(g, x, y, r, P, t = 0) {
 // 頭（顔のトーン影・光の向き）
 export function head(g, P, x, y, r, o = {}) {
   g.save();
-  hairBack(g, x, y, r, P);
+  if (isHair2(P)) hairBack2(g, x, y, r, P, o.t || 0); else hairBack(g, x, y, r, P);
   // 首
   fillRR(g, x - r * 0.3, y + r * 0.6, r * 0.6, r * 0.6, r * 0.15, C.skinS);
   // 顔（少し縦長）
@@ -127,9 +128,9 @@ export function head(g, P, x, y, r, o = {}) {
   if (P.scar) line(g, x - r * 0.62, y - r * 0.2, x - r * 0.4, y + r * 0.25, r * 0.04, 'rgba(150,60,70,.8)');
   if (P.glasses) { const gx = x + (o.turn || 0) * r * 0.3; g.save(); g.lineWidth = r * 0.05; g.strokeStyle = '#2a2420'; for (const sd of [-1, 1]) { g.beginPath(); g.ellipse(gx + sd * r * 0.36, y + r * 0.1, r * 0.25, r * 0.19, 0, 0, 7); g.stroke(); } line(g, gx - r * 0.11, y + r * 0.08, gx + r * 0.11, y + r * 0.08, r * 0.04, '#2a2420'); if (o.glint) { g.globalAlpha = o.glint; g.fillStyle = 'rgba(255,255,255,.85)'; for (const sd of [-1, 1]) { g.beginPath(); g.ellipse(gx + sd * r * 0.36, y + r * 0.1, r * 0.24, r * 0.18, 0, 0, 7); g.fill(); } } g.restore(); }
   if (o.sweat) { const sx = x + r * 0.85, sy = y - r * 0.3 + ((o.sweat * 0.6) % 1) * r * 0.4; poly(g, [[sx, sy - r * 0.2], [sx - r * 0.08, sy], [sx + r * 0.08, sy]], '#bfe0ff'); circ(g, sx, sy, r * 0.08, '#bfe0ff'); }
-  hairFront(g, x, y, r, P, o.turn || 0);
+  if (isHair2(P)) hairFront2(g, x, y, r, P, o.turn || 0); else hairFront(g, x, y, r, P, o.turn || 0);
   // 女性は横の髪を頬まで下ろす
-  if (P.female) { for (const sd of [-1, 1]) { g.beginPath(); g.moveTo(x + sd * r * 0.98, y - r * 0.4); g.quadraticCurveTo(x + sd * r * 1.12, y + r * 0.4, x + sd * r * 0.92, y + r * 0.85); g.lineTo(x + sd * r * 0.72, y + r * 0.55); g.quadraticCurveTo(x + sd * r * 0.82, y - r * 0.05, x + sd * r * 0.7, y - r * 0.4); g.closePath(); g.fillStyle = P.hairC; g.fill(); } }
+  if (P.female && !isHair2(P)) { for (const sd of [-1, 1]) { g.beginPath(); g.moveTo(x + sd * r * 0.98, y - r * 0.4); g.quadraticCurveTo(x + sd * r * 1.12, y + r * 0.4, x + sd * r * 0.92, y + r * 0.85); g.lineTo(x + sd * r * 0.72, y + r * 0.55); g.quadraticCurveTo(x + sd * r * 0.82, y - r * 0.05, x + sd * r * 0.7, y - r * 0.4); g.closePath(); g.fillStyle = P.hairC; g.fill(); } }
   g.restore();
 }
 

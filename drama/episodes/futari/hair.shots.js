@@ -1,0 +1,10 @@
+import { vgrad, text, W, H } from '../../engine/core.js';
+import { close, CAST2 } from '../../engine/noir.js';
+import { runEpisode } from '../../engine/player.js';
+import { P } from './common.js';
+import { SERIES, EPISODE, CAST, LINES } from './hair.script.js';
+const L = [['bob2', { ...CAST2.akari, hair: 'bob2' }], ['long2', { ...CAST2.misaki, hair: 'long2' }], ['bun2 佐和子', P.sawako], ['pony2', { ...CAST2.miku, hair: 'pony2' }], ['bun2 横', P.sawako], ['long2 横', { ...CAST2.misaki, hair: 'long2' }]];
+const SHOTS = [{ at: 'a', draw(g) { vgrad(g, 0, 0, W, H, [[0, '#2a3242'], [1, '#161b26']]);
+  L.forEach(([n, p], i) => { const x = 270 + (i % 2) * 540, y = 360 + Math.floor(i / 2) * 600; g.save(); g.beginPath(); g.rect(x - 270, y - 340, 540, 600); g.clip(); close(g, p, { x, y, s: 1.6, eyes: 'normal', lightFrom: i % 2 ? 'left' : 'right', turn: i >= 4 ? 0.5 : 0 }); g.restore(); text(g, n, x, y + 240, { size: 30, color: '#fff' }); });
+} }];
+runEpisode({ SERIES, EPISODE, CAST, LINES, SHOTS });
