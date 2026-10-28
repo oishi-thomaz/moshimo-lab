@@ -17,7 +17,7 @@ import { lift, look, runStory, endCard, hudTime, countUp, makeSparkles, setTop, 
 const AC = new THREE.Group(); room.add(AC);
 const acPos = new THREE.Vector3(1.6, 2.72, -3.33);
 {
-  const body = box(1.15, 0.36, 0.3, mat('#f4f5f3')); AC.add(body);
+  const body = box(1.15, 0.36, 0.3, mat('#f4f5f3', { emissive: 0x3a3d42 })); AC.add(body); // v2：夜の寝室でも1枚目で白く見えるよう少し光らせる
   const flap = box(1.0, 0.04, 0.12, mat('#d9dcdf')); flap.position.set(0, -0.17, 0.12); flap.rotation.x = 0.5; AC.add(flap);
   const grille = box(1.0, 0.02, 0.01, mat('#c9cdd2')); grille.position.set(0, 0.12, 0.155); AC.add(grille);
   const led = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.025, 0.01), new THREE.MeshBasicMaterial({ color: 0x46e08a })); led.position.set(0.45, -0.06, 0.156); AC.add(led);
@@ -57,13 +57,13 @@ function townAt(t, n) { walkers.forEach((w, i) => { w.p.visible = i < n; w.p.pos
 
 const SUBS = [
   [2.6, 6.0, '真夏の夜。エアコンの<br>おかげで眠れている。'],
-  [6.2, 10.1, '日本中のエアコンが、<br>一斉に消えた。'],
+  [6.2, 10.1, '暑いだけじゃ済まない。<br>危ないのは意外な場所。'],
   [10.1, 14, '二人以上の世帯の<br>92.2%が持っていた。'],
   [14.2, 18.1, '寝室が、じわじわ<br>暑くなっていく。'],
   [18.1, 22, '消えたのは、100世帯で<br>284.5台。'],
   [22.2, 26.1, 'いつもの夏でも、熱中症の<br>搬送は約10万人。'],
   [26.1, 30, 'いちばん多い場所は、<br>家の中だった。'],
-  [30.2, 34.6, '店も駅も、涼しい場所は<br>どこにもない。'],
+  [30.2, 34.6, '店も駅も、もう涼しくない。<br>本当に重いのはこの先。'],
   [34.6, 39, '搬送された人の半分以上は、<br>65歳以上。'],
   [39.2, 43.6, '2025年夏、東京23区で<br>亡くなった人は193人。'],
   [43.6, 47.8, 'そのうち181人が、<br>家の中だった。'],
@@ -73,16 +73,16 @@ const SUBS = [
 ];
 
 const cd = (left) => { left += 1e-6; return `0:${String(Math.floor(left)).padStart(2, '0')}.${String(Math.floor((left % 1) * 100)).padStart(2, '0')}`; };
-const TV = 1.3;
+const TV = 0.5; // v2：0.5秒で消える（冒頭で待たせない）
 function hookCam(t) { const u = ease(t / 4); look(lerp(-0.4, -0.2, u), lerp(1.9, 1.95, u), lerp(1.2, 0.9, u), 1.4, 1.95, -2.9, 52); }
+const HOOK_LIFT = -170; // v2：1枚目（サムネ）でエアコンがタイトルの帯にかからないよう、絵を下へ
 function shot0(t) { // hook: AC running, countdown, vanishes
-  lift(0);
+  lift(HOOK_LIFT);
   bedroom(0, t); AC.visible = t < TV; setAir(t < TV, t);
   if (t >= TV && !acSpark.ready) { acSpark.init([[acPos.x - 0.4, acPos.y, acPos.z + 0.15], [acPos.x, acPos.y, acPos.z + 0.15], [acPos.x + 0.4, acPos.y, acPos.z + 0.15]], 0.3, 0.6); acSpark.ready = true; }
   acSpark.set(t >= TV ? (t - TV) / 1.0 : 0);
   el.flash.style.opacity = t >= TV ? 0.5 * Math.max(0, 1 - (t - TV) / 0.3) : 0;
   hookCam(t);
-  el.title.style.opacity = 1;
   setHud('エアコンが消えるまで', cd(Math.max(0, TV - t)), 1, { mono: true, color: t < TV ? '#fff' : '#ff6b6b' });
   return room;
 }
@@ -90,7 +90,6 @@ function shot1(t) { // everyday: cool bedroom
   lift(230);
   bedroom(0, t); AC.visible = true; setAir(true, t + 2); acSpark.set(0);
   bedCam(t, 4);
-  el.title.style.opacity = clamp(1 - (t - 0.3) / 0.5);
   return room;
 }
 function shot2(t) { // +10min: AC gone
@@ -145,7 +144,7 @@ function shot7(t) { // result: hot bedroom, no AC
   return room;
 }
 function shot8(t) { // loop: hook framing, AC gone, warm light
-  lift(0);
+  lift(HOOK_LIFT);
   bedroom(0.8, t); AC.visible = false; setAir(false); acSpark.set(0);
   hookCam(t + 1.3);
   setHud('エアコンが消えるまで', cd(0), 1, { mono: true, color: '#ff6b6b' });
@@ -161,13 +160,16 @@ const shots = [
 shots.forEach(s => { const f = s.f; s.f = (t, T) => { reset(f); return f(t, T); }; });
 runStory({
   shots, subs: SUBS, duration: 64.5,
+  cut: [[2.5, 6.0]], // v2：涼しい寝室（元の2.5〜6秒）を抜いて、消えた直後から本題へ
   meta: {
     id: '0038',
+    v2: true,
+    hookLine: '日本中のエアコンが、一斉に消えた。',
     title: '真夏にエアコンが全部消えたら？',
     titleHtml: '真夏にエアコンが<br>全部消えたら？',
-    mood: 'tension', seed: 38, hits: [1.3, 48.1], risers: [36.0],
+    mood: 'tension', seed: 38, hits: [0.5, 48.1], risers: [36.0],
     impacts: [22.6, 48.4],
-    sfx: [[1.3, 'poof', 1], [14.5, 'meter', 0.5]],
+    sfx: [[0.5, 'poof', 1], [14.5, 'meter', 0.5]],
     narr: { '92.2%': 'きゅうじゅうにてんにパーセント', '284.5台': 'にひゃくはちじゅうよんてんごだい', '東京23区': 'とうきょうにじゅうさんく', '8割': 'はちわり', '193人': 'ひゃくきゅうじゅうさんにん', '181人': 'ひゃくはちじゅういちにん' },
     ask: 'あなたの家、エアコン何台？',
     caption: 'もしも真夏に、日本中のエアコンが一斉に消えたら？\nエアコンがある家は二人以上の世帯の92.2%、100世帯あたり284.5台（2026年3月末）。\nいつもの夏でも、熱中症の救急搬送は100,510人（2025年5〜9月、過去最多）。発生場所でいちばん多いのは家の中（38.1%）で、65歳以上が57.1%。\n2025年夏、東京23区で熱中症で亡くなった人は193人。そのうち181人が家の中で、その約8割（79.6%）はエアコンを使っていなかった（設置なしを含む）。\n結果：全員が、亡くなった人の8割と同じ「エアコンなしの夏」になる。エアコンは、命を守る家電だった。\n\nあなたの家、エアコン何台？ コメントで教えて。\n\n出典：内閣府「消費動向調査」（2026年3月）、総務省消防庁「令和7年（5月〜9月）の熱中症による救急搬送状況」、東京都監察医務院「令和7年夏の熱中症死亡者の状況（東京都23区・確定値）」',
