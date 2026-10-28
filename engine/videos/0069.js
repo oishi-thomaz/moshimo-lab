@@ -31,10 +31,10 @@ const SUBS = [
   [10.1, 14, '全員が大人の平均体重<br>62kgだとすると…'],
   [14.2, 18.1, '重さは、<br>約5億1,000万トン。'],
   [18.1, 22, '体の体積は、東京ドーム<br>約410杯分。'],
-  [22.2, 26.1, 'それが全部、<br>海に沈んだ。'],
+  [22.2, 26.1, 'それが全部、海に沈んだ。<br>海面は何m上がる？'],
   [26.1, 30, 'でも海の広さは、<br>3億6,000万km²。'],
   [30.2, 34.6, '海面が上がったのは、<br>わずか0.0014mm。'],
-  [34.6, 39, '目では、まったく<br>わからない高さ。'],
+  [34.6, 39, '目では、まったくわからない。<br>でも本題はここから。'],
   [39.2, 43.6, 'ところが海は、1993年から<br>もう10cm上がっている。'],
   [43.6, 47.8, '氷がとけて、温まった<br>海水がふくらんだから。'],
   [48.1, 53.8, '結果：人類より温暖化。<br>今世紀末、砂浜の6割が消える。'],
@@ -47,8 +47,10 @@ function shore(t, k = 0, o = {}) { setBeachEnv(o.env || 'day'); setSea(t, { leve
 function hookCam(t, d = 2.5) { const u = ease(t / d); look(lerp(-1, 0, u), lerp(7.5, 7, u), lerp(26, 24, u), 0, 0.8, -12, 50); }
 const TP = 0.5; // v2：0.5秒で全員が走り出す（冒頭で待たせない）
 function shot0(t) { // hook: crowd on the sand, countdown hits 0 at 0.5s and everyone runs in
-  shore(t, clamp((t - TP) / 4.5));
+  lift(330); // v2：0秒目サムネ。浜の人の群れをタイトルの下（620〜1050px）に上げる
+  shore(t, clamp((t - TP) / 3.5));
   hookCam(t);
+  el.flash.style.opacity = t >= TP ? 0.4 * Math.max(0, 1 - (t - TP) / 0.3) : 0;
   setHud('全人類が海に入るまで', cd(Math.max(0, TP - t)), 1, { mono: true, color: t < TP ? '#fff' : '#ff6b6b' });
   return beach;
 }
@@ -63,7 +65,7 @@ function shot1(t) { // everyday: crowd waiting on the sand
 }
 function shot2(t) { // +0秒: everyone runs into the sea
   lift(160);
-  const k = clamp((t + 2.0) / 4.5); // v2：冒頭（0.5秒〜）で走り出した続き
+  const k = clamp((t + 2.0) / 3.5); // v2：冒頭（0.5秒〜）で走り出した続き
   shore(t + 6, k);
   const u = ease(t / 8);
   look(lerp(4, 2, u), lerp(3, 7, u), lerp(16, 18, u), 0, lerp(1.2, 0, u), lerp(4, -4, u), 50);
@@ -124,6 +126,7 @@ function shot7(t) { // result: the beach shrinks, parasols swallowed
   return beach;
 }
 function shot8(t) { // loop: crowd on the sand again, countdown
+  lift(330);
   shore(t + 60, 0);
   hookCam(t + 0.3, 4.5);
   setHud('全人類が海に入るまで', cd(TP), 1, { mono: true });
@@ -149,7 +152,7 @@ runStory({
     titleHtml: '全人類が同時に<br>海に入ったら？',
     mood: 'mystery', seed: 69, hits: [0.5, 48.1], risers: [2.5], impacts: [30.4, 43.8],
     sfx: [[0.5, 'whoosh'], [8.0, 'bubble'], [39.6, 'meter', 0.6]],
-    narr: { '82億人': 'はちじゅうにおくにん', '62kg': '62キロ', '0.0014mm': 'れいてんれいれいいちよんミリ', '3億6,000万km²': '3億6000万平方キロメートル', '10cm': '10センチ', '5億1,000万トン': '5億1000万トン', '410杯分': '410ぱいぶん' },
+    narr: { '何m': 'なんメートル', '82億人': 'はちじゅうにおくにん', '62kg': '62キロ', '0.0014mm': 'れいてんれいれいいちよんミリ', '3億6,000万km²': '3億6000万平方キロメートル', '10cm': '10センチ', '5億1,000万トン': '5億1000万トン', '410杯分': '410ぱいぶん' },
     ask: '次に全人類でやってほしいことは？',
     caption: 'もしも全人類82億人が同時に海に飛び込んだら、海面はどれだけ上がる？\n全員が大人の平均体重62kgだとすると、重さは約5.1億トン。体を水と同じ重さとすると体積は東京ドーム約410杯分（単純計算）。\nでも海の広さは3億6,000万km²。上がる海面は、わずか0.0014mm（単純計算）。\nところが実際の海面は、氷がとけて温まった海水がふくらみ、1993年から約10cmも上がっている。全人類が飛び込んだ分の約7万倍。\n日本の砂浜は、今世紀末に6割以上が消えると予測されている。\n\n次に全人類でやってほしいことは？ コメントで教えて。\n\n出典：国連 World Population Prospects 2024、Walpole ほか BMC Public Health（2012年）、東京ドームシティ、環境省、NASA（2025年）、国立環境研究所 気候変動適応センター（Udo & Takeda 2017）',
     hashtags: ['もしもラボ', '全人類', '海面上昇', '雑学', 'もしも'],
