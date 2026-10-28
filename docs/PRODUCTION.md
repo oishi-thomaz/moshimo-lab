@@ -115,6 +115,7 @@ CHROME_PATH=<chromium> node tools/render.mjs --video NNNN --stills 0.5,2,5,10,16
 - scenes/plaza.js：駅前広場（架空の もしも台駅の駅舎とひさし・タイル・ベンチ・植え込み・時計の柱）とローポリのハト。makePigeon（userData.anim(t,{walk,peck,fly})）、makeFlock(n, seed, 範囲).set(数, t)、makeDroppings（setK でフンの量）、makePlazaPeople、LEDGE、setPlazaEnv で day / dusk
 - scenes/beach.js：夏の砂浜と波打つ海（坂の砂浜・海底・波打ちぎわの泡・パラソル・遠くの山）。setSea(t,{level, amp}) で波と海面（level を上げると砂浜が沈む）、floorY(z)、makeSwimmers(n, seed, 範囲).set(k, t)（0 浜で待つ→1 海へ）、makeFarCrowd、makeGauge（目盛りの柱、setMark で赤い線）、PARASOLS、setBeachEnv で day / dusk
 - scenes/appliances.js：ブランドなしのローポリ家電（makeTV / makeMicrowave / makeWasher / makeFridge / makeAircon）と、5つの台座にダメージメーター付きのラインナップ（aLineup、setASlot(i, {show, meter, word, glow, t})、aLineupIdle、setALabels）。ヤバい順の家電回用
+- scenes/mites.js：小さな這う虫の部品（どのシーンにも足せる）。makeMite({kind: dust / tick})（8本脚の室内ダニ・マダニ）、makeBedBug（6本脚の平たいトコジラミ）、どちらも .userData.anim(t, moving)。makeCrawlers(n, seed, {x0,x1,z0,z1,y,size,color,legs}).set(数, t, speed) で面の上を這う InstancedMesh の群れ、makeLitter(n, seed, 範囲).set(k) で落ち葉が厚く積もる
 
 ## 着地は人への影響で言い切る（2026/10/20 ゆうとの指摘・最重要）
 - 結果は「何がいくつ消えた」で終わらせない。それで人間の暮らし・お金・体・心がどう変わったかを数字で言い切る（例：蚊の回＝マラリアだけで年61万人が助かる）。
