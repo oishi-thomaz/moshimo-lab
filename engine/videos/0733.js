@@ -62,11 +62,11 @@ const others = []; { const r = rng(9); for (let i = 0; i < 4; i++) { const p = r
 
 const SUBS = [
   [2.6, 6.0, '朝から晩まで、<br>デスクに座りっぱなし。'],
-  [6.2, 10.1, 'これを1年続けたら、<br>体はどうなる？'],
+  [6.2, 10.1, '脚だけじゃない。<br>ヤバいのは1年後の数字。'],
   [10.1, 14, '座って1時間。脚の血管の<br>広がる力が、最大で半分に。'],
   [14.2, 18.1, '日本人6万人以上を<br>7年以上追いかけた研究。'],
   [18.1, 22, '座る時間が2時間増えるごとに、<br>死亡率が15%上がった。'],
-  [22.2, 26.1, '家に帰っても、<br>ソファで座りっぱなし。'],
+  [22.2, 26.1, '家でもソファ。持病が<br>あると、さらに悪い。'],
   [26.1, 30, '糖尿病がある人は、<br>2時間ごとに27%上がった。'],
   [30.2, 34.6, '100万人以上を<br>調べた分析では、'],
   [34.6, 39, '8時間以上座って動かない人の<br>早死にリスクは最大59%高い。'],
@@ -80,27 +80,31 @@ const SUBS = [
 function deskCam(t, d, a, b, tg = [0, 0.8, -0.5]) { const u = ease(t / d); look(lerp(a[0], b[0], u), lerp(a[1], b[1], u), lerp(a[2], b[2], u), ...tg, 50); }
 const sitClock = (s) => { s = Math.max(0, s); const h = Math.floor(s / 3600), m = Math.floor(s / 60) % 60, x = Math.floor(s) % 60; return `${h}:${String(m).padStart(2, '0')}:${String(x).padStart(2, '0')}`; };
 function sideCam(t, d, a, b) { const u = ease(t / d); look(lerp(a[0], b[0], u), lerp(a[1], b[1], u), lerp(a[2], b[2], u), 0, 0.85, -0.55, 50); }
+const TP = 0.5;
+// v2：1枚目（サムネ）で顔がタイトルにかからず、青紫になる脚も見えるよう、少し引いて横から
+const HOOK_LIFT = -180;
+function hookCam(t, d) { const u = ease(t / d); look(lerp(3.85, 3.7, u), lerp(1.4, 1.35, u), lerp(0.75, 0.6, u), 0, 0.72, -0.45, 48); }
 function shot0(t) { // hook: the clock since sitting runs fast; legs start to turn purple-blue
-  lift(120); SIDE = true;
+  lift(HOOK_LIFT); SIDE = true;
   office('day', { ceil: 6, hemi: 1.05 }, '9:00'); sitDesk(t);
-  const sec = Math.pow(t / 2.5, 2) * 3600; legSlow(clamp((t - 1.0) / 1.4) * 0.7);
-  if (t > 1.0) { if (!flow.ok) { flow.init([[-0.12, 0.5, 0.1], [0.12, 0.5, 0.1], [0, 0.5, 0.4]], 0.2, 0.3); flow.ok = true; } flow.set(((t - 1.0) % 1.2) / 1.2); }
-  sideCam(t, 2.5, [3.3, 1.55, 0.9], [3.1, 1.5, 0.7]);
-  el.title.style.opacity = 1;
-  setHud('座ってから', sitClock(sec), 1, { mono: true, color: t > 1.2 ? '#b9a4ff' : '#fff' });
+  // v2：0.5秒で 座ってから1時間 に届き、脚が一気に青紫に（冒頭で待たせない）
+  const sec = t < TP ? Math.pow(t / TP, 2) * 3600 : 3600 + (t - TP) * 60; legSlow(clamp((t - TP) / 0.3) * 0.7);
+  if (t > TP) { if (!flow.ok) { flow.init([[-0.12, 0.5, 0.1], [0.12, 0.5, 0.1], [0, 0.5, 0.4]], 0.2, 0.3); flow.ok = true; } flow.set(((t - TP) % 1.2) / 1.2); }
+  el.flash.style.opacity = t >= TP ? 0.4 * Math.max(0, 1 - (t - TP) / 0.3) : 0;
+  hookCam(t, 2.5);
+  setHud('座ってから', sitClock(sec), 1, { mono: true, color: t >= TP ? '#b9a4ff' : '#fff' });
   return room;
 }
 function shot1(t) { // everyday: the whole office sitting
   lift(200); SIDE = false;
   office('day', { ceil: 6, hemi: 1.05 }, '9:30'); sitDesk(t + 2); legSlow(0);
   deskCam(t, 3.5, [-2.4, 3.0, 3.6], [-2.0, 2.9, 3.2], [0, 0.8, -1.0]);
-  el.title.style.opacity = clamp(1 - (t - 0.2) / 0.5);
   setHud('座ってから', sitClock(1800 + t * 60), 1, { mono: true });
   return room;
 }
 function shot2(t) { // +1時間: close on the legs, they turn blue-purple
   lift(120); SIDE = true;
-  office('day', { ceil: 6, hemi: 1.05 }, '10:00'); sitDesk(t + 4); legSlow(clamp(t / 4) * 0.85);
+  office('day', { ceil: 6, hemi: 1.05 }, '10:00'); sitDesk(t + 4); legSlow(lerp(0.7, 0.85, clamp(t / 4))); // v2：冒頭で青紫になった脚の続き
   if (!flow.ok2) { flow.init([[-0.12, 0.5, 0.1], [0.12, 0.5, 0.1], [-0.12, 0.3, 0.5], [0.12, 0.3, 0.5]], 0.15, 0.25); flow.ok2 = true; } flow.set((t % 1.6) / 1.6);
   sideCam(t, 8, [3.1, 1.5, 0.7], [2.6, 1.3, 0.3]);
   hudTime('+1時間');
@@ -154,9 +158,9 @@ function shot7(t) { // result: night office, you alone still sitting
   return room;
 }
 function shot8(t) { // loop: back to 9:00, sitting down again
-  lift(120); SIDE = true;
+  lift(HOOK_LIFT); SIDE = true;
   office('day', { ceil: 6, hemi: 1.05 }, '9:00'); sitDesk(t); legSlow(0);
-  sideCam(t + 0.4, 4.5, [3.3, 1.55, 0.9], [3.1, 1.5, 0.7]);
+  hookCam(t + 0.4, 4.5); // v2：冒頭（サムネ）と同じ構図に戻してループ
   setHud('座ってから', sitClock(0), 1, { mono: true });
   return room;
 }
@@ -168,15 +172,18 @@ const shots = [
 ];
 runStory({
   shots, subs: SUBS, duration: 64.5,
+  cut: [[2.5, 6.0]], // v2：朝のオフィス（元の2.5〜6秒）を抜いて、1時間たった脚から本題へ
   meta: {
     id: '0733',
+    v2: true,
+    hookLine: '座ってたった1時間で、脚に異変。',
     series: '人体の限界',
     hookType: 'H4',
     cat: '体・健康',
     title: '1日中座りっぱなしを1年続けたら？',
     titleHtml: '1日中座りっぱなしを<br>1年続けたら？',
-    mood: 'tension', seed: 733, hits: [1.2, 48.1], risers: [30.2], impacts: [10.6, 19.0, 35.0],
-    sfx: [[1.2, 'meter', 0.5]],
+    mood: 'tension', seed: 733, hits: [0.5, 48.1], risers: [30.2], impacts: [10.6, 19.0, 35.0],
+    sfx: [[0.5, 'meter', 0.5]],
     narr: { '50%': '50パーセント', '15%': '15パーセント', '27%': '27パーセント', '59%': '59パーセント', '60〜75分': '60から75分', '6万人': '6万人' },
     ask: 'あなたは1日何時間座ってる？',
     caption: 'もしも1日中座りっぱなしの生活を1年続けたら、体はどうなる？\n座って1時間で、脚の動脈の血管の広がる力は最大50%落ちた（2014年の実験。1時間ごとに5分歩くと落ちなかった）。\n日本人6万4,456人を平均7年8か月追いかけた研究では、日中に座る時間が2時間増えるごとに死亡率が15%上昇。糖尿病がある人は27%上がった（2021年）。\n100万人以上を調べた分析では、1日8時間以上座って体をあまり動かさない人は、早死にのリスクが最大59%高かった。でも、1日60〜75分の早歩きくらいの運動をしている人は、この上乗せが見られなかった（2016年）。\n※ 研究の結果をもとにした説明で、個人の病気の予測ではありません。\n\nあなたは1日何時間座ってる？ コメントで教えて。\n\n出典：Thosar ほか（インディアナ大学 2014年）、J-MICC Study（J Am Heart Assoc 2021年）、Ekelund ほか The Lancet（2016年）',
