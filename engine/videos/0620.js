@@ -105,7 +105,7 @@ function mode(...ms) { for (const k in GROUPS) GROUPS[k].forEach(o => { o.visibl
 const SUBS = [
   [2.7, 6.2, '性病だけじゃない。<br>この菌、目も奪っていた。'],
   [6.3, 10.2, '世界では1年で、<br>約1億2,850万人が感染。'],
-  [10.3, 14.2, '日本の性感染症でも最多。<br>報告だけで年約3万件。'],
+  [10.3, 14.2, '日本の性感染症で最多。<br>年に約3万件。'],
   [14.3, 18.2, '女性の約8割、男性の<br>約半分は症状が出ない。'],
   [18.3, 22.2, 'だから気づかないまま、<br>パートナーにうつす。'],
   [22.3, 26.2, 'でも本当に怖いのは、<br>ここから。'],
@@ -116,7 +116,7 @@ const SUBS = [
   [42.3, 47.8, '世界で約190万人が、<br>失明や視力を失った。'],
   [48.0, 54.6, '結果：毎年1億人超の感染と、<br>失明の原因が1つ消える。'],
   [54.7, 57.4, 'でも梅毒や淋菌は、残ったまま。'],
-  [57.5, 60.7, '付き合う前に性病検査、<br>アリ？ナシ？'],
+  [57.5, 61.3, '付き合う前に性病検査、<br>アリ？ナシ？'],
 ];
 
 // ---------- shots ----------
@@ -234,15 +234,15 @@ function shot10(t) { // loop: same as the hook framing, dish empty
 const shots = [
   { a: 0, b: 2.7, f: shot0 }, { a: 2.7, b: 6.2, f: shot1 }, { a: 6.2, b: 14.2, f: shot2 }, { a: 14.2, b: 22.2, f: shot3 },
   { a: 22.2, b: 30.2, f: shot4 }, { a: 30.2, b: 34.2, f: shot5 }, { a: 34.2, b: 38.2, f: shot6 }, { a: 38.2, b: 47.9, f: shot7 },
-  { a: 47.9, b: 54.6, f: shot8 }, { a: 54.6, b: 57.4, f: shot9 }, { a: 57.4, b: 61.0, f: shot10 }, { a: 61.0, b: 65.0, f: endCard },
+  { a: 47.9, b: 54.6, f: shot8 }, { a: 54.6, b: 57.4, f: shot9 }, { a: 57.4, b: 61.5, f: shot10 }, { a: 61.5, b: 65.5, f: endCard },
 ];
 shots.forEach(s => { const f = s.f; s.f = (t, T) => { gDots.visible = false; gSpark.set(0); if (f !== shot8) gSpark.r = false; return f(t, T); }; });
 runStory({
-  shots, subs: SUBS, duration: 65.0,
+  shots, subs: SUBS, duration: 65.5,
   meta: {
     id: '0620',
     v2: true,
-    hookLine: '世界中のクラミジア菌が、一斉に消えた。',
+    hookLine: 'クラミジア菌が、一斉に消えた。',
     series: '絶滅ボタン',
     hookType: 'H5',
     cat: '体・健康',
