@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { rng, clamp, lerp, ease, easeOut, easeBack, fade, mat, box, comma, makePerson, randPerson, makeQ, SKIN, HAIR } from '../lib.js';
 import { room, setRoom, setLight, setScreen, props, sets } from '../scenes/room.js';
 import { city, cam as cityCam, setEnv, setStore, setStoreLights, updateCars, parked, setBurst, ghost, ghostScr, ghostFill } from '../city.js';
-import { look, cam, runStory, endCard, hudTime, countUp, textSprite, setTop, setHud, el } from '../story.js';
+import { lift, look, cam, runStory, endCard, hudTime, countUp, textSprite, setTop, setHud, el } from '../story.js';
 
 // もしも1日だけ昭和（1970年）に戻ったら？
 // 数字：携帯電話の契約数 2億3,121万（総務省 2026年6月末）
@@ -59,15 +59,15 @@ function cityBase() { setEnv('dusk', new THREE.Vector3(-3, 0, 6)); setStore(1); 
 
 const SUBS = [
   [2.6, 6.0, 'いつもの部屋。<br>スマホ、テレビ、Wi-Fi。'],
-  [6.2, 10.1, '1970年の部屋に。<br>スマホは圏外。'],
+  [6.2, 10.1, 'スマホは圏外。でも一番<br>変わったのは家族の数。'],
   [10.1, 14, '今は2億を超える携帯電話が、<br>1台もつながらない。'],
   [14.2, 18.1, 'テレビはほとんどが白黒。'],
-  [18.1, 22, 'カラーテレビは、<br>まだ4軒に1軒ほど。'],
+  [18.1, 22, 'カラーテレビは4軒に1軒ほど。<br>外はもっと違う。'],
   [22.2, 26.1, '外で電話するなら、<br>公衆電話に並ぶ。'],
   [26.1, 30, '昭和の終わりごろには、<br>約93万台もあった。'],
-  [30.2, 34.6, 'ちゃぶ台を囲んで、<br>家族で晩ごはん。'],
+  [30.2, 34.6, 'ちゃぶ台を囲んで晩ごはん。<br>この人数がカギになる。'],
   [34.6, 39, '1世帯の人数は、<br>平均3.41人。'],
-  [39.2, 43.6, '元の時代に戻ってきた。'],
+  [39.2, 43.6, '元の時代に戻ってきた。<br>何が減ったか分かる？'],
   [43.6, 47.8, '今の1世帯は、<br>平均2.10人。'],
   [48.1, 52.6, '結果：電話は1人1台以上に。<br>でも家族は1.31人減った。'],
   [52.6, 55.4, '公衆電話は、いちばん<br>多いときの約10分の1に。'],
@@ -75,13 +75,12 @@ const SUBS = [
 ];
 
 function shot0(t, T) { // hook: modern room flips to showa at 1.0
-  const tv = 1.0; scene(t < tv ? 'modern' : 'showa'); setLight('evening', { ceil: t < tv ? 0 : 6, hemi: 1.1 });
+  const tv = 0.5; scene(t < tv ? 'modern' : 'showa'); // v2：0.5秒で昭和に変わる setLight('evening', { ceil: t < tv ? 0 : 6, hemi: 1.1 });
   heroAt(-0.2, -1.1, 0.3, true); scr.material.color.set(t < tv ? 0x9fd8ff : 0x30333a);
-  noSignal.visible = t > tv + 0.3; noSignal.position.set(-0.2, 2.35, -1.1);
+  noSignal.visible = t > tv + 0.3; noSignal.position.set(-0.2, 2.2, -1.1);
   el.flash.style.opacity = t >= tv ? 0.6 * Math.max(0, 1 - (t - tv) / 0.3) : 0;
   const u = ease(t / 2.6);
-  L(lerp(-0.6, -0.8, u), 1.8, lerp(3.6, 3.2, u), -0.6, 1.75, -1.6, 52);
-  el.title.style.opacity = 1;
+  lift(170); L(lerp(-0.6, -0.8, u), 1.8, lerp(4.1, 3.7, u), -0.6, 1.75, -1.6, 52); // v2：主役（スマホを持つ人）をタイトルの下に
   setHud('いまは', t < tv ? '2026年' : '1970年', 1, { color: t < tv ? '#fff' : '#f2c14e' });
   return room;
 }
@@ -90,7 +89,6 @@ function shot1(t, T) { // everyday modern living
   heroAt(-1.6, -1.2, 0.6, true); scr.material.color.set(0x9fd8ff);
   const u = ease(t / 3.5);
   L(lerp(-1.2, -0.8, u), 2.3, lerp(-2.8, -3.1, u), 0.4, 1.1, 0.4, 58);
-  el.title.style.opacity = clamp(1 - (t - 2.8) / 0.5);
   setHud('いまは', '2026年', 1);
   return room;
 }
@@ -99,9 +97,9 @@ function shot2(t, T) { // +1min: no signal
   noSignal.visible = true; noSignal.position.set(-0.2, 2.35, -1.1);
   heroQ.visible = false;
   const u = ease(t / 8);
-  L(lerp(-0.4, -0.8, u), 1.8, lerp(3.8, 3.3, u), -0.6, 1.75, -1.6, 52);
+  lift(170); L(lerp(-0.8, -0.8, u), 1.8, lerp(3.7, 3.4, u), -0.6, 1.75, -1.6, 52); // v2：冒頭の終わりと同じ構図から続ける
   hudTime('+1分');
-  setTop('携帯電話の契約数（2026年6月）', (() => { const v = countUp(t, 23121); return `${Math.floor(v / 10000)}億${comma(v % 10000)}万`; })(), fade(t, 0.15, 8, 0.25));
+  setTop('携帯電話の契約数（2026年6月）', (() => { const v = countUp(t, 23121); return v < 10000 ? `${comma(v)}万` : `${Math.floor(v / 10000)}億${comma(v % 10000)}万`; })(), fade(t, 0.15, 8, 0.25));
   return room;
 }
 function shot3(t, T) { // +1h black-and-white TV
@@ -148,7 +146,7 @@ function shot7(t, T) { // result: the showa table, now with fewer people
 function shot8(t, T) { // loop: modern room again
   scene('modern'); setLight('evening', { ceil: 0, hemi: 1.1 }); heroAt(-0.2, -1.1, 0.3, true); scr.material.color.set(0x9fd8ff);
   const u = ease(t / 4);
-  L(lerp(-0.5, -0.6, u), 1.8, lerp(3.7, 3.6, u), -0.6, 1.75, -1.6, 52);
+  lift(170); L(lerp(-0.5, -0.6, u), 1.8, lerp(4.2, 4.1, u), -0.6, 1.75, -1.6, 52); // v2：冒頭（0秒目）と同じ構図に戻ってループ
   setHud('いまは', '2026年', 1);
   return room;
 }
@@ -156,15 +154,18 @@ function shot8(t, T) { // loop: modern room again
 const shots = [
   { a: 0, b: 2.5, f: shot0 }, { a: 2.5, b: 6, f: shot1 }, { a: 6, b: 14, f: shot2 }, { a: 14, b: 22, f: shot3 },
   { a: 22, b: 30, f: shot4 }, { a: 30, b: 39.2, f: shot5 }, { a: 39.2, b: 48, f: shot6 }, { a: 48, b: 55.5, f: shot7 },
-  { a: 55.5, b: 59.5, f: shot8 }, { a: 59.5, b: 64.5, f: endCard },
+  { a: 55.5, b: 59.5, f: shot8 }, { a: 59.5, b: 65, f: endCard },
 ];
 runStory({
-  shots, subs: SUBS, duration: 64.5, camera: cityCam,
+  shots, subs: SUBS, duration: 65, camera: cityCam,
+  cut: [[2.5, 6.0]], // v2：いつもの今の部屋（元の2.5〜6秒）を抜いて、昭和に変わった直後から本題へ
   meta: {
     id: '0014',
+    v2: true,
+    hookLine: '一瞬で、1970年の昭和に戻った。',
     title: '1日だけ昭和に戻ったら？',
     titleHtml: '1日だけ<br>昭和に戻ったら？',
-    mood: 'emotional', seed: 15, hits: [1.0, 39.3], risers: [1.0],
+    mood: 'emotional', seed: 15, hits: [0.5, 39.3], risers: [0.5],
     ask: '住むなら昭和と今、どっち？',
     caption: 'もしも1日だけ昭和（1970年）に戻ったら？\nスマホは圏外、テレビはほとんど白黒、電話は公衆電話に並ぶ。そして1世帯の人数は3.41人。国勢調査などの公式データで、昭和の1日をシミュレーション。\n\n住むなら昭和と今、どっち？ コメントで教えて。\n\n出典：総務省 国勢調査・電気通信サービスの契約数（2026年6月）、内閣府 消費動向調査（1970年）、NTT東日本 データブック（公衆電話施設数）',
     hashtags: ['もしもラボ', '昭和', 'レトロ', 'タイムスリップ', '雑学'],
