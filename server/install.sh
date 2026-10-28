@@ -25,6 +25,9 @@ cat > /opt/moshimo-lab/server/moshimo-server.mjs <<'MOSHIMO_EOF'
 //  4. Instagram の長期トークンを30日ごとに自動更新する
 //  5. 同じ動画を YouTube（ショート）にも同時に投稿する（LINE の YouTube設定 で接続したとき）
 //  6. インスタ・YouTube・TikTok の数字を毎時記録し、急に伸びたら LINE に知らせる。毎朝の解析の日報を預かって LINE に送る
+//  7. （TT_UPLOAD=1 のとき）インスタに投稿するのと同時に、TikTok アプリの下書き（受信箱）へ動画を送り、キャプションを LINE に送る
+//
+// 同じファイルで別のアカウント用のサーバーも動かせる（いつわ劇場：PREFIX=/itsuwa BRAND=いつわ劇場 など。server/itsuwa.env.example）
 //
 // 設定は環境変数（/etc/moshimo.env を systemd から読む）。項目は server/moshimo.env.example を参照。
 import http from 'node:http';
@@ -34,7 +37,10 @@ import crypto from 'node:crypto';
 
 const env = process.env;
 const PORT = Number(env.PORT || 8787);
-const PREFIX = '/moshimo';
+const PREFIX = (env.PREFIX || '/moshimo').replace(/\/$/, '');
+const BRAND = env.BRAND || 'もしもラボ';                           // LINE の文言に出す名前
+const APPROVAL_NOW = env.APPROVAL_NOW === '1';                    // 1：動画が届いたらすぐ承認カードを送る（まとめを待たない）
+const TT_UPLOAD = env.TT_UPLOAD === '1';                          // 1：投稿と同時に TikTok の下書きへ送る
 const BASE_URL = (env.BASE_URL || '').replace(/\/$/, '');          // 例 https://example.com/moshimo
 const DATA = env.DATA_DIR || '/var/lib/moshimo';
 const MEDIA = path.join(DATA, 'media');
@@ -115,8 +121,8 @@ const mmss = sec => `${Math.floor(sec / 60)}:${String(Math.round(sec % 60)).padS
 function card(id, head = '承認待ち') {
   const m = meta(id);
   const title = m.title || `動画 ${id}`;
-  const len = m.duration ? mmss(Math.max(0, Number(m.duration) - 5)) : '';
-  const where = state.yt?.refresh ? 'インスタ＋YouTube' : 'インスタ';
+  const len = m.len || (m.duration ? mmss(Math.max(0, Number(m.duration) - 5)) : '');
+  const where = ['インスタ', state.yt?.refresh ? 'YouTube' : '', TT_UPLOAD && state.tt?.refresh ? 'TikTok下書き' : ''].filter(Boolean).join('＋');
   const row = (k, v, color = '#111111') => ({ type: 'box', layout: 'horizontal', spacing: 'md', contents: [
     { type: 'text', text: String(k).slice(0, 40), size: 'sm', color: '#888888', flex: 5, wrap: true },
     { type: 'text', text: String(v).slice(0, 40), size: 'sm', color, weight: 'bold', flex: 4, align: 'end', wrap: true }] });
@@ -168,23 +174,25 @@ function approvalMessages(id) {
 function postedCard(id, r) {
   const m = meta(id); const title = m.title || `動画 ${id}`;
   const ok = (x) => x && x.ok;
-  const allOk = ok(r.ig) && (ok(r.yt) || !r.yt);
-  const head = allOk ? '投稿した' : (ok(r.ig) || ok(r.yt)) ? '一部だけ投稿できた' : '投稿に失敗した';
+  const got = [r.ig, r.yt, r.tt].filter(x => x && !x.skip);
+  const allOk = got.length > 0 && got.every(ok);
+  const head = allOk ? '投稿した' : got.some(ok) ? '一部だけ投稿できた' : '投稿に失敗した';
   const color = allOk ? '#1DB446' : '#E0453A';
   const row = (k, x) => ({ type: 'box', layout: 'horizontal', spacing: 'md', contents: [
     { type: 'text', text: k, size: 'sm', color: '#888888', flex: 4 },
-    { type: 'text', text: !x ? '—' : x.ok ? '投稿済み' : x.skip ? '上げない設定' : '失敗', size: 'sm', weight: 'bold', flex: 5, align: 'end', color: !x || x.skip ? '#888888' : x.ok ? '#1DB446' : '#E0453A' }] });
+    { type: 'text', text: !x ? '—' : x.ok ? (x.draft ? '下書きに送った' : '投稿済み') : x.skip ? '上げない設定' : '失敗', size: 'sm', weight: 'bold', flex: 5, align: 'end', color: !x || x.skip ? '#888888' : x.ok ? '#1DB446' : '#E0453A' }] });
   const body = [
     { type: 'text', text: `${head}・${id}`, size: 'xs', color, weight: 'bold' },
     { type: 'text', text: title, size: 'lg', weight: 'bold', wrap: true, margin: 'sm' },
-    { type: 'box', layout: 'vertical', margin: 'lg', spacing: 'sm', contents: [row('インスタ', r.ig), row('YouTube', r.yt), { type: 'box', layout: 'horizontal', contents: [
+    { type: 'box', layout: 'vertical', margin: 'lg', spacing: 'sm', contents: [row('インスタ', r.ig), row('YouTube', r.yt), ...(r.tt ? [row('TikTok', r.tt)] : []), { type: 'box', layout: 'horizontal', contents: [
       { type: 'text', text: '時刻', size: 'sm', color: '#888888', flex: 4 }, { type: 'text', text: fmt(Date.now()), size: 'sm', weight: 'bold', flex: 5, align: 'end' }] }] },
   ];
-  const errs = [r.ig && !r.ig.ok && r.ig.error ? `インスタ：${r.ig.error}` : '', r.yt && !r.yt.ok && r.yt.error ? `YouTube：${r.yt.error}` : ''].filter(Boolean).join('\n');
+  const errs = [r.ig && !r.ig.ok && r.ig.error ? `インスタ：${r.ig.error}` : '', r.yt && !r.yt.ok && r.yt.error ? `YouTube：${r.yt.error}` : '', r.tt && !r.tt.ok && r.tt.error ? `TikTok：${r.tt.error}` : ''].filter(Boolean).join('\n');
   if (errs) body.push({ type: 'separator', margin: 'lg' }, { type: 'text', text: errs.slice(0, 300), size: 'xxs', color: '#E0453A', wrap: true, margin: 'md' });
   const btns = [];
   if (r.ig && r.ig.ok && r.ig.url) btns.push({ type: 'button', style: 'primary', color: '#C13584', height: 'sm', action: { type: 'uri', label: 'インスタで見る', uri: r.ig.url } });
   if (r.yt && r.yt.ok && r.yt.url) btns.push({ type: 'button', style: 'primary', color: '#E62117', height: 'sm', action: { type: 'uri', label: 'YouTubeで見る', uri: r.yt.url } });
+  if (r.tt && !r.tt.ok) btns.push({ type: 'button', style: 'secondary', height: 'sm', action: { type: 'postback', label: 'TikTokにもう一回', data: `ttretry:${id}`, displayText: `${id} をTikTokにもう一回` } });
   if (r.ig && !r.ig.ok) btns.push({ type: 'button', style: 'secondary', height: 'sm', action: { type: 'postback', label: 'インスタにもう一回', data: `retry:${id}`, displayText: `${id} をもう一回投稿` } });
   if (r.yt && !r.yt.ok && !r.yt.skip) btns.push({ type: 'box', layout: 'horizontal', spacing: 'sm', contents: [
     { type: 'button', style: 'secondary', height: 'sm', action: { type: 'postback', label: 'YouTubeもう一回', data: `ytretry:${id}`, displayText: `${id} をYouTubeにもう一回` } },
@@ -196,12 +204,21 @@ function postedCard(id, r) {
   return { type: 'flex', altText: `${head} ${id} ${title}`.slice(0, 380), contents: bubble };
 }
 function postedText(id, r) {
-  const m = meta(id); const l = (k, x) => !x ? '' : x.ok ? `${k}：${x.url || '投稿済み'}` : `${k}：失敗 ${x.error || ''}`;
-  return text([`投稿した：${id} ${m.title || ''}`, l('インスタ', r.ig), l('YouTube', r.yt)].filter(Boolean).join('\n'));
+  const m = meta(id); const l = (k, x) => !x ? '' : x.ok ? `${k}：${x.url || (x.draft ? '下書きに送った' : '投稿済み')}` : `${k}：失敗 ${x.error || ''}`;
+  return text([`投稿した：${id} ${m.title || ''}`, l('インスタ', r.ig), l('YouTube', r.yt), l('TikTok', r.tt)].filter(Boolean).join('\n'));
 }
+// TikTok の下書きに送ったときの案内（キャプションはコピーしやすいように吹き出しを分ける）
+const ttCaption = id => { const m = meta(id); return String(m.ttCaption || captionText(id)).trim(); };
+const ttGuide = id => [text(`TikTokの下書きに ${meta(id).title || id} を送った。TikTokアプリの受信箱の通知を開いて、次の吹き出しのキャプションを貼って投稿して。`), text(ttCaption(id) || '（キャプションなし）')];
 async function pushPosted(id, r) {
-  const failed = (r.ig && !r.ig.ok) || (r.yt && !r.yt.ok && !r.yt.skip);
+  const failed = (r.ig && !r.ig.ok) || (r.yt && !r.yt.ok && !r.yt.skip) || (r.tt && !r.tt.ok);
   logPosted(id, r);
+  if (r.tt) { // TikTok の下書きを送ったときは、結果とキャプションをすぐ1通で送る（ゆうとがアプリで投稿するため）
+    const msgs = [postedCard(id, r), ...(r.tt.ok ? ttGuide(id) : [])];
+    const ok = await push(msgs);
+    if (ok === false) await push([postedText(id, r), ...(r.tt.ok ? ttGuide(id) : [])]);
+    return;
+  }
   if (!failed) return; // うまくいったときは送らない（次のまとめに入る）
   const ok = await push(postedCard(id, r));
   if (ok === false) { log('posted card rejected, sending text'); await push(postedText(id, r)); }
@@ -265,6 +282,7 @@ async function onPostback(ev) {
   if (act === 'cap') return reply(ev.replyToken, text(captionText(id) || 'キャプションがない'));
   if (act === 'ytskip') { it.yt = { ...(it.yt || {}), skipped: true }; save(); return reply(ev.replyToken, text(`${id} はYouTubeに上げへんことにした`)); }
   if (act === 'ytretry') { it.yt = {}; save(); await reply(ev.replyToken, text(`${id} をYouTubeにもう一回上げてみる`)); return youtube(id); }
+  if (act === 'ttretry') { await reply(ev.replyToken, text(`${id} をTikTokの下書きにもう一回送ってみる`)); const tr = await tiktokDraft(id); return pushPosted(id, { tt: tr }); }
   if (it.status === 'published') return reply(ev.replyToken, text(`${id} はもう投稿済み：${it.permalink || ''}`));
   if (act === 'approve') { it.status = 'approved'; it.publishAt = nextSlot(); save(); return reply(ev.replyToken, text(`OK。${id} は ${fmt(it.publishAt)} に投稿する`)); }
   if (act === 'now') { it.status = 'approved'; it.publishAt = Date.now(); save(); return reply(ev.replyToken, text(`OK。${id} を今から投稿する`)); }
@@ -318,7 +336,7 @@ async function onLineWebhook(req, res) {
     const uid = ev.source && ev.source.userId;
     if (!state.owner && uid && (ev.type === 'follow' || ev.type === 'message')) {
       state.owner = uid; save();
-      await reply(ev.replyToken, text('このLINEを、もしもラボの承認と通知の送り先に登録した。'));
+      await reply(ev.replyToken, text(`このLINEを、${BRAND}の承認と通知の送り先に登録した。`));
       continue;
     }
     if (uid !== state.owner) continue;                               // 持ち主以外は無視
@@ -413,12 +431,14 @@ async function publish(id) {
     Object.assign(it, { status: 'published', mediaId: p.id, permalink: info.permalink || '', publishedAt: Date.now() }); save();
     log('published', id, it.permalink);
     const yr = await youtube(id, true);
-    await pushPosted(id, { ig: { ok: true, url: it.permalink }, yt: yr });
+    const tr = TT_UPLOAD ? await tiktokDraft(id) : undefined;
+    await pushPosted(id, { ig: { ok: true, url: it.permalink }, yt: yr, tt: tr });
   } catch (e) {
     Object.assign(it, { status: 'error', error: String(e.message || e) }); save();
     log('publish error', id, e);
     const yr = await youtube(id, true); // インスタが失敗しても YouTube は予定どおり出す
-    await pushPosted(id, { ig: { ok: false, error: it.error.slice(0, 200) }, yt: yr });
+    const tr = TT_UPLOAD ? await tiktokDraft(id) : undefined;
+    await pushPosted(id, { ig: { ok: false, error: it.error.slice(0, 200) }, yt: yr, tt: tr });
   }
 }
 
@@ -461,7 +481,7 @@ function ytCommand(msg) {
     const [cid, sec] = parts.slice(1).filter(x => !/設定/.test(x));
     if (!cid || !sec || !/apps\.googleusercontent\.com$/.test(cid)) return 'YouTube設定 クライアントID シークレット の形で送って（間はスペース）';
     state.yt = { ...(state.yt || {}), clientId: cid, clientSecret: sec, refresh: '' }; save();
-    return `次のリンクを開いて、もしもラボのチャンネルを持ってるGoogleアカウントで許可して。チャンネルを選ぶ画面が出たら、もしもラボのチャンネルを選ぶ。\n確認されていないアプリと出たら、詳細 → 移動 で進めてOK（自分で作ったアプリやから大丈夫）。\n\n${ytAuthUrl()}`;
+    return `次のリンクを開いて、${BRAND}のチャンネルを持ってるGoogleアカウントで許可して。チャンネルを選ぶ画面が出たら、${BRAND}のチャンネルを選ぶ。\n確認されていないアプリと出たら、詳細 → 移動 で進めてOK（自分で作ったアプリやから大丈夫）。\n\n${ytAuthUrl()}`;
   }
   if (idArg) {
     if (!state.yt?.refresh) return 'まだYouTubeにつながってない。YouTube と送ると手順が出る';
@@ -511,6 +531,7 @@ function scheduleBackfill() {
   return { count: ids.length, from: fmt(slots[0]), to: fmt(slots[ids.length - 1]) };
 }
 function ytMeta(m) {
+  if (m.yt && m.yt.title) return { title: String(m.yt.title).slice(0, 100), desc: String(m.yt.desc || '').replace(/[<>]/g, '').slice(0, 4900), tags: (m.yt.tags || []).slice(0, 15) }; // ドラマなど、書き出し側で決めたもの
   // タイトル：問いかけのタイトル（続きが気になる形）＋ショートの発見に効くタグ。100字以内
   const title = `${m.ytTitle || m.title || 'もしもラボ'} #shorts #雑学`.slice(0, 100);
   // 説明欄：1行目にコメントを呼ぶ質問、その下にキャプション（数字と出典）、最後にタグ（先頭3つがタイトルの上に出る）
@@ -592,7 +613,7 @@ async function remind() {
 // /an/export を取りに来て、日報を /an/report で預ける（指定の時刻に LINE へ送る）。
 const MET_FILE = path.join(DATA, 'metrics.jsonl');
 const TT_USER = (env.TT_USERNAME || 'moshimo__lab').replace(/^@/, '');
-const TT_SCOPE = 'user.info.basic,user.info.stats,video.list';
+const TT_SCOPE = env.TT_SCOPE || (TT_UPLOAD ? 'user.info.basic,video.upload' : 'user.info.basic,user.info.stats,video.list');
 state.an = state.an || {};
 if (!state.an.key) state.an.key = crypto.randomBytes(24).toString('hex');
 const ymd = t => new Date(t + JST).toISOString().slice(0, 10);
@@ -713,7 +734,7 @@ async function ttApi(method, url, body) {
   return j.data || {};
 }
 async function collectTT() {
-  if (state.tt && state.tt.refresh) {
+  if (state.tt && state.tt.refresh && /video\.list/.test(TT_SCOPE)) {
     const u = (await ttApi('GET', 'https://open.tiktokapis.com/v2/user/info/?fields=open_id,display_name,follower_count,following_count,likes_count,video_count')).user || {};
     const out = { src: 'api', followers: num(u.follower_count), follows: num(u.following_count), hearts: num(u.likes_count), videos: num(u.video_count), media: {} };
     let cursor = 0;
@@ -747,9 +768,9 @@ function ttCommand(msg) {
     if (!key || !sec) return 'TikTok設定 クライアントキー シークレット の形で送って（間はスペース）';
     state.tt = { ...(state.tt || {}), clientKey: key, clientSecret: sec, refresh: '', oauthState: crypto.randomBytes(16).toString('hex') }; save();
     const q = new URLSearchParams({ client_key: key, scope: TT_SCOPE, response_type: 'code', redirect_uri: ttRedirect(), state: state.tt.oauthState });
-    return `次のリンクを開いて、もしもラボのTikTokアカウント（@${TT_USER}）でログインして許可して。\n\nhttps://www.tiktok.com/v2/auth/authorize/?${q}`;
+    return `次のリンクを開いて、${BRAND}のTikTokアカウント（@${TT_USER}）でログインして許可して。\n\nhttps://www.tiktok.com/v2/auth/authorize/?${q}`;
   }
-  if (state.tt && state.tt.refresh) return `TikTokは接続済み（${state.tt.name || TT_USER}）。動画ごとの再生数まで取ってる`;
+  if (state.tt && state.tt.refresh) return TT_UPLOAD ? `TikTokは接続済み（${state.tt.name || TT_USER}）。インスタに投稿するときに、下書きへ動画を送る` : `TikTokは接続済み（${state.tt.name || TT_USER}）。動画ごとの再生数まで取ってる`;
   return `TikTokの接続で使うリダイレクトURI：\n${ttRedirect()}\n\nTikTok for Developers でアプリを作るときに Login Kit のリダイレクトURIにこれを入れて。できたら このLINEに\nTikTok設定 クライアントキー シークレット\nと送る`;
 }
 async function ttCallback(u, res) {
@@ -760,8 +781,43 @@ async function ttCallback(u, res) {
   if (!j.refresh_token) { log('tt auth failed', j); return html(`接続に失敗した（${String(j.error_description || j.error || '').slice(0, 100)}）。LINEで TikTok設定 からやり直して。`); }
   state.tt.refresh = j.refresh_token; delete state.tt.oauthState; ttAccess = { token: j.access_token, exp: Date.now() + (j.expires_in || 86400) * 1000 }; save();
   try { const d = await ttApi('GET', 'https://open.tiktokapis.com/v2/user/info/?fields=display_name,follower_count'); state.tt.name = (d.user && d.user.display_name) || ''; save(); } catch (e) { log('tt user', e.message); }
-  await push(text(`TikTokにつながった（${state.tt.name || TT_USER}）。これからは動画ごとの再生数も毎時取る。`));
+  await push(text(TT_UPLOAD ? `TikTokにつながった（${state.tt.name || TT_USER}）。これからはインスタに投稿するときに、TikTokの下書きにも動画を送る。` : `TikTokにつながった（${state.tt.name || TT_USER}）。これからは動画ごとの再生数も毎時取る。`));
   return html('TikTokにつながった。LINEに戻ってOK。');
+}
+
+// --- TikTok の下書き（受信箱）へ送る：Content Posting API の Upload（video.upload）。審査なしで使える ---
+// 送ると TikTok アプリに通知が来る。キャプション・公開範囲はアプリで決めて投稿する（API ではキャプションを渡せない）
+async function tiktokDraft(id) {
+  const it = state.items[id] || (state.items[id] = { status: 'manual', receivedAt: Date.now() });
+  if (!state.tt || !state.tt.refresh) return { ok: false, error: 'TikTokにつながってない（LINEで TikTok と送ると手順が出る）' };
+  if (it.tt && it.tt.ok) return it.tt;
+  const file = path.join(MEDIA, `${id}.mp4`);
+  if (!fs.existsSync(file)) return (it.tt = { ok: false, error: '動画ファイルがVPSにない' });
+  try {
+    const buf = fs.readFileSync(file), size = buf.length;
+    // 64MB以下は1回で送る。超えるときは 10MB ごとに分けて最後の塊に残りをまとめる（TikTok の決まり：1塊5〜64MB、最後は128MBまで）
+    const chunk = size <= 64 * 1024 * 1024 ? size : 10 * 1024 * 1024, count = Math.max(1, Math.floor(size / chunk));
+    const init = await ttApi('POST', 'https://open.tiktokapis.com/v2/post/publish/inbox/video/init/', { source_info: { source: 'FILE_UPLOAD', video_size: size, chunk_size: chunk, total_chunk_count: count } });
+    for (let k = 0; k < count; k++) {
+      const a = k * chunk, b = k === count - 1 ? size - 1 : a + chunk - 1;
+      const r = await fetch(init.upload_url, { method: 'PUT', headers: { 'content-type': 'video/mp4', 'content-length': String(b - a + 1), 'content-range': `bytes ${a}-${b}/${size}` }, body: buf.subarray(a, b + 1) });
+      if (!r.ok && r.status !== 201 && r.status !== 206) throw new Error(`アップロード ${r.status} ${(await r.text()).slice(0, 150)}`);
+    }
+    let st = 'PROCESSING_UPLOAD', fail = '';
+    for (let k = 0; k < 40 && /PROCESSING/.test(st); k++) {
+      await sleep(6000);
+      const d = await ttApi('POST', 'https://open.tiktokapis.com/v2/post/publish/status/fetch/', { publish_id: init.publish_id });
+      st = d.status || st; fail = d.fail_reason || '';
+    }
+    if (st === 'FAILED') throw new Error(`TikTok側で失敗：${fail}`);
+    it.tt = { ok: true, draft: true, publishId: init.publish_id, status: st, at: Date.now() }; save();
+    log('tiktok draft', id, st);
+    return it.tt;
+  } catch (e) {
+    it.tt = { ok: false, error: errMsg(e).slice(0, 200) }; save();
+    log('tiktok draft error', id, e);
+    return it.tt;
+  }
 }
 
 // --- 毎時の記録とバズ検知 ---
@@ -1025,6 +1081,13 @@ http.createServer(async (req, res) => {
   try {
     const u = new URL(req.url, 'http://x');
     const p = u.pathname.startsWith(PREFIX) ? u.pathname.slice(PREFIX.length) : u.pathname;
+    // TikTok / Google のアプリ登録で求められる利用規約・プライバシーポリシー（自分のアカウントにだけ投稿する個人用ツール）
+    if (p === '/terms' || p === '/privacy') {
+      const body = p === '/terms'
+        ? `<h1>${BRAND} 投稿ツール 利用規約</h1><p>このツールは ${BRAND} の運営者が、自分のアカウントに自分で制作した動画を投稿するためだけに使います。第三者の利用はできません。</p><p>This tool is used only by the operator of ${BRAND} to upload original videos to the operator's own accounts. It is not offered to third parties.</p>`
+        : `<h1>${BRAND} 投稿ツール プライバシーポリシー</h1><p>このツールが扱うのは、運営者自身のアカウントの認証情報と、運営者が制作した動画・キャプションだけです。第三者の個人情報は集めません。認証情報は運営者のサーバー内にのみ保存し、投稿以外の目的には使いません。</p><p>This tool only handles the operator's own account credentials and the operator's own videos and captions. No personal data of other people is collected. Credentials are stored only on the operator's server and used only for uploading.</p>`;
+      return send(res, 200, `<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>${BRAND}</title><body style="font-family:sans-serif;max-width:720px;margin:auto;padding:24px;line-height:1.8">${body}</body>`, 'text/html; charset=utf-8');
+    }
     if (p === '/health') return send(res, 200, { ok: true, owner: !!state.owner, ig: !!state.igToken, yt: !!state.yt?.refresh, items: Object.keys(state.items).length });
     if ((req.method === 'GET' || req.method === 'HEAD') && p.startsWith('/media/')) return serveMedia(req, res, p.slice(7));
     if (req.method === 'PUT' && p.startsWith('/upload/')) {
@@ -1042,6 +1105,7 @@ http.createServer(async (req, res) => {
       const prev = state.items[id];
       if (prev && prev.status === 'published') return send(res, 409, { ok: false, error: 'already published' });
       state.items[id] = { status: 'pending', receivedAt: Date.now() }; save(); // 承認カードはまとめて送る（朝・夕方・「承認待ち」と送ったとき）
+      if (APPROVAL_NOW) { await pushApproval(id).catch(e => log('approval push', e)); state.digestSeen = { ...(state.digestSeen || {}), [id]: 1 }; save(); }
       return send(res, 200, { ok: true });
     }
     if (req.method === 'POST' && p === '/hook/notice') {
@@ -1084,7 +1148,7 @@ http.createServer(async (req, res) => {
     log('error', e);
     if (!res.headersSent) send(res, e.code === 413 ? 413 : 500, { ok: false });
   }
-}).listen(PORT, '127.0.0.1', () => log(`moshimo server on 127.0.0.1:${PORT}`));
+}).listen(PORT, '127.0.0.1', () => log(`${BRAND} server on 127.0.0.1:${PORT}${PREFIX}`));
 MOSHIMO_EOF
 
 cat > /etc/systemd/system/moshimo.service <<'MOSHIMO_EOF'

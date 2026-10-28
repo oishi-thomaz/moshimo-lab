@@ -1,0 +1,34 @@
+name: drama-publish
+
+# いつわ劇場：仕上がった1話（drama-out ブランチの mp4・表紙・説明）を投稿サーバーに送って、LINE に承認待ちを出す
+on:
+  workflow_dispatch:
+    inputs:
+      id:
+        description: '投稿サーバーでの番号（例 2002）'
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      BASE: ${{ secrets.ITSUWA_BASE_URL }}
+      SECRET: ${{ secrets.ITSUWA_SECRET }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: drama-out
+          sparse-checkout: posts/${{ github.event.inputs.id }}
+      - name: Upload to VPS and ask for approval
+        run: |
+          ID="${{ github.event.inputs.id }}"
+          [ -n "$BASE" ] && [ -n "$SECRET" ] || { echo "ITSUWA_BASE_URL / ITSUWA_SECRET が未設定"; exit 1; }
+          cd "posts/$ID"
+          for f in "$ID.mp4" "$ID.json" "${ID}_cover.jpg"; do
+            curl -fsS --retry 3 -T "$f" -H "X-Moshimo-Secret: $SECRET" "$BASE/upload/$f"; echo
+          done
+          curl -fsS -X POST "$BASE/hook/new" -H "X-Moshimo-Secret: $SECRET" -H 'content-type: application/json' -d "{\"id\":\"$ID\"}"; echo

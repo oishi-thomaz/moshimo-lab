@@ -1,0 +1,16 @@
+[Unit]
+Description=itsuwa-gekijo posting server
+After=network-online.target
+
+[Service]
+EnvironmentFile=/etc/itsuwa.env
+ExecStart=/usr/bin/node /opt/itsuwa/server.mjs
+Restart=always
+RestartSec=5
+User=www-data
+Group=www-data
+StateDirectory=itsuwa
+MemoryMax=200M
+
+[Install]
+WantedBy=multi-user.target
