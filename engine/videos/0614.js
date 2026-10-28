@@ -1,3 +1,6 @@
+import { clamp, lerp, ease, renderer } from '../lib.js';
+import { setHud, el, cam, look } from '../story.js';
+import { town } from '../scenes/town.js';
 import { workoutVideo } from '../scenes/workout.js';
 
 // もしも毎日30分走るのを30日続けたら？（0531 腕立て100回の派生）
@@ -15,12 +18,12 @@ workoutVideo({
   title: '毎日30分走るのを30日続けたら？', titleHtml: '毎日30分走るのを<br>30日続けたら？',
   counter: { label: '今日のラン', total: 30, perSec: 4, fmt: n => `${Math.floor(n)} / 30分` },
   subs: [
-    [3.6, 6.0, '運動は、ほとんど<br>していないあなた。'],
-    [6.2, 10.1, '1日目。30分、<br>ゆっくり走ってみる。'],
+    [3.6, 6.0, '運動は、ほとんど<br>していないあなた。'], // v2：cut で抜ける
+    [6.2, 10.1, 'やせるかと思ったら、<br>変わったのは別の所だった。'],
     [10.1, 14, '走る人は、走らない人より<br>約3年長生きだった。'],
     [14.2, 18.1, '1時間走ると、<br>寿命が7時間のびる計算。'],
     [18.1, 22, '2日目。ふくらはぎが<br>パンパン。'],
-    [22.2, 26.1, '20日で、合計<br>約80km走った。'],
+    [22.2, 26.1, '20日で約80km。<br>体はどう変わった？'],
     [26.1, 30, '使ったのは約5,200kcal。<br>体脂肪約0.7kg分。'],
     [30.2, 34.6, '30日で約120km。<br>体脂肪およそ1kg分。'],
     [34.6, 39, 'でも、速く長く走る人は、<br>走らない人と差がなかった。'],
@@ -39,7 +42,9 @@ workoutVideo({
     s7: [[0, 3.6, '走る人の寿命', '約3年長い', G], [3.6, 7.5, 'うつの症状', '走る43%・薬45%', G]],
   },
   meta: {
-    mood: 'hopeful', seed: 614, hits: [6.2, 30.2, 48.1], risers: [22.0], impacts: [10.1, 18.1, 26.1, 30.2, 34.6, 43.6, 48.4],
+    v2: true,
+    hookLine: '毎日30分、30日走りきった。',
+    mood: 'hopeful', seed: 614, hits: [0.5, 6.2, 30.2, 48.1], risers: [22.0], impacts: [10.1, 18.1, 26.1, 30.2, 34.6, 43.6, 48.4],
     sfx: [[0.2, 'whoosh'], [30.4, 'meter', 1.0], [39.4, 'bubble'], [44.0, 'bubble']],
     narr: { '3年': '3年', '7時間': '7時間', '80km': '80キロ', '5,200kcal': '5200キロカロリー', '0.7kg': '0.7キロ', '120km': '120キロ', '1kg': '1キロ', '43%': '43パーセント', '45%': '45パーセント' },
     ask: 'ゆっくり派？ ガチ派？ あなたはどっち？',
@@ -49,3 +54,33 @@ workoutVideo({
     sources: '出典：Lee et al. PCVD（2017年）、Schnohr et al. JACC（2015年）、<br>Verhoeven et al. J Affect Disord（2023年）、メッツ表',
   },
 });
+
+// ---------- v2（2026/10/28〜 TikTok基準の冒頭） ----------
+// workoutVideo（scenes/workout.js）は runStory に cut を渡せないので、ここで時間をつなぎ替える（0612 と同じやり方）。
+//  ・出来上がりの 0〜2.5秒：元の shot0（夕方に走っている所）。0秒目＝サムネは 30日で走った距離 ？km、0.5秒で 約120km がドン
+//  ・2.5秒〜：元の 6.0秒〜（いつもの日常＝元の 2.5〜6秒 を抜く）
+//  字幕・効果音・BGMの強調の秒と長さは、runStory の cut と同じやり方でずらす
+{
+  const CUT = [2.5, 6.0], D = CUT[1] - CUT[0], TP = 0.5;
+  const out = (S) => (S >= CUT[1] ? Math.round((S - D) * 100) / 100 : S > CUT[0] ? null : S);
+  const r0 = window.renderAt;
+  window.renderAt = function (T0) {
+    const ok = r0(T0 < CUT[0] ? T0 : T0 + D);
+    el.title.style.opacity = T0 < 1.4 ? 1 : clamp((1.9 - T0) / 0.5);
+    if (T0 < CUT[0]) {
+      setHud('30日で走った距離（単純計算）', T0 < TP ? '？km' : '約120km', 1, { mono: true, color: T0 < TP ? '#fff' : '#ffd166' });
+      el.flash.style.opacity = T0 >= TP ? 0.4 * Math.max(0, 1 - (T0 - TP) / 0.3) : 0;
+      // 1枚目（サムネ）で顔がタイトルにかからず、街灯にも隠れないよう、走る人を斜め前から撮り直す（人は x=4.3・z=30−2.2t を走る）
+      const z = 30 - T0 * 2.2, u = ease(T0 / 2.5);
+      look(lerp(3.2, 3.4, u), lerp(2.2, 2.1, u), z - lerp(10.0, 9.4, u), 4.3, 1.45, z, 40);
+      cam.setViewOffset(1080, 1920, 0, 90, 1080, 1920); renderer.render(town, cam);
+    }
+    return ok;
+  };
+  const M = window.META, m1 = (a) => (a || []).map(out).filter((x) => x != null);
+  window.META = { ...M,
+    subs: M.subs.map(([a, b, x]) => { const a2 = out(a), b2 = out(b); return a2 == null || b2 == null ? null : [a2, b2, x]; }).filter(Boolean),
+    hits: m1(M.hits), risers: m1(M.risers), impacts: m1(M.impacts),
+    sfx: (M.sfx || []).map(([t, ...r]) => { const t2 = out(t); return t2 == null ? null : [t2, ...r]; }).filter(Boolean) };
+  window.DURATION = 61.0; // 元の64.5秒 − 3.5秒
+}
