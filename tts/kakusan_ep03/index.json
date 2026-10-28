@@ -144,9 +144,9 @@
   "model": "gemini-3.8-flash-tts"
  },
  "d3": {
-  "dur": 0.265,
+  "dur": 2.065,
   "voice": "Umbriel",
-  "text": "…ごめん。",
+  "text": "ごめん、アカリさん。",
   "model": "gemini-3.8-flash-tts"
  },
  "d4": {
