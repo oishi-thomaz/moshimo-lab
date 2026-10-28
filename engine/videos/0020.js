@@ -103,15 +103,15 @@ function hideWalkers() { walkers.forEach(w => w.p.visible = false); }
 // ---------- subtitles ----------
 const SUBS = [
   [2.6, 6.0, 'いつもの朝。<br>電車が来て、乗りこむ。'],
-  [6.2, 10.1, '日本中の電車が、<br>いっせいに止まった。'],
+  [6.2, 10.1, 'まだ1分。でもこの先、<br>歩く距離がとんでもない。'],
   [10.1, 14.0, 'ホームに人が<br>あふれていく。'],
   [14.2, 18.1, '乗る人の半分以上は、<br>通勤・通学の定期券。'],
-  [18.1, 22.0, '都市の路線が、<br>まとめて止まった。'],
+  [18.1, 22.0, '都市の路線が、まとめて<br>止まった。じゃあ、どうする？'],
   [22.2, 26.1, 'みんな、<br>歩いて向かうしかない。'],
   [26.1, 30.0, '1回に乗る距離は、<br>平均17.4km（推計）'],
-  [30.2, 34.6, '新幹線も止まった。'],
+  [30.2, 34.6, '通勤だけじゃない。<br>新幹線も止まった。'],
   [34.6, 39.0, '1日約106万人の<br>遠くへの移動が消えた。'],
-  [39.2, 43.6, '貨物列車も動かない。'],
+  [39.2, 43.6, '貨物列車も動かない。<br>止まるのは、人だけじゃない。'],
   [43.6, 47.8, '1年で3,847万トンを<br>運ぶ線路が止まった。'],
   [48.1, 52.6, '結果：1日約6,400万人が、<br>歩くしかなくなった。'],
   [52.6, 55.4, '電車の代わりに歩くと、<br>片道で約3時間38分。'],
@@ -122,13 +122,17 @@ const cd = (left) => `0:${String(Math.floor(left)).padStart(2, '0')}.${String(Ma
 function stn(env = 'day') { setStationEnv(env); waiting.set(0, 0); crowd.set(0, 0); qs.set(0, crowd.people, 0); freight.g.visible = false; train.g.visible = true; train.setLights(1); }
 const arriveX = t => lerp(-70, 0, easeOut(clamp(t / 3.4))); // train arrives and stops at x=0 by T=3.4
 
-function shot0(t, T) { // hook: platform, train approaching, countdown, big number
-  stn(); setBoard(ROWS);
-  train.setX(arriveX(T)); train.setDoors(0); waiting.set(40, T, { look: true });
+const TP = 0.5; // v2：0.5秒で全国の電車が止まる（冒頭で待たせない）
+function shot0(t, T) { // hook (v2): train at the platform, countdown hits 0 at 0.5s -> board flips to 運転見合わせ, lights off
+  const on = t < TP;
+  stn();
+  if (on) setBoard(ROWS); else setBoard([], { stop: STOP, blink: 0.5 + 0.5 * Math.cos((t - TP) * 5) });
+  train.setX(0); train.setDoors(on ? 0 : clamp((t - TP - 0.4) / 0.6)); train.setLights(on ? 1 : 0);
+  crowd.set(50, T + 6 - 2.5, { look: true }); // shot2 の最初（50人）とつながる
+  el.flash.style.opacity = on ? 0 : 0.5 * Math.max(0, 1 - (t - TP) / 0.3);
   const u = ease(t / 2.5);
-  lift(160); look(lerp(13, 12.5, u), PH + 3.0, -1.4, -15, PH + 0.9, -2.4, 55);
-  el.title.style.opacity = 1;
-  setHud('全国の電車が止まるまで', cd(6 - T), 1, { mono: true });
+  lift(lerp(40, 160, u)); look(lerp(13, 12.5, u), PH + 3.0, -1.4, -15, PH + 0.9, -2.4, 55); // v2：0秒目は発車標をタイトルの下に出す
+  setHud('全国の電車が止まるまで', cd(Math.max(0, TP - t)), 1, { mono: true, color: on ? '#fff' : '#ff6b6b' });
   setTop('鉄道で運ばれる人（2024年度・1年間）', '233億7,700万人', 1);
   return station;
 }
@@ -138,7 +142,6 @@ function shot1(t, T) { // ordinary: stops, doors open, people board
   waiting.set(40, T, { board: clamp((T - 4.0) / 2.0), side: -1 });
   const u = ease(t / 3.5);
   lift(160); look(lerp(12.5, 11.5, u), PH + 3.0, -1.4, -15, PH + 0.9, -2.4, 55);
-  el.title.style.opacity = clamp(1 - (t - 2.8) / 0.5);
   setHud('全国の電車が止まるまで', cd(Math.max(0, 6 - T)), 1, { mono: true });
   setTop('鉄道で運ばれる人（2024年度・1年間）', '233億7,700万人', clamp(1 - (t - 0.1) / 0.3));
   return station;
@@ -216,15 +219,18 @@ function shot8(t, T) { // loop: same platform framing as the opening, still stop
 const shots = [
   { a: 0, b: 2.5, f: shot0 }, { a: 2.5, b: 6, f: shot1 }, { a: 6, b: 14, f: shot2 }, { a: 14, b: 22, f: shot3 },
   { a: 22, b: 30, f: shot4 }, { a: 30, b: 39.2, f: shot5 }, { a: 39.2, b: 48, f: shot6 }, { a: 48, b: 55.5, f: shot7 },
-  { a: 55.5, b: 59.5, f: shot8 }, { a: 59.5, b: 64.5, f: endCard },
+  { a: 55.5, b: 59.5, f: shot8 }, { a: 59.5, b: 65, f: endCard },
 ];
 runStory({
-  shots, subs: SUBS, duration: 64.5,
+  shots, subs: SUBS, duration: 65,
+  cut: [[2.5, 6.0]], // v2：いつもの朝の乗車（元の2.5〜6秒）を抜いて、止まった直後から本題へ
   meta: {
     id: '0020',
+    v2: true,
+    hookLine: '日本中の電車が、一斉に止まった。',
     title: '日本中の電車が全部止まったら？',
     titleHtml: '日本中の電車が<br>全部止まったら？',
-    mood: 'tension', seed: 20, hits: [6.0, 48.1], risers: [6.0],
+    mood: 'tension', seed: 20, hits: [0.5, 48.1], risers: [6.0],
     ask: 'あなたの通勤、歩くと何時間？',
     narr: { '17.4km': '17.4キロ', '3,847万トン': '3847万トン', '1回': 'いっかい' },
     caption: 'もしも日本中の電車が全部止まったら？\n鉄道が運ぶ人は2024年度で1年に233億7,700万人、1日あたり約6,400万人（推計）。1回に乗る平均の距離は約17.4km。歩くと片道約3時間38分（1分80mで計算・推計）。国交省の鉄道輸送統計で計算してみた。\n\nあなたの通勤、歩くと何時間？ コメントで教えて。\n\n出典：国土交通省 鉄道輸送統計調査（2024年度 年報）、不動産公正取引協議会連合会（徒歩所要時間の基準 80m＝1分）',
