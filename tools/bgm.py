@@ -342,7 +342,7 @@ if __name__ == '__main__':
             place(sfx, impact(rng), im, 0.9)
         for c in cues:
             fn, gain = SFX[c[1]]
-            sig = fn(rng, float(c[2])) if len(c) > 2 else fn(rng)
+            sig = fn(rng, float(c[2])) if len(c) > 2 and c[1] == 'meter' else fn(rng)  # 3つ目の値を受け取るのは meter だけ
             if c[1] == 'meter' and len(c) > 2: gain *= 0.55 + 0.6 * float(c[2])
             place(sfx, sig, float(c[0]), gain, pan=float(rng.uniform(-0.25, 0.25)))
         sfx = reverb(sfx, rng, seconds=1.2, mix=0.18)
