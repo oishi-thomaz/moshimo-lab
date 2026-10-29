@@ -1,0 +1,25 @@
+name: notice
+
+# LINE に知らせを1件入れる（承認と同じLINE。まとめ通知に入る）。見張りの定期タスク（Claude）が報告に使う
+on:
+  workflow_dispatch:
+    inputs:
+      message:
+        description: '知らせる文'
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  notice:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Send
+        env:
+          BASE: ${{ secrets.MOSHIMO_BASE_URL }}
+          SECRET: ${{ secrets.MOSHIMO_SECRET }}
+          MESSAGE: ${{ github.event.inputs.message }}
+        run: |
+          MSG=$(node -e "console.log(JSON.stringify({message:process.env.MESSAGE}))")
+          curl -fsS -X POST "$BASE/hook/notice" -H "X-Moshimo-Secret: $SECRET" -H 'content-type: application/json' -d "$MSG"

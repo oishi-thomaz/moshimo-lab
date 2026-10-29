@@ -1,0 +1,59 @@
+name: preflight
+
+# 書き出しの事前チェック。仕組み・台本・在庫を変えて main に入れたら、在庫の次の10本と変えた回を軽く通す（本番の書き出しはしない）
+# 1本でも落ちたら LINE に日本語で知らせる。見張りの定期タスク（Claude）がこれを見て直す
+on:
+  push:
+    branches: [main]
+    paths: ['engine/**', 'tools/**', 'plan/queue.txt', 'package.json']
+  workflow_dispatch:
+    inputs:
+      ids:
+        description: '確かめる番号（スペース区切り。空なら在庫の次の10本）'
+        required: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: preflight
+  cancel-in-progress: true
+
+jobs:
+  smoke:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    env:
+      BASE: ${{ secrets.MOSHIMO_BASE_URL }}
+      SECRET: ${{ secrets.MOSHIMO_SECRET }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: System packages
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg fonts-noto-cjk
+          pip install --quiet numpy scipy
+      - run: npm ci --no-audit --no-fund
+      - name: Smoke test
+        env:
+          CHROME_PATH: /usr/bin/google-chrome
+        run: |
+          IDS="${{ github.event.inputs.ids }}"
+          if [ -z "$IDS" ] && [ "${{ github.event_name }}" = push ]; then
+            CHANGED=$(git diff --name-only "${{ github.event.before }}" "${{ github.sha }}" 2>/dev/null | sed -n 's#^engine/videos/\([0-9]\{4\}\)\.js$#\1#p' | tr '\n' ' ')
+            NEXT=$(node -e "const fs=require('fs');const r=f=>(fs.existsSync(f)?fs.readFileSync(f,'utf8'):'').split(/\r?\n/).map(s=>s.trim()).filter(s=>/^\d{4}$/.test(s));const d=new Set(r('state/rendered.txt'));console.log(r('plan/queue.txt').filter(i=>!d.has(i)&&fs.existsSync('engine/videos/'+i+'.js')).slice(0,10).join(' '))")
+            IDS=$(echo "$CHANGED $NEXT" | tr ' ' '\n' | grep -E '^[0-9]{4}$' | awk '!s[$0]++' | tr '\n' ' ')
+          fi
+          echo "check: $IDS"
+          bash tools/smoke.sh $IDS
+      - name: Failure notice
+        if: failure()
+        run: |
+          MSG=$(node -e "const r=require('fs').existsSync('out/smoke/report.txt')?require('fs').readFileSync('out/smoke/report.txt','utf8').trim():'（チェックの途中で止まった）';console.log(JSON.stringify({message:'書き出しの事前チェックで落ちた回がある。本番の前にClaudeが直す。\n'+r.slice(0,600)}))")
+          curl -fsS -X POST "$BASE/hook/notice" -H "X-Moshimo-Secret: $SECRET" -H 'content-type: application/json' -d "$MSG" || true

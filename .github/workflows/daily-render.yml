@@ -74,7 +74,12 @@ jobs:
         env:
           CHROME_PATH: /usr/bin/google-chrome
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-        run: bash tools/build.sh "${{ steps.pick.outputs.id }}"
+        run: |
+          # 一時的な失敗（ブラウザ・声のAPI）は1回だけやり直す
+          ID="${{ steps.pick.outputs.id }}"
+          bash tools/build.sh "$ID" 2>&1 | tee /tmp/build.log && exit 0
+          echo "::warning::1回目の書き出しに失敗。30秒待ってやり直す"; sleep 30
+          bash tools/build.sh "$ID" 2>&1 | tee /tmp/build2.log; exit ${PIPESTATUS[0]}
 
       - name: Upload to VPS and ask for approval
         if: steps.pick.outputs.id != ''
@@ -104,4 +109,4 @@ jobs:
         if: failure()
         run: |
           curl -fsS -X POST "$BASE/hook/notice" -H "X-Moshimo-Secret: $SECRET" -H 'content-type: application/json' \
-            -d "{\"message\":\"動画の書き出しに失敗した（${{ steps.pick.outputs.id }}）。Claudeに伝えて。\"}" || true
+            -d "$(node -e "const fs=require('fs');const f=fs.existsSync('/tmp/build2.log')?'/tmp/build2.log':'/tmp/build.log';const L=fs.existsSync(f)?fs.readFileSync(f,'utf8').split('\\n').filter(l=>/Error|error|EXC|Traceback/.test(l)).slice(-2).join(' ').slice(0,300):'';console.log(JSON.stringify({message:'動画の書き出しに失敗した（${{ steps.pick.outputs.id }}）。見張りのClaudeが直して、上がるまでやり直す。'+(L?'\\n原因：'+L:'')}))")" || true
