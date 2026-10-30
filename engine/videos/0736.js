@@ -63,7 +63,7 @@ function makeSnake() { // とぐろ＋鎌首
 
 function makeMosquito() { // +x が頭。細い体・しま模様のおなか・長い脚・針のような口
   const g = new THREE.Group();
-  const dk = mat('#2a2622'), st = mat('#d8d2c4');
+  const dk = mat('#5a4a3c'), st = mat('#efe6d6'); // 暗い背景でも形が分かるように明るめの茶色と白のしま
   const thorax = new THREE.Mesh(new THREE.SphereGeometry(0.09, 10, 8), dk); thorax.scale.set(1.2, 1, 0.9); g.add(thorax);
   const abd = new THREE.Group(); abd.position.set(-0.1, -0.01, 0); abd.rotation.z = 0.25; g.add(abd);
   for (let i = 0; i < 6; i++) { const seg = new THREE.Mesh(new THREE.CylinderGeometry(0.05 - i * 0.004, 0.05 - i * 0.004, 0.06, 8), i % 2 ? st : dk); seg.rotation.z = Math.PI / 2; seg.position.x = -0.03 - i * 0.055; abd.add(seg); }
@@ -75,7 +75,7 @@ function makeMosquito() { // +x が頭。細い体・しま模様のおなか・
     const up = box(0.012, 0.2, 0.012, dk); up.geometry.translate(0, -0.1, 0); up.position.set(x, -0.03, s2 * 0.05); up.rotation.set(s2 * 0.9, 0, x * 4); g.add(up);
     const lo = box(0.01, 0.26, 0.01, dk); lo.geometry.translate(0, -0.13, 0); lo.position.set(x + x * 1.5, -0.16, s2 * 0.2); lo.rotation.set(s2 * -0.15, 0, x * 3); g.add(lo);
   }
-  const wingM = new THREE.MeshBasicMaterial({ color: 0xe8f0ff, transparent: true, opacity: 0.55, side: THREE.DoubleSide });
+  const wingM = new THREE.MeshBasicMaterial({ color: 0xbfd4ff, transparent: true, opacity: 0.28, side: THREE.DoubleSide });
   const wings = [];
   for (const s2 of [-1, 1]) { const w = new THREE.Mesh(new THREE.PlaneGeometry(0.3, 0.09), wingM); w.geometry.translate(-0.13, 0, 0); const pv = new THREE.Group(); pv.position.set(-0.02, 0.07, s2 * 0.03); pv.rotation.y = s2 * 0.35; pv.add(w); w.rotation.x = Math.PI / 2; g.add(pv); wings.push(pv); }
   g.userData.flap = (t) => { const a = Math.sin(t * 60) * 0.6; wings[0].rotation.x = a; wings[1].rotation.x = -a; };
@@ -101,7 +101,7 @@ function makeHero(i) {
   if (i === 1) { const d = makeDog({ kind: 'shiba' }); dogPose(d, 'stand'); d.scale.setScalar(1.15); d.position.y = 0.32; d.rotation.y = -0.6; d.userData.anim = (t) => dogIdle(d, t); return d; }
   if (i === 2) { const s = makeSnake(); s.scale.setScalar(1.15); s.position.y = 0.32; s.rotation.y = -0.9; return s; }
   if (i === 3) { const p = makePerson({ skin: SKIN[1], hair: HAIR[0], shirt: '#3a4f7a', pants: '#2b2f3a', scale: 0.58 }); p.position.y = 0.32; p.rotation.y = -0.25; p.userData.anim = () => {}; return p; }
-  const m = makeMosquito(); m.scale.setScalar(2.1); m.position.y = 1.0; m.rotation.y = -0.6; m.userData.anim = (t) => { m.userData.flap(t); m.position.y = 1.0 + Math.sin(t * 2.2) * 0.05; m.position.x = Math.sin(t * 1.3) * 0.05; }; return m;
+  const m = makeMosquito(); m.scale.setScalar(2.3); m.position.y = 1.05; m.rotation.y = -0.15; m.userData.anim = (t) => { m.userData.flap(t); m.position.y = 1.05 + Math.sin(t * 2.2) * 0.05; m.position.x = Math.sin(t * 1.3) * 0.05; }; return m;
 }
 const SLOTS = NAMES.map((name, i) => {
   const g = new THREE.Group(); g.position.set(SX[i], 0, 0); stage.add(g);
