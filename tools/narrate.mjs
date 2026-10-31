@@ -43,7 +43,9 @@ const STYLE = 'Calm Japanese documentary narrator. Clear, natural pacing, slight
 const lines = [];
 const subs = meta.subs || [];
 const firstSub = subs.length ? subs[0][0] : 2.5;
-if (V2) lines.push({ t: 0.0, end: firstSub - 0.05, text: speak(meta.hookLine || meta.titleHtml || meta.title || ''), style: STYLE });
+// 2026/10/31 ゆうと：どの動画も最初は必ずタイトルを言う（v2 も hookLine ではなくタイトルを0秒から読む）
+// タイトルは字幕より長いことがあるので、最初の字幕の頭0.6秒まで使ってよい（最初の字幕の声はその分あとにずれる）
+if (V2) lines.push({ t: 0.0, end: firstSub + 0.6, text: speak(meta.titleHtml || meta.title || meta.hookLine || ''), style: STYLE });
 else lines.push({ t: 0.2, end: firstSub - 0.05, text: speak(meta.titleHtml || meta.title || ''), style: 'Calm Japanese documentary narrator asking an intriguing question, quietly.' });
 subs.forEach(([a, b, txt], i) => {
   const s = String(txt);
