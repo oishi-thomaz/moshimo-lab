@@ -49,8 +49,8 @@ export function applyQuizCards({ answer, info, answerSize = 128 }) {
   const end = document.getElementById('end');
   end.querySelector('.t').innerHTML = `<span style="display:block;font-size:44px;letter-spacing:14px;color:#cfd6df;margin-bottom:26px">答え</span><span style="color:#e6b450;font-size:${answerSize}px;line-height:1.15">${answer}</span>`;
   end.querySelector('.s').innerHTML = `<span style="display:inline-block;padding:10px 34px;border:3px solid rgba(255,255,255,.5);border-radius:999px;font-size:40px;font-weight:900;color:#fff">${info}</span>`;
-  const ask = end.querySelector('.ask'); ask.innerHTML = '観た人はコメントで感想を<small>まだの人は保存して今夜観て</small>'; ask.style.color = '#e6b450';
-  end.querySelector('.nx').innerHTML = '';
+  const ask = end.querySelector('.ask'); ask.innerHTML = '何秒でわかった？<br>どこでわかった？<small>コメントで教えて。観た人は感想も聞かせて</small>'; ask.style.color = '#e6b450';
+  end.querySelector('.nx').innerHTML = 'まだ観てない人は<small>保存して今夜観て</small>';
   end.querySelector('.lg').innerHTML = '<div style="font-family:\'M PLUS Rounded 1c\',sans-serif;font-size:46px;font-weight:800;letter-spacing:6px">タイトル当てクイズ</div><div style="font-size:24px;letter-spacing:6px;color:#8a94a3;margin-top:10px">フォローして次の問題を待ってて</div>';
   end.querySelector('.src').innerHTML = '作品の映像・画像は使っていません';
 }

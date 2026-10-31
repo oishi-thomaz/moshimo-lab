@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { clamp, lerp, ease, easeOut, easeBack, mat, box, canvasTex, windowTextures, makePerson } from '../lib.js';
 import { cam, lift, look, runStory, endCard, setTop, el, textSprite } from '../story.js';
+import { applyQuizCards } from './quiz-kit.js';
 
 // タイトル当てクイズ #001（映画・ドラマ紹介アカウントの試作）
 // お題：地面師たち（Netflix・全7話）。作品の映像・キャラクター・ロゴは使わず、設定だけを汎用の3Dで見せる
@@ -225,9 +226,9 @@ const SUBS = [
   [42.2, 45.4, 'でも本当に<br>怖いのは'],
   [45.4, 49.0, 'だまされる側<br>じゃない。'],
   [49.2, 52.0, 'この作品、<br>わかった？'],
-  [52.0, 55.8, 'わかった人は、<br>コメントで答えて。'],
+  [52.0, 55.8, 'カウントダウンの間に、<br>当ててみて。'],
   [56.4, 59.6, '答えは、地面師たち。'],
-  [59.6, 63.6, '観た人は感想を、<br>まだの人は保存して。'],
+  [59.6, 63.6, '何秒で、どこでわかった？<br>感想も聞かせて。'],
 ];
 
 runStory({
@@ -242,20 +243,9 @@ runStory({
     impacts: [0.35, 5.6, 21.0, 56.4],
     sfx: [[9.0, 'whoosh'], [17.0, 'whoosh'], [25.0, 'whoosh'], [29.1, 'alarm'], [33.0, 'whoosh'], [42.2, 'drone'], [49.0, 'meter', 0.5]],
     narr: { '地面師': 'じめんし', '100億円': 'ひゃくおくえん', 'なりすまし役': 'なりすましやく', '印鑑証明': 'いんかんしょうめい' },
-    caption: 'このドラマのタイトル、わかる？\n持ち主じゃない人間が、100億円の土地を売った。本物の地主にそっくりな人を立てて、書類は全部ニセモノ。狙うのは大手デベロッパー。\n\n答えは動画の最後で。わかった人はコメントで答えて。',
+    caption: 'このドラマのタイトル、わかる？\n持ち主じゃない人間が、100億円の土地を売った。本物の地主にそっくりな人を立てて、書類は全部ニセモノ。狙うのは大手デベロッパー。\n\n答えは動画の最後で。何秒でわかった？どこでわかった？コメントで教えて。観た人は感想も聞かせて。',
     hashtags: ['タイトル当てクイズ', 'ネトフリ', 'Netflix', 'ドラマ紹介', 'どんでん返し'],
   },
 });
 
-// ---------- このアカウント用にロゴとまとめカードを差し替える（エンジン共通部分はそのまま） ----------
-{
-  const nm = document.querySelector('#logo .nm'); if (nm) nm.textContent = 'タイトル当てクイズ';
-  const mk = document.querySelector('#logo .mk'); if (mk) mk.style.display = 'none';
-  const end = document.getElementById('end');
-  end.querySelector('.t').innerHTML = '<span style="display:block;font-size:44px;letter-spacing:14px;color:#cfd6df;margin-bottom:26px">答え</span><span style="color:#e6b450;font-size:128px;line-height:1.15">地面師たち</span>';
-  end.querySelector('.s').innerHTML = '<span style="display:inline-block;padding:10px 34px;border:3px solid rgba(255,255,255,.5);border-radius:999px;font-size:40px;font-weight:900;color:#fff">Netflix｜全7話</span>';
-  end.querySelector('.ask').innerHTML = '観た人はコメントで感想を<small>まだの人は保存して今夜観て</small>'; end.querySelector('.ask').style.color = '#e6b450';
-  end.querySelector('.nx').innerHTML = '';
-  end.querySelector('.lg').innerHTML = '<div style="font-family:\'M PLUS Rounded 1c\',sans-serif;font-size:46px;font-weight:800;letter-spacing:6px">タイトル当てクイズ</div><div style="font-size:24px;letter-spacing:6px;color:#8a94a3;margin-top:10px">フォローして次の問題を待ってて</div>';
-  end.querySelector('.src').innerHTML = '作品の映像・画像は使っていません';
-}
+applyQuizCards({ answer: '地面師たち', info: 'Netflix｜全7話', answerSize: 128 });
