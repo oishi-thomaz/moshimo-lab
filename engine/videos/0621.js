@@ -185,7 +185,7 @@ runStory({
   meta: {
     id: '0621',
     v2: true,
-    hookLine: '北朝鮮という国が、一夜で消えた。',
+    hookLine: '北朝鮮という国が、消えた。',
     series: '国が消えたら',
     hookType: 'H5',
     cat: '社会・政治',
