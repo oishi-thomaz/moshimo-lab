@@ -13,10 +13,13 @@ TikTok は個人では公式の投稿APIが使えないので、ゆうとの Mac
 - アカウントは個人アカウントのまま。ビジネスアカウントへの切り替えや設定の変更はしない。途中のお知らせは閉じる。コンテンツの自動チェックをオンにするかの確認はキャンセルする。
 
 ## 1. 候補を決める（二重投稿させないのが最優先）
-1. moshimo-analytics（/home/claude/moshimo-analytics）で `node tools/run.mjs collect --account=quiz` を実行し、data/quiz/state.json の items から status が published の回（インスタに出た回）を投稿順に並べる（番号・title・publishedAt・permalink）。これが候補。
+2026/11/1 から、TikTok はインスタと同じ時間に出す（ゆうとの決定）。このタスクは毎時（7〜23時）動き、ゆうとが LINE で承認した回を、そのインスタの投稿時間で TikTok に予約する。
+1. moshimo-analytics（/home/claude/moshimo-analytics）で `node tools/run.mjs collect --account=quiz` を実行し、data/quiz/state.json の items から次の2つを出す。
+   - 予約する回：status が approved で、publishAt（インスタの投稿時間）が今から20分以上先の回。TikTok もその publishAt の日時で予約する。
+   - すぐ出す回：status が published（インスタにはもう出た）か、approved で publishAt が20分以内の回。TikTok は 今 で投稿する（TikTok の予約は15分以上先しか入れられないため）。インスタに出てから24時間以上たった回は、すぐ出さずに最後の返答で知らせるだけにする。
 2. state/quiz-tiktok.md に載っている回（予約済み・公開済み・手動）を外す。
-3. TikTok Studio の投稿一覧（https://www.tiktok.com/tiktokstudio/content）を get_page_text で読み、キャプション1行目に同じ作品の手がかりがある投稿があれば外す。
-4. 1日5本まで、枠は 12:30・15:30・18:30・20:30・22:30（日本時間）。すでに予約が入っている枠には入れない。10日先まで埋まっていたら何もしない。インスタに出た順に入れる。
+3. TikTok Studio の投稿一覧（https://www.tiktok.com/tiktokstudio/content）を get_page_text で読み、キャプション1行目と同じ文で、同じ日時に予約・公開されている投稿があれば外す（クイズはキャプション1行目が同じ文になりやすいので、日時で見分ける）。
+4. 残った回が今回の候補。何もなければ、ブラウザを開かずに 予約する回なし とだけ返して終わる（毎時なので、何もない回は短く終える）。TikTok は1日5本まで（日本時間の日付ごと）。
 
 ## 2. 動画を Cloudinary に置く
 TikTok Studio のページは決まった配信元からしか動画を読み込めない（投稿サーバーの sslip.io は読み込めない）。なので候補の動画をワークフローで Cloudinary（res.cloudinary.com）にも置く。

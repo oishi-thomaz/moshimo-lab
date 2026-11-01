@@ -7,7 +7,7 @@
 | 朝の仕事 | 毎日 6:15 | 全アカウントの解析と日報（8:00 に各アカウントの LINE へ）→ 今日の分の書き出し（承認カードが LINE に届く） |
 | 見張り | 毎日 7:37〜23:37 の毎時 | 書き出し・送信の失敗を直して上げきる。15時台の回は午後の見回りも |
 | 動画制作 | 毎日 10:47・16:47 | 在庫が減ったアカウントの動画を作る（アカウントごとにサブエージェントで並行） |
-| TikTok 予約 | 毎日 23:00（ゆうとの Mac） | インスタに出た回を TikTok に予約する |
+| TikTok 予約 | 毎時 7:07〜23:07（ゆうとの Mac） | LINE で承認された回を、インスタと同じ時間で TikTok に予約する（何もなければすぐ終わる） |
 
 リポジトリ：oishi-thomaz/moshimo-lab（公開。動画・台本・この手順書）と oishi-thomaz/moshimo-analytics（非公開。数字・日報・TikTok の記録）。/home/claude/moshimo-lab と /home/claude/moshimo-analytics に clone して使う（すでにあれば git pull --rebase）。
 
@@ -88,7 +88,8 @@
 4. 全部のサブエージェントが終わったら、作業フォルダが全部 push 済みか確かめて、作業フォルダを消す。
 5. 最後の返答：アカウントごとに、作った番号・タイトル（クイズは作品名・映画かドラマか・Filmarks の点数、もしもラボはシリーズの区分と hookLine）と在庫。作らなかったアカウントは 在庫は足りてる。
 
-## 4. TikTok 予約（23:00、ゆうとの Mac）
+## 4. TikTok 予約（毎時 7:07〜23:07、ゆうとの Mac）
+TikTok はインスタと同じ時間に出す（2026/11/1 ゆうとの決定）。承認された回を、そのインスタの投稿時間で予約する。両方のアカウントとも、予約する回がなければブラウザを開かずに すぐ終わる。
 1. 両方のリポジトリを用意する。
 2. もしもラボ：moshimo-analytics の TIKTOK.md を最後まで読んで完全に従う（notes/tiktok-schedule.md・notes/tiktok-crp.md も）。Chrome（Claude in Chrome）を使う。Chrome の操作の前に chrome-browser のスキルを読む。
 3. クイズ：docs/QUIZ-TIKTOK.md を最後まで読んで完全に従う（state/quiz-tiktok.md も）。Claude アプリのブラウザ（built-in browser、mcp__remote-devices__Claude_Browser__*）を使う。操作の前に built-in-browser のスキルを読む。Chrome は絶対に使わない（Chrome は @moshimo__lab でログインしているので、取り違えるとクイズの動画がもしもラボに出てしまう）。
