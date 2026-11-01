@@ -127,6 +127,9 @@ CHROME_PATH=<chromium> node tools/render.mjs --video NNNN --stills 0,0.4,1,2,3,1
 - scenes/beach.js：夏の砂浜と波打つ海（坂の砂浜・海底・波打ちぎわの泡・パラソル・遠くの山）。setSea(t,{level, amp}) で波と海面（level を上げると砂浜が沈む）、floorY(z)、makeSwimmers(n, seed, 範囲).set(k, t)（0 浜で待つ→1 海へ）、makeFarCrowd、makeGauge（目盛りの柱、setMark で赤い線）、PARASOLS、setBeachEnv で day / dusk
 - scenes/appliances.js：ブランドなしのローポリ家電（makeTV / makeMicrowave / makeWasher / makeFridge / makeAircon）と、5つの台座にダメージメーター付きのラインナップ（aLineup、setASlot(i, {show, meter, word, glow, t})、aLineupIdle、setALabels）。ヤバい順の家電回用
 - scenes/mites.js：小さな這う虫の部品（どのシーンにも足せる）。makeMite({kind: dust / tick})（8本脚の室内ダニ・マダニ）、makeBedBug（6本脚の平たいトコジラミ）、どちらも .userData.anim(t, moving)。makeCrawlers(n, seed, {x0,x1,z0,z1,y,size,color,legs}).set(数, t, speed) で面の上を這う InstancedMesh の群れ、makeLitter(n, seed, 範囲).set(k) で落ち葉が厚く積もる
+- scenes/snake.js：ローポリのヘビと草むら。makeSnake({len, r, color})（.userData.pose(t,{coil, amp, lift, speed}) で S字で這う・とぐろ・鎌首、舌つき）、makeGrass(n, seed, {x0,x1,z0,z1,h,hole:[x,z,r]})（揺れる草むら。.userData.sway(t)、hole の中は草が短くて主役が隠れない）
+- scenes/cedar.js：スギの人工林（林道・手前の大きなスギ HERO・斜面に並ぶ森・遠くの山）と花粉の雲。makeCedarTree(h, seed)（雄花の粒つき、.userData.flowers(on)）、setPollen(k, t)（花粉の粒）、puff(k, t)（黄色い花粉の雲）、setForest(k)（森の量）、setCedarEnv で day / haze / clear
+- scenes/foodlineup.js：ブランドなしのローポリ食べ物（makeRiceBowl / makeRiceBag / makeOil / makeBread / makeSugar / makeSoy / makeEgg）と、メーター付きの5つの台座のラインナップ（fLineup、FSLOTS、setFoods(makers, names, scales)、setFSlot(i, {show, meter, word, glow, t, label})、fLineupIdle）。ヤバい順の食べ物回用
 
 ## 着地は人への影響で言い切る（2026/10/20 ゆうとの指摘・最重要）
 - 結果は「何がいくつ消えた」で終わらせない。それで人間の暮らし・お金・体・心がどう変わったかを数字で言い切る（例：蚊の回＝マラリアだけで年61万人が助かる）。
