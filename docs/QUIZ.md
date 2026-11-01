@@ -6,7 +6,7 @@
 
 ```
 毎週   Claude が次の回（engine/videos/qNNN.js）を作って plan/quiz-queue.txt に足す
-毎朝   Claude の定期タスクが quiz-render を動かす → 5本書き出し → タイトル当てクイズの投稿サーバー（VPS /quiz/）へ送る
+毎朝   Claude の定期タスク（ops/OPS.md の 朝の仕事）が quiz-render を動かす → 5本書き出し → タイトル当てクイズの投稿サーバー（VPS /quiz/）へ送る
 VPS    届いた順に LINE（タイトル当てクイズ通知）に承認カード → 承認すると 12:00・15:00・18:00・20:00・22:00 の空いている枠でインスタに投稿
 TikTok Claude の定期タスクが Mac の Claude アプリのブラウザ（@title_ate_quiz でログイン済み）で TikTok Studio に予約投稿。動画は quiz-cdn ワークフローで Cloudinary に置いてから取り込む（docs/QUIZ-TIKTOK.md）。Chrome はもしもラボ用なので使わない
 ```

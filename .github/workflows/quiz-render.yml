@@ -11,7 +11,7 @@ on:
         required: false
         default: '5'
       id:
-        description: '回を指定するとき（例 q004。在庫の記録はしない）'
+        description: '回を指定するとき（例 q004。落ちた回のやり直し用。書き出せたら在庫の記録もする）'
         required: false
 
 permissions:
@@ -109,12 +109,14 @@ jobs:
           [ -s /tmp/done.txt ]
 
       - name: Record as rendered
-        if: steps.pick.outputs.ids != '' && github.event.inputs.id == ''
+        if: steps.pick.outputs.ids != ''
         run: |
-          mkdir -p state
-          cat /tmp/done.txt >> state/quiz-rendered.txt
+          mkdir -p state; touch state/quiz-rendered.txt
+          # 同じ回を2回書かない（やり直しの回も記録して、次の朝に二重に書き出さないようにする）
+          for ID in $(cat /tmp/done.txt); do grep -qx "$ID" state/quiz-rendered.txt || echo "$ID" >> state/quiz-rendered.txt; done
           git config user.name "moshimo-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add state/quiz-rendered.txt
+          git diff --cached --quiet && exit 0
           git commit -m "quiz rendered $(tr '\n' ' ' < /tmp/done.txt)"
           for i in 1 2 3; do git pull --rebase -q && git push && break; sleep 5; done

@@ -13,7 +13,7 @@
    - 柱の候補が足りないときは、STRATEGY.md の柱シリーズの型で新しいお題を blueprint の末尾に足してから作ってよい（no は 701 以降の空き番号。series と slot を付ける。plan/RULES.md の書式に合わせる）
 3. 1本ごとに、下の手順で `engine/videos/NNNN.js` を作る（NNNN は blueprint の `no` を4桁にしたもの。例 no 2 → 0002、no 701 → 0701。その番号のファイルがもうあるときは 05xx・08xx など空いている番号にして blueprint の made にその番号を書く）
 4. できた番号を `plan/queue.txt` に入れ、blueprint の該当行に `"made": "NNNN"` を付ける。入れる場所：まだ書き出していない在庫の並びが 柱・（派生か挑戦）・柱 のくり返しになるように差し込む（12:00 と 20:30 が柱、18:00 が派生・挑戦になる）。同じ series が2本続かないようにする。並びがすでにそうなっているときは末尾でよい
-5. commit して `main` に push する（GitHub Actions が毎朝7時台に queue の順に書き出す）
+5. commit して `main` に push する（毎朝6時台の朝の仕事（ops/OPS.md）が queue の順に書き出す）
 
 作れないお題（必要な絵が今のエンジンでは無理、確かな数字が見つからない など）は飛ばして、blueprint の行に `"skip": "理由"` を付けて次へ進む。
 

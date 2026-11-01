@@ -1,0 +1,39 @@
+# いつわ劇場 自動制作の手順（定期タスクの 動画制作 から呼ぶ）
+
+いつわ劇場は1話3分・全5話のショートドラマのアカウント（インスタ・YouTubeショート・TikTok @itsuwa_drama）。投稿は1日1話20:00。出来上がった話を投稿サーバーに送ると、いつわ劇場の LINE に承認カードが届き、ゆうとが承認すると予約される（TikTok はアプリの下書きに届く）。
+作り方の仕組みそのものは drama/README.md。このファイルは、それを毎日自動で回すための決めごと。
+
+## 1. 在庫を数える（作るかどうか）
+1. moshimo-analytics で `node tools/run.mjs collect --account=itsuwa` を実行し、data/itsuwa/state.json の items で status が published 以外（承認待ち・承認済み・予約済み）の話を数える。これが在庫。
+2. ITSUWA_AN が未設定で collect が落ちるときは、代わりに drama-out ブランチの posts/ の話数と、いつわ劇場の投稿（1日1話）の進みから見積もる。分からなければ1話作る（1日1話のペースなので作りすぎにはならない）。
+3. 在庫が5話以上なら何もしない。作るのは1回のタスクで1話まで（ドラマの声は1日の上限があるため。GEMINI_API_KEY_DRAMA）。
+
+## 2. どの話を作るか
+- 作品ごとの進み：drama/episodes/<作品>/ の台本（epNN.script.js）、drama-tts ブランチの tts/<作品>_epNN、drama-out ブランチの posts/<番号>（送った話）で見る。番号は captions.js の ID_BASE＋話数。
+- 今の作品は 二人の息子（futari、番号 3001〜3005）。第1話は台本・映像・声（tts/futari_ep01）まであって、まだ投稿サーバーに送っていない。まず第1話を書き出して確認し、送る。第2話から第5話は台本から作る（第1話の台本・captions.js の あらすじと、作品の共通部品 common.js を読み、話をつなげる）。
+- 作品の5話が全部送れたら、次の作品を作る（下の 新作の決め方）。
+
+## 3. 新作の決め方
+ゆうとが決めたこと（必ず守る）：
+- ジャンルはサスペンス・ミステリー（ファンがつくまでは広げない）。参考の動画やほかの作品の映像・話を真似しない。完全オリジナル。実在の人物・団体・事件は使わない。
+- 視聴者が気になる身近な話題を扱う。ただし注意喚起の動画に見えると離脱されるので、啓発や説明にしない。
+- 冒頭は宣言や前置きではなく、衝撃の瞬間をそのまま見せる。わかる・不思議・怖い・不安・ハラハラを同時に感じさせる。切れ端の映像をつなぐだけの冒頭はいらない。
+- 毎話に大きなどんでん返しを3つ。1つの場面は20〜30秒で、一度に1つのことを見せる。テンポは良く、でも早口や端折りはしない。何を伝えたい話かが伝わるように、話の筋を1本通す。
+- 毎話のラストは、韓国・海外ドラマのように続きがむちゃくちゃ気になる場面で切る。最終話は次の作品も見たくなる終わり方にする。
+- セリフは標準語（関西弁は声の撮り直しが多くなるので使わない）。1話は178.5秒以内。
+- 声はナレーター＋登場人物ごとに別の声。
+新作は最初に drama/episodes/<新作>/STORY.md に、登場人物（名前・年齢・人物・声）、全5話の構成（話・タイトル・主な出来事・3つのどんでん返し・ラストの引き）、映像のテイスト（色・人物・演出）を書いて commit する。そのあと第1話から作る。新作を始めた日は、朝の日報（いつわ劇場の LINE）で作品名とあらすじを2〜3行で知らせる。
+
+## 4. 1話の作り方（drama/README.md の手順どおり）
+1. 台本 epNN.script.js と映像 epNN.shots.js、captions.js のその話のキャプションを書く。キャプションの1行目は 全5話｜作品名 第N話 タイトル。最後の仕掛けがわかる言葉は書かない。見本は white・kakusan の各話。
+2. 声：`gh api -X POST repos/oishi-thomaz/moshimo-lab/actions/workflows/drama-tts.yml/dispatches -f ref=main -f 'inputs[script]=drama/episodes/<作品>/epNN.script.js' -f 'inputs[name]=<作品>_epNN'`。終わるまで待つ。1日の上限で途中までしかできなかったときは、そこで止めて次の回に続ける（作れた分はキャッシュに残る）。前の話の声を使う行は drama/tools/reuse.mjs。
+3. 声の確認：全行を文字起こし（`pip install --break-system-packages faster-whisper` のあと `python3 drama/tools/wcheck.py tts/<作品>_epNN out/drama/<作品>_epNN.whisper.json '<登場人物の名前を並べた一文>'`）して、台本と読みが違う行は read で読みを直して撮り直す。
+4. 書き出し：`bash drama/tools/build.sh <作品>/epNN tts/<作品>_epNN out/drama/<作品>_epNN`。178.5秒を超えたら、声を最大1.08倍まで速める・間を詰める・台本を削るの順で直す。
+5. 静止画を15枚以上書き出して全部自分の目で見る（`node drama/tools/render.mjs --ep <作品>/epNN --tts tts/<作品>_epNN/index.json --stills shots --outdir out/drama/stills`）。人物の顔が字幕（y=1262）にかぶっていないか、文字の切れ・暗すぎ・崩れがないか。表紙（out/drama/<作品>_epNN_cover.jpg）にタイトルと第◯話が大きく出ているか。直して120点の状態にする。
+6. 台本・映像・キャプションを main に commit・push（最後に Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>）。
+7. 送る：`bash drama/publish/send.sh <作品> <話数>`。いつわ劇場の LINE に承認カードが届く。
+
+## 5. 守ること
+- 投稿・承認そのものはしない（承認カードを出すところまで）。投稿済みの話は変えない。
+- もしもラボ・タイトル当てクイズのファイル（engine/videos/、plan/queue.txt、plan/quiz-queue.txt、state/）には触らない。
+- ゆうとの発言を創作しない。歌詞は使わない。
