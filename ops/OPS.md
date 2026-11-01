@@ -92,7 +92,7 @@
 TikTok はインスタと同じ時間に出す（2026/11/1 ゆうとの決定）。承認された回を、そのインスタの投稿時間で予約する。両方のアカウントとも、予約する回がなければブラウザを開かずに すぐ終わる。
 1. 両方のリポジトリを用意する。
 2. もしもラボ：moshimo-analytics の TIKTOK.md を最後まで読んで完全に従う（notes/tiktok-schedule.md・notes/tiktok-crp.md も）。Chrome（Claude in Chrome）を使う。Chrome の操作の前に chrome-browser のスキルを読む。
-3. クイズ：docs/QUIZ-TIKTOK.md を最後まで読んで完全に従う（state/quiz-tiktok.md も）。Claude アプリのブラウザ（built-in browser、mcp__remote-devices__Claude_Browser__*）を使う。操作の前に built-in-browser のスキルを読む。Chrome は絶対に使わない（Chrome は @moshimo__lab でログインしているので、取り違えるとクイズの動画がもしもラボに出てしまう）。
+3. クイズ：（2026/11/2 から停止中。docs/QUIZ-TIKTOK.md の先頭を見る）docs/QUIZ-TIKTOK.md を最後まで読んで完全に従う（state/quiz-tiktok.md も）。Claude アプリのブラウザ（built-in browser、mcp__remote-devices__Claude_Browser__*）を使う。操作の前に built-in-browser のスキルを読む。Chrome は絶対に使わない（Chrome は @moshimo__lab でログインしているので、取り違えるとクイズの動画がもしもラボに出てしまう）。
 4. いつわ劇場：やることはない（投稿サーバーが TikTok の下書きに送っている）。
 5. 片方につながらないときは、そちらは つながらなかった とだけ書いて、もう片方は続ける。
 6. TikTok のアカウント設定は変えない（ビジネスアカウントへの切り替えは絶対にしない）。ログインやパスワードの入力はしない。公開済みの投稿は消さない・変えない。
