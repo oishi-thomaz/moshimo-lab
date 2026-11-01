@@ -19,6 +19,8 @@ jobs:
       - name: Status
         run: |
           [ -n "$BASE" ] && [ -n "$KEY" ] || { echo "QUIZ_BASE_URL / QUIZ_AN が未設定"; exit 1; }
+          # LINE の返事をURLごと登録しても動くよう、最後の語（キー）だけ使う
+          KEY=$(printf '%s' "$KEY" | tr -s '[:space:]' '\n' | grep -v '^$' | tail -1); echo "::add-mask::$KEY"
           curl -fsS -m 30 -H "X-An-Key: $KEY" "$BASE/an/export?hours=24" -o /tmp/ex.json
           node -e "
             const ex = require('/tmp/ex.json'); const rows = Object.entries(ex.items || {}).sort((a, b) => a[0].localeCompare(b[0]));
