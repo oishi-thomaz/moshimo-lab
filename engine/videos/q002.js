@@ -226,7 +226,7 @@ runStory({
   shots: SHOTS, subs: SUBS, duration: 64,
   dim: (f) => f === shotCell || f === shotWard,
   meta: {
-    id: 'q002', v2: true,
+    id: 'q002', v2: true, answer: 'シャッター アイランド',
     title: 'この映画のタイトルは？',
     titleHtml: 'この映画の<br>タイトルは？',
     mood: 'mystery', seed: 202,

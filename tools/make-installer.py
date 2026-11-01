@@ -125,3 +125,73 @@ echo "YouTube のリダイレクトURI: $BASE/yt/callback"
 '''
 (root / 'server/install-itsuwa.sh').write_text(iscript)
 print('wrote server/install-itsuwa.sh', len(iscript))
+
+
+# タイトル当てクイズ用（もしもラボ・いつわ劇場のサーバーには触らない。同じプログラムを /opt/quiz に置いて、別のサービス・別のURLで動かす）
+qservice = (root / 'server/quiz.service').read_text()
+qenv = (root / 'server/quiz.env.example').read_text()
+qscript = f"""#!/usr/bin/env bash
+# タイトル当てクイズ 投稿サーバーのインストール（ConoHa VPS で sudo bash install-quiz.sh）
+# もしもラボ（moshimo）・いつわ劇場（itsuwa）のサーバーには触らない。何度実行しても大丈夫。/etc/quiz.env が既にあれば上書きしない。
+set -euo pipefail
+if [ "$(id -u)" != 0 ]; then echo "sudo bash install-quiz.sh で実行して"; exit 1; fi
+NODE_BIN=$(command -v node || true)
+if [ -z "$NODE_BIN" ]; then echo "Node.js がない。先にもしもラボの install.sh を実行して"; exit 1; fi
+
+mkdir -p /opt/quiz
+cat > /opt/quiz/server.mjs <<'MOSHIMO_EOF'
+{server}MOSHIMO_EOF
+
+cat > /etc/systemd/system/quiz.service <<'MOSHIMO_EOF'
+{qservice}MOSHIMO_EOF
+sed -i "s#/usr/bin/node#$NODE_BIN#" /etc/systemd/system/quiz.service
+
+if [ ! -f /etc/quiz.env ]; then
+cat > /etc/quiz.env <<'MOSHIMO_EOF'
+{qenv}MOSHIMO_EOF
+  SECRET="$(head -c 32 /dev/urandom | base64 | tr -dc 'A-Za-z0-9' | head -c 40)"
+  sed -i "s#^HOOK_SECRET=.*#HOOK_SECRET=$SECRET#" /etc/quiz.env
+  # もしもラボと同じドメインを使う
+  MB=$(grep -E '^BASE_URL=' /etc/moshimo.env 2>/dev/null | head -1 | cut -d= -f2- || true)
+  if [ -n "$MB" ]; then sed -i "s#^BASE_URL=.*#BASE_URL=${{MB%/moshimo}}/quiz#" /etc/quiz.env; fi
+  chmod 600 /etc/quiz.env
+fi
+
+# nginx：もしもラボの location /moshimo/ がある設定ファイルに、location /quiz/ を1回だけ足す（失敗したら元に戻す）
+CONF=$(grep -l "location /moshimo/" /etc/nginx/sites-enabled/* /etc/nginx/conf.d/*.conf 2>/dev/null | head -1 || true)
+if [ -n "$CONF" ] && ! grep -q "location /quiz/" "$CONF"; then
+  CONF=$(readlink -f "$CONF"); BK="/root/$(basename "$CONF").bak-quiz-$(date +%Y%m%d%H%M%S)"; cp "$CONF" "$BK"
+  python3 - "$CONF" <<'PY'
+import sys
+p = sys.argv[1]; s = open(p).read()
+block = \"\"\"    location /quiz/ {{
+        proxy_pass http://127.0.0.1:8789;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        client_max_body_size 300m;
+        proxy_request_buffering off;
+        proxy_read_timeout 300s;
+    }}
+
+\"\"\"
+i = s.index("location /moshimo/"); i = s.rfind("\\n", 0, i) + 1
+open(p, "w").write(s[:i] + block + s[i:])
+PY
+  if nginx -t 2>/dev/null; then systemctl reload nginx; echo "nginx に /quiz/ を追加した（バックアップ：$BK）"; else cp "$BK" "$CONF"; echo "nginx の設定チェックに失敗したので元に戻した。Claude に伝えて"; fi
+fi
+
+systemctl daemon-reload
+systemctl enable --now quiz
+systemctl restart quiz
+sleep 1
+curl -fsS http://127.0.0.1:8789/quiz/health && echo && echo "タイトル当てクイズのサーバーは動いてる"
+BASE=$(grep -E '^BASE_URL=' /etc/quiz.env | cut -d= -f2-)
+echo
+echo "=== 控えておくもの ==="
+echo "HOOK_SECRET（GitHub の QUIZ_SECRET）: $(grep -E '^HOOK_SECRET=' /etc/quiz.env | cut -d= -f2-)"
+echo "QUIZ_BASE_URL: $BASE"
+echo "LINE の Webhook URL: $BASE/line/webhook"
+"""
+(root / 'server/install-quiz.sh').write_text(qscript)
+print('wrote server/install-quiz.sh', len(qscript))

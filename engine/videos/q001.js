@@ -235,7 +235,7 @@ runStory({
   shots: SHOTS, subs: SUBS, duration: 64,
   dim: (f) => f === shotFake || f === shotDocs,
   meta: {
-    id: 'q001', v2: true,
+    id: 'q001', v2: true, answer: '地面師たち',
     title: 'このドラマのタイトルは？',
     titleHtml: 'このドラマの<br>タイトルは？',
     mood: 'tension', seed: 101,

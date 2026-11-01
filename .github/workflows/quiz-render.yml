@@ -1,0 +1,120 @@
+name: quiz-render
+
+# タイトル当てクイズ：在庫（plan/quiz-queue.txt）の次の回を書き出して、タイトル当てクイズの投稿サーバーに送り、LINE で承認を待つ
+# もしもラボ（daily-render）・いつわ劇場とは別。毎朝 Claude の定期タスクが手動実行する（GitHub の cron は動かなかったので使わない）
+# 投稿サーバーの番号は 5000＋回の番号（q001 → 5001）。サーバーは4桁の番号しか受け付けないため
+on:
+  workflow_dispatch:
+    inputs:
+      count:
+        description: '書き出す本数（在庫の順に）'
+        required: false
+        default: '5'
+      id:
+        description: '回を指定するとき（例 q004。在庫の記録はしない）'
+        required: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: quiz-render
+  cancel-in-progress: false
+
+jobs:
+  render:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 240
+    env:
+      BASE: ${{ secrets.QUIZ_BASE_URL }}
+      SECRET: ${{ secrets.QUIZ_SECRET }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Check secrets
+        run: '[ -n "$BASE" ] && [ -n "$SECRET" ] || { echo "QUIZ_BASE_URL / QUIZ_SECRET が未設定"; exit 1; }'
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: System packages (ffmpeg, Japanese fonts)
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg fonts-noto-cjk
+          pip install --quiet numpy scipy
+
+      - name: Node packages
+        run: npm ci --no-audit --no-fund
+
+      - name: Pick videos
+        id: pick
+        run: |
+          IDS="${{ github.event.inputs.id }}"
+          [ -z "$IDS" ] && IDS=$(node tools/quiz-next.mjs "${{ github.event.inputs.count || '5' }}")
+          [ -z "${{ github.event.inputs.id }}" ] || node tools/quiz-next.mjs 1 >/dev/null
+          echo "ids=$IDS" >> "$GITHUB_OUTPUT"
+          echo "left=$(cat /tmp/quiz_left 2>/dev/null || echo 0)" >> "$GITHUB_OUTPUT"
+          echo "videos: ${IDS:-none}"
+
+      - name: Queue empty notice
+        if: steps.pick.outputs.ids == ''
+        run: |
+          curl -fsS -X POST "$BASE/hook/notice" -H "X-Moshimo-Secret: $SECRET" -H 'content-type: application/json' \
+            -d '{"message":"クイズのストックが切れた。次の回ができるまで投稿は止まる。"}'
+
+      - name: Narration cache
+        if: steps.pick.outputs.ids != ''
+        uses: actions/cache@v4
+        with:
+          path: cache/narr
+          key: narr-quiz-${{ github.run_id }}
+          restore-keys: narr-
+
+      - name: Build, upload and ask for approval
+        if: steps.pick.outputs.ids != ''
+        env:
+          CHROME_PATH: /usr/bin/google-chrome
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          : > /tmp/done.txt
+          for ID in ${{ steps.pick.outputs.ids }}; do
+            N=$((5000 + 10#${ID#q}))
+            # 一時的な失敗（ブラウザ・声のAPI）は1回だけやり直す
+            if ! bash tools/build.sh "$ID" > /tmp/build.log 2>&1; then
+              echo "::warning::$ID の1回目の書き出しに失敗。30秒待ってやり直す"; tail -20 /tmp/build.log; sleep 30
+              if ! bash tools/build.sh "$ID" > /tmp/build.log 2>&1; then
+                tail -40 /tmp/build.log
+                curl -fsS -X POST "$BASE/hook/notice" -H "X-Moshimo-Secret: $SECRET" -H 'content-type: application/json' \
+                  -d "{\"message\":\"クイズ $ID の書き出しに失敗した。ほかの回は続ける。\"}" || true
+                continue
+              fi
+            fi
+            # LINE のカードで見分けられるよう、タイトルに答えを足す（インスタのキャプションは caption を使うので見る人には出ない）
+            node -e "const fs=require('fs');const f='out/$ID.json';const m=JSON.parse(fs.readFileSync(f,'utf8'));m.id='$N';m.quizId='$ID';if(m.answer)m.title=m.answer+'｜'+m.title;fs.writeFileSync('out/$N.json',JSON.stringify(m,null,2))"
+            cp "out/$ID.mp4" "out/$N.mp4"; cp "out/${ID}_cover.jpg" "out/${N}_cover.jpg"
+            for f in "$N.mp4" "$N.json" "${N}_cover.jpg"; do
+              curl -fsS --retry 3 -T "out/$f" -H "X-Moshimo-Secret: $SECRET" "$BASE/upload/$f"; echo
+            done
+            curl -fsS -X POST "$BASE/hook/new" -H "X-Moshimo-Secret: $SECRET" -H 'content-type: application/json' -d "{\"id\":\"$N\"}"; echo
+            echo "$ID" >> /tmp/done.txt
+          done
+          if [ -z "${{ github.event.inputs.id }}" ] && [ "${{ steps.pick.outputs.left }}" -le 10 ]; then
+            curl -fsS -X POST "$BASE/hook/notice" -H "X-Moshimo-Secret: $SECRET" -H 'content-type: application/json' \
+              -d "{\"message\":\"クイズのストックが残り${{ steps.pick.outputs.left }}本。\"}" || true
+          fi
+          [ -s /tmp/done.txt ]
+
+      - name: Record as rendered
+        if: steps.pick.outputs.ids != '' && github.event.inputs.id == ''
+        run: |
+          mkdir -p state
+          cat /tmp/done.txt >> state/quiz-rendered.txt
+          git config user.name "moshimo-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add state/quiz-rendered.txt
+          git commit -m "quiz rendered $(tr '\n' ' ' < /tmp/done.txt)"
+          for i in 1 2 3; do git pull --rebase -q && git push && break; sleep 5; done

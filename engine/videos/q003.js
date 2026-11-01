@@ -233,7 +233,7 @@ runStory({
   shots: SHOTS, subs: SUBS, duration: 64,
   dim: (f) => f === shotDen || f === shotPress || f === shotCrew,
   meta: {
-    id: 'q003', v2: true,
+    id: 'q003', v2: true, answer: 'ペーパー・ハウス',
     title: 'このドラマのタイトルは？',
     titleHtml: 'このドラマの<br>タイトルは？',
     mood: 'tension', seed: 303,
