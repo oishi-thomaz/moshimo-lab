@@ -25,18 +25,16 @@ TikTok Studio のページは決まった配信元からしか動画を読み込
 3. 説明は投稿サーバーの json：`curl -fsS https://133-88-122-181.sslip.io/quiz/media/5001.json`（answer・title・caption・hashtags）。
 
 ## 3. 予約する（1本ずつ）
-1. https://www.tiktok.com/tiktokstudio/upload を開き直す（navigate）。javascript_tool で次を実行して動画を入れる（URL は QUIZ_CDN の行のもの）：
+1. https://www.tiktok.com/tiktokstudio/upload を開き直す（navigate）。javascript_tool で次を実行して動画を入れる（URL は QUIZ_CDN の行のもの）。javascript_tool は45秒で切れるので、入れるのと待つのは分ける：
    ```js
-   const url = 'https://res.cloudinary.com/.../quiz/5001.mp4';
-   const blob = await (await fetch(url)).blob();
-   const file = new File([blob], '5001.mp4', { type: 'video/mp4' });
-   const inp = document.querySelector('input[type=file]');
-   const dt = new DataTransfer(); dt.items.add(file); inp.files = dt.files;
-   inp.dispatchEvent(new Event('change', { bubbles: true }));
-   await new Promise(r => setTimeout(r, 15000));
-   ({ size: blob.size, text: document.body.innerText.slice(0, 300) })
+   let inp = null;
+   for (let i = 0; i < 20 && !inp; i++) { inp = document.querySelector('input[type=file]'); if (!inp) await new Promise(r => setTimeout(r, 500)); }
+   const blob = await (await fetch('https://res.cloudinary.com/j7knfiev/video/upload/v.../quiz/5001.mp4')).blob();
+   const dt = new DataTransfer(); dt.items.add(new File([blob], '5001.mp4', { type: 'video/mp4' }));
+   inp.files = dt.files; inp.dispatchEvent(new Event('change', { bubbles: true }));
+   blob.size
    ```
-   input[type=file] が見つからないときは数秒待ってからもう一度。アップロード完了 の表示が出るまで待つ（get_page_text で確認）。
+   返ってきた大きさが QUIZ_CDN の動画と同じくらい（17MB前後）か確かめる。そのあと get_page_text を10秒おきくらいに読み、アップロード完了 が出るまで待つ（17MBで1〜3分）。input[type=file] が見つからないときは数秒待ってからもう一度。新しい編集機能 などのお知らせは OK で閉じる。
 2. 説明欄をクリック → cmd+a → Delete → キャプションを打つ（computer の type。改行は key Return）。最初はファイル名が入っているので必ず消す。打ち終わったら zoom で全文を確認する。
 3. キャプションの形（答えは絶対に書かない）：
    1行目：json の title（このドラマのタイトルは？ など）＋🎬
