@@ -13,15 +13,15 @@ TikTok は個人では公式の投稿APIが使えないので、ゆうとの Mac
 - アカウントは個人アカウントのまま。ビジネスアカウントへの切り替えや設定の変更はしない。途中のお知らせは閉じる。コンテンツの自動チェックをオンにするかの確認はキャンセルする。
 
 ## 1. 候補を決める（二重投稿させないのが最優先）
-1. `gh workflow run quiz-status.yml -R oishi-thomaz/moshimo-lab` を実行し、終わったらログの QUIZ_STATUS_BEGIN〜END を読む（番号・状態・タイトル・投稿予定・投稿日時・インスタのURL）。状態が published の回（インスタに出た回）が候補。
+1. `gh api -X POST repos/oishi-thomaz/moshimo-lab/actions/workflows/quiz-status.yml/dispatches -f ref=main` で実行し（gh workflow run はこの環境では使えない）、`gh api "repos/oishi-thomaz/moshimo-lab/actions/workflows/quiz-status.yml/runs?per_page=1"` で終わったのを確かめてから、ジョブのログ（`gh api repos/oishi-thomaz/moshimo-lab/actions/runs/<run id>/jobs` で job id → `gh api repos/oishi-thomaz/moshimo-lab/actions/jobs/<job id>/logs`）の QUIZ_STATUS_BEGIN〜END を読む（番号・状態・タイトル・投稿予定・投稿日時・インスタのURL）。状態が published の回（インスタに出た回）が候補。
 2. state/quiz-tiktok.md に載っている回（予約済み・公開済み・手動）を外す。
 3. TikTok Studio の投稿一覧（https://www.tiktok.com/tiktokstudio/content）を get_page_text で読み、キャプション1行目に同じ作品の手がかりがある投稿があれば外す。
 4. 1日5本まで、枠は 12:30・15:30・18:30・20:30・22:30（日本時間）。すでに予約が入っている枠には入れない。10日先まで埋まっていたら何もしない。インスタに出た順に入れる。
 
 ## 2. 動画を Cloudinary に置く
 TikTok Studio のページは決まった配信元からしか動画を読み込めない（投稿サーバーの sslip.io は読み込めない）。なので候補の動画をワークフローで Cloudinary（res.cloudinary.com）にも置く。
-1. `gh workflow run quiz-cdn.yml -R oishi-thomaz/moshimo-lab -f ids="5001 5002"`（候補の番号をスペース区切りで）。
-2. 終わったらログの `QUIZ_CDN 番号 URL` の行を読む。NG の回はこの日は予約しない。CLOUDINARY_URL 未設定で落ちたときは、予約せずその旨だけ報告して終わる。
+1. `gh api -X POST repos/oishi-thomaz/moshimo-lab/actions/workflows/quiz-cdn.yml/dispatches -f ref=main -f 'inputs[ids]=5001 5002'`（候補の番号をスペース区切りで）。
+2. 終わったら（状態の見方とログの取り方は 1. と同じ）ログの `QUIZ_CDN 番号 URL` の行を読む。NG の回はこの日は予約しない。CLOUDINARY_URL 未設定で落ちたときは、予約せずその旨だけ報告して終わる。
 3. 説明は投稿サーバーの json：`curl -fsS https://133-88-122-181.sslip.io/quiz/media/5001.json`（answer・title・caption・hashtags）。
 
 ## 3. 予約する（1本ずつ）

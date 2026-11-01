@@ -34,7 +34,10 @@ jobs:
           # CLOUDINARY_URL は cloudinary://APIキー:APIシークレット@クラウド名
           REST="${CLD#cloudinary://}"; KEY="${REST%%:*}"; REST="${REST#*:}"; SEC="${REST%%@*}"; CLOUD="${REST#*@}"
           [ -n "$KEY" ] && [ -n "$SEC" ] && [ -n "$CLOUD" ] || { echo "CLOUDINARY_URL の形が違う"; exit 1; }
+          SEC=$(printf '%s' "$SEC" | tr -d '[:space:]')
           echo "::add-mask::$SEC"
+          # シークレットの中身は出さず、長さと使える文字だけかを出す（Cloudinary のシークレットは英数字と - _ で27文字くらい）
+          echo "secret: ${#SEC}文字 $(printf '%s' "$SEC" | grep -qE '^[A-Za-z0-9_-]+$' && echo 英数字のみ || echo 英数字以外を含む)"
           FAIL=0
           for N in ${{ github.event.inputs.ids }}; do
             case "$N" in ''|*[!0-9]*) echo "番号が数字じゃない: $N"; FAIL=1; continue;; esac
