@@ -1,0 +1,29 @@
+name: quiz-status
+
+# タイトル当てクイズ：投稿サーバーの各回の状態（承認待ち・承認済み・投稿済み）をログに出す。TikTok の予約係（Claude の定期タスク）が、インスタに出た回を知るために使う
+# QUIZ_AN は LINE（タイトル当てクイズ通知）で 解析設定 と送ると届く合言葉
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  status:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    env:
+      BASE: ${{ secrets.QUIZ_BASE_URL }}
+      KEY: ${{ secrets.QUIZ_AN }}
+    steps:
+      - name: Status
+        run: |
+          [ -n "$BASE" ] && [ -n "$KEY" ] || { echo "QUIZ_BASE_URL / QUIZ_AN が未設定"; exit 1; }
+          curl -fsS -m 30 -H "X-An-Key: $KEY" "$BASE/an/export?hours=24" -o /tmp/ex.json
+          node -e "
+            const ex = require('/tmp/ex.json'); const rows = Object.entries(ex.items || {}).sort((a, b) => a[0].localeCompare(b[0]));
+            const t = x => x ? new Date(x).toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' }) : '';
+            console.log('QUIZ_STATUS_BEGIN');
+            for (const [id, i] of rows) console.log([id, i.status, i.title, t(i.publishAt), t(i.publishedAt), i.permalink].join('\t'));
+            console.log('QUIZ_STATUS_END');
+          "
