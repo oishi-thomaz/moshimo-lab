@@ -78,7 +78,8 @@ jobs:
         if: steps.pick.outputs.ids != ''
         env:
           CHROME_PATH: /usr/bin/google-chrome
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          # クイズ専用のキーがあればそれを使う（もしもラボと声の1日の上限を分ける。上限はキーを作った Google Cloud プロジェクトごと）
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY_QUIZ || secrets.GEMINI_API_KEY }}
         run: |
           : > /tmp/done.txt
           for ID in ${{ steps.pick.outputs.ids }}; do

@@ -4,7 +4,7 @@
 // 読む文：冒頭のタイトル（0.2秒〜）＋ 字幕（META.subs）を字幕の出る時刻から。
 // 1行ずつ声を作り、字幕の時間に収まらないときは少し速める（最大1.35倍）。前の行と重なりそうなら後ろへずらす。
 // 読み方の調整：下の READ（全動画共通）と META.narr（{ 字幕の文字: 読む文字 }、動画ごと）。（）の中は読まない。
-// GEMINI_API_KEY が無いときは何もせず終了コード 2（build.sh はナレーションなしで続ける）。
+// GEMINI_API_KEY が無いときは何もせず終了コード 2（build.sh はナレーションなしで続ける）。1日の上限で作れないときは終了コード 3（build.sh も失敗する）。
 // MOCK_TTS=1 のときはAPIを呼ばず、文字数に合わせた長さのダミー音で作る（つなぎ方の確認用）。
 import fs from 'node:fs';
 import path from 'node:path';
@@ -138,7 +138,8 @@ for (;;) {
     if (!isDaily(e)) throw e;
     console.log(`narrate: 1日の上限エラー（${MODEL}）: ${String(e.message).slice(0, 400)}`);
     const next = FALLBACK.shift();
-    if (!next || MOCK) { console.log('narrate: 今日の上限に達したのでナレーションなしで作る'); process.exit(2); }
+    // 声なしの動画が投稿されないよう、書き出しごと失敗させる（終了コード 3）。上限が戻ったら同じ番号でやり直す
+    if (!next || MOCK) { console.log('narrate: 今日の上限に達した。声なしでは作らずに止める'); process.exit(3); }
     console.log(`narrate: ${MODEL} が今日の上限。${next} で作り直す`); MODEL = next;
   }
 }
