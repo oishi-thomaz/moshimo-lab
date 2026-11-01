@@ -303,8 +303,8 @@ function reserve(msg) {
   if (it.status === 'published') return `${id} はもう投稿済み`;
   const j = new Date(Date.now() + JST); const day0 = Date.UTC(j.getUTCFullYear(), j.getUTCMonth(), j.getUTCDate()) - JST;
   const [hh, mm] = hm.split(':').map(Number); let t = day0 + (hh * 60 + mm) * 60e3; if (t < Date.now() + 60e3) t += 86400e3;
-  it.status = 'approved'; it.publishAt = t; save();
-  return `OK。${id} は ${fmt(t)} に投稿する`;
+  it.status = 'approved'; it.publishAt = t; it.ttNow = true; save(); // 2026/11/01 ゆうと：予約はインスタ・YouTube・TikTok（下書き）全部同じ時間で
+  return `OK。${id} は ${fmt(t)} に投稿する（インスタ・YouTube・TikTokの下書き、全部この時間）`;
 }
 // 「インスタトークン 〜」：解析の権限を足して作り直したトークンに差し替える
 async function setIgToken(msg) {

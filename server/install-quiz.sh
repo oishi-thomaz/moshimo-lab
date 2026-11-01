@@ -303,8 +303,8 @@ function reserve(msg) {
   if (it.status === 'published') return `${id} はもう投稿済み`;
   const j = new Date(Date.now() + JST); const day0 = Date.UTC(j.getUTCFullYear(), j.getUTCMonth(), j.getUTCDate()) - JST;
   const [hh, mm] = hm.split(':').map(Number); let t = day0 + (hh * 60 + mm) * 60e3; if (t < Date.now() + 60e3) t += 86400e3;
-  it.status = 'approved'; it.publishAt = t; save();
-  return `OK。${id} は ${fmt(t)} に投稿する`;
+  it.status = 'approved'; it.publishAt = t; it.ttNow = true; save(); // 2026/11/01 ゆうと：予約はインスタ・YouTube・TikTok（下書き）全部同じ時間で
+  return `OK。${id} は ${fmt(t)} に投稿する（インスタ・YouTube・TikTokの下書き、全部この時間）`;
 }
 // 「インスタトークン 〜」：解析の権限を足して作り直したトークンに差し替える
 async function setIgToken(msg) {
@@ -1193,8 +1193,8 @@ IG_TOKEN=
 POST_TIMES=12:00,15:00,18:00,20:00,22:00
 # 承認待ちが残ってたら再通知する時刻（日本時間）
 REMIND_TIMES=10:30,14:30,19:30
-# 動画が届いたらすぐ承認カードを送る（朝の書き出しが終わった順に届く）
-APPROVAL_NOW=1
+# 0：承認カードは1本ずつ送らず、朝8:00の日報と同じ1通にカルーセルでまとめる（LINE無料プランの月200通を節約。2026/11/1 ゆうとの決定）
+APPROVAL_NOW=0
 # TikTok は Mac の Chrome で予約投稿する（このサーバーからは送らない）。解析で使うユーザー名
 TT_USERNAME=title_ate_quiz
 MOSHIMO_EOF
