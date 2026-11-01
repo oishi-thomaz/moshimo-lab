@@ -21,12 +21,11 @@ function tree(x, z, s = 1, c = '#2f5a34') { const g = new THREE.Group(); const t
 // パラグライダー（白いキャノピー＋ひも＋人）
 function glider() {
   const g = new THREE.Group();
-  const canopy = new THREE.Mesh(new THREE.CylinderGeometry(2.4, 2.4, 1.0, 24, 1, true, -Math.PI * 0.42, Math.PI * 0.84), new THREE.MeshLambertMaterial({ color: '#ffffff', side: THREE.DoubleSide }));
-  canopy.rotation.z = Math.PI / 2; canopy.rotation.y = Math.PI / 2; canopy.position.y = 3.2; g.add(canopy);
-  const stripe = new THREE.Mesh(new THREE.CylinderGeometry(2.42, 2.42, 0.22, 24, 1, true, -Math.PI * 0.42, Math.PI * 0.84), new THREE.MeshLambertMaterial({ color: '#e6b450', side: THREE.DoubleSide }));
-  stripe.rotation.copy(canopy.rotation); stripe.position.copy(canopy.position); g.add(stripe);
+  // キャノピー：正面から見て弓なりの翼（白に金の帯）
+  const W = new THREE.MeshLambertMaterial({ color: '#ffffff' }), Y = new THREE.MeshLambertMaterial({ color: '#e6b450' });
+  for (let i = -3; i <= 3; i++) { const an = i * 0.24; const seg = box(0.72, 0.1, 0.95, Math.abs(i) === 1 ? Y : W); seg.position.set(Math.sin(an) * 2.3, 1.2 + Math.cos(an) * 2.0, 0); seg.rotation.z = -an; seg.castShadow = true; g.add(seg); }
   const lm = new THREE.LineBasicMaterial({ color: '#dddddd' });
-  for (const s of [-1, -0.5, 0.5, 1]) { const geo = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(s * 2.0, 2.0, 0), new THREE.Vector3(0, 0.9 + 0.5, 0)]); g.add(new THREE.Line(geo, lm)); }
+  for (const i of [-3, -1.5, 1.5, 3]) { const an = i * 0.24; const geo = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(Math.sin(an) * 2.3, 1.2 + Math.cos(an) * 2.0 - 0.05, 0), new THREE.Vector3(0, 1.35, 0)]); g.add(new THREE.Line(geo, lm)); }
   const p = makePerson(HEIRESS); p.scale.setScalar(0.9); p.position.y = -0.2; p.userData.arms.forEach(a => { a.rotation.x = -2.6; }); g.add(p);
   g.userData.person = p;
   return g;
@@ -35,12 +34,12 @@ function glider() {
 // ---------- 1. 空と竜巻（x=0） ----------
 const SKY = new THREE.Group(); SKY.position.set(0, 0, 0); qs.add(SKY);
 for (let i = 0; i < 9; i++) { const m = new THREE.Mesh(new THREE.ConeGeometry(2.2 + R() * 1.6, 3 + R() * 2.5, 6), mat(['#6f8a5a', '#5d7a4c', '#7c946a'][i % 3])); m.position.set(-14 + i * 3.6, 1.2, -9 - R() * 4); SKY.add(m); }
-const TWIST = new THREE.Group(); TWIST.position.set(3.2, 0, -3); qs.add(TWIST);
+const TWIST = new THREE.Group(); TWIST.position.set(2.6, 0, -3.4); qs.add(TWIST);
 const DEBRIS = [];
-for (let k = 0; k < 7; k++) { const r = 0.5 + k * 0.42; const ring = new THREE.Mesh(new THREE.TorusGeometry(r, 0.14 + k * 0.02, 6, 28), new THREE.MeshLambertMaterial({ color: '#59606b', transparent: true, opacity: 0.55 })); ring.rotation.x = Math.PI / 2; ring.position.y = 0.6 + k * 0.95; TWIST.add(ring); }
+for (let k = 0; k < 7; k++) { const r = 0.5 + k * 0.42; const ring = new THREE.Mesh(new THREE.TorusGeometry(r, 0.14 + k * 0.02, 6, 28), new THREE.MeshLambertMaterial({ color: '#4a505a', transparent: true, opacity: 0.72 })); ring.rotation.x = Math.PI / 2; ring.position.y = 0.6 + k * 0.95; TWIST.add(ring); }
 for (let i = 0; i < 40; i++) { const d = box(0.12, 0.06, 0.12, mat(['#3d3f45', '#6a5a46', '#4a6a3a'][i % 3])); d.userData.a = R() * Math.PI * 2; d.userData.h = 0.4 + R() * 6.2; d.userData.r = 0.6 + d.userData.h * 0.36; TWIST.add(d); DEBRIS.push(d); }
-const G1 = glider(); G1.position.set(-1.2, 3.4, -1); qs.add(G1);
-const tStorm = tag('突然の竜巻', { size: 80, bg: '#e2483c' }); tStorm.position.set(1.4, 7.6, -2); qs.add(tStorm);
+const G1 = glider(); G1.position.set(-1.2, 2.6, -1); qs.add(G1);
+const tStorm = tag('突然の竜巻', { size: 80, bg: '#e2483c' }); tStorm.position.set(1.0, 6.4, -2); qs.add(tStorm);
 
 // ---------- 2. 森と境界線（x=22） ----------
 const FOREST = []; for (let i = 0; i < 16; i++) FOREST.push(tree(15.5 + (i % 8) * 1.9 + R() * 0.6, -3.5 - Math.floor(i / 8) * 2.2 - R() * 0.6, 0.9 + R() * 0.5));
@@ -58,9 +57,9 @@ for (let i = 0; i < 10; i++) tree(38 + (i % 5) * 2.6 + R(), -3.6 - Math.floor(i 
 const her3 = makePerson(HEIRESS); her3.position.set(43.2, 0, 0.2); her3.rotation.y = 0.7; her3.userData.arms.forEach(a => { a.rotation.x = -2.9; }); qs.add(her3);
 const off3 = makePerson(OFFICER); cap(off3); off3.position.set(45.0, 0, -0.4); off3.rotation.y = -1.1; off3.userData.arms[1].rotation.x = -1.4; qs.add(off3);
 const SOL3 = [[46.2, -1.4], [46.6, 0.4], [45.8, 1.2]].map(([x, z], i) => { const p = makePerson(SOLDIER(i)); cap(p, '#4a5538'); p.position.set(x, 0, z); p.rotation.y = -1.3; qs.add(p); return p; });
-const tOff = tag('北の軍の将校', { size: 76 }); tOff.position.set(45.0, 2.7, -0.4); qs.add(tOff);
-const tHard = tag('しかも堅物', { size: 76, bg: '#e2483c' }); tHard.position.set(45.0, 2.7, -0.4); qs.add(tHard);
-const tHer = tag('財閥令嬢', { size: 76, bg: '#e6b450', color: '#14161c' }); tHer.position.set(43.2, 2.7, 0.2); qs.add(tHer);
+const tOff = tag('北の軍の将校', { size: 76 }); tOff.position.set(44.6, 3.15, -0.2); qs.add(tOff);
+const tHard = tag('しかも堅物', { size: 76, bg: '#e2483c' }); tHard.position.set(44.6, 3.15, -0.2); qs.add(tHard);
+const tHer = tag('財閥令嬢', { size: 76, bg: '#e6b450', color: '#14161c' }); tHer.position.set(43.6, 2.55, 0.4); qs.add(tHer);
 
 // ---------- 4. 将校の家（x=66） ----------
 const HOUSE = new THREE.Group(); HOUSE.position.set(66, 0, -2.6); qs.add(HOUSE);
@@ -71,17 +70,17 @@ const HOUSE = new THREE.Group(); HOUSE.position.set(66, 0, -2.6); qs.add(HOUSE);
   const wood = box(1.4, 0.5, 0.6, mat('#7a5a3a')); wood.position.set(-2.2, 0.25, 2.2); HOUSE.add(wood); }
 const her4 = makePerson({ ...HEIRESS, shirt: '#b98a6a', pants: '#5a4a3a' }); her4.position.set(65.2, 0, 0.6); her4.rotation.y = 0.4; qs.add(her4);
 const off4 = makePerson(OFFICER); cap(off4); off4.position.set(67.2, 0, 0.4); off4.rotation.y = -0.5; qs.add(off4);
-const tHide = tag('身分を隠して同居', { size: 74, bg: '#e6b450', color: '#14161c' }); tHide.position.set(66.2, 4.6, -1); qs.add(tHide);
-const tHome = tag('帰る方法がない', { size: 74, bg: '#e2483c' }); tHome.position.set(66.2, 4.6, -1); qs.add(tHome);
+const tHide = tag('身分を隠して同居', { size: 74, bg: '#e6b450', color: '#14161c' }); tHide.position.set(66.2, 3.75, -0.6); qs.add(tHide);
+const tHome = tag('帰る方法がない', { size: 74, bg: '#e2483c' }); tHome.position.set(66.2, 3.75, -0.6); qs.add(tHome);
 
 // ---------- 5. 近所の奥さんたちと部下（x=88） ----------
 for (let i = 0; i < 3; i++) { const h = box(3.2, 1.9, 2.4, mat(['#e3dccb', '#d9d2c0', '#ebe4d3'][i])); h.position.set(82 + i * 6, 0.95, -5); qs.add(h); const rf = new THREE.Mesh(new THREE.ConeGeometry(2.5, 1.0, 4), mat('#5a4636')); rf.rotation.y = Math.PI / 4; rf.scale.set(1, 1, 0.7); rf.position.set(82 + i * 6, 2.4, -5); qs.add(rf); }
-const AUNTS = [[85.4, -0.8], [86.2, 0.2], [85.0, 0.9], [86.8, -1.2]].map(([x, z], i) => { const p = makePerson(AUNT(i)); p.position.set(x, 0, z); p.rotation.y = 0.9 + (R() - 0.5) * 0.5; qs.add(p); return p; });
-const SUBS4 = [[90.0, -0.6], [90.8, 0.4], [89.6, 1.0], [91.2, -1.2]].map(([x, z], i) => { const p = makePerson(SOLDIER(i + 1)); cap(p, '#4a5538'); p.position.set(x, 0, z); p.rotation.y = -0.9 + (R() - 0.5) * 0.4; qs.add(p); return p; });
+const AUNTS = [[86.2, -0.8], [86.9, 0.2], [85.9, 0.9], [87.3, -1.2]].map(([x, z], i) => { const p = makePerson(AUNT(i)); p.position.set(x, 0, z); p.rotation.y = 0.9 + (R() - 0.5) * 0.5; qs.add(p); return p; });
+const SUBS4 = [[89.2, -0.6], [89.9, 0.4], [88.9, 1.0], [90.2, -1.2]].map(([x, z], i) => { const p = makePerson(SOLDIER(i + 1)); cap(p, '#4a5538'); p.position.set(x, 0, z); p.rotation.y = -0.9 + (R() - 0.5) * 0.4; qs.add(p); return p; });
 const her5 = makePerson({ ...HEIRESS, shirt: '#b98a6a', pants: '#5a4a3a' }); her5.position.set(88, 0, -1.6); qs.add(her5);
-const tAunt = tag('近所の奥さんたち', { size: 70 }); tAunt.position.set(85.8, 2.75, 0); qs.add(tAunt);
-const tSub = tag('部下たち', { size: 70 }); tSub.position.set(90.4, 2.75, 0); qs.add(tSub);
-const tBare = tag('バレたら終わり', { size: 78, bg: '#e2483c' }); tBare.position.set(88, 4.4, -1.6); qs.add(tBare);
+const tAunt = tag('近所の奥さんたち', { size: 70 }); tAunt.position.set(86.7, 2.75, 0.2); qs.add(tAunt);
+const tSub = tag('部下たち', { size: 70 }); tSub.position.set(89.5, 2.4, 0.4); qs.add(tSub);
+const tBare = tag('バレたら終わり', { size: 78, bg: '#e2483c' }); tBare.position.set(88, 3.85, -1.6); qs.add(tBare);
 
 // ---------- 6〜7. 夜、2人（x=110） ----------
 const NIGHT = new THREE.Group(); NIGHT.position.set(110, 0, 0); qs.add(NIGHT);
@@ -92,7 +91,7 @@ const BULBS = [];
   const warm = new THREE.PointLight(0xffc878, 0, 9, 1.4); warm.position.set(0, 2.6, 0.6); NIGHT.add(warm); NIGHT.userData.warm = warm; }
 const her6 = makePerson(HEIRESS); her6.position.set(109.45, 0, 0.3); her6.rotation.y = 0.9; qs.add(her6);
 const off6 = makePerson(OFFICER); cap(off6); off6.position.set(110.55, 0, 0.3); off6.rotation.y = -0.9; qs.add(off6);
-const tWorld = tag('住む世界がちがう2人', { size: 72, bg: '#e6b450', color: '#14161c' }); tWorld.position.set(110, 4.2, 0); qs.add(tWorld);
+const tWorld = tag('住む世界がちがう2人', { size: 72, bg: '#e6b450', color: '#14161c' }); tWorld.position.set(110, 2.75, 0.6); qs.add(tWorld);
 
 // ---------- shots ----------
 const ALLTAG = [tStorm, tLine, tOff, tHard, tHer, tHide, tHome, tAunt, tSub, tBare, tWorld];
@@ -104,11 +103,11 @@ function shotStorm(t, T) { // 0〜9：パラグライダーが竜巻にのまれ
   TWIST.rotation.y = T * 2.6;
   DEBRIS.forEach((d, i) => { const a = d.userData.a + T * (2.2 + (i % 5) * 0.3); d.position.set(Math.cos(a) * d.userData.r, d.userData.h, Math.sin(a) * d.userData.r); d.rotation.set(T * 3 + i, T * 2, 0); });
   const pull = easeOut(clamp(T / 9));
-  G1.position.set(lerp(-1.4, 1.6, pull) + Math.sin(T * 5) * 0.12, 3.4 + Math.sin(T * 3.1) * 0.25, lerp(-1, -2.2, pull));
+  G1.position.set(lerp(-1.6, 1.2, pull) + Math.sin(T * 5) * 0.12, lerp(0.9, 2.6, pull) + Math.sin(T * 3.1) * 0.25, lerp(-1, -2.2, pull));
   G1.rotation.z = Math.sin(T * 4.2) * 0.35 + pull * 0.6; G1.rotation.y = T * 0.6;
   tStorm.userData.pop((T - 5.4) / 0.3);
   const u = ease(T / 9);
-  look(lerp(-2.4, -1.2, u), lerp(4.4, 4.8, u), lerp(9.8, 8.6, u), lerp(0.2, 1.6, u), 4.0, -2, 52);
+  look(lerp(-1.6, -0.6, u), lerp(3.2, 4.0, u), lerp(11.6, 10.4, u), lerp(0.4, 1.4, u), lerp(2.6, 3.4, u), -2.2, 54);
   return qs;
 }
 function shotFence(t) { // 9〜17：森の木に引っかかる。そこは境界線の向こう
@@ -126,7 +125,7 @@ function shotFound(t) { // 17〜25：見つけたのは北の軍の将校。し�
   tOff.userData.pop((t - 0.9) / 0.35);
   if (t > 4.2) { tOff.visible = false; tHard.userData.pop((t - 4.3) / 0.35); }
   const u = ease(t / 8);
-  look(lerp(43.4, 44.4, u), lerp(2.7, 2.5, u), lerp(6.8, 6.0, u), 44.4, 1.5, -0.2, 50);
+  look(lerp(43.8, 44.4, u), lerp(2.8, 2.6, u), lerp(8.2, 7.4, u), 44.2, 1.7, -0.2, 50);
   return qs;
 }
 function shotHouse(t) { // 25〜33：帰る方法がない。身分を隠して将校の家で暮らす
@@ -144,7 +143,7 @@ function shotVillage(t) { // 33〜42：近所の奥さんたちに部下たち�
   tSub.userData.pop((t - 1.6) / 0.35);
   if (t > 4.6) tBare.userData.pop((t - 4.7) / 0.35);
   const u = ease(t / 9);
-  look(lerp(86.4, 88.6, u), lerp(3.9, 3.6, u), lerp(10.6, 9.8, u), 88.2, 1.7, -0.6, 52);
+  look(lerp(87.4, 88.4, u), lerp(3.9, 3.6, u), lerp(12.2, 11.4, u), 88.0, 1.7, -0.4, 52);
   return qs;
 }
 const DARK = '#0a0d18';
@@ -154,7 +153,6 @@ function shotNight(t) { // 42〜49：夜、2人だけが灯りに照らされる
   S.hemi.intensity = lerp(1.25, 0.18, d); S.key.intensity = lerp(1.5, 0, d); S.darken(d, DARK);
   NIGHT.userData.warm.intensity = lerp(0, 9, ease((t - 0.6) / 1.2));
   BULBS.forEach((b, i) => b.material.color.set(Math.floor(t * 3 + i) % 4 === 0 ? '#fff2c8' : '#ffd98a'));
-  if (t > 3.2) tWorld.userData.pop((t - 3.3) / 0.35);
   const k = ease(t / 6.5);
   look(lerp(110, 110, k), lerp(2.6, 2.0, k), lerp(7.6, 4.4, k), 110, lerp(1.7, 1.75, k), 0.3, lerp(50, 44, k));
   return qs;
