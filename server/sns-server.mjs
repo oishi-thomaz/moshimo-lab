@@ -170,8 +170,16 @@ async function loadLive(acc) {
     const r = await fetch(`${acc.local}/an/export?hours=27`, { headers: { 'x-an-key': (st.an && st.an.key) || '' }, signal: AbortSignal.timeout(20e3) });
     if (r.ok) snaps = ((await r.json()).snaps || []).sort((a, b) => a.t - b.t);
   } catch (e) { log('export', acc.key, e.message); }
-  return { items, snaps };
+  return { items, snaps, revenue: st.revenue || null };
 }
+// もしもラボの TikTok 収益（投稿サーバーに届いている記録から）：最新の日の収益と、その日の月の累計
+function revenueLines(r) {
+  if (!r || !Array.isArray(r.days)) return null;
+  const days = r.days.filter(d => d.reward != null).sort((a, b) => a.date.localeCompare(b.date)); const last = days.at(-1); if (!last) return null;
+  const m = last.date.slice(0, 7), sum = days.filter(d => d.date.startsWith(m)).reduce((a, d) => a + d.reward, 0), mo = (r.months || {})[m];
+  return { day: `${Number(last.date.slice(5, 7))}/${Number(last.date.slice(8, 10))}`, reward: last.reward, month: `${Number(m.slice(5, 7))}月`, total: mo && mo.reward >= sum ? mo.reward : sum, full: !!(mo && mo.reward >= sum) };
+}
+const yen = n => (n == null ? '-' : `${Math.floor(n).toLocaleString('ja-JP')}円`);
 const ok = (s, p) => s[p] && !s[p].error && (p !== 'tt' || s[p].followers != null || Object.keys(s[p].media || {}).length);
 function analyzeLive(acc, L, now = Date.now()) {
   const ser = p => L.snaps.filter(s => ok(s, p));
@@ -279,6 +287,7 @@ async function numbersMessage() {
       [head('いま回ってる動画'), ...trendBoxes(a.trend.slice(0, 3), false)],
       [head('フォロワー（24時間の増減）'), ...a.foll.map(f => numRow(f.p, f.p === 'yt' ? '登録者' : 'フォロワー', kfmt(f.now), f.d == null ? '' : sgn(f.d)))],
       [head('再生（24時間で増えた分）'), ...a.views24.filter(v => v.v != null).map(v => numRow(v.p, '再生', kfmt(v.v)))],
+      ...(acc.key === 'moshimo' && revenueLines(L.revenue) ? [(r => [head('TikTok の収益（2日ほど遅れて出る）'), numRow('tt', `${r.day} の収益`, yen(r.reward)), numRow('tt', `${r.month}の累計${r.full ? '' : '（記録の合計）'}`, yen(r.total))])(revenueLines(L.revenue))] : []),
     ]);
   }));
 }

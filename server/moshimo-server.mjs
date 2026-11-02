@@ -96,6 +96,7 @@ async function line(pathname, body) {
 }
 const push = (messages) => state.owner ? line('/v2/bot/message/push', { to: state.owner, messages: [].concat(messages) }) : log('no LINE owner yet');
 const reply = (token, messages) => line('/v2/bot/message/reply', { replyToken: token, messages: [].concat(messages) });
+const replyChecked = reply; // 届いたら true（カードが弾かれたら false なので文で送り直す）
 const text = t => ({ type: 'text', text: t.slice(0, 4900) });
 
 // 承認カード（LINE の Flex Message）。表紙・タイトル・長さ・投稿予定・質問・主な数字・ボタンを1枚にまとめる
@@ -325,9 +326,7 @@ async function onLineWebhook(req, res) {
     if (uid !== state.owner) continue;                               // 持ち主以外は無視
     if (ev.type === 'postback') await onPostback(ev);
     else if (ev.type === 'message' && ev.message.type === 'text' && /^通数$/.test(ev.message.text.trim())) {
-      const g = async u => { const r = await fetch(`https://api.line.me/v2/bot/message/${u}`, { headers: { authorization: `Bearer ${LINE_TOKEN}` } }); return r.json(); };
-      const [q, c] = await Promise.all([g('quota').catch(() => ({})), g('quota/consumption').catch(() => ({}))]);
-      await reply(ev.replyToken, text(`今月の送信：${c.totalUsage ?? '?'}通 / ${q.value ?? '?'}通\n（返事は数えられない。まとめは朝と、新着がある日の夕方だけ）`));
+      await reply(ev.replyToken, await quotaCard().catch(() => text('通数が取れへんかった')));
     }
     else if (ev.type === 'message' && ev.message.type === 'text' && /^(承認待ち|承認)$/.test(ev.message.text.trim())) {
       const ac = approvalCarousel(pendingIds());
@@ -362,7 +361,10 @@ async function onLineWebhook(req, res) {
       await reply(ev.replyToken, [text('GitHub の moshimo-analytics → Settings → Secrets and variables → Actions → New repository secret\n名前：MOSHIMO_AN\n値：次の吹き出しの1行をそのまま貼る'), text(`${BASE_URL} ${state.an.key}`)]);
     }
     else if (ev.type === 'message' && ev.message.type === 'text' && /^(解析|数字)$/.test(ev.message.text.trim())) {
-      await reply(ev.replyToken, text(anSummary()));
+      const nc = numbersCard(); if (!(await replyChecked(ev.replyToken, nc))) await reply(ev.replyToken, text(anSummary()));
+    }
+    else if (ev.type === 'message' && ev.message.type === 'text' && /^(収益|しゅうえき)$/.test(ev.message.text.trim())) {
+      const rc = revenueCard(); if (!(await replyChecked(ev.replyToken, rc))) await reply(ev.replyToken, text('収益のカードが送れへんかった'));
     }
     else if (ev.type === 'message' && ev.message.type === 'text' && /状態|ステータス/.test(ev.message.text)) {
       const yts = i => !state.yt?.refresh ? '' : i.yt?.videoId ? ' / YT済' : i.yt?.error ? ' / YT失敗' : i.ytAt ? ` / YT ${fmt(i.ytAt)}` : '';
@@ -1037,6 +1039,130 @@ function anSummary() {
   return `${fmt(first.t)}→${fmt(last.t)} の動き\n${rows.join('\n')}${state.an.igIns === 'no_permission' ? '\n※インスタの再生数は権限が足りなくて取れてない' : ''}`;
 }
 
+
+// ---- 数字・通数・収益のカード（リッチメニューのボタンから。2026/11/02〜） ----
+// 文字が変なところで折り返さないよう、ラベルは1行に収め（長いときは小さくする）、数字は幅を取って見切れないようにする
+const ACOL = { '/moshimo': '#0F766E', '/quiz': '#B45309', '/itsuwa': '#9F1239' }[PREFIX] || '#1F2937';
+const yen = n => (n == null ? '-' : `${Math.floor(n).toLocaleString('ja-JP')}円`);
+const sgnK = n => (n == null ? '' : n > 0 ? `+${kfmt(n)}` : n < 0 ? `-${kfmt(-n)}` : '±0');
+const mdOf = t => { const d = new Date(t + JST); return `${d.getUTCMonth() + 1}/${d.getUTCDate()}`; };
+const one = (t, o = {}) => ({ type: 'text', text: nz(t), size: 'sm', wrap: false, adjustMode: 'shrink-to-fit', color: '#111111', ...o });
+const capH = t => ({ type: 'text', text: t, size: 'xs', color: '#6B7280', weight: 'bold' });
+function nrow({ tg, label, value, delta, vcol }) {
+  return { type: 'box', layout: 'horizontal', alignItems: 'center', contents: [
+    ...(tg ? [tag(PLAT[tg] || tg, PCOL[tg] || '#4B5563')] : []), one(label, { flex: 1, margin: tg ? 'md' : 'none' }),
+    { type: 'text', text: nz(value), size: 'sm', weight: 'bold', flex: 0, margin: 'md', color: vcol || '#111111' },
+    ...(delta ? [{ type: 'text', text: delta, size: 'xs', flex: 0, margin: 'md', color: deltaColor(delta) }] : [])] };
+}
+function gcard(title, subtitle, sections, foot) {
+  const body = [];
+  sections.filter(x => x && x.length).forEach((x, i) => { if (i) body.push({ type: 'separator' }); body.push({ type: 'box', layout: 'vertical', spacing: 'sm', contents: x }); });
+  const b = { type: 'bubble', size: 'giga',
+    header: { type: 'box', layout: 'vertical', backgroundColor: ACOL, paddingAll: '14px', contents: [one(title, { color: '#ffffff', weight: 'bold', size: 'lg' }), ...(subtitle ? [one(subtitle, { color: '#E5E7EB', size: 'xs' })] : [])] },
+    body: { type: 'box', layout: 'vertical', paddingAll: '14px', spacing: 'md', contents: body.length ? body : [one('-')] } };
+  if (foot) b.footer = { type: 'box', layout: 'vertical', paddingAll: '10px', contents: [{ type: 'text', text: foot, size: 'xxs', color: '#999999', align: 'center', wrap: true }] };
+  return { type: 'flex', altText: `${title}${subtitle ? '：' + subtitle : ''}`.slice(0, 390), contents: b };
+}
+// 横棒（0〜1）。数字の行の下に置く
+const bar = (ratio, color) => ({ type: 'box', layout: 'vertical', height: '6px', backgroundColor: '#E5E7EB', cornerRadius: '3px', contents: [{ type: 'box', layout: 'vertical', width: `${Math.max(2, Math.min(100, Math.round(ratio * 100)))}%`, height: '6px', backgroundColor: color, cornerRadius: '3px', contents: [] }] });
+
+// TikTok の収益（moshimo-analytics のまとめが TikTok Studio の記録から計算して /an/revenue で届ける）
+function revenueView(now = Date.now()) {
+  const r = state.revenue; if (!r || !Array.isArray(r.days) || !r.days.length) return null;
+  const days = r.days.slice().sort((a, b) => a.date.localeCompare(b.date));
+  const last = days.at(-1);
+  const thisMonth = ymd(now).slice(0, 7);
+  const lastMonth = last.date.slice(0, 7);
+  const monthTotal = m => { const mo = (r.months || {})[m]; const sum = days.filter(d => d.date.startsWith(m)).reduce((a, d) => a + (d.reward || 0), 0); return mo && mo.reward >= sum ? { v: mo.reward, full: true } : { v: sum, full: false }; };
+  const recent = days.filter(d => d.reward != null).slice(-7);
+  const avg = recent.length ? recent.reduce((a, d) => a + d.reward, 0) / recent.length : 0;
+  const [Y, M] = thisMonth.split('-').map(Number);
+  const dim = new Date(Date.UTC(Y, M, 0)).getUTCDate();
+  const cur = monthTotal(thisMonth);
+  const lastDayThis = days.filter(d => d.date.startsWith(thisMonth)).at(-1);
+  const doneDays = lastDayThis ? Number(lastDayThis.date.slice(8, 10)) : 0;
+  const forecast = cur.v + avg * (dim - doneDays);
+  return { last, lastMonth, thisMonth, cur, prev: lastMonth !== thisMonth ? monthTotal(lastMonth) : null, recent, avg, forecast, dim, doneDays, top: r.top || [], at: r.at || 0 };
+}
+const ymLabel = m => `${Number(m.slice(5, 7))}月`;
+const dLabel = d => `${Number(d.slice(5, 7))}/${Number(d.slice(8, 10))}`;
+// 数字カード用の1行：最新の日の収益と、その月の累計
+function revenueRows() {
+  const v = revenueView(); if (!v) return null;
+  const mt = v.lastMonth === v.thisMonth ? v.cur : v.prev;
+  return [capH('TikTok の収益（2日ほど遅れて出る）'),
+    nrow({ tg: 'tt', label: `${dLabel(v.last.date)} の収益`, value: yen(v.last.reward), vcol: '#0A7D3C' }),
+    nrow({ tg: 'tt', label: `${ymLabel(v.lastMonth)}の累計${mt && !mt.full ? '（記録の合計）' : ''}`, value: yen(mt ? mt.v : null) })];
+}
+
+function numbersCard() {
+  const s = readSnaps(Date.now() - 27 * 3600e3);
+  if (!s.length) return text('まだ数字が貯まってない（毎時5分に取ってる）');
+  const last = s.at(-1);
+  const near = (target, tol) => { let b = null; for (const x of s) if (Math.abs(x.t - target) <= tol && (!b || Math.abs(x.t - target) < Math.abs(b.t - target))) b = x; return b; };
+  const o24 = near(last.t - 24 * 3600e3, 10 * 3600e3), o3 = near(last.t - 3 * 3600e3, 2 * 3600e3);
+  const ok = (x, p) => x && x[p] && !x[p].error;
+  const fk = p => (p === 'yt' ? 'subs' : 'followers');
+  const plats = ['ig', 'tt', 'yt'].filter(p => ok(last, p) && (p !== 'tt' || last.tt.followers != null || Object.keys(last.tt.media || {}).length));
+  const gain = (p, base) => Object.entries(last[p].media || {}).map(([k, m]) => { const b = (ok(base, p) && base[p].media) || {}; const pv = b[k] ? b[k].views || 0 : (m.t > base.t ? 0 : null); return pv == null ? null : { p, k, m, g: Math.max(0, (m.views || 0) - pv) }; }).filter(Boolean);
+  const fol = plats.map(p => nrow({ tg: p, label: p === 'yt' ? '登録者' : 'フォロワー', value: kfmt(last[p][fk(p)]), delta: ok(o24, p) && o24[p][fk(p)] != null && last[p][fk(p)] != null ? sgnK(last[p][fk(p)] - o24[p][fk(p)]) : '' }));
+  const v24 = o24 ? plats.map(p => nrow({ tg: p, label: '再生', value: kfmt(gain(p, o24).reduce((a, x) => a + x.g, 0)) })) : [];
+  let trend = [];
+  if (o3) {
+    const hrs = Math.max(1, Math.round((last.t - o3.t) / 3600e3)), floor = PREFIX === '/moshimo' ? 1000 : 150;
+    for (const p of plats) { const g = gain(p, o3).filter(x => x.g > 0).sort((a, b) => b.g - a.g); const med = g.length ? g[Math.floor(g.length / 2)].g : 0; for (const x of g.slice(0, 3)) if (x.g >= Math.max(floor * hrs / 3, med * 2)) trend.push({ ...x, hrs }); }
+    trend = trend.sort((a, b) => b.g - a.g).slice(0, 3);
+  }
+  const tr = trend.length ? trend.map((x, i) => ({ type: 'box', layout: 'vertical', spacing: 'xs', margin: i ? 'md' : 'none', contents: [
+    { type: 'box', layout: 'horizontal', alignItems: 'center', contents: [tag(PLAT[x.p], PCOL[x.p]), { type: 'text', text: `+${kfmt(x.g)}／${x.hrs}時間`, size: 'sm', weight: 'bold', color: '#0A7D3C', flex: 1, align: 'end' }] },
+    one(titleOf(x.p, x.k, x.m)), { type: 'text', text: `累計 ${kfmt(x.m.views)}再生`, size: 'xxs', color: '#888888' }] })) : [one('記載なし', { size: 'xs', color: '#888888' })];
+  const secs = [[capH('いま回ってる動画'), ...tr], [capH('フォロワー（24時間の増減）'), ...fol]];
+  if (v24.length) secs.push([capH('再生（24時間で増えた分）'), ...v24]);
+  const rv = revenueRows(); if (rv) secs.push(rv);
+  return gcard(`${BRAND} の数字`, `${fmt(last.t)} 時点`, secs, state.an.igIns === 'no_permission' ? 'インスタの再生数は権限が足りなくて取れてない' : '');
+}
+
+async function quotaCard() {
+  const g = async u => { const r = await fetch(`https://api.line.me/v2/bot/message/${u}`, { headers: { authorization: `Bearer ${LINE_TOKEN}` } }); return r.json(); };
+  const [q, c] = await Promise.all([g('quota').catch(() => ({})), g('quota/consumption').catch(() => ({}))]);
+  const used = Number(c.totalUsage) || 0, limit = q.type === 'limited' ? Number(q.value) || 0 : 0;
+  const j = new Date(Date.now() + JST), dim = new Date(Date.UTC(j.getUTCFullYear(), j.getUTCMonth() + 1, 0)).getUTCDate(), left = dim - j.getUTCDate() + 1;
+  const rows = [capH(`${j.getUTCMonth() + 1}月の送信`), nrow({ label: '送った通数', value: `${used.toLocaleString('ja-JP')}通` })];
+  if (limit) {
+    const rest = Math.max(0, limit - used), ratio = used / limit;
+    rows.push(bar(ratio, ratio >= 0.85 ? '#C62828' : ratio >= 0.6 ? '#B45309' : ACOL));
+    rows.push(nrow({ label: '上限', value: `${limit.toLocaleString('ja-JP')}通` }), nrow({ label: '残り', value: `${rest.toLocaleString('ja-JP')}通`, vcol: ratio >= 0.85 ? '#C62828' : '#111111' }), nrow({ label: `残り${left}日の目安`, value: `1日 ${Math.floor(rest / left)}通まで` }));
+  } else rows.push(nrow({ label: '上限', value: 'なし' }));
+  return gcard(`${BRAND} の通数`, '承認カードや通知で使った分。返事は数えない', [rows]);
+}
+
+function revenueCard() {
+  const v = revenueView();
+  if (!v) return text('まだ収益の記録が届いてない（毎晩 TikTok Studio から取って、朝昼夜のまとめのときに届く）');
+  const max = Math.max(1, ...v.recent.map(d => d.reward || 0));
+  const days = v.recent.slice().reverse().map(d => ({ type: 'box', layout: 'vertical', spacing: 'xs', contents: [
+    { type: 'box', layout: 'horizontal', alignItems: 'center', contents: [
+      { type: 'text', text: dLabel(d.date), size: 'sm', color: '#6B7280', flex: 0 },
+      { type: 'text', text: `${kfmt(d.views)}再生`, size: 'xs', color: '#888888', flex: 1, align: 'end', margin: 'md' },
+      { type: 'text', text: yen(d.reward), size: 'sm', weight: 'bold', color: '#111111', flex: 0, margin: 'lg' }] },
+    bar((d.reward || 0) / max, ACOL)] }));
+  const cur = v.cur, curLabel = `${ymLabel(v.thisMonth)}の累計`;
+  const monthRows = [capH('月の合計と見込み'),
+    nrow({ label: `${curLabel}${v.doneDays ? `（${v.doneDays}日分）` : ''}`, value: v.doneDays ? yen(cur.v) : 'まだ反映なし', vcol: '#0A7D3C' }),
+    nrow({ label: '着地予想', value: yen(v.forecast) }),
+    { type: 'text', text: `直近${v.recent.length}日の平均（1日 ${yen(v.avg)}）で残り${v.dim - v.doneDays}日を足した見込み`, size: 'xxs', color: '#888888', wrap: true }];
+  if (v.prev) monthRows.splice(1, 0, nrow({ label: `${ymLabel(v.lastMonth)}の合計${v.prev.full ? '' : '（記録の合計）'}`, value: yen(v.prev.v) }));
+  const top = v.top.length ? v.top.slice(0, 3).map((t, i) => ({ type: 'box', layout: 'vertical', spacing: 'xs', margin: i ? 'md' : 'none', contents: [
+    { type: 'box', layout: 'horizontal', alignItems: 'center', contents: [{ type: 'text', text: `${i + 1}位`, size: 'xs', weight: 'bold', color: ACOL, flex: 0 }, one(String(t.title || t.id).replace(/^もしも/, ''), { flex: 1, margin: 'md' }), { type: 'text', text: yen(t.reward), size: 'sm', weight: 'bold', flex: 0, margin: 'md', color: '#0A7D3C' }] },
+    { type: 'text', text: `${kfmt(t.views)}再生・1,000再生あたり ${t.views ? yen(t.reward / t.views * 1000) : '-'}${t.avgWatch ? `・平均視聴 ${Math.round(t.avgWatch)}秒` : ''}`, size: 'xxs', color: '#888888', wrap: true }] }))
+    : [one('記録なし', { size: 'xs', color: '#888888' })];
+  return gcard('TikTok の収益', `いちばん新しいのは ${dLabel(v.last.date)} 分（TikTok は2日ほど遅れて出る）`, [
+    [capH('直近の収益'), ...days],
+    monthRows,
+    [capH('いま稼いでる動画（公開14日以内・推定報酬の多い順）'), ...top],
+  ], v.at ? `TikTok Studio の推定報酬・${fmt(v.at)} 時点の記録` : '');
+}
+
 let busy = false;
 setInterval(async () => {
   if (busy) return; busy = true;
@@ -1126,6 +1252,15 @@ http.createServer(async (req, res) => {
         if (at > Date.now() + 60e3) { state.an.outbox = [...(state.an.outbox || []), r]; save(); return send(res, 200, { ok: true, scheduled: fmt(at) }); }
         await pushReport(r); return send(res, 200, { ok: true, sent: true });
       }
+      if (req.method === 'POST' && p === '/an/revenue') { // TikTok の収益（moshimo-analytics のまとめから）
+        if (!Array.isArray(body.days)) return send(res, 400, { ok: false, error: 'days' });
+        state.revenue = { at: Number(body.at) || Date.now(), days: body.days.slice(-62), months: body.months || {}, top: (body.top || []).slice(0, 5) }; save();
+        return send(res, 200, { ok: true });
+      }
+      if (body.validateMessages && req.method === 'POST' && p === '/an/control') { // 渡したメッセージの形を LINE に確かめる（送らない）
+        const vr = await fetch('https://api.line.me/v2/bot/message/validate/push', { method: 'POST', headers: { 'content-type': 'application/json', authorization: `Bearer ${LINE_TOKEN}` }, body: JSON.stringify({ messages: body.validateMessages }) });
+        return send(res, 200, { ok: true, validate: `${vr.status} ${(await vr.text()).slice(0, 500)}` });
+      }
       if (req.method === 'POST' && p === '/an/control') {
         const out = {};
         if (body.postTimes) out.postTimes = setPostTimes(`投稿時間 ${body.postTimes}`);
@@ -1146,3 +1281,5 @@ http.createServer(async (req, res) => {
     if (!res.headersSent) send(res, e.code === 413 ? 413 : 500, { ok: false });
   }
 }).listen(PORT, '127.0.0.1', () => log(`${BRAND} server on 127.0.0.1:${PORT}${PREFIX}`));
+// 動作確認用：node moshimo-server.mjs --cards で、数字・通数・収益のカードの中身を表示して終わる（LINE には送らない）
+if (process.argv.includes('--cards')) { (async () => { globalThis.fetch = async u => ({ json: async () => (/consumption/.test(u) ? { totalUsage: 37 } : { type: 'limited', value: 200 }) }); console.log(JSON.stringify({ numbers: numbersCard(), revenue: revenueCard(), quota: await quotaCard() }, null, 1)); process.exit(0); })(); }

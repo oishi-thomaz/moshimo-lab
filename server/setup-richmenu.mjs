@@ -12,11 +12,11 @@ const msg = (x, y, w, h, text) => ({ bounds: { x, y, width: w, height: h }, acti
 const C = [0, 833, 1666, W]; // 3列の境目
 const R = [0, 843, H];        // 2段の境目
 const grid6 = texts => texts.map((t, i) => msg(C[i % 3], R[Math.floor(i / 3)], C[i % 3 + 1] - C[i % 3], R[Math.floor(i / 3) + 1] - R[Math.floor(i / 3)], t));
-const wide1plus3 = (top, texts) => [msg(0, 0, W, R[1], top), ...texts.map((t, i) => msg(C[i], R[1], C[i + 1] - C[i], H - R[1], t))];
+const wide1plus3 = (top, texts) => { const n = texts.length, X = [...Array(n + 1).keys()].map(i => Math.round(W * i / n)); return [msg(0, 0, W, R[1], top), ...texts.map((t, i) => msg(X[i], R[1], X[i + 1] - X[i], H - R[1], t))]; };
 
 const MENUS = [
   { key: 'sns', env: '/etc/sns.env', bar: '司令室メニュー', areas: grid6(['ストック', '承認待ち', '今日の投稿', 'いま回ってる', 'いまの数字', '使い方']) },
-  { key: 'moshimo', env: '/etc/moshimo.env', bar: 'メニュー', areas: wide1plus3('承認待ち', ['投稿した', '数字', '通数']) },
+  { key: 'moshimo', env: '/etc/moshimo.env', bar: 'メニュー', areas: wide1plus3('承認待ち', ['投稿した', '数字', '収益', '通数']) },
   { key: 'quiz', env: '/etc/quiz.env', bar: 'メニュー', areas: wide1plus3('承認待ち', ['投稿した', '数字', '通数']) },
   { key: 'itsuwa', env: '/etc/itsuwa.env', bar: 'メニュー', areas: wide1plus3('承認待ち', ['投稿した', '数字', '通数']) },
 ];

@@ -13,6 +13,7 @@ const ICON = {
   help: '<circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>',
   send: '<line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>',
   msg: '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',
+  yen: '<polyline points="6 3 12 11 18 3"/><line x1="12" y1="11" x2="12" y2="21"/><line x1="7" y1="13" x2="17" y2="13"/><line x1="7" y1="17" x2="17" y2="17"/>',
 };
 const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;');
 
@@ -37,9 +38,9 @@ function grid6(cells) {
   const cw = (W - G * 4) / 3, ch = (H - G * 3) / 2;
   return cells.map((c, i) => tile({ x: G + (i % 3) * (cw + G), y: G + Math.floor(i / 3) * (ch + G), w: cw, h: ch, ...c })).join('');
 }
-// 上に大きい1マス＋下に3マス（各アカウント）
+// 上に大きい1マス＋下にnマス（各アカウント。もしもラボは収益を足して4マス）
 function wide1plus3(top, cells) {
-  const tw = W - G * 2, th = (H - G * 3) * 0.5, cw = (W - G * 4) / 3, ch = H - G * 3 - th;
+  const n = cells.length, tw = W - G * 2, th = (H - G * 3) * 0.5, cw = (W - G * (n + 1)) / n, ch = H - G * 3 - th;
   return tile({ x: G, y: G, w: tw, h: th, big: true, ...top }) + cells.map((c, i) => tile({ x: G + i * (cw + G), y: G * 2 + th, w: cw, h: ch, ...c })).join('');
 }
 
@@ -61,7 +62,8 @@ for (const [key, color, light] of [['moshimo', '#0F766E', '#CCFBF1'], ['quiz', '
     [
       { bg: '#FFFFFF', fg: color, sub: '#64748B', icon: 'send', label: '投稿した', note: 'この24時間の結果' },
       { bg: '#FFFFFF', fg: color, sub: '#64748B', icon: 'chart', label: '数字', note: 'フォロワーと再生' },
-      { bg: '#FFFFFF', fg: color, sub: '#64748B', icon: 'msg', label: '通数', note: '今月のLINEの送信数' },
+      ...(key === 'moshimo' ? [{ bg: '#FFFFFF', fg: color, sub: '#64748B', icon: 'yen', label: '収益', note: 'TikTokの収益' }] : []),
+      { bg: '#FFFFFF', fg: color, sub: '#64748B', icon: 'msg', label: '通数', note: '今月の送信数' },
     ]));
 }
 const dir = new URL('.', import.meta.url).pathname;
