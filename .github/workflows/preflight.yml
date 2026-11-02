@@ -38,7 +38,7 @@ jobs:
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y -qq ffmpeg fonts-noto-cjk
-          pip install --quiet numpy scipy
+          pip install --quiet numpy scipy pillow
       - run: npm ci --no-audit --no-fund
       - name: Smoke test
         env:
@@ -52,6 +52,11 @@ jobs:
           fi
           echo "check: $IDS"
           bash tools/smoke.sh $IDS
+          # チラつき検査は時間がかかるので、変えた回だけ
+          if [ -n "${CHANGED:-}${{ github.event.inputs.ids }}" ]; then
+            for i in ${CHANGED:-${{ github.event.inputs.ids }}}; do bash tools/flicker.sh $i || { echo "FLICKER $i $(tail -1 out/flick/$i/report.txt)" >> out/smoke/report.txt; FLK=1; }; done
+            [ -z "${FLK:-}" ]
+          fi
       - name: Failure notice
         if: failure()
         run: |

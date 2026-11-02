@@ -28,9 +28,16 @@ const SUN_DIR = new THREE.Vector3(-1, 0.16, -0.06).normalize();
 const zoneM = new THREE.ShaderMaterial({
   transparent: true, depthWrite: false,
   uniforms: { sd: { value: SUN_DIR.clone() }, k: { value: 0 }, band: { value: 0 }, phase: { value: 0 } },
-  vertexShader: 'varying vec3 vN; void main(){ vN = normalize(mat3(modelMatrix)*normal); gl_Position = projectionMatrix*modelViewMatrix*vec4(position,1.0);} ',
-  fragmentShader: `uniform vec3 sd; uniform float k; uniform float band; uniform float phase; varying vec3 vN;
-  void main(){ float d = dot(vN, sd);
+  vertexShader: `#include <common>
+#include <logdepthbuf_pars_vertex>
+varying vec3 vN; void main(){ vN = normalize(mat3(modelMatrix)*normal); gl_Position = projectionMatrix*modelViewMatrix*vec4(position,1.0);
+#include <logdepthbuf_vertex>
+} `,
+  fragmentShader: `#include <logdepthbuf_pars_fragment>
+uniform vec3 sd; uniform float k; uniform float band; uniform float phase; varying vec3 vN;
+  void main(){
+#include <logdepthbuf_fragment>
+ float d = dot(vN, sd);
     float hot = smoothstep(0.08, 0.6, d) * k; float cold = smoothstep(-0.08, -0.6, d) * k; float shade = smoothstep(0.02, -0.35, d);
     float b = (1.0 - smoothstep(0.0, 0.2, abs(d))) * band;
     vec3 c = vec3(0.0); float a = shade * 0.55;

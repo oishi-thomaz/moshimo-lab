@@ -61,8 +61,15 @@ const globe = new THREE.Mesh(new THREE.SphereGeometry(R, 64, 48), globeM); earth
 const atm = new THREE.Mesh(new THREE.SphereGeometry(R * 1.04, 48, 32), new THREE.ShaderMaterial({
   transparent: true, side: THREE.BackSide, depthWrite: false,
   uniforms: { c: { value: new THREE.Color('#6fb7ff') } },
-  vertexShader: 'varying vec3 vN; void main(){ vN = normalize(normalMatrix*normal); gl_Position = projectionMatrix*modelViewMatrix*vec4(position,1.0);} ',
-  fragmentShader: 'uniform vec3 c; varying vec3 vN; void main(){ float i = pow(0.75 - dot(vN, vec3(0.0,0.0,1.0)), 3.0); gl_FragColor = vec4(c, clamp(i,0.0,1.0)*0.9); }'
+  vertexShader: `#include <common>
+#include <logdepthbuf_pars_vertex>
+varying vec3 vN; void main(){ vN = normalize(normalMatrix*normal); gl_Position = projectionMatrix*modelViewMatrix*vec4(position,1.0);
+#include <logdepthbuf_vertex>
+} `,
+  fragmentShader: `#include <logdepthbuf_pars_fragment>
+uniform vec3 c; varying vec3 vN; void main(){
+#include <logdepthbuf_fragment>
+ float i = pow(0.75 - dot(vN, vec3(0.0,0.0,1.0)), 3.0); gl_FragColor = vec4(c, clamp(i,0.0,1.0)*0.9); }`
 }));
 space.add(atm);
 // stars

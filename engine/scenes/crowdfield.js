@@ -26,6 +26,8 @@ const gTex = canvasTex(512, 512, (g, w, h) => {
 });
 gTex.wrapS = gTex.wrapT = THREE.RepeatWrapping; gTex.repeat.set(200, 200);
 const ground = new THREE.Mesh(new THREE.PlaneGeometry(200000, 200000), new THREE.MeshLambertMaterial({ map: gTex })); ground.rotation.x = -Math.PI / 2; world.add(ground);
+// 2026/11/02 チラつき対策：地面と、その上に重ねる面（人の絨毯・枠・区画）は奥行きを書かず、描く順番で重ねる
+ground.material.depthWrite = false; ground.renderOrder = -0.9;
 
 // carpet of heads: 1 tile = 8 x 8 people at 0.707m
 const SP = Math.SQRT1_2;
@@ -38,8 +40,8 @@ const cTex = canvasTex(256, 256, (g, w, h) => {
   }
 });
 cTex.wrapS = cTex.wrapT = THREE.RepeatWrapping;
-const carpet = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshLambertMaterial({ map: cTex, color: '#ffd0a0' })); carpet.rotation.x = -Math.PI / 2; carpet.position.y = 0.05; world.add(carpet);
-const edge = new THREE.Mesh(new THREE.RingGeometry(0.49, 0.52, 4, 1), new THREE.MeshBasicMaterial({ color: 0xffe08a, side: THREE.DoubleSide })); edge.rotation.x = -Math.PI / 2; edge.rotation.z = Math.PI / 4; edge.position.y = 0.08; world.add(edge);
+const carpet = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshLambertMaterial({ map: cTex, color: '#ffd0a0' })); carpet.rotation.x = -Math.PI / 2; carpet.position.y = 0.05; carpet.material.depthWrite = false; carpet.renderOrder = -0.8; world.add(carpet);
+const edge = new THREE.Mesh(new THREE.RingGeometry(0.49, 0.52, 4, 1), new THREE.MeshBasicMaterial({ color: 0xffe08a, side: THREE.DoubleSide })); edge.rotation.x = -Math.PI / 2; edge.rotation.z = Math.PI / 4; edge.position.y = 0.08; edge.material.depthWrite = false; edge.renderOrder = -0.7; world.add(edge);
 function setCrowd(area) {
   const s = Math.sqrt(Math.max(area, 0.01)); carpet.scale.set(s, s, 1); carpet.visible = area > 0.01;
   cTex.repeat.set(s / (8 * SP), s / (8 * SP));
@@ -81,7 +83,7 @@ function setPeopleN(side) {
 }
 
 function makePatch(color = '#e2c15a') {
-  const p = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), mat(color)); p.rotation.x = -Math.PI / 2; p.position.y = 0.04; world.add(p);
+  const p = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), mat(color, { depthWrite: false })); p.rotation.x = -Math.PI / 2; p.position.y = 0.04; p.renderOrder = -0.75; world.add(p);
   p.userData.setSize = (m) => { p.scale.set(m, m, 1); p.visible = m > 0.001; };
   return p;
 }

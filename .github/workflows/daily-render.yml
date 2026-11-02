@@ -37,7 +37,7 @@ jobs:
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y -qq ffmpeg fonts-noto-cjk
-          pip install --quiet numpy scipy
+          pip install --quiet numpy scipy pillow
 
       - name: Node packages
         run: npm ci --no-audit --no-fund
@@ -68,6 +68,15 @@ jobs:
           path: cache/narr
           key: narr-${{ github.run_id }}
           restore-keys: narr-
+
+      - name: Flicker check
+        if: steps.pick.outputs.id != ''
+        env:
+          CHROME_PATH: /usr/bin/google-chrome
+        run: |
+          # 2026/11/02 ゆうと：チラつき（Zファイティング）は絶対に出さない。1秒ごとに連続3コマを撮って調べ、出たら書き出さずに止める
+          ID="${{ steps.pick.outputs.id }}"
+          if ! bash tools/flicker.sh "$ID"; then echo "失敗：チラつき（Zファイティング）を検出したので書き出しを止めた $(tail -1 out/flick/$ID/report.txt)" | tee /tmp/build.log; exit 1; fi
 
       - name: Build video
         if: steps.pick.outputs.id != ''
@@ -109,4 +118,4 @@ jobs:
         if: failure()
         run: |
           curl -fsS -X POST "$BASE/hook/notice" -H "X-Moshimo-Secret: $SECRET" -H 'content-type: application/json' \
-            -d "$(node -e "const fs=require('fs');const f=fs.existsSync('/tmp/build2.log')?'/tmp/build2.log':'/tmp/build.log';const L=fs.existsSync(f)?fs.readFileSync(f,'utf8').split('\\n').filter(l=>/Error|error|EXC|Traceback/.test(l)).slice(-2).join(' ').slice(0,300):'';console.log(JSON.stringify({message:'動画の書き出しに失敗した（${{ steps.pick.outputs.id }}）。見張りのClaudeが直して、上がるまでやり直す。'+(L?'\\n原因：'+L:'')}))")" || true
+            -d "$(node -e "const fs=require('fs');const f=fs.existsSync('/tmp/build2.log')?'/tmp/build2.log':'/tmp/build.log';const L=fs.existsSync(f)?fs.readFileSync(f,'utf8').split('\\n').filter(l=>/Error|error|EXC|Traceback|失敗/.test(l)).slice(-2).join(' ').slice(0,300):'';console.log(JSON.stringify({message:'動画の書き出しに失敗した（${{ steps.pick.outputs.id }}）。見張りのClaudeが直して、上がるまでやり直す。'+(L?'\\n原因：'+L:'')}))")" || true

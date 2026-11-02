@@ -4,7 +4,8 @@ import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 
 const W = 1080, H = 1920, RW = 720, RH = 1280;
 const canvas = document.getElementById('gl');
-const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, preserveDrawingBuffer: true });
+// 2026/11/02 ゆうと：YouTube でチラつき（Zファイティング）の指摘。遠くの重なった面が交互に見えないよう、奥行きを対数で持つ
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, preserveDrawingBuffer: true, logarithmicDepthBuffer: true });
 renderer.setPixelRatio(1);
 renderer.setSize(RW, RH, false);
 renderer.shadowMap.enabled = true;
@@ -65,8 +66,15 @@ function makeSky() {
   const m = new THREE.ShaderMaterial({
     side: THREE.BackSide, depthWrite: false, fog: false,
     uniforms: { top: { value: new THREE.Color() }, bot: { value: new THREE.Color() } },
-    vertexShader: `varying vec3 vP; void main(){ vP = normalize(position); gl_Position = projectionMatrix*modelViewMatrix*vec4(position,1.0);} `,
-    fragmentShader: `uniform vec3 top; uniform vec3 bot; varying vec3 vP; void main(){ float h = clamp(vP.y*1.6+0.15,0.0,1.0); gl_FragColor = vec4(mix(bot,top,h),1.0);
+    vertexShader: `#include <common>
+#include <logdepthbuf_pars_vertex>
+varying vec3 vP; void main(){ vP = normalize(position); gl_Position = projectionMatrix*modelViewMatrix*vec4(position,1.0);
+#include <logdepthbuf_vertex>
+} `,
+    fragmentShader: `#include <logdepthbuf_pars_fragment>
+uniform vec3 top; uniform vec3 bot; varying vec3 vP; void main(){
+#include <logdepthbuf_fragment>
+ float h = clamp(vP.y*1.6+0.15,0.0,1.0); gl_FragColor = vec4(mix(bot,top,h),1.0);
 #include <colorspace_fragment>
 }`
   });
