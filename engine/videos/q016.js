@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { clamp, lerp, ease, easeOut, mat, box, canvasTex, makePerson, rng } from '../lib.js';
+import { clamp, lerp, ease, easeOut, mat, box, canvasTex, makePerson, poseWalk, rng } from '../lib.js';
 import { lift, look, runStory, endCard } from '../story.js';
 import { quizStage, tag, countdown, applyQuizCards } from './quiz-kit.js';
 
@@ -7,7 +7,8 @@ import { quizStage, tag, countdown, applyQuizCards } from './quiz-kit.js';
 // 設定：舞妓さんを夢見て、親友と青森から京都へ来た少女。舞妓さんたちが共に暮らす屋形で、親友は期待の舞妓さんに、
 //       少女は屋形のみんなのごはんをつくる係になる。華やかな舞妓の世界とふだんのごはん。同じ屋根の下で、ふたりはそれぞれの夢を追いかける
 //       （Netflix 公式ニュース「舞妓さんちのまかないさん」発表・Filmarks の作品ページ・Netflix の作品紹介）
-// 作品の映像・俳優・ロゴ・有名な場面の構図は使わない。実在の店や屋形の名前は出さない。人と町並みは汎用の3D
+// 構成（ヒント6段）：1 親友とふたり、ふるさとを出る → 2 遠く離れた古い町へ → 3 同じ夢の女の子たちが暮らす家 → 4 親友は期待の新星に → 5 夢は京都の舞妓さん、青森から → 6 決め手：もうひとりは、みんなのごはんをつくる係
+// 地名（青森・京都）と「舞妓」は5段目まで字幕にも札にも出さない。作品の映像・俳優・ロゴ・有名な場面の構図は使わない。実在の店や屋形の名前は出さない。人と町並みは汎用の3D
 
 const S = quizStage({ bg: '#e8c8a8', floor: '#8a8478', fogNear: 22, fogFar: 70 });
 const qs = S.scene;
@@ -41,8 +42,7 @@ function suitcase(x, c) { const g = new THREE.Group(); const b = box(0.42, 0.6, 
 suitcase(-1.0, '#c4302b'); suitcase(1.0, '#3a6aa0');
 const APPLES = new THREE.Group(); APPLES.position.set(-1.0, 0.68, 2.15); qs.add(APPLES);
 { const crate = box(0.5, 0.18, 0.34, mat('#b8905a')); APPLES.add(crate); for (let i = 0; i < 4; i++) { const a = new THREE.Mesh(new THREE.SphereGeometry(0.08, 10, 8), mat('#d8323a')); a.position.set(-0.15 + i * 0.1, 0.13, 0); APPLES.add(a); } }
-const tFrom = tag('青森から京都へ', { size: 66, w: 480, bg: '#e6b450', color: '#14161c' }); tFrom.position.set(0, 3.4, 1.0); qs.add(tFrom);
-const tFriend = tag('親友とふたり', { size: 66, w: 440, bg: '#c43a4a' }); tFriend.position.set(0, 3.4, 1.0); qs.add(tFriend);
+const tFriend = tag('ここで暮らす', { size: 66, w: 440, bg: '#c43a4a' }); qs.add(tFriend);
 
 // ---------- 2. 屋形（x=30） ----------
 const YAKATA = machiya(30, -2.4, 7, true);
@@ -53,7 +53,7 @@ const kiyo2 = makePerson(KIYO); kiyo2.position.set(27.8, 0, 1.9); kiyo2.rotation
 const sumi2 = makePerson(SUMI); sumi2.position.set(32.2, 0, 1.9); sumi2.rotation.y = -0.6; qs.add(sumi2);
 const NIGHTL = new THREE.PointLight(0xffd8a0, 0, 10, 1.2); NIGHTL.position.set(30, 2.6, 1.5); qs.add(NIGHTL);
 const MOON = new THREE.Mesh(new THREE.CircleGeometry(0.9, 32), new THREE.MeshBasicMaterial({ color: '#fff4d8', fog: false })); MOON.position.set(33.0, 6.6, -7); qs.add(MOON);
-const tHouse = tag('舞妓さんが暮らす家', { size: 62, w: 580, bg: '#c43a4a' }); tHouse.position.set(30, 4.35, -0.8); qs.add(tHouse);
+const tHouse = tag('舞妓さんが暮らす家', { size: 62, w: 580, bg: '#c43a4a' }); tHouse.position.set(30, 3.3, 3.0); qs.add(tHouse);
 
 // ---------- 3. 稽古の座敷（x=60） ----------
 const ROOM = new THREE.Group(); ROOM.position.set(60, 0, 0); qs.add(ROOM);
@@ -99,98 +99,118 @@ const DINERS = [seated(maiko(1), 118.4, -1.7, 0), seated(maiko(2), 119.6, -1.7, 
 const kiyo4 = makePerson(KIYO); kiyo4.position.set(122.4, 0, 0.3); kiyo4.rotation.y = -1.0; qs.add(kiyo4);
 const TABL = new THREE.PointLight(0xffd8a0, 6, 8, 1.2); TABL.position.set(120, 2.6, 0); qs.add(TABL);
 
+// ---------- 0. ふるさとの道（x=150）。りんごの木の間の一本道 ----------
+{ const grass = new THREE.Mesh(new THREE.PlaneGeometry(60, 80), mat('#7a9a5a')); grass.rotation.x = -Math.PI / 2; grass.position.set(150, 0.01, -20); qs.add(grass);
+  const road = box(2.6, 0.04, 80, mat('#b8a888')); road.position.set(150, 0.03, -20); qs.add(road);
+  for (const sd of [-1, 1]) for (let i = 0; i < 9; i++) { const tr = new THREE.Group(); tr.position.set(150 + sd * (3.0 + R() * 0.8 + (i % 2) * 2.2), 0, 4 - i * 4.2); qs.add(tr);
+    const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.18, 1.4, 8), mat('#6a4a30')); trunk.position.y = 0.7; tr.add(trunk);
+    const top = new THREE.Mesh(new THREE.SphereGeometry(1.1, 12, 10), mat('#4a7a3a')); top.position.y = 1.9; top.scale.y = 0.85; tr.add(top);
+    for (let k = 0; k < 7; k++) { const a = R() * Math.PI * 2, e = (R() - 0.3) * 1.0; const ap = new THREE.Mesh(new THREE.SphereGeometry(0.11, 8, 6), mat('#d8323a')); ap.position.set(Math.cos(a) * Math.cos(e) * 1.05, 1.9 + Math.sin(e) * 0.9, Math.sin(a) * Math.cos(e) * 1.05); tr.add(ap); } }
+  for (let i = 0; i < 7; i++) { const m = new THREE.Mesh(new THREE.ConeGeometry(6 + R() * 4, 6 + R() * 5, 6), mat('#7a8aa8')); m.position.set(150 - 24 + i * 8, 2.5, -48 - R() * 6); qs.add(m); }
+  for (let i = 0; i < 5; i++) { const c = new THREE.Group(); for (let k = 0; k < 3; k++) { const b = new THREE.Mesh(new THREE.SphereGeometry(1.6 + R() * 0.8, 12, 8), new THREE.MeshBasicMaterial({ color: '#ffffff', fog: false })); b.position.set(k * 1.8 - 1.8, R() * 0.5, 0); b.scale.y = 0.55; c.add(b); } c.position.set(150 - 14 + i * 7 + R() * 2, 12 + R() * 5, -34 - R() * 6); qs.add(c); } }
+const kiyo5 = makePerson(KIYO); qs.add(kiyo5);
+const sumi5 = makePerson(SUMI); qs.add(sumi5);
+function bag(c) { const g = new THREE.Group(); const b = box(0.42, 0.6, 0.22, mat(c)); b.position.y = 0.36; g.add(b); const h = box(0.04, 0.4, 0.04, mat('#3a3a40')); h.position.set(0, 0.85, 0); g.add(h); qs.add(g); return g; }
+const BAG1 = bag('#c4302b'), BAG2 = bag('#3a6aa0');
+const tWhat = tag('？', { size: 120, w: 220, h: 190, bg: '#e6b450', color: '#14161c' }); qs.add(tWhat);
+
 // ---------- shots ----------
-const ALL = [tFrom, tFriend, tHouse, tStar, tCook];
+const ALL = [tWhat, tFriend, tHouse, tStar, tCook];
 ALL.forEach(x => { x.material.fog = false; });
-function base() { S.reset(); ALL.forEach(x => x.visible = false); FAN.visible = false; NIGHTL.intensity = 0; MOON.visible = false; SPOTD.intensity = 0; STEAM.forEach(s => s.visible = false); DISHES.forEach(d => d.visible = true); }
-function shotStreet(t, T) { // 0〜9：京都の町並みに、スーツケースのふたり（0秒目がサムネ）
+function base() { S.reset(); ALL.forEach(x => x.visible = false); FAN.visible = false; NIGHTL.intensity = 0; MOON.visible = false; SPOTD.intensity = 0; STEAM.forEach(s => s.visible = false); DISHES.forEach(d => d.visible = true); GROUP.forEach(p => p.visible = true); YAKATA.userData.win.color.set('#f4e8c8'); }
+function shotRoad(t, T) { // 1段目 0〜9：親友とふたり、大きな荷物でふるさとを出る（0秒目がサムネ）
+  base(); S.aim(150, -2); lift(-120);
+  S.darken(0.9, '#8cbce8');
+  const z = 1.2 - T * 0.32;
+  [[kiyo5, -0.5, 0], [sumi5, 0.5, 1.3]].forEach(([p, x, ph]) => { p.position.set(150 + x, 0, z); p.rotation.y = Math.PI; poseWalk(p, T * 5 + ph, 0.6); p.userData.arms[x < 0 ? 0 : 1].rotation.x = 0; });
+  kiyo5.userData.head.rotation.y = T > 4.5 ? -0.7 * ease((T - 4.5) / 0.8) : 0; sumi5.userData.head.rotation.y = T > 4.7 ? 0.6 * ease((T - 4.7) / 0.8) : 0;
+  BAG1.position.set(150 - 0.85, 0, z + 0.05); BAG2.position.set(150 + 0.85, 0, z + 0.05);
+  tWhat.position.set(150.1, 3.3, z - 0.6); tWhat.userData.pop(T < 0.1 ? 1 : (T - 0.1) / 0.3); if (T > 2.4) tWhat.visible = false;
+  const u = ease(T / 9);
+  look(lerp(150.4, 150.2, u), lerp(3.4, 3.2, u), lerp(z + 6.0, z + 5.7, u), 150, 1.2, z - 12, 50);
+  return qs;
+}
+function shotStreet(t) { // 2段目 9〜17：たどり着いたのは、遠く離れた古い町（地名・看板は出さない）
   base(); S.aim(0, 0); lift(0);
   S.darken(0.15, '#c87a5a');
-  kiyo.userData.head.rotation.y = Math.sin(T * 0.8) * 0.4; sumi.userData.head.rotation.y = Math.sin(T * 0.7 + 1) * 0.3;
-  tFrom.userData.pop((T - 2.8) / 0.35); if (T > 5.6) { tFrom.visible = false; tFriend.userData.pop((T - 5.8) / 0.35); }
-  const u = ease(T / 9);
+  kiyo.userData.head.rotation.y = Math.sin(t * 0.8) * 0.4; sumi.userData.head.rotation.y = Math.sin(t * 0.7 + 1) * 0.3;
+  tFriend.position.set(0, 3.9, 1.0); tFriend.userData.pop((t - 4.4) / 0.35);
+  const T = t; const u = ease(T / 8);
   look(lerp(0.5, 0.2, u), lerp(2.3, 2.0, u), lerp(9.4, 8.0, u), 0, lerp(2.2, 2.0, u), -4, 56);
   return qs;
 }
-function shotHouse(t) { // 9〜17：舞妓さんたちが共に暮らす屋形
+function shotHome(t) { // 3段目 17〜25：同じ夢を持つ女の子たちが暮らす古い家。夕方、灯りがともる（舞妓の姿はまだ見せない）
   base(); S.aim(30, -1); lift(260);
-  GROUP.forEach((p, i) => { p.userData.head.rotation.y = Math.sin(t * 1.2 + i) * 0.3; p.userData.arms[0].rotation.x = -0.3 + Math.sin(t * 2 + i) * 0.1; });
-  tHouse.userData.pop((t - 4.2) / 0.35);
+  GROUP.forEach(p => p.visible = false);
+  const d = 0.6; S.hemi.intensity = lerp(1.25, 0.6, d); S.key.intensity = lerp(1.5, 0.3, d); S.darken(0.55, '#8a4a5a'); NIGHTL.intensity = 6; MOON.visible = true;
+  YAKATA.userData.win.color.set('#ffd890');
+  kiyo2.rotation.y = 2.6; sumi2.rotation.y = -2.6;
   const u = ease(t / 8);
+  look(lerp(30.4, 30.1, u), lerp(2.5, 2.4, u), lerp(12.6, 11.4, u), 30, 2.2, -1, 56);
+  return qs;
+}
+function shotHouse(t) { // 5段目 33〜42：ふたりの夢は京都の舞妓さん。青森からやってきた
+  base(); S.aim(30, -1); lift(260);
+  kiyo2.rotation.y = 0.6; sumi2.rotation.y = -0.6;
+  GROUP.forEach((p, i) => { p.userData.head.rotation.y = Math.sin(t * 1.2 + i) * 0.3; p.userData.arms[0].rotation.x = -0.3 + Math.sin(t * 2 + i) * 0.1; });
+  tHouse.userData.pop((t - 1.2) / 0.35);
+  const u = ease(t / 9);
   look(lerp(30.4, 30.0, u), lerp(2.6, 2.4, u), lerp(10.4, 9.2, u), 30, 2.2, -1, 56);
   return qs;
 }
-function shotDance(t) { // 17〜25：親友は、期待の舞妓さんに
+function shotDance(t) { // 4段目 25〜33：やがて親友は、みんなが期待する新星に
   base(); S.aim(60, -1); lift(80);
   SPOTD.intensity = 40;
   const a = Math.sin(t * 1.4);
   dancer.rotation.y = a * 0.5; dancer.userData.arms[1].rotation.x = -1.6 + a * 0.5; dancer.userData.arms[1].rotation.z = 0.3; dancer.userData.arms[0].rotation.x = -0.6 - a * 0.3;
   const hand = new THREE.Vector3(0, -0.62, 0); dancer.userData.arms[1].localToWorld(hand); FAN.visible = true; FAN.position.copy(hand); FAN.position.y += 0.15; FAN.rotation.set(0, dancer.rotation.y, a * 0.6);
-  tStar.userData.pop((t - 1.0) / 0.35);
+  tStar.userData.pop((t - 3.9) / 0.35);
   const u = ease(t / 8);
   look(lerp(60.6, 60.2, u), lerp(2.0, 1.8, u), lerp(6.2, 5.2, u), 60, 1.4, -0.6, 54);
   return qs;
 }
-function shotKitchen(t) { // 25〜33：屋形のみんなのごはんをつくる係に
+function shotKitchen(t) { // 6段目 42〜49（決め手）：もうひとりは、みんなのごはんをつくる係に
   base(); S.aim(90, -1); lift(80);
   STEAM.forEach((s, i) => { s.visible = true; const u = ((t * 0.6 + i / 10) % 1); s.position.set(89.0 + Math.sin(u * 6 + i) * 0.12, 1.4 + u * 1.3, -1.7); s.scale.setScalar(0.6 + u * 1.6); s.material.opacity = 0.55 * (1 - u); });
   POT.userData.lid.position.y = 0.4 + Math.max(0, Math.sin(t * 9)) * 0.03;
   kiyo3.userData.arms[1].rotation.x = -1.0 + Math.sin(t * 5) * 0.25; kiyo3.userData.arms[0].rotation.x = -0.8;
-  tCook.userData.pop((t - 4.2) / 0.35);
-  const u = ease(t / 8);
+  tCook.userData.pop((t - 1.0) / 0.35);
+  const u = ease(t / 7);
   look(lerp(91.6, 91.2, u), lerp(2.6, 2.4, u), lerp(4.6, 4.0, u), 89.8, 1.3, -1.6, 54);
   return qs;
 }
-function shotTable(t) { // 33〜42：華やかな舞妓の世界と、ふだんのごはん
+function shotTable(t) { // 49〜56：みんなの食卓（このドラマ、わかった？＋カウントダウン）
   base(); S.aim(120, -1); lift(120);
   DISHES.forEach((d, i) => { const k = easeOut(clamp((t - 0.3 - i * 0.12) / 0.35)); d.visible = k > 0; d.scale.setScalar(Math.max(0.001, k)); });
   DINERS.forEach((p, i) => { p.userData.arms[1].rotation.x = -0.9 + Math.sin(t * 3 + i) * 0.2; p.userData.head.rotation.x = Math.sin(t * 2 + i) * 0.08; });
-  const u = ease(t / 9);
+  const u = ease(t / 7);
   look(lerp(120.2, 120.0, u), lerp(3.8, 3.4, u), lerp(5.8, 4.8, u), 120, 0.6, -0.6, 54);
-  return qs;
-}
-const DUSK = '#2a2440';
-function shotTwist(t) { // 42〜49：夜の屋形。同じ屋根の下で、それぞれの夢を
-  base(); S.aim(30, -1); lift(lerp(260, 320, ease(t / 7)));
-  const d = ease(t / 1.5); S.hemi.intensity = lerp(1.25, 0.6, d); S.key.intensity = lerp(1.5, 0.1, d); S.darken(d * 0.75, DUSK); NIGHTL.intensity = 10 * d; MOON.visible = d > 0.3;
-  YAKATA.userData.win.color.set('#ffd890');
-  const k = ease(t / 7);
-  look(lerp(30.0, 30.0, k), lerp(2.4, 3.4, k), lerp(9.2, 13.0, k), 30, lerp(2.2, 2.8, k), -1.5, 56);
-  return qs;
-}
-function shotQuiz(t) { // 49〜56：このドラマ、わかった？
-  base(); S.aim(30, -1); lift(320);
-  S.hemi.intensity = 0.6; S.key.intensity = 0.1; S.darken(0.75, DUSK); NIGHTL.intensity = 10; MOON.visible = true;
-  YAKATA.userData.win.color.set('#ffd890');
-  const k = ease(t / 7);
-  look(30, lerp(3.4, 3.8, k), lerp(13.0, 14.4, k), 30, lerp(2.8, 3.0, k), -1.5, 56);
   countdown(t);
   return qs;
 }
-
 const SHOTS = [
-  { a: 0, b: 9, f: (t, T) => shotStreet(t, T) },
-  { a: 9, b: 17, f: shotHouse },
-  { a: 17, b: 25, f: shotDance },
-  { a: 25, b: 33, f: shotKitchen },
-  { a: 33, b: 42, f: shotTable },
-  { a: 42, b: 49, f: shotTwist },
-  { a: 49, b: 56, f: shotQuiz },
+  { a: 0, b: 9, f: (t, T) => shotRoad(t, T) },
+  { a: 9, b: 17, f: shotStreet },
+  { a: 17, b: 25, f: shotHome },
+  { a: 25, b: 33, f: shotDance },
+  { a: 33, b: 42, f: shotHouse },
+  { a: 42, b: 49, f: shotKitchen },
+  { a: 49, b: 56, f: shotTable },
   { a: 56, b: 64, f: endCard },
 ];
 const SUBS = [
-  [2.5, 5.6, '舞妓さんを夢見て、<br>青森から京都へ。'],
-  [5.6, 9.0, '親友とふたりで<br>やってきた。'],
-  [9.2, 13.2, 'ふたりが暮らすのは、'],
-  [13.2, 17.0, '舞妓さんたちが<br>共に暮らす家。'],
-  [17.2, 21.0, '親友は、<br>期待の新星に。'],
-  [21.0, 25.0, 'そしてもうひとりは、'],
-  [25.2, 29.0, 'その家のみんなの<br>ごはんをつくる'],
-  [29.0, 33.0, '係になった。'],
-  [33.2, 37.4, '華やかな<br>舞妓の世界と、'],
-  [37.4, 41.8, '毎日の<br>あったかいごはん。'],
-  [42.2, 45.4, '同じ屋根の下で、'],
-  [45.4, 49.0, 'ふたりはそれぞれの<br>夢を追いかける。'],
+  [2.5, 5.6, '親友とふたり、<br>大きな荷物を持って。'],
+  [5.6, 9.0, '夢をかなえるため、<br>ふるさとを出る。'],
+  [9.2, 13.0, 'たどり着いたのは、<br>遠く離れた古い町。'],
+  [13.0, 17.0, 'ここで、ふたりの<br>新しい暮らしが始まる。'],
+  [17.2, 21.0, '暮らすのは、同じ夢を<br>持つ女の子たちの家。'],
+  [21.0, 25.0, 'みんなで、<br>ひとつ屋根の下。'],
+  [25.2, 29.0, 'やがて親友は、'],
+  [29.0, 33.0, 'みんなが期待する<br>新星に。'],
+  [33.2, 37.4, 'ふたりの夢は、<br>京都の舞妓さん。'],
+  [37.4, 41.8, '青森から、<br>はるばるやってきた。'],
+  [42.2, 45.6, 'もうひとりは、みんなの<br>ごはんをつくる係に。'],
+  [45.6, 49.0, 'ふたりはそれぞれの<br>夢を追いかける。'],
   [49.2, 52.0, 'このドラマ、<br>わかった？'],
   [52.0, 55.8, 'カウントダウンの間に、<br>当ててみて。'],
   [56.4, 59.6, '答えは、舞妓さんちの<br>まかないさん。'],
@@ -205,12 +225,12 @@ runStory({
     title: 'このドラマのタイトルは？',
     titleHtml: 'このドラマの<br>タイトルは？',
     mood: 'calm', seed: 1616,
-    hits: [5.6, 21.0, 56.4], risers: [52.0],
-    impacts: [0.3, 17.2, 29.0, 56.4],
-    sfx: [[0.2, 'whoosh'], [9.0, 'whoosh'], [17.0, 'whoosh'], [25.0, 'whoosh'], [25.6, 'bubble'], [33.0, 'whoosh'], [42.2, 'whoosh'], [49.0, 'meter', 0.5]],
-    narr: { '舞妓': 'まいこ', '夢見て': 'ゆめみて', '青森': 'あおもり', '京都': 'きょうと', '親友': 'しんゆう', '暮らす': 'くらす', '共に': 'ともに', '家': 'いえ', '期待': 'きたい', '新星': 'しんせい', '係': 'かかり', '華やか': 'はなやか', '世界': 'せかい', '毎日': 'まいにち', '屋根': 'やね', '下': 'した', '夢': 'ゆめ', '追いかける': 'おいかける' },
-    caption: 'このドラマのタイトル、わかる？\n舞妓さんを夢見て、親友とふたりで青森から京都へ。舞妓さんたちが共に暮らす家で、親友は期待の新星に。もうひとりは、みんなのごはんをつくる係になった。\n\n答えは動画の最後で。何秒でわかった？どこでわかった？コメントで教えて。観た人は感想も聞かせて。',
-    hashtags: ['タイトル当てクイズ', 'ネトフリ', 'Netflix', '日本のドラマ', '京都'],
+    hits: [5.6, 29.0, 56.4], risers: [52.0],
+    impacts: [0.3, 29.0, 33.2, 42.2, 56.4],
+    sfx: [[0.2, 'whoosh'], [9.0, 'whoosh'], [17.0, 'whoosh'], [25.0, 'whoosh'], [33.0, 'whoosh'], [42.0, 'whoosh'], [42.6, 'bubble'], [49.0, 'whoosh'], [49.4, 'meter', 0.5]],
+    narr: { '遠く離れた': 'とおくはなれた', '新しい暮らし': 'あたらしいくらし', '屋根の下': 'やねのした', '追いかける': 'おいかける', '女の子': 'おんなのこ', '始まる': 'はじまる', '暮らす': 'くらす', '大きな': 'おおきな', '持って': 'もって', '持つ': 'もつ', '荷物': 'にもつ', '親友': 'しんゆう', '期待': 'きたい', '新星': 'しんせい', '舞妓': 'まいこ', '京都': 'きょうと', '青森': 'あおもり', '同じ': 'おなじ', '古い': 'ふるい', '出る': 'でる', '係': 'かかり', '夢': 'ゆめ', '町': 'まち', '家': 'いえ' },
+    caption: 'このドラマのタイトル、わかる？\n親友とふたり、夢をかなえるためにふるさとを出た。たどり着いたのは、遠く離れた古い町。暮らすのは、同じ夢を持つ女の子たちが、ひとつ屋根の下で過ごす家。\n\n答えは動画の最後で。何秒でわかった？どこでわかった？コメントで教えて。観た人は感想も聞かせて。',
+    hashtags: ['タイトル当てクイズ', 'ネトフリ', 'Netflix', '日本のドラマ', 'ドラマ紹介'],
   },
 });
 applyQuizCards({ answer: '舞妓さんちの<br>まかないさん', info: 'Netflix｜日本・全9話', answerSize: 104 });
