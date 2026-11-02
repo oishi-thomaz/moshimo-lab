@@ -141,11 +141,16 @@ async function reply(token, messages) {
 const text = t => ({ type: 'text', text: t });
 const HELP = 'ストック と送ると、まだ投稿してない動画を3アカウント分カードで返す。\n1日3回（8:00・13:00・22:30）のまとめは自動で届く。';
 
+// LINE Developers の 検証 で送られてくるテスト用の偽ユーザー（これを持ち主にしない）
+const DUMMY = /^Udeadbeef/i;
+if (DUMMY.test(state.owner || '')) { log('owner was the test user, cleared'); state.owner = env.LINE_OWNER_USER_ID || ''; save(); }
 async function onEvent(ev) {
-  if (ev.type === 'follow' && !state.owner && ev.source && ev.source.userId) { state.owner = ev.source.userId; save(); }
-  if (ev.type !== 'message' || !ev.message || ev.message.type !== 'text') return;
   const uid = ev.source && ev.source.userId;
-  if (!state.owner && uid) { state.owner = uid; save(); log('owner set'); }
+  log('event', ev.type, ev.message ? ev.message.type : '', uid ? uid.slice(0, 6) + '…' : '-', uid && uid === state.owner ? 'owner' : 'not-owner');
+  if (!uid || DUMMY.test(uid) || /^0+$|^f+$/i.test(ev.replyToken || '')) return;
+  if (ev.type === 'follow' && !state.owner) { state.owner = uid; save(); log('owner set (follow)'); }
+  if (ev.type !== 'message' || !ev.message || ev.message.type !== 'text') return;
+  if (!state.owner) { state.owner = uid; save(); log('owner set'); }
   if (uid !== state.owner) return; // ゆうと以外には返さない
   const msg = ev.message.text.trim();
   if (/^(ストック|すとっく|在庫|stock)/i.test(msg)) {
