@@ -1,0 +1,53 @@
+# まだインスタに出ていないクイズの回を、preview で書き出し直した動画に差し替える。
+# 承認の状態と投稿の時間はそのまま（hook/new を呼ばないので LINE にカードも出ない）。
+# 使い方：inputs[pairs]=q008:41411601280 q009:41415483459（回の番号:preview の run id をスペース区切りで）
+name: quiz-replace
+
+on:
+  workflow_dispatch:
+    inputs:
+      pairs:
+        description: '回の番号:preview の run id（スペース区切り）'
+        required: true
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  replace:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      BASE: ${{ secrets.QUIZ_BASE_URL }}
+      SECRET: ${{ secrets.QUIZ_SECRET }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - name: Replace
+        env:
+          CHROME_PATH: /usr/bin/google-chrome
+        run: |
+          mkdir -p out
+          for P in ${{ github.event.inputs.pairs }}; do
+            ID=${P%%:*}; RUN=${P##*:}; N=$((5000 + 10#${ID#q}))
+            ST=$(curl -fsS "$BASE/health" >/dev/null && echo up)
+            [ "$ST" = up ] || { echo "::error::サーバーにつながらない"; exit 1; }
+            rm -rf "dl-$ID"; gh run download "$RUN" -n "preview-$ID" -D "dl-$ID" -R "${{ github.repository }}"
+            [ -s "dl-$ID/$ID.mp4" ] || { echo "::error::$ID の動画がない"; exit 1; }
+            node tools/render.mjs --video "$ID" --meta "out/$ID.json"
+            node -e "const fs=require('fs');const m=JSON.parse(fs.readFileSync('out/$ID.json','utf8'));m.id='$N';m.quizId='$ID';if(m.answer)m.title=m.answer+'｜'+m.title;fs.writeFileSync('out/$N.json',JSON.stringify(m,null,2))"
+            cp "dl-$ID/$ID.mp4" "out/$N.mp4"; cp "dl-$ID/${ID}_cover.jpg" "out/${N}_cover.jpg"
+            for f in "$N.mp4" "$N.json" "${N}_cover.jpg"; do
+              curl -fsS --retry 3 -T "out/$f" -H "X-Moshimo-Secret: $SECRET" "$BASE/upload/$f"; echo
+            done
+            GOT=$(curl -fsSI "$BASE/media/$N.mp4" | awk 'tolower($1)=="content-length:"{print $2}' | tr -d '\r')
+            echo "REPLACED $N $ID local=$(stat -c %s out/$N.mp4) server=$GOT"
+          done
