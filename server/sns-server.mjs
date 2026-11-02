@@ -66,7 +66,10 @@ const readState = f => { try { return JSON.parse(fs.readFileSync(f, 'utf8')); } 
 // ---- 在庫を集める ----
 async function stockOf(acc) {
   const st = readState(acc.state);
-  const items = Object.entries((st && st.items) || {}).map(([id, it]) => ({ id, ...it }));
+  // タイトルは投稿サーバーの media/<番号>.json にある（state.json には入っていない）
+  const mediaDir = path.join(path.dirname(acc.state), 'media');
+  const titleOf = (id, it) => { if (it.title) return it.title; try { const m = JSON.parse(fs.readFileSync(path.join(mediaDir, `${id}.json`), 'utf8')); return m.title || ''; } catch { return ''; } };
+  const items = Object.entries((st && st.items) || {}).map(([id, it]) => ({ id, ...it, title: titleOf(id, it) }));
   const reserved = items.filter(it => it.status === 'approved').sort((a, b) => (a.publishAt || 0) - (b.publishAt || 0));
   const pending = items.filter(it => it.status === 'pending').sort((a, b) => (a.receivedAt || 0) - (b.receivedAt || 0));
   const out = { acc, reserved, pending, queue: [], note: st ? '' : '投稿サーバーの記録が読めなかった' };
@@ -116,8 +119,8 @@ function bubbleOf(s) {
   const secs = [];
   const sec = (title, rows) => { if (secs.length) secs.push({ type: 'separator' }); secs.push({ type: 'box', layout: 'vertical', spacing: 'sm', contents: [head(title), ...rows] }); };
   const pair = (left, right, col) => ({ type: 'box', layout: 'horizontal', contents: [line1(left, { flex: 1 }), ...(String(right || '').trim() ? [{ type: 'text', text: String(right).trim(), size: 'xs', color: col, weight: 'bold', flex: 0, margin: 'md' }] : [])] });
-  sec(`予約済み（${s.reserved.length}本）`, s.reserved.length ? s.reserved.slice(0, 15).map(it => pair(short(it.title), it.publishAt ? when(it.publishAt) : '予約済み', '#1D4ED8')) : [line1('なし', { size: 'xs', color: '#888888' })]);
-  sec(`承認待ち（${s.pending.length}本）`, s.pending.length ? s.pending.slice(0, 15).map(it => pair(short(it.title), '承認待ち', '#C62828')) : [line1('なし', { size: 'xs', color: '#888888' })]);
+  sec(`予約済み（${s.reserved.length}本）`, s.reserved.length ? s.reserved.slice(0, 15).map(it => pair(short(it.title || `番号 ${it.id}`), it.publishAt ? when(it.publishAt) : '予約済み', '#1D4ED8')) : [line1('なし', { size: 'xs', color: '#888888' })]);
+  sec(`承認待ち（${s.pending.length}本）`, s.pending.length ? s.pending.slice(0, 15).map(it => pair(short(it.title || `番号 ${it.id}`), '承認待ち', '#C62828')) : [line1('なし', { size: 'xs', color: '#888888' })]);
   const qTitle = acc.drama ? `これから送る話（${s.queueTotal || 0}話）` : `書き出し前の在庫（${s.queueTotal || 0}本・上から順に出る）`;
   const qRows = s.queue.slice(0, 30).map((q, k) => acc.drama ? pair(q.title, q.note, '#6B7280') : pair(`${k + 1}. ${itemTitle(acc, q)}`, q.trial ? '挑戦' : q.series || '', '#6B7280'));
   if ((s.queueTotal || 0) > s.queue.slice(0, 30).length) qRows.push(line1(`ほか${s.queueTotal - 30}本`, { size: 'xs', color: '#888888' }));
