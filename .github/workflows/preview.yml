@@ -7,6 +7,10 @@ on:
       id:
         description: '書き出す動画の番号'
         required: true
+      key:
+        description: '声に使うキー（moshimo / quiz / drama）。1日の上限をアカウントごとに分けるため'
+        required: false
+        default: moshimo
 
 permissions:
   contents: read
@@ -36,7 +40,7 @@ jobs:
       - name: Build video
         env:
           CHROME_PATH: /usr/bin/google-chrome
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_API_KEY: ${{ (github.event.inputs.key == 'quiz' && secrets.GEMINI_API_KEY_QUIZ) || (github.event.inputs.key == 'drama' && secrets.GEMINI_API_KEY_DRAMA) || secrets.GEMINI_API_KEY }}
         run: bash tools/build.sh "${{ github.event.inputs.id }}"
       - uses: actions/upload-artifact@v4
         with:
