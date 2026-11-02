@@ -13,6 +13,12 @@ curl -fsSL "$RAW/setup-richmenu.mjs" -o "$TMP/setup-richmenu.mjs"
 node --check "$TMP/moshimo-server.mjs" && node --check "$TMP/sns-server.mjs"
 
 BK="/root/server-backup-$(date +%Y%m%d%H%M%S)"; mkdir -p "$BK"
+# 2026/11/02〜：承認と通知は SNS司令室にまとめる（各アカウントの LINE から自分では送らない）。クイズの TikTok は下書き送り
+setenv() { local f=$1 k=$2 v=$3; [ -f "$f" ] || return 0; cp "$f" "$BK/$(basename "$f")"; if grep -q "^$k=" "$f"; then sed -i "s/^$k=.*/$k=$v/" "$f"; else echo "$k=$v" >> "$f"; fi; }
+setenv /etc/moshimo.env QUIET 1
+setenv /etc/quiz.env QUIET 1
+setenv /etc/itsuwa.env QUIET 1
+setenv /etc/quiz.env TT_UPLOAD 1
 put() { local src=$1 dst=$2 svc=$3; [ -f "$dst" ] || { echo "× $dst がない（$svc は飛ばす）"; return; }; cp "$dst" "$BK/$svc.mjs"; cp "$src" "$dst"; systemctl restart "$svc"; echo "○ $svc を入れ替えた"; }
 put "$TMP/moshimo-server.mjs" /opt/moshimo-lab/server/moshimo-server.mjs moshimo
 put "$TMP/moshimo-server.mjs" /opt/quiz/server.mjs quiz

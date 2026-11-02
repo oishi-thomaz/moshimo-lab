@@ -104,7 +104,11 @@ async function line(pathname, body) {
   if (!r.ok) log('LINE error', r.status, await r.text());
   return r.ok;
 }
-const push = (messages) => state.owner ? line('/v2/bot/message/push', { to: state.owner, messages: [].concat(messages) }) : log('no LINE owner yet');
+// QUIET=1（2026/11/02〜）：承認・通知は SNS司令室にまとめたので、このアカウントの LINE には自分から送らない（返事は送る）。
+// 例外は接続のお知らせとトークン切れ（pushForce）だけ。投稿の失敗は SNS司令室が記録を見て知らせる
+const QUIET = env.QUIET === '1';
+const pushForce = (messages) => state.owner ? line('/v2/bot/message/push', { to: state.owner, messages: [].concat(messages) }) : log('no LINE owner yet');
+const push = (messages) => (QUIET ? (log('quiet: push skipped'), Promise.resolve(true)) : pushForce(messages));
 const reply = (token, messages) => line('/v2/bot/message/reply', { replyToken: token, messages: [].concat(messages) });
 const replyChecked = reply; // 届いたら true（カードが弾かれたら false なので文で送り直す）
 const text = t => ({ type: 'text', text: t.slice(0, 4900) });
@@ -269,6 +273,19 @@ async function digestTick() {
   for (const k of Object.keys(state.digestDone)) if (!k.endsWith(dk)) delete state.digestDone[k];
 }
 
+// 承認などの操作（LINE のボタンと、SNS司令室からの /an/action の両方で使う）。返事の文を返す
+async function doAction(act, id) {
+  const it = state.items[id];
+  if (!it) return `${id} が見つからへん`;
+  if (act === 'cap') return captionText(id) || 'キャプションがない';
+  if (act === 'ttcap') return ttCaption(id) || 'キャプションがない';
+  if (it.status === 'published') return `${id} はもう投稿済み`;
+  if (act === 'approve') { it.status = 'approved'; it.publishAt = nextSlot(); save(); return `OK。${meta(id).title || id} は ${fmt(it.publishAt)} に投稿する`; }
+  if (act === 'now') { it.status = 'approved'; it.publishAt = Date.now(); it.ttNow = true; save(); return `OK。${meta(id).title || id} を今から投稿する`; }
+  if (act === 'reject') { it.status = 'rejected'; save(); return `${meta(id).title || id} は却下にした`; }
+  if (act === 'retry') { it.status = 'approved'; it.publishAt = Date.now(); it.error = ''; save(); return `${meta(id).title || id} をもう一回投稿してみる`; }
+  return `知らない操作：${act}`;
+}
 async function onPostback(ev) {
   const [act, id] = String(ev.postback.data).split(':');
   const it = state.items[id];
@@ -517,7 +534,7 @@ async function ytCallback(u, res) {
   state.yt.refresh = j.refresh_token; state.yt.scopeV2 = /yt-analytics/.test(j.scope || YT_SCOPE); delete state.yt.oauthState; ytAccess = { token: j.access_token, exp: Date.now() + (j.expires_in || 3600) * 1000 }; save();
   try { const c = await (await yt('GET', 'https://www.googleapis.com/youtube/v3/channels?part=snippet&mine=true')).json(); state.yt.channel = c.items?.[0]?.snippet?.title || ''; save(); } catch (e) { log('yt channel', e); }
   const n = scheduleBackfill();
-  await push(text(`YouTubeにつながった（${state.yt.channel || 'チャンネル名は取れなかった'}）。これからはインスタと同時にYouTubeにも投稿する。${n ? `\nインスタに投稿済みの${n.count}本は ${n.from}〜${n.to} に2日に分けて上げる。` : ''}`));
+  await pushForce(text(`YouTubeにつながった（${state.yt.channel || 'チャンネル名は取れなかった'}）。これからはインスタと同時にYouTubeにも投稿する。${n ? `\nインスタに投稿済みの${n.count}本は ${n.from}〜${n.to} に2日に分けて上げる。` : ''}`));
   return html(`YouTubeにつながった（${state.yt.channel || ''}）。LINEに戻ってOK。`);
 }
 // インスタに投稿済みでまだYouTubeにない動画を、YT_TIMES の時刻に2日に分けて並べる
@@ -595,7 +612,7 @@ async function refreshToken() {
     if (!j.access_token) throw new Error(JSON.stringify(j));
     state.igToken = j.access_token; state.igTokenAt = Date.now(); save();
     log('IG token refreshed');
-  } catch (e) { log('token refresh failed', e); await push(text(`Instagramのトークン更新に失敗した。Claudeに伝えて：${String(e).slice(0, 300)}`)); }
+  } catch (e) { log('token refresh failed', e); await pushForce(text(`Instagramのトークン更新に失敗した。Claudeに伝えて：${String(e).slice(0, 300)}`)); }
 }
 
 // 承認待ちが残ってたら REMIND_TIMES に1回ずつ再通知（その時刻から15分以内のときだけ。再起動で連発しない）
@@ -792,7 +809,7 @@ async function ttCallback(u, res) {
   if (!j.refresh_token) { log('tt auth failed', j); return html(`接続に失敗した（${String(j.error_description || j.error || '').slice(0, 100)}）。LINEで TikTok設定 からやり直して。`); }
   state.tt.refresh = j.refresh_token; delete state.tt.oauthState; ttAccess = { token: j.access_token, exp: Date.now() + (j.expires_in || 86400) * 1000 }; save();
   try { const d = await ttApi('GET', 'https://open.tiktokapis.com/v2/user/info/?fields=display_name,follower_count'); state.tt.name = (d.user && d.user.display_name) || ''; save(); } catch (e) { log('tt user', e.message); }
-  await push(text(TT_UPLOAD ? `TikTokにつながった（${state.tt.name || TT_USER}）。これからはインスタに投稿するときに、TikTokの下書きにも動画を送る。` : `TikTokにつながった（${state.tt.name || TT_USER}）。これからは動画ごとの再生数も毎時取る。「今すぐ投稿」を押したときは TikTok の下書きにも動画を送る。`));
+  await pushForce(text(TT_UPLOAD ? `TikTokにつながった（${state.tt.name || TT_USER}）。これからはインスタに投稿するときに、TikTokの下書きにも動画を送る。` : `TikTokにつながった（${state.tt.name || TT_USER}）。これからは動画ごとの再生数も毎時取る。「今すぐ投稿」を押したときは TikTok の下書きにも動画を送る。`));
   return html('TikTokにつながった。LINEに戻ってOK。');
 }
 
@@ -917,6 +934,7 @@ async function pushReport(r) {
   catch (e) { log('report+digest failed', e.message); await push(body); }
 }
 async function pushChecked(msg) {
+  if (QUIET) { log('quiet: pushChecked skipped'); return; }
   if (!state.owner || !LINE_TOKEN) throw new Error('no owner/token');
   const res = await fetch('https://api.line.me/v2/bot/message/push', { method: 'POST', headers: { 'content-type': 'application/json', authorization: `Bearer ${LINE_TOKEN}` }, body: JSON.stringify({ to: state.owner, messages: [].concat(msg) }) });
   if (!res.ok) throw new Error(`LINE ${res.status} ${(await res.text()).slice(0, 300)}`);
@@ -1016,7 +1034,7 @@ function readSnaps(since) {
 }
 function exportData(hours) {
   const now = Date.now();
-  const items = Object.fromEntries(Object.entries(state.items).map(([id, i]) => { const m = meta(id); return [id, { status: i.status, tt: i.tt ? { ok: !!i.tt.ok, error: i.tt.error || '', status: i.tt.status || '', at: i.tt.at || 0 } : undefined, ttNow: !!i.ttNow, title: m.title || '', ask: m.ask || '', hashtags: m.hashtags || [], mediaId: i.mediaId || '', permalink: i.permalink || '', publishedAt: i.publishedAt || 0, publishAt: i.publishAt || 0, yt: i.yt && i.yt.videoId ? i.yt.videoId : '' }]; }));
+  const items = Object.fromEntries(Object.entries(state.items).map(([id, i]) => { const m = meta(id); return [id, { status: i.status, tt: i.tt ? { ok: !!i.tt.ok, error: i.tt.error || '', status: i.tt.status || '', at: i.tt.at || 0 } : undefined, ttNow: !!i.ttNow, title: m.title || '', ask: m.ask || '', hashtags: m.hashtags || [], mediaId: i.mediaId || '', permalink: i.permalink || '', publishedAt: i.publishedAt || 0, publishAt: i.publishAt || 0, yt: i.yt && i.yt.videoId ? i.yt.videoId : '', feedback: i.feedback || undefined, feedbackDone: i.feedbackDone || undefined }]; }));
   return {
     now, items, snaps: readSnaps(now - hours * 3600e3),
     igDays: state.an.igDays || {}, ytAnalytics: state.an.ytA || null, ytAnalyticsError: state.an.ytAerr || '',
@@ -1264,6 +1282,20 @@ http.createServer(async (req, res) => {
         if (at > Date.now() + 60e3) { state.an.outbox = [...(state.an.outbox || []), r]; save(); return send(res, 200, { ok: true, scheduled: fmt(at) }); }
         await pushReport(r); return send(res, 200, { ok: true, sent: true });
       }
+      // ---- SNS司令室から（同じ VPS の返事係が使う）----
+      if (req.method === 'GET' && p === '/an/pending') {
+        let slot = nextSlot(); const used = new Set(Object.values(state.items).filter(i => i.status === 'approved').map(i => i.publishAt));
+        const list = pendingIds().map(id => { const m = meta(id); return { id, title: m.title || `動画 ${id}`, len: m.len || (m.duration ? mmss(Math.max(0, Number(m.duration) - 5)) : ''), ask: m.ask || '', cover: `${BASE_URL}/media/${id}_cover.jpg`, video: `${BASE_URL}/media/${id}.mp4`, receivedAt: state.items[id].receivedAt || 0 }; });
+        return send(res, 200, { ok: true, brand: BRAND, nextSlot: slot, tt: !!(TT_UPLOAD && state.tt && state.tt.refresh), yt: !!(state.yt && state.yt.refresh), items: list, usedSlots: used.size });
+      }
+      if (req.method === 'GET' && p === '/an/caption') { const id = u.searchParams.get('id') || ''; return send(res, 200, { ok: !!state.items[id], tt: ttCaption(id), full: captionText(id), title: meta(id).title || id }); }
+      if (req.method === 'POST' && p === '/an/action') return send(res, 200, { ok: true, message: await doAction(String(body.act || ''), String(body.id || '')) });
+      if (req.method === 'POST' && p === '/an/feedback') { // 修正の指示：その回は却下にして、指示を記録する（Claude が直して同じ番号で上げ直す）
+        const it = state.items[String(body.id || '')]; if (!it) return send(res, 404, { ok: false, error: 'no item' });
+        if (it.status === 'published') return send(res, 200, { ok: false, message: 'もう投稿済み' });
+        it.status = 'rejected'; it.feedback = [...(it.feedback || []), { t: Date.now(), text: String(body.text || '').slice(0, 2000) }]; delete it.feedbackDone; save();
+        return send(res, 200, { ok: true });
+      }
       if (req.method === 'POST' && p === '/an/revenue') { // TikTok の収益（moshimo-analytics のまとめから）
         if (!Array.isArray(body.days)) return send(res, 400, { ok: false, error: 'days' });
         state.revenue = { at: Number(body.at) || Date.now(), days: body.days.slice(-62), months: body.months || {}, top: (body.top || []).slice(0, 5) }; save();
@@ -1276,6 +1308,7 @@ http.createServer(async (req, res) => {
       if (req.method === 'POST' && p === '/an/control') {
         const out = {};
         if (body.postTimes) out.postTimes = setPostTimes(`投稿時間 ${body.postTimes}`);
+        if (Array.isArray(body.feedbackDone)) { for (const id of body.feedbackDone) if (state.items[id]) state.items[id].feedbackDone = Date.now(); save(); out.feedbackDone = body.feedbackDone.length; }
         if (body.notice) { await push(text(String(body.notice))); out.notice = true; }
         if (body.validate) { // LINE に送らずにカードの形が正しいかだけ確かめる
           const sample = [flexAlert([{ p: 'tt', kind: 'velocity', gain: 12000, base: 800, total: 29000, title: 'ゴキブリが絶滅したら？' }, { p: 'tt', kind: 'followers', gain: 100, total: 21000 }], Date.now())];

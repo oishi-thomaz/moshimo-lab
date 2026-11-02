@@ -22,7 +22,19 @@
 | タイトル当てクイズ（quiz、@title_ate_quiz） | 映画・ドラマのタイトル当て3D（約64秒） | 1日5本 12:00・15:00・18:00・20:00・22:00（立ち上げの1か月） | plan/quiz-queue.txt にあって state/quiz-rendered.txt にない本数 | docs/QUIZ.md | quiz-render.yml を1回（count=5） | この下の 日報（サーバー型） | docs/QUIZ-TIKTOK.md（Claude アプリのブラウザ） |
 | いつわ劇場（itsuwa、@itsuwa_drama） | 1話3分・全5話のショートドラマ | 1日1話 20:00 | docs/ITSUWA-AUTO.md の 1 | docs/ITSUWA-AUTO.md | なし（作った話をその場で送る） | この下の 日報（サーバー型） | なし（投稿サーバーが TikTok の下書きに送る） |
 
-各アカウントの投稿サーバー（VPS）は別々で、承認用の LINE 公式アカウントもアカウントごとに別。承認はゆうとが LINE でする。
+各アカウントの投稿サーバー（VPS）は別々。承認はゆうとが SNS司令室（LINE）の 承認待ち ボタンからする（2026/11/02〜。承認・修正の指示・却下・まとめて承認がそこでできる）。各アカウントの LINE は QUIET=1 で、自分からは送らない（返事だけ）。
+
+## ゆうとの役割と Claude の役割（2026/11/02 ゆうとの決定）
+- ゆうとがやるのは、確認・台本の修正の指示・承認だけ。台本の管理、数字の分析、方向性の判断、在庫の並び、投稿時間の調整は Claude が全部やる。収益化前のアカウント（クイズ・いつわ劇場）は、TikTok のフォロワーを増やして収益化の条件に届かせるのが最優先。
+- 修正の指示（下の 修正の指示 を取り込む）は、何よりも先にやる。
+- LINE の無料の送信枠（各アカウント月200通）を守る。Claude から送るのは SNS司令室だけで、1日3回のまとめ・見張りの連絡・月曜の週の振り返り・投稿の失敗のお知らせだけ。ほかはゆうとがメニューのボタンで取りに来る（返事は数えない）。
+
+## 修正の指示を取り込む（朝の仕事と動画制作の最初に毎回）
+1. moshimo-analytics で各アカウントの `node tools/run.mjs collect --account=<moshimo|quiz|itsuwa>` のあと、data/state.json・data/quiz/state.json・data/itsuwa/state.json の items で feedback があって feedbackDone がない回を探す（その回は投稿サーバーで却下になっている）。
+2. ゆうとの指示どおりに台本を直す（指示があれば数字・構成・言い回しも変えてよい。事実は一次資料で確かめる）。もしもラボ・クイズは、直した台本を commit したあと state/rendered.txt（クイズは state/quiz-rendered.txt）からその番号を消し、在庫（plan/queue.txt・plan/quiz-queue.txt）の一番前に置いて push する。次の書き出しで同じ番号で上がり、また承認待ちに出る。いつわ劇場は docs/ITSUWA-AUTO.md の 4 で作り直して send.sh で送り直す。
+3. 同じ種類の指摘がまた起きないよう、ルールに足す（もしもラボは plan/RULES.md か docs/PRODUCTION.md、クイズは docs/QUIZ.md、いつわ劇場は docs/ITSUWA-AUTO.md の 3）。
+4. reports/outbox/control-<アカウント>-fb-YYYY-MM-DD.json に {"feedbackDone": ["番号", ...]} を書いて `node tools/run.mjs control <ファイル> --account=<アカウント>`（同じ指示を二重に直さないため）。
+5. 最後の返答と、その日の日報の やったこと に、何をどう直したかを1行ずつ書く。
 
 ## 連絡は SNS司令室 にまとめる（2026/11/02〜）
 - 日報・見張りの直した連絡・午後の見回りの連絡は、全部 SNS司令室（まとめ用の LINE 公式アカウント。Secrets の SNS_LINE_TOKEN）に送る。Claude から各アカウントの LINE には何も送らない（ゆうとの決定。各アカウントの LINE に届くのは承認カードと、投稿サーバー自身の通知だけ）。
@@ -47,6 +59,7 @@
 
 ## 1. 朝の仕事（6:15）
 1. 両方のリポジトリを用意する。
+1.5. 修正の指示を取り込む（上）。直した回は、このあとの書き出しで同じ番号で上げ直す。
 2. 解析と日報（アカウント一覧の順に）：
    - もしもラボ：moshimo-analytics の ANALYST.md の 毎朝の手順（月曜は 毎週月曜の朝にやること も）。
    - クイズ・いつわ劇場：下の 日報（サーバー型）。
@@ -56,7 +69,8 @@
    - もしもラボ：daily-render.yml を番号なしで3回。同時に1本しか待機できない（2本目を予約すると前の待機分が取り消される）ので、1本目が in_progress になってから次を予約する。1本20分くらい。
    - クイズ：quiz-render.yml を1回だけ（inputs[count]=5）。1本10〜12分で、1本できるごとに LINE に承認カードが届く。
    - 両方とも終わるまで待つ。落ちた回は 2. 見張り の直し方で直して、同じ番号で1回だけやり直す（同じ回を二重に上げない。もしもラボは state/rendered.txt、クイズは state/quiz-rendered.txt を確かめてから）。在庫が空なら その旨だけ。
-4. 最後の返答：アカウントごとに 日報の要点1行と、書き出した番号と結果。
+4. 月曜だけ：週の振り返りを SNS司令室に1通送る。reports/outbox/week-YYYY-MM-DD.json に {"card": {"title": "週の振り返り M/D", "sections": [{"head": "<アカウント名>", "items": ["伸びた型（数字つき）", "やめる型", "来週の方針", "実際に変えたこと"]}, …3アカウント分]}} を書いて commit・push し、`node tools/run.mjs notice reports/outbox/week-YYYY-MM-DD.json`。収益化の条件（下の 収益化の条件）に近づいたアカウントがあれば、その数字も items に入れる。
+5. 最後の返答：アカウントごとに 日報の要点1行と、書き出した番号と結果。
 
 ### 日報（サーバー型：クイズ・いつわ劇場）
 1. moshimo-analytics で `node tools/run.mjs collect --account=<quiz|itsuwa>` → `node tools/brief.mjs <quiz|itsuwa>` を実行し、出てきた analysis/<アカウント>-YYYY-MM-DD.md を全部読む。notes/<アカウント>-insights.md と直近3日の reports/<アカウント>-YYYY-MM-DD.md も読む（なければ作る）。
@@ -91,7 +105,7 @@
 
 ## 3. 動画制作（10:47・16:47）
 1. 両方のリポジトリを用意する。
-2. アカウントごとに在庫を数えて、作るかどうかを決める：
+2. 先に 修正の指示を取り込む（上）をやる。そのあと、アカウントごとに在庫を数えて、作るかどうかを決める：
    - もしもラボ：在庫が21本を下回っていたら28本になるまで作る（1回で最低7本）。21本以上なら作らない。
    - クイズ：在庫が20本を下回っていたら20本になるまで作る（1回で最大6本。品質を落として数を合わせない）。
    - いつわ劇場：docs/ITSUWA-AUTO.md の 1。作るのは1日1話まで（今日すでに1話送っていれば作らない）。

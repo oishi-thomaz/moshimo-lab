@@ -30,8 +30,8 @@ const log = (...a) => console.log(new Date().toISOString(), ...a);
 
 const ACCOUNTS = [
   { key: 'moshimo', name: 'もしもラボ', color: '#0F766E', state: env.MOSHIMO_STATE || '/var/lib/moshimo/state.json', local: env.MOSHIMO_LOCAL || 'http://127.0.0.1:8787/moshimo', queue: 'plan/queue.txt', rendered: 'state/rendered.txt' },
-  { key: 'quiz', name: 'タイトル当てクイズ', color: '#B45309', state: env.QUIZ_STATE || '/var/lib/quiz/state.json', local: env.QUIZ_LOCAL || 'http://127.0.0.1:8789/quiz', queue: 'plan/quiz-queue.txt', rendered: 'state/quiz-rendered.txt' },
-  { key: 'itsuwa', name: 'いつわ劇場', color: '#9F1239', state: env.ITSUWA_STATE || '/var/lib/itsuwa/state.json', local: env.ITSUWA_LOCAL || 'http://127.0.0.1:8788/itsuwa', drama: true },
+  { key: 'quiz', name: 'タイトル当てクイズ', color: '#B45309', state: env.QUIZ_STATE || '/var/lib/quiz/state.json', local: env.QUIZ_LOCAL || 'http://127.0.0.1:8789/quiz', queue: 'plan/quiz-queue.txt', rendered: 'state/quiz-rendered.txt', ttDraft: true },
+  { key: 'itsuwa', name: 'いつわ劇場', color: '#9F1239', state: env.ITSUWA_STATE || '/var/lib/itsuwa/state.json', local: env.ITSUWA_LOCAL || 'http://127.0.0.1:8788/itsuwa', drama: true, ttDraft: true },
 ];
 
 // ---- 時刻（日本時間） ----
@@ -228,14 +228,15 @@ function trendBoxes(list, withAcc) {
     { type: 'text', text: `累計 ${kfmt(x.m.views)}再生`, size: 'xxs', color: '#888888' }] }));
 }
 const STATUS = { published: ['公開済み', '#0A7D3C'], approved: ['予約済み', '#1D4ED8'], pending: ['承認待ち', '#C62828'] };
-function postBoxes(list) {
+function postBoxes(list, acc) {
   return list.slice(0, 10).map((it, i) => {
     const [st, col] = STATUS[it.status] || [it.status, '#666666'];
     const vs = ['ig', 'tt', 'yt'].filter(p => it.v[p] != null).map(p => `${PLAT[p]} ${kfmt(it.v[p])}`);
     return { type: 'box', layout: 'vertical', spacing: 'xs', margin: i ? 'md' : 'none', contents: [
       { type: 'box', layout: 'horizontal', contents: [{ type: 'text', text: hm(it.publishAt), size: 'xs', color: '#6B7280', weight: 'bold', flex: 1 }, { type: 'text', text: st, size: 'xs', weight: 'bold', color: col, flex: 0 }] },
       line1(short(it.title || `番号 ${it.id}`)),
-      ...(it.status === 'published' ? [{ type: 'text', text: vs.length ? vs.join('・') : '再生はまだ取れてない', size: 'xxs', color: '#888888', wrap: true }] : [])] };
+      ...(it.status === 'published' ? [{ type: 'text', text: vs.length ? vs.join('・') : '再生はまだ取れてない', size: 'xxs', color: '#888888', wrap: true }] : []),
+      ...(acc && acc.ttDraft && it.status === 'published' ? [{ type: 'button', style: 'link', height: 'sm', action: { type: 'postback', label: 'TikTokのキャプションを出す', data: `cap:${acc.key}:${it.id}` } }] : [])] };
   });
 }
 function card(acc, subtitle, sections, footer) {
@@ -257,20 +258,78 @@ const openButton = (acc, text) => {
 async function liveAll() { return Promise.all(ACCOUNTS.map(async acc => { const L = await loadLive(acc); return { acc, L, a: L.error ? null : analyzeLive(acc, L) }; })); }
 const carousel = (alt, bubbles) => ({ type: 'flex', altText: alt.slice(0, 390), contents: { type: 'carousel', contents: bubbles } });
 
+// ---- 承認（2026/11/02〜 SNS司令室に一本化）：各投稿サーバーに同じ VPS の中から聞いて、ここで承認・修正・却下する ----
+const accOf = key => ACCOUNTS.find(a => a.key === key);
+const keyOf = acc => { const st = readState(acc.state); return (st && st.an && st.an.key) || ''; };
+async function api(acc, method, p, body) {
+  const r = await fetch(`${acc.local}${p}`, { method, headers: { 'x-an-key': keyOf(acc), 'content-type': 'application/json' }, body: body ? JSON.stringify(body) : undefined, signal: AbortSignal.timeout(20e3) });
+  const t = await r.text(); let j = {}; try { j = JSON.parse(t); } catch {}
+  if (!r.ok) throw new Error(`${acc.name} ${r.status} ${t.slice(0, 80)}`);
+  return j;
+}
+const pb = (label, data, display, style = 'secondary', color) => ({ type: 'button', style, height: 'sm', ...(color ? { color } : {}), action: { type: 'postback', label, data, ...(display ? { displayText: display } : {}) } });
+function approvalBubble(acc, it, slotText) {
+  return { type: 'bubble', size: 'mega',
+    hero: { type: 'image', url: it.cover, size: 'full', aspectRatio: '4:5', aspectMode: 'cover', action: { type: 'uri', uri: it.video } },
+    body: { type: 'box', layout: 'vertical', spacing: 'sm', contents: [
+      { type: 'box', layout: 'horizontal', contents: [{ type: 'box', layout: 'vertical', flex: 0, backgroundColor: acc.color, cornerRadius: '4px', paddingAll: '4px', paddingStart: '8px', paddingEnd: '8px', contents: [{ type: 'text', text: acc.name, size: 'xxs', color: '#ffffff', weight: 'bold' }] }, { type: 'filler' }] },
+      { type: 'text', text: short(it.title, 60), size: 'md', weight: 'bold', wrap: true, maxLines: 3 },
+      { type: 'box', layout: 'horizontal', margin: 'md', contents: [{ type: 'text', text: '承認すると', size: 'xs', color: '#888888', flex: 1 }, { type: 'text', text: slotText, size: 'xs', weight: 'bold', color: '#0A7D3C', flex: 0 }] },
+      ...(it.len ? [{ type: 'box', layout: 'horizontal', contents: [{ type: 'text', text: '長さ', size: 'xs', color: '#888888', flex: 1 }, { type: 'text', text: it.len, size: 'xs', weight: 'bold', flex: 0 }] }] : []),
+      { type: 'text', text: '画像を押すと動画が見られる', size: 'xxs', color: '#AAAAAA', margin: 'md' }] },
+    footer: { type: 'box', layout: 'vertical', spacing: 'sm', contents: [
+      pb('承認する', `ap:${acc.key}:approve:${it.id}`, `${short(it.title, 20)} を承認`, 'primary', acc.color),
+      { type: 'box', layout: 'horizontal', spacing: 'sm', contents: [pb('修正して', `fb:${acc.key}:${it.id}`, `${short(it.title, 20)} を修正して`), pb('却下', `ap:${acc.key}:reject:${it.id}`, `${short(it.title, 20)} を却下`)] }] } };
+}
 async function pendingMessage() {
-  const all = await liveAll();
-  return carousel(`承認待ち：${all.map(x => `${x.acc.name} ${x.a ? x.a.pending.length : '?'}本`).join('・')}`, all.map(({ acc, L, a }) => {
-    if (!a) return card(acc, L.error, [[line1('読めなかった', { size: 'xs', color: '#C62828' })]]);
-    const rows = a.pending.length ? a.pending.slice(0, 12).map(it => line1(short(it.title || `番号 ${it.id}`))) : [line1('なし', { size: 'xs', color: '#888888' })];
-    return card(acc, `承認待ち ${a.pending.length}本`, [[head('承認待ちの動画'), ...rows]], a.pending.length ? openButton(acc, '承認待ち') : null);
-  }));
+  const all = await Promise.all(ACCOUNTS.map(async acc => { try { return { acc, P: await api(acc, 'GET', '/an/pending') }; } catch (e) { return { acc, err: e.message }; } }));
+  const total = all.reduce((n, x) => n + (x.P ? x.P.items.length : 0), 0);
+  // 1枚目：アカウントごとの本数と まとめて承認
+  const rows = all.map(({ acc, P, err }, i) => ({ type: 'box', layout: 'vertical', spacing: 'sm', margin: i ? 'lg' : 'none', contents: [
+    { type: 'box', layout: 'horizontal', alignItems: 'center', contents: [line1(acc.name, { flex: 1, weight: 'bold' }), { type: 'text', text: err ? '読めなかった' : `${P.items.length}本`, size: 'sm', weight: 'bold', flex: 0, color: err ? '#C62828' : P.items.length ? '#C62828' : '#0A7D3C' }] },
+    ...(P && P.items.length > 1 ? [pb(`${acc.name}を全部承認`, `apall:${acc.key}`, `${acc.name}の承認待ちを全部承認`, 'primary', acc.color)] : [])] }));
+  const head1 = { type: 'bubble', size: 'mega',
+    header: { type: 'box', layout: 'vertical', backgroundColor: '#16324F', paddingAll: '14px', contents: [line1(`承認待ち ${total}本`, { color: '#ffffff', weight: 'bold', size: 'lg' }), line1('右にスワイプで1本ずつ見られる', { color: '#E5E7EB', size: 'xs' })] },
+    body: { type: 'box', layout: 'vertical', paddingAll: '14px', contents: rows },
+    footer: { type: 'box', layout: 'vertical', paddingAll: '10px', contents: [{ type: 'text', text: '修正して を押すと、直してほしいところを書ける。その回は却下になって、Claude が直してもう一回ここに出す', size: 'xxs', color: '#888888', wrap: true }] } };
+  if (!total) return { type: 'flex', altText: '承認待ちはない', contents: head1 };
+  const bubbles = [];
+  for (const { acc, P } of all) if (P) P.items.forEach((it, k) => bubbles.push(approvalBubble(acc, it, k === 0 ? (P.nextSlot ? when(P.nextSlot) : '-') : '承認した順に次の枠')));
+  const msgs = [], chunks = [[head1, ...bubbles.slice(0, 11)]];
+  for (let i = 11; i < bubbles.length; i += 12) chunks.push(bubbles.slice(i, i + 12));
+  for (const c of chunks.slice(0, 5)) msgs.push({ type: 'flex', altText: `承認待ち ${total}本`, contents: { type: 'carousel', contents: c } });
+  return msgs;
+}
+async function onApproval(data, uid) {
+  const [kind, key, a3, a4] = data.split(':');
+  const acc = accOf(key); if (!acc) return text('アカウントがわからへん');
+  if (kind === 'ap') { const r = await api(acc, 'POST', '/an/action', { act: a3, id: a4 }); return text(r.message || 'OK'); }
+  if (kind === 'cap') { const r = await api(acc, 'GET', `/an/caption?id=${encodeURIComponent(a3)}`); return [text(`${r.title} の TikTok キャプション。次の吹き出しを長押しでコピーして貼って`), text(r.tt || r.full || 'キャプションがない')]; }
+  if (kind === 'apall') {
+    const P = await api(acc, 'GET', '/an/pending'); const out = [];
+    for (const it of P.items) { const r = await api(acc, 'POST', '/an/action', { act: 'approve', id: it.id }); out.push(`・${r.message}`); }
+    return text(out.length ? `${acc.name}を全部承認した\n${out.join('\n')}` : '承認待ちはなかった');
+  }
+  if (kind === 'fb') {
+    state.awaitFb = { key, id: a3, until: Date.now() + 15 * 60e3 }; save();
+    return text('直してほしいところを、このまま送って（例：冒頭の言い回しをもっと皮肉っぽく、数字を大きく見せて など）。15分以内に送ったぶんを記録する。やめるときは やめる と送って');
+  }
+  return text('わからへんボタンやった');
+}
+async function onFeedbackText(msg) {
+  const f = state.awaitFb; delete state.awaitFb; save();
+  if (/^(やめる|キャンセル)$/.test(msg)) return text('修正の指示はやめた（その回はまだ承認待ちのまま）');
+  const acc = accOf(f.key);
+  const r = await api(acc, 'POST', '/an/feedback', { id: f.id, text: msg });
+  if (!r.ok) return text(`記録できへんかった（${r.message || r.error || ''}）`);
+  return text(`記録した。その回はいったん却下にして、次の動画制作の回（10:47 か 16:47）で Claude が直して、もう一回 承認待ち に出す。\n同じ指摘は今後の台本のルールにも入れる。`);
 }
 async function todayMessage() {
   const all = await liveAll(), now = Date.now();
   return carousel(`今日の投稿 ${md(now)}`, all.map(({ acc, L, a }) => {
     if (!a) return card(acc, L.error, [[line1('読めなかった', { size: 'xs', color: '#C62828' })]]);
-    const sec = a.today.length ? postBoxes(a.today) : [line1(a.pending.length ? `まだ予定なし（承認待ち ${a.pending.length}本）` : '予定なし', { size: 'xs', color: '#C62828' })];
-    return card(acc, `${md(now)} の投稿・${a.at ? hm(a.at) + ' 時点' : ''}`, [[head('今日の投稿'), ...sec]], a.pending.length ? openButton(acc, '承認待ち') : null);
+    const sec = a.today.length ? postBoxes(a.today, acc) : [line1(a.pending.length ? `まだ予定なし（承認待ち ${a.pending.length}本）` : '予定なし', { size: 'xs', color: '#C62828' })];
+    return card(acc, `${md(now)} の投稿・${a.at ? hm(a.at) + ' 時点' : ''}`, [[head('今日の投稿'), ...sec]]);
   }));
 }
 async function trendMessage() {
@@ -302,12 +361,12 @@ const HOWTO = [
   '',
   'ボタン',
   '・ストック：まだ投稿してない動画（予約済み・承認待ち・書き出し前）',
-  '・承認待ち：3アカウントの承認待ち。ボタンでそのアカウントのLINEを開ける',
-  '・今日の投稿：今日の予定と今の再生',
+  '・承認待ち：3アカウントの承認待ちをここで承認・修正・却下（まとめて承認もできる）',
+  '・今日の投稿：今日の予定と今の再生。クイズといつわ劇場は TikTok のキャプションもここから出せる',
   '・いま回ってる：直近3時間で伸びてる動画',
   '・いまの数字：フォロワーと24時間の再生',
   '',
-  '承認そのものは、各アカウントのLINE（下の 承認待ち ボタン）でする。',
+  '修正して を押したあとに書いた指示は、Claude が次の動画制作で直してもう一回 承認待ち に出す。',
 ].join('\n');
 
 // ---- LINE ----
@@ -328,10 +387,20 @@ async function onEvent(ev) {
   log('event', ev.type, ev.message ? ev.message.type : '', uid ? uid.slice(0, 6) + '…' : '-', uid && uid === state.owner ? 'owner' : 'not-owner');
   if (!uid || DUMMY.test(uid) || /^0+$|^f+$/i.test(ev.replyToken || '')) return;
   if (ev.type === 'follow' && !state.owner) { state.owner = uid; save(); log('owner set (follow)'); }
+  if (ev.type === 'postback') {
+    try { const m = await onApproval(String(ev.postback.data || ''), uid); await reply(ev.replyToken, m); }
+    catch (e) { log('approval error', e); await reply(ev.replyToken, text(`うまくいかへんかった（${String(e.message).slice(0, 100)}）`)); }
+    return;
+  }
   if (ev.type !== 'message' || !ev.message || ev.message.type !== 'text') return;
   if (!state.owner) { state.owner = uid; save(); log('owner set'); }
   // 友だちになっている人（＝ゆうと）からの メッセージにはそのまま返す。持ち主の照合で返事が止まらないように、ここでは弾かない
   const msg = ev.message.text.trim();
+  const isCmd = /^(承認待ち|承認|今日(の投稿)?|(いま|今)回って(る|いる).*|(いま|今)の数字|数字|使い方|ヘルプ|help|ストック|すとっく|在庫|stock)$/i.test(msg);
+  if (state.awaitFb && state.awaitFb.until > Date.now() && !isCmd) {
+    try { await reply(ev.replyToken, await onFeedbackText(msg)); } catch (e) { log('feedback error', e); await reply(ev.replyToken, text(`記録できへんかった（${String(e.message).slice(0, 80)}）`)); }
+    return;
+  }
   const CMDS = [[/^(承認待ち|承認)$/, pendingMessage], [/^今日(の投稿)?$/, todayMessage], [/^(いま|今)回って(る|いる)/, trendMessage], [/^(いま|今)の数字$|^数字$/, numbersMessage]];
   for (const [re, fn] of CMDS) if (re.test(msg)) {
     try { const m = await fn(); if (!(await reply(ev.replyToken, m))) await reply(ev.replyToken, text('カードが送れへんかった。もう一回押してみて。')); }
@@ -346,6 +415,36 @@ async function onEvent(ev) {
   }
   await reply(ev.replyToken, text(HELP));
 }
+
+// ---- 投稿の失敗だけは SNS司令室から知らせる（各アカウントの LINE は静かにしたので）。5分ごとに記録を見る ----
+async function pushOwner(messages) {
+  if (!state.owner || !LINE_TOKEN) return false;
+  const r = await fetch('https://api.line.me/v2/bot/message/push', { method: 'POST', headers: { 'content-type': 'application/json', authorization: `Bearer ${LINE_TOKEN}` }, body: JSON.stringify({ to: state.owner, messages: [].concat(messages) }) });
+  if (!r.ok) log('push failed', r.status, (await r.text()).slice(0, 200));
+  return r.ok;
+}
+async function watchFailures() {
+  state.alerted = state.alerted || {};
+  const out = [];
+  for (const acc of ACCOUNTS) {
+    const st = readState(acc.state); if (!st) continue;
+    for (const x of (st.postedLog || []).filter(x => x.t > Date.now() - 6 * 3600e3)) {
+      const r = x.r || {}, bad = ['ig', 'yt', 'tt'].filter(p => r[p] && !r[p].ok && !r[p].skip);
+      const k = `${acc.key}:${x.id}:${x.t}`;
+      if (!bad.length || state.alerted[k]) continue;
+      state.alerted[k] = Date.now();
+      let title = x.id; try { title = JSON.parse(fs.readFileSync(path.join(path.dirname(acc.state), 'media', `${x.id}.json`), 'utf8')).title || x.id; } catch {}
+      out.push({ acc, id: x.id, title, why: bad.map(p => `${PLAT[p]}：${String(r[p].error || '失敗').slice(0, 80)}`).join('\n'), ig: bad.includes('ig') });
+    }
+  }
+  for (const k of Object.keys(state.alerted)) if (state.alerted[k] < Date.now() - 3 * 86400e3) delete state.alerted[k];
+  save();
+  if (!out.length) return;
+  const b = { type: 'bubble', size: 'giga', header: { type: 'box', layout: 'vertical', backgroundColor: '#C62828', paddingAll: '14px', contents: [line1('投稿に失敗した', { color: '#ffffff', weight: 'bold', size: 'lg' })] },
+    body: { type: 'box', layout: 'vertical', paddingAll: '14px', spacing: 'md', contents: out.slice(0, 6).map(o => ({ type: 'box', layout: 'vertical', spacing: 'xs', contents: [line1(`${o.acc.name}：${short(o.title)}`, { weight: 'bold' }), { type: 'text', text: o.why, size: 'xs', color: '#C62828', wrap: true }, ...(o.ig ? [pb('インスタにもう一回', `ap:${o.acc.key}:retry:${o.id}`, `${short(o.title, 20)} をもう一回投稿`)] : [])] })) } };
+  await pushOwner({ type: 'flex', altText: `投稿に失敗：${out.map(o => short(o.title, 14)).join('・')}`, contents: b });
+}
+if (!process.argv.some(a => a.startsWith('--'))) setInterval(() => watchFailures().catch(e => log('watch', e.message)), 5 * 60e3);
 
 // ---- HTTP ----
 const send = (res, code, body) => { res.writeHead(code, { 'content-type': 'application/json; charset=utf-8' }); res.end(JSON.stringify(body)); };
