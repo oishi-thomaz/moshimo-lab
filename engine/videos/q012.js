@@ -17,7 +17,7 @@ function tree(x, z, h = 4) { const g = new THREE.Group(); const t = box(0.3, 1.2
 function forest(cx, n, spread = 14, clear = 3) { for (let i = 0; i < n; i++) { const x = cx + (R() - 0.5) * spread * 2, z = -2 - R() * 14; if (Math.abs(x - cx) < clear && z > -6) continue; tree(x, z, 3.2 + R() * 2.4); } }
 function flashlight() { const g = new THREE.Group(); const b = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 0.3, 12), mat('#2a2a2a')); b.rotation.z = Math.PI / 2; g.add(b); const h = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.06, 0.1, 12), mat('#c8c8c8')); h.rotation.z = Math.PI / 2; h.position.x = 0.19; g.add(h); return g; }
 
-// ---------- 1. 夜の道（x=0）。少年がひとり。0秒目がサムネ ----------
+// ---------- 1段目・5段目. 夜の道（x=0）。少年がひとり。0秒目がサムネ ----------
 { const road = box(5, 0.04, 60, mat('#3a3d44')); road.position.set(0, 0.02, -10); qs.add(road);
   for (let i = 0; i < 12; i++) { const l = box(0.14, 0.05, 1.2, mat('#d8c060')); l.position.set(0, 0.04, 8 - i * 3); qs.add(l); } }
 for (let i = 0; i < 26; i++) { const side = i % 2 ? 1 : -1; tree(side * (3.6 + R() * 6), 6 - i * 1.6 - R(), 3.4 + R() * 2.6); }
@@ -28,14 +28,14 @@ const LAMP = new THREE.SpotLight(0xffd890, 0, 14, 0.62, 0.45, 0.8); LAMP.positio
 const boy = makePerson(BOY(0)); boy.position.set(0.9, 0, -1.2); boy.rotation.y = 0.2; qs.add(boy);
 const FL0 = flashlight(); FL0.position.set(0.9, 0.06, -0.8); FL0.rotation.y = 0.7; qs.add(FL0);
 const BEAM0 = new THREE.SpotLight(0xfff2c8, 0, 8, 0.35, 0.6, 1.2); qs.add(BEAM0); qs.add(BEAM0.target);
-const tMissing = tag('行方不明', { size: 84, bg: '#e2483c' }); tMissing.position.set(0.9, 2.15, -1.0); qs.add(tMissing);
+const tMissing = tag('行方不明', { size: 84, bg: '#e2483c' }); tMissing.position.set(0.9, 1.75, -1.0); qs.add(tMissing);
 
-// ---------- 2. 森を捜す3人（x=30） ----------
+// ---------- 2段目. 森を捜す3人（x=30） ----------
 forest(30, 40, 12, 3.5);
 const SEEK = [1, 2, 3].map((k, i) => { const p = makePerson(BOY(k)); p.position.set(29 + i * 1.0, 0, 1.0 - (i % 2) * 0.5); qs.add(p); const f = flashlight(); f.rotation.y = -Math.PI / 2; f.position.set(0.18, 0.75, 0.3); p.userData.arms[1].add(f); f.position.set(0, -0.62, 0.12); const sp = new THREE.SpotLight(0xfff2c8, 0, 10, 0.32, 0.6, 1.1); qs.add(sp); qs.add(sp.target); p.userData.beam = sp; return p; });
 const tThree = tag('仲間3人', { size: 80, bg: '#e6b450', color: '#14161c' }); tThree.position.set(30, 2.4, 0.6); qs.add(tThree);
 
-// ---------- 3. 母親と保安官（x=60） ----------
+// ---------- 4段目. 母親と保安官（x=60） ----------
 const HOUSE = new THREE.Group(); HOUSE.position.set(60, 0, -3.5); qs.add(HOUSE);
 { const w = box(6, 3, 4, mat('#8a7a5a')); w.position.y = 1.5; HOUSE.add(w);
   const roof = new THREE.Mesh(new THREE.ConeGeometry(4.6, 1.8, 4), mat('#4a3a34')); roof.position.y = 3.9; roof.rotation.y = Math.PI / 4; roof.scale.z = 0.7; HOUSE.add(roof);
@@ -53,7 +53,7 @@ const CAR = new THREE.Group(); CAR.position.set(63.6, 0, 1.4); CAR.rotation.y = 
 const tMom = tag('母親', { size: 72, w: 260, bg: '#e6b450', color: '#14161c' }); tMom.position.set(59.3, 2.35, -0.6); qs.add(tMom);
 const tSher = tag('保安官', { size: 72, w: 320, bg: '#e6b450', color: '#14161c' }); tSher.position.set(61.0, 2.35, 0.6); qs.add(tSher);
 
-// ---------- 4. 町の秘密の研究所（x=90） ----------
+// ---------- 3段目. 町の秘密の研究所（x=90） ----------
 const LAB = new THREE.Group(); LAB.position.set(90, 0, -7); qs.add(LAB);
 const LAB_WIN = [];
 { const b = box(12, 4.2, 5, mat('#6a707a')); b.position.y = 2.1; LAB.add(b); const t = box(4, 2, 4, mat('#5a606a')); t.position.set(-2.5, 5.2, -0.5); LAB.add(t);
@@ -68,34 +68,35 @@ const tLab = tag('秘密の研究所', { size: 70, w: 500, bg: '#e2483c' }); tLa
 const tExp = tag('ひそかに実験', { size: 70, w: 460, bg: '#14161c' }); tExp.position.set(89.4, 4.6, -1.5); qs.add(tExp);
 forest(90, 24, 14, 9);
 
-// ---------- 5. 突然現れた少女（x=120） ----------
+// ---------- 6段目（決め手）. 突然現れた少女（x=120） ----------
 forest(120, 34, 12, 4);
 const girl = makePerson({ skin: '#f3d2b4', hair: '#5a3a26', shirt: '#7a8a9a', pants: '#5a6270', scale: 0.8 }); girl.position.set(120, 0, 0); qs.add(girl);
 const FLOAT = [];
 for (let i = 0; i < 7; i++) { const m = i % 3 === 0 ? new THREE.Mesh(new THREE.DodecahedronGeometry(0.16 + R() * 0.1), mat('#8a8a80')) : i % 3 === 1 ? box(0.26, 0.26, 0.26, mat('#a8463a')) : new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 0.22, 12), mat('#d8d0c0')); const a = i / 7 * Math.PI * 2; m.userData.a = a; m.userData.r = 1.1 + (i % 2) * 0.35; m.userData.y = 0.1; qs.add(m); FLOAT.push(m); }
 const GLOW = new THREE.PointLight(0xa8c8ff, 0, 6, 1.2); GLOW.position.set(120, 0.6, 1.2); qs.add(GLOW);
 const tPower = tag('特別な力', { size: 80, bg: '#e2483c' }); tPower.position.set(120, 2.35, 0); qs.add(tPower);
+const tEra = tag('1980年代・アメリカ', { size: 64, w: 640, bg: '#e6b450', color: '#14161c' }); qs.add(tEra);
 
 // ---------- shots ----------
-const ALL = [tMissing, tThree, tMom, tSher, tLab, tExp, tPower];
+const ALL = [tMissing, tThree, tMom, tSher, tLab, tExp, tPower, tEra];
 function base() { S.reset(); ALL.forEach(x => x.visible = false); FLOAT.forEach(m => m.visible = false); LAMP.intensity = 0; BEAM0.intensity = 0; SEEK.forEach(p => p.userData.beam.intensity = 0); PORCH.intensity = 0; FLOOD.intensity = 0; GLOW.intensity = 0; S.hemi.intensity = 0.55; S.key.intensity = 0.25; }
 const flick = (T) => (Math.sin(T * 31) * Math.sin(T * 17.3) > 0.25 ? 0.15 : 1);
 function beam(sp, x, y, z, tx, tz, k = 30) { sp.position.set(x, y, z); sp.target.position.set(tx, 0, tz); sp.intensity = k; }
 
-function shotRoad(t, T) { // 0〜9：夜の道に少年がひとり → 消える
-  base(); S.aim(0, -2); lift(0);
+function shotRoad(t, T) { // 1段目 0〜9：夜の道に少年がひとり → 消える
+  base(); S.aim(0, -2); lift(Math.round(lerp(120, 300, ease((T - 3.5) / 2.5))));
   const gone = T > 6.15;
   const fl = T > 5.5 && T < 6.6 ? flick(T) : 1;
   LAMP.intensity = 90 * fl; bulb.material.color.set(fl < 0.5 ? '#3a3020' : '#ffe2a0');
-  boy.visible = !gone; boy.rotation.y = 0.2 + Math.sin(T * 0.8) * 0.3;
+  boy.visible = !gone; boy.rotation.y = 0.2 + Math.sin(T * 0.8) * 0.3; boy.userData.head.rotation.y = 0.9 - ease(T / 3) * 0.6; // 何かの気配に振り向く
   FL0.visible = gone; if (gone) beam(BEAM0, 0.9, 0.12, -0.8, 3.2, 1.4, 22);
   if (!gone) { beam(BEAM0, 0.9, 1.0, -1.0, 0.6, 2.5, 18); }
   tMissing.userData.pop((T - 6.8) / 0.35);
   const u = ease(T / 9);
-  look(lerp(-0.2, 0.1, u), lerp(1.9, 1.6, u), lerp(6.0, 4.8, u), 0.8, lerp(2.1, 1.5, u), -1.6, 54);
+  look(lerp(-0.1, 0.1, u), lerp(1.5, 1.4, u), lerp(4.4, 4.0, u), 0.8, lerp(1.3, 1.1, u), -1.6, 54);
   return qs;
 }
-function shotSearch(t) { // 9〜17：仲間3人が懐中電灯で捜す
+function shotSearch(t) { // 2段目 9〜17：仲間3人が懐中電灯で捜す
   base(); S.aim(30, 0); lift(80);
   SEEK.forEach((p, i) => { const z = lerp(1.6, -0.8, ease(t / 7)) - (i % 2) * 0.6; p.position.set(29 + i * 1.0, 0, z); p.rotation.y = Math.PI + Math.sin(t * 0.9 + i * 2) * 0.35; poseWalk(p, t * 6 + i, 0.8); p.userData.arms[1].rotation.x = -1.3; const a = p.rotation.y; beam(p.userData.beam, p.position.x, 1.0, p.position.z, p.position.x + Math.sin(a) * 6, p.position.z + Math.cos(a) * 6, 26); });
   tThree.userData.pop((t - 4.4) / 0.35);
@@ -103,7 +104,7 @@ function shotSearch(t) { // 9〜17：仲間3人が懐中電灯で捜す
   look(lerp(30.5, 30.0, u), lerp(2.6, 2.3, u), lerp(7.6, 6.4, u), 30, 1.3, -1, 54);
   return qs;
 }
-function shotHome(t) { // 17〜25：母親と保安官も行方を追う
+function shotHome(t) { // 4段目 25〜33：母親と保安官も行方を追う
   base(); S.aim(60, -1); lift(60);
   PORCH.intensity = 8; CAR.userData.lr.color.set(Math.floor(t * 3) % 2 ? '#e8b040' : '#6a4a20');
   mom.rotation.y = Math.sin(t * 0.7) * 0.4;
@@ -112,7 +113,7 @@ function shotHome(t) { // 17〜25：母親と保安官も行方を追う
   look(lerp(60.6, 60.4, u), lerp(2.6, 2.3, u), lerp(9.0, 7.6, u), 60.6, 1.4, -0.6, 54);
   return qs;
 }
-function shotLab(t) { // 25〜33：町の秘密の研究所
+function shotLab(t) { // 3段目 17〜25：町の秘密の研究所（ひそかに実験）
   base(); S.aim(90, -4); lift(260);
   FLOOD.intensity = 60;
   const red = t > 4.0;
@@ -122,14 +123,14 @@ function shotLab(t) { // 25〜33：町の秘密の研究所
   look(lerp(87.0, 88.0, u), lerp(1.6, 2.2, u), lerp(6.0, 4.6, u), 90, lerp(3.4, 3.8, u), -6, 56);
   return qs;
 }
-function shotGirl(t) { // 33〜42：突然現れた少女。物が浮かぶ
+function shotGirl(t) { // 6段目 42〜49（決め手）：突然現れた少女。特別な力で物が浮かぶ
   base(); S.aim(120, 0); lift(60);
-  const k = easeOut(clamp((t - 4.4) / 1.4));
+  const k = easeOut(clamp((t - 2.6) / 1.2));
   FLOAT.forEach((m, i) => { m.visible = true; const a = m.userData.a + t * 0.6 * k; m.position.set(120 + Math.cos(a) * (m.userData.r + 0.25), lerp(m.userData.y, 1.3 + Math.sin(t * 2 + i) * 0.25, k), Math.sin(a) * 0.35 - 0.45); m.rotation.set(t * 0.8 + i, t * 0.6, 0); });
   GLOW.intensity = 4 * k;
   girl.userData.arms.forEach(a => a.rotation.x = lerp(0, -1.2, k));
-  tPower.userData.pop((t - 5.0) / 0.35);
-  const u = ease(t / 9);
+  tPower.userData.pop((t - 3.4) / 0.35);
+  const u = ease(t / 7);
   look(lerp(120.6, 120.3, u), lerp(1.8, 1.6, u), lerp(6.2, 4.8, u), 120, 1.1, 0, 54);
   return qs;
 }
@@ -140,16 +141,17 @@ function roadNight(T, d) {
   boy.visible = false; FL0.visible = true; beam(BEAM0, 0.9, 0.12, -0.8, 3.2, 1.4, 26);
 }
 function seekOnRoad(T) { // 3人が道の奥から懐中電灯で近づいてくる
-  SEEK.forEach((p, i) => { const z = -14 + (T - 42) * 0.55 - (i % 2) * 0.7; p.position.set(-1.0 + i * 1.0, 0, z); p.rotation.y = 0 + Math.sin(T * 0.9 + i * 2) * 0.3; poseWalk(p, T * 6 + i, 0.8); p.userData.arms[1].rotation.x = -1.3; const a = p.rotation.y; beam(p.userData.beam, p.position.x, 1.0, p.position.z, p.position.x + Math.sin(a) * 6, p.position.z + Math.cos(a) * 6, 30); });
+  SEEK.forEach((p, i) => { const z = -15 + (T - 33) * 0.5 - (i % 2) * 0.7; p.position.set(-1.0 + i * 1.0, 0, z); p.rotation.y = 0 + Math.sin(T * 0.9 + i * 2) * 0.3; poseWalk(p, T * 6 + i, 0.8); p.userData.arms[1].rotation.x = -1.3; const a = p.rotation.y; beam(p.userData.beam, p.position.x, 1.0, p.position.z, p.position.x + Math.sin(a) * 6, p.position.z + Math.cos(a) * 6, 30); });
 }
-function shotTwist(t, T) { // 42〜49：落ちた懐中電灯。街灯が点滅する
-  base(); S.aim(0, -2); lift(0);
+function shotEra(t, T) { // 5段目 33〜42：1980年代アメリカの小さな町。夜の道を少年たちが懐中電灯で進む
+  base(); S.aim(0, -2); lift(220);
   roadNight(T, ease(t / 1.3)); seekOnRoad(T);
-  const k = ease(t / 7);
-  look(lerp(0.0, 0.3, k), lerp(0.9, 2.6, k), lerp(1.8, 6.4, k), lerp(1.0, 0.6, k), lerp(0.2, 1.0, k), lerp(-1.0, -4.0, k), 54);
+  tEra.position.set(0.6, 2.3, -3.0); tEra.userData.pop((t - 3.2) / 0.35);
+  const k = ease(t / 9);
+  look(lerp(0.5, 0.3, k), lerp(1.1, 2.6, k), lerp(2.4, 6.4, k), lerp(0.6, 0.6, k), lerp(0.3, 1.0, k), lerp(-1.4, -4.0, k), 54);
   return qs;
 }
-function shotQuiz(t, T) { // 49〜56：このドラマ、わかった？
+function shotQuiz(t, T) { // 49〜56：このドラマ、わかった？（夜の道。落ちた懐中電灯と、近づく3人）
   base(); S.aim(0, -2); lift(0);
   roadNight(T, 1); seekOnRoad(T);
   const k = ease(t / 7);
@@ -161,26 +163,26 @@ function shotQuiz(t, T) { // 49〜56：このドラマ、わかった？
 const SHOTS = [
   { a: 0, b: 9, f: (t, T) => shotRoad(t, T) },
   { a: 9, b: 17, f: shotSearch },
-  { a: 17, b: 25, f: shotHome },
-  { a: 25, b: 33, f: shotLab },
-  { a: 33, b: 42, f: shotGirl },
-  { a: 42, b: 49, f: (t, T) => shotTwist(t, T) },
+  { a: 17, b: 25, f: shotLab },
+  { a: 25, b: 33, f: shotHome },
+  { a: 33, b: 42, f: (t, T) => shotEra(t, T) },
+  { a: 42, b: 49, f: shotGirl },
   { a: 49, b: 56, f: (t, T) => shotQuiz(t, T) },
   { a: 56, b: 64, f: endCard },
 ];
 const SUBS = [
-  [2.5, 5.6, '1980年代、<br>アメリカの小さな町。'],
-  [5.6, 9.0, 'ひとりの少年が、<br>突然姿を消した。'],
-  [9.2, 13.2, 'ゲーム好きの<br>仲間3人は、'],
+  [2.5, 5.6, 'ある夜、<br>ひとりの少年が'],
+  [5.6, 9.0, '突然、<br>姿を消した。'],
+  [9.2, 13.2, '残された<br>仲間3人は、'],
   [13.2, 17.0, '自分たちで<br>捜しはじめる。'],
-  [17.2, 21.0, '少年の母親と、<br>町の保安官も'],
-  [21.0, 25.0, '必死に<br>行方を追う。'],
-  [25.2, 29.0, '町には、<br>秘密の研究所。'],
-  [29.0, 33.0, 'そこでは、ひそかに<br>実験が行われていた。'],
-  [33.2, 37.4, 'そして、突然現れた<br>不思議な少女。'],
-  [37.4, 41.8, '彼女には、<br>特別な力があった。'],
-  [42.2, 45.4, '少年は、<br>どこへ消えたのか。'],
-  [45.4, 49.0, '小さな町に<br>隠された秘密とは。'],
+  [17.2, 21.0, '小さな町には、<br>秘密の研究所。'],
+  [21.0, 25.0, 'そこでは、ひそかに<br>実験が行われていた。'],
+  [25.2, 29.0, '少年の母親と、<br>町の保安官も'],
+  [29.0, 33.0, '必死に<br>行方を追う。'],
+  [33.2, 37.4, '舞台は1980年代、<br>アメリカの小さな町。'],
+  [37.4, 41.8, 'ゲーム好きの少年たちが、<br>町の秘密に迫る。'],
+  [42.2, 45.4, 'そして、突然現れた<br>不思議な少女。'],
+  [45.4, 49.0, '彼女には、<br>特別な力があった。'],
   [49.2, 52.0, 'このドラマ、<br>わかった？'],
   [52.0, 55.8, 'カウントダウンの間に、<br>当ててみて。'],
   [56.4, 59.6, '答えは、<br>ストレンジャー・シングス。'],
@@ -195,11 +197,11 @@ runStory({
     title: 'このドラマのタイトルは？',
     titleHtml: 'このドラマの<br>タイトルは？',
     mood: 'mystery', seed: 1212,
-    hits: [6.2, 29.0, 56.4], risers: [52.0],
-    impacts: [0.3, 6.2, 37.4, 56.4],
-    sfx: [[0.2, 'whoosh'], [6.1, 'buzz'], [9.0, 'whoosh'], [17.0, 'whoosh'], [25.0, 'whoosh'], [29.1, 'alarm'], [33.0, 'whoosh'], [42.2, 'drone'], [49.0, 'meter', 0.5]],
-    narr: { '1980年代': 'せんきゅうひゃくはちじゅうねんだい', '少年': 'しょうねん', '突然': 'とつぜん', '姿': 'すがた', '仲間3人': 'なかまさんにん', '捜し': 'さがし', '母親': 'ははおや', '保安官': 'ほあんかん', '必死': 'ひっし', '行方': 'ゆくえ', '研究所': 'けんきゅうじょ', '実験': 'じっけん', '行われて': 'おこなわれて', '現れた': 'あらわれた', '不思議': 'ふしぎ', '少女': 'しょうじょ', '彼女': 'かのじょ', '特別': 'とくべつ', '隠された': 'かくされた', '秘密': 'ひみつ' },
-    caption: 'このドラマのタイトル、わかる？\n1980年代、アメリカの小さな町。ひとりの少年が突然姿を消した。ゲーム好きの仲間3人、母親、町の保安官が行方を追う。町には秘密の研究所。そして突然現れた、特別な力を持つ少女。\n\n答えは動画の最後で。何秒でわかった？どこでわかった？コメントで教えて。観た人は感想も聞かせて。',
+    hits: [6.2, 21.0, 42.2, 56.4], risers: [37.4, 52.0],
+    impacts: [0.3, 6.2, 33.2, 45.4, 56.4],
+    sfx: [[0.2, 'whoosh'], [6.1, 'buzz'], [9.0, 'whoosh'], [17.0, 'whoosh'], [21.1, 'alarm'], [25.0, 'whoosh'], [33.0, 'drone'], [42.0, 'whoosh'], [49.0, 'meter', 0.5]],
+    narr: { '1980年代': 'せんきゅうひゃくはちじゅうねんだい', '少年たち': 'しょうねんたち', '少年': 'しょうねん', '突然': 'とつぜん', '姿': 'すがた', '残された': 'のこされた', '仲間3人': 'なかまさんにん', '捜し': 'さがし', '母親': 'ははおや', '保安官': 'ほあんかん', '必死': 'ひっし', '行方': 'ゆくえ', '研究所': 'けんきゅうじょ', '実験': 'じっけん', '行われて': 'おこなわれて', '現れた': 'あらわれた', '不思議': 'ふしぎ', '少女': 'しょうじょ', '彼女': 'かのじょ', '特別': 'とくべつ', '迫る': 'せまる', '秘密': 'ひみつ', '舞台': 'ぶたい' },
+    caption: 'このドラマのタイトル、わかる？\nある夜、ひとりの少年が突然姿を消した。残された仲間3人は、自分たちで捜しはじめる。小さな町には、秘密の研究所があった。\n\n答えは動画の最後で。何秒でわかった？どこでわかった？コメントで教えて。観た人は感想も聞かせて。',
     hashtags: ['タイトル当てクイズ', 'ネトフリ', 'Netflix', '海外ドラマ', 'SF'],
   },
 });
