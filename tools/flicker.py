@@ -16,5 +16,7 @@ for i in range(0, len(fs) - 2, 3):
     t = float(re.search(r'_t([\d.]+)\.jpg', fs[i]).group(1))
     if r > th: bad.append((t, r))
     print(f'{t:6.2f}s  {r*100:.3f}%' + ('  ← チラつき' if r > th else ''))
+n = len(fs) // 3
+if n < 20: print(f'NG 撮れたコマが少なすぎる（{n}組）'); sys.exit(1)  # 撮影に失敗しても素通りしないように
 print('NG' if bad else 'OK', ' '.join(f'{t:.1f}s' for t, _ in bad))
 sys.exit(1 if bad else 0)
