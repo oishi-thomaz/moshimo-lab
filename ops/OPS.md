@@ -29,6 +29,7 @@
 - 送り方は moshimo-analytics の `node tools/run.mjs report <ファイル>`（または `notice`）。朝の日報（reports/outbox/YYYY-MM-DD.json・quiz-…・itsuwa-…）は 7:58 までに push してあれば送らずに終わり、8:00 のまとめに入る。それより後の日報と、-pm・-fix などの連絡はその場で SNS司令室に届く。JSON の形は ANALYST.md の 日報の書き方 と同じ（{card} か {message}）。
 - もしもラボの notice.yml・投稿サーバーの report は使わない（各アカウントの LINE に行くため）。
 - SNS司令室に ストック と送ると、まだ投稿していない動画（予約済み・承認待ち・書き出し前の在庫）が3アカウント分カードで返ってくる。返事係は VPS の server/sns-server.mjs（install-sns.sh で入れる。/var/lib/moshimo・quiz・itsuwa の state.json と、このリポジトリの在庫を読むだけ）。
+- 4つの LINE（SNS司令室・各アカウント）には下にボタンのメニューがある（server/setup-richmenu.mjs で入れる。画像は server/richmenu/）。SNS司令室：ストック・承認待ち・今日の投稿・いま回ってる・いまの数字・使い方。各アカウント：承認待ち・投稿した・数字・通数。
 - まとめの TikTok の数字は、投稿サーバーで取れていないアカウント（クイズ・いつわ劇場）は公開ページから読む（moshimo-analytics の data/<アカウント>/tiktok-embed/ に貯まる）。いま回ってる動画 は直近およそ3時間（公開ページの分は前回のまとめから）で再生が大きく増えた動画。
 
 ## 声（Gemini TTS）の1日の上限

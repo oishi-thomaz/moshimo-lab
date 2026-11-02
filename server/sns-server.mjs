@@ -29,9 +29,9 @@ const save = () => { fs.writeFileSync(STATE_FILE + '.tmp', JSON.stringify(state,
 const log = (...a) => console.log(new Date().toISOString(), ...a);
 
 const ACCOUNTS = [
-  { key: 'moshimo', name: 'もしもラボ', color: '#0F766E', state: env.MOSHIMO_STATE || '/var/lib/moshimo/state.json', queue: 'plan/queue.txt', rendered: 'state/rendered.txt' },
-  { key: 'quiz', name: 'タイトル当てクイズ', color: '#B45309', state: env.QUIZ_STATE || '/var/lib/quiz/state.json', queue: 'plan/quiz-queue.txt', rendered: 'state/quiz-rendered.txt' },
-  { key: 'itsuwa', name: 'いつわ劇場', color: '#9F1239', state: env.ITSUWA_STATE || '/var/lib/itsuwa/state.json', drama: true },
+  { key: 'moshimo', name: 'もしもラボ', color: '#0F766E', state: env.MOSHIMO_STATE || '/var/lib/moshimo/state.json', local: env.MOSHIMO_LOCAL || 'http://127.0.0.1:8787/moshimo', queue: 'plan/queue.txt', rendered: 'state/rendered.txt' },
+  { key: 'quiz', name: 'タイトル当てクイズ', color: '#B45309', state: env.QUIZ_STATE || '/var/lib/quiz/state.json', local: env.QUIZ_LOCAL || 'http://127.0.0.1:8789/quiz', queue: 'plan/quiz-queue.txt', rendered: 'state/quiz-rendered.txt' },
+  { key: 'itsuwa', name: 'いつわ劇場', color: '#9F1239', state: env.ITSUWA_STATE || '/var/lib/itsuwa/state.json', local: env.ITSUWA_LOCAL || 'http://127.0.0.1:8788/itsuwa', drama: true },
 ];
 
 // ---- 時刻（日本時間） ----
@@ -135,6 +135,172 @@ async function stockMessage() {
   return { type: 'flex', altText: `ストック：${all.map(s => `${s.acc.name} ${s.reserved.length + s.pending.length + (s.queueTotal || 0)}本`).join('・')}`, contents: { type: 'carousel', contents: all.map(bubbleOf) } };
 }
 
+
+// =====================================================================
+// 数字（承認待ち・今日の投稿・いま回ってる・いまの数字）：同じ VPS の各投稿サーバーの記録を読む
+// =====================================================================
+const md = t => { const d = jst(t); return `${d.getUTCMonth() + 1}/${d.getUTCDate()}`; };
+const hm = t => jst(t).toISOString().slice(11, 16);
+const dayStart = t => Date.parse(`${jst(t).toISOString().slice(0, 10)}T00:00:00+09:00`);
+const kfmt = n => (n == null ? '-' : n >= 10000 ? `${(n / 10000).toFixed(n >= 100000 ? 0 : 1)}万` : Math.round(n).toLocaleString('ja-JP'));
+const sgn = n => (n == null ? '' : n > 0 ? `+${kfmt(n)}` : n < 0 ? `-${kfmt(-n)}` : '±0');
+const PLAT = { ig: 'インスタ', yt: 'YouTube', tt: 'TikTok' };
+const PCOL = { ig: '#D6246E', yt: '#E52D27', tt: '#111111' };
+const bigr = s => { const t = String(s || '').replace(/#\S+/g, '').replace(/[\s　？?！!、。,.「」『』…・〜~｜|]/g, '').replace(/^もしも/, ''); const b = new Set(); for (let i = 0; i < t.length - 1; i++) b.add(t.slice(i, i + 2)); return b; };
+function ttScore(it, m) {
+  const tb = bigr(it.title); let sc = 0;
+  if (tb.size >= 3) { const cb = bigr(String(m.cap || '').split('#')[0]); let n = 0; for (const g of tb) if (cb.has(g)) n++; sc = n / tb.size; }
+  if (it.publishAt && Math.abs(m.t - it.publishAt) <= 20 * 60e3) sc += 0.6;
+  return sc;
+}
+function matchMedia(media, it, p) {
+  const list = Object.values(media || {});
+  const byId = list.find(m => m.id === it.id); if (byId || p !== 'tt') return byId || null;
+  let best = null, bs = 0; for (const m of list) { const sc = ttScore(it, m); if (sc > bs) { bs = sc; best = m; } }
+  return bs >= 0.5 ? best : null;
+}
+async function loadLive(acc) {
+  const st = readState(acc.state);
+  if (!st) return { error: '投稿サーバーの記録が読めなかった' };
+  const mediaDir = path.join(path.dirname(acc.state), 'media');
+  const titleOf = (id, it) => { if (it.title) return it.title; try { return JSON.parse(fs.readFileSync(path.join(mediaDir, `${id}.json`), 'utf8')).title || ''; } catch { return ''; } };
+  const items = Object.entries(st.items || {}).map(([id, it]) => ({ id, ...it, title: titleOf(id, it) }));
+  let snaps = [];
+  try {
+    const r = await fetch(`${acc.local}/an/export?hours=27`, { headers: { 'x-an-key': (st.an && st.an.key) || '' }, signal: AbortSignal.timeout(20e3) });
+    if (r.ok) snaps = ((await r.json()).snaps || []).sort((a, b) => a.t - b.t);
+  } catch (e) { log('export', acc.key, e.message); }
+  return { items, snaps };
+}
+const ok = (s, p) => s[p] && !s[p].error && (p !== 'tt' || s[p].followers != null || Object.keys(s[p].media || {}).length);
+function analyzeLive(acc, L, now = Date.now()) {
+  const ser = p => L.snaps.filter(s => ok(s, p));
+  const plats = ['ig', 'tt', 'yt'].filter(p => ser(p).length);
+  const near = (list, target, tol) => { let b = null; for (const e of list) if (Math.abs(e.t - target) <= tol && (!b || Math.abs(e.t - target) < Math.abs(b.t - target))) b = e; return b; };
+  const fol = (s, p) => (s ? (p === 'yt' ? s[p].subs ?? null : s[p].followers ?? null) : null);
+  const gain = (p, cur, base) => Object.entries(cur[p].media || {}).map(([k, m]) => { const b = base[p].media || {}; const pv = b[k] ? b[k].views || 0 : (m.t > base.t ? 0 : null); return pv == null ? null : { p, k, m, gain: Math.max(0, (m.views || 0) - pv) }; }).filter(Boolean);
+  const out = { foll: [], views24: [], trend: [] };
+  for (const p of plats) {
+    const list = ser(p), cur = list.at(-1), o = near(list, cur.t - 24 * 3600e3, 10 * 3600e3);
+    out.foll.push({ p, now: fol(cur, p), d: o && fol(o, p) != null && fol(cur, p) != null ? fol(cur, p) - fol(o, p) : null });
+    out.views24.push({ p, v: o ? gain(p, cur, o).reduce((a, x) => a + x.gain, 0) : null });
+    const base = near(list.filter(e => cur.t - e.t >= 50 * 60e3), cur.t - 3 * 3600e3, 2 * 3600e3);
+    if (base) {
+      const g = gain(p, cur, base).filter(x => x.gain > 0).sort((a, b) => b.gain - a.gain);
+      const med = g.length ? g[Math.floor(g.length / 2)].gain : 0, hours = Math.max(1, Math.round((cur.t - base.t) / 3600e3));
+      const floor = acc.key === 'moshimo' ? 1000 : 150;
+      for (const x of g.slice(0, 3)) if (x.gain >= Math.max(floor * hours / 3, med * 2)) {
+        let title = x.m.id && L.items.find(it => it.id === x.m.id)?.title;
+        if (!title && p === 'tt') { let best = null, bs = 0; for (const it of L.items) { if (it.status !== 'published') continue; const sc = ttScore(it, x.m); if (sc > bs) { bs = sc; best = it; } } if (bs >= 0.5) title = best.title; }
+        out.trend.push({ ...x, hours, title: title || String(x.m.cap || '').split(/[#…？?！!。\n]/)[0].slice(0, 26) || `${md(x.m.t)} ${hm(x.m.t)}の投稿` });
+      }
+    }
+  }
+  out.trend.sort((a, b) => b.gain / b.hours - a.gain / a.hours);
+  const last = L.snaps.at(-1) || {};
+  const d0 = dayStart(now);
+  out.today = L.items.filter(it => it.publishAt >= d0 && it.publishAt < d0 + 86400e3 && it.status !== 'rejected').sort((a, b) => a.publishAt - b.publishAt)
+    .map(it => ({ ...it, v: Object.fromEntries(['ig', 'tt', 'yt'].map(p => { const m = ok(last, p) ? matchMedia(last[p].media, it, p) : null; return [p, m ? m.views ?? null : null]; })) }));
+  out.pending = L.items.filter(it => it.status === 'pending');
+  out.at = last.t || 0;
+  return out;
+}
+const tagBox = (label, color) => ({ type: 'box', layout: 'vertical', flex: 0, width: '68px', backgroundColor: color, cornerRadius: '4px', paddingAll: '3px', contents: [{ type: 'text', text: label, size: 'xxs', color: '#ffffff', align: 'center', weight: 'bold' }] });
+const dcol = v => (/^\+/.test(String(v)) ? '#0A7D3C' : /^[-−]/.test(String(v)) ? '#C62828' : '#666666');
+function numRow(p, label, value, delta) {
+  return { type: 'box', layout: 'horizontal', alignItems: 'center', contents: [tagBox(PLAT[p], PCOL[p]), line1(label, { flex: 1, margin: 'md' }),
+    { type: 'text', text: nz(value), size: 'sm', weight: 'bold', flex: 0, margin: 'md', color: '#111111' },
+    ...(delta ? [{ type: 'text', text: delta, size: 'xs', flex: 0, margin: 'md', color: dcol(delta) }] : [])] };
+}
+function trendBoxes(list, withAcc) {
+  if (!list.length) return [line1('記載なし', { size: 'xs', color: '#888888' })];
+  return list.map((x, i) => ({ type: 'box', layout: 'vertical', spacing: 'xs', margin: i ? 'md' : 'none', contents: [
+    { type: 'box', layout: 'horizontal', alignItems: 'center', contents: [tagBox(PLAT[x.p], PCOL[x.p]), { type: 'text', text: `+${kfmt(x.gain)}／${x.hours}時間`, size: 'sm', weight: 'bold', color: '#0A7D3C', flex: 1, align: 'end' }] },
+    line1(`${withAcc ? `${x.acc}：` : ''}${short(x.title)}`),
+    { type: 'text', text: `累計 ${kfmt(x.m.views)}再生`, size: 'xxs', color: '#888888' }] }));
+}
+const STATUS = { published: ['公開済み', '#0A7D3C'], approved: ['予約済み', '#1D4ED8'], pending: ['承認待ち', '#C62828'] };
+function postBoxes(list) {
+  return list.slice(0, 10).map((it, i) => {
+    const [st, col] = STATUS[it.status] || [it.status, '#666666'];
+    const vs = ['ig', 'tt', 'yt'].filter(p => it.v[p] != null).map(p => `${PLAT[p]} ${kfmt(it.v[p])}`);
+    return { type: 'box', layout: 'vertical', spacing: 'xs', margin: i ? 'md' : 'none', contents: [
+      { type: 'box', layout: 'horizontal', contents: [{ type: 'text', text: hm(it.publishAt), size: 'xs', color: '#6B7280', weight: 'bold', flex: 1 }, { type: 'text', text: st, size: 'xs', weight: 'bold', color: col, flex: 0 }] },
+      line1(short(it.title || `番号 ${it.id}`)),
+      ...(it.status === 'published' ? [{ type: 'text', text: vs.length ? vs.join('・') : '再生はまだ取れてない', size: 'xxs', color: '#888888', wrap: true }] : [])] };
+  });
+}
+function card(acc, subtitle, sections, footer) {
+  const body = [];
+  sections.filter(x => x && x.length).forEach((x, i) => { if (i) body.push({ type: 'separator' }); body.push({ type: 'box', layout: 'vertical', spacing: 'sm', contents: x }); });
+  const b = { type: 'bubble', size: 'giga',
+    header: { type: 'box', layout: 'vertical', backgroundColor: acc.color, paddingAll: '14px', contents: [line1(acc.name, { color: '#ffffff', weight: 'bold', size: 'lg' }), line1(subtitle, { color: '#E5E7EB', size: 'xs' })] },
+    body: { type: 'box', layout: 'vertical', paddingAll: '14px', spacing: 'md', contents: body.length ? body : [line1('-')] } };
+  if (footer) b.footer = footer;
+  return b;
+}
+const readAccounts = () => { try { return JSON.parse(fs.readFileSync(path.join(DATA, 'accounts.json'), 'utf8')); } catch { return {}; } };
+const openButton = (acc, text) => {
+  const id = (readAccounts()[acc.key] || {}).basicId;
+  if (!id) return null;
+  return { type: 'box', layout: 'vertical', paddingAll: '10px', contents: [{ type: 'button', style: 'primary', color: acc.color, height: 'sm',
+    action: { type: 'uri', label: `${acc.name}のLINEで${text}`.slice(0, 40), uri: `https://line.me/R/oaMessage/${id}/?${encodeURIComponent(text)}` } }] };
+};
+async function liveAll() { return Promise.all(ACCOUNTS.map(async acc => { const L = await loadLive(acc); return { acc, L, a: L.error ? null : analyzeLive(acc, L) }; })); }
+const carousel = (alt, bubbles) => ({ type: 'flex', altText: alt.slice(0, 390), contents: { type: 'carousel', contents: bubbles } });
+
+async function pendingMessage() {
+  const all = await liveAll();
+  return carousel(`承認待ち：${all.map(x => `${x.acc.name} ${x.a ? x.a.pending.length : '?'}本`).join('・')}`, all.map(({ acc, L, a }) => {
+    if (!a) return card(acc, L.error, [[line1('読めなかった', { size: 'xs', color: '#C62828' })]]);
+    const rows = a.pending.length ? a.pending.slice(0, 12).map(it => line1(short(it.title || `番号 ${it.id}`))) : [line1('なし', { size: 'xs', color: '#888888' })];
+    return card(acc, `承認待ち ${a.pending.length}本`, [[head('承認待ちの動画'), ...rows]], a.pending.length ? openButton(acc, '承認待ち') : null);
+  }));
+}
+async function todayMessage() {
+  const all = await liveAll(), now = Date.now();
+  return carousel(`今日の投稿 ${md(now)}`, all.map(({ acc, L, a }) => {
+    if (!a) return card(acc, L.error, [[line1('読めなかった', { size: 'xs', color: '#C62828' })]]);
+    const sec = a.today.length ? postBoxes(a.today) : [line1(a.pending.length ? `まだ予定なし（承認待ち ${a.pending.length}本）` : '予定なし', { size: 'xs', color: '#C62828' })];
+    return card(acc, `${md(now)} の投稿・${a.at ? hm(a.at) + ' 時点' : ''}`, [[head('今日の投稿'), ...sec]], a.pending.length ? openButton(acc, '承認待ち') : null);
+  }));
+}
+async function trendMessage() {
+  const all = await liveAll();
+  const list = all.flatMap(x => (x.a ? x.a.trend : []).map(t => ({ ...t, acc: x.acc.name }))).sort((a, b) => b.gain / b.hours - a.gain / a.hours).slice(0, 6);
+  const b = card({ name: 'いま回ってる動画', color: '#B45309' }, '直近およそ3時間で再生が大きく増えた動画', [[...trendBoxes(list, true)]]);
+  return { type: 'flex', altText: `いま回ってる：${list.length ? list.slice(0, 3).map(x => short(x.title, 14)).join('・') : '記載なし'}`, contents: b };
+}
+async function numbersMessage() {
+  const all = await liveAll();
+  return carousel('いまの数字', all.map(({ acc, L, a }) => {
+    if (!a) return card(acc, L.error, [[line1('読めなかった', { size: 'xs', color: '#C62828' })]]);
+    return card(acc, `${a.at ? hm(a.at) + ' 時点' : '-'}`, [
+      [head('いま回ってる動画'), ...trendBoxes(a.trend.slice(0, 3), false)],
+      [head('フォロワー（24時間の増減）'), ...a.foll.map(f => numRow(f.p, f.p === 'yt' ? '登録者' : 'フォロワー', kfmt(f.now), f.d == null ? '' : sgn(f.d)))],
+      [head('再生（24時間で増えた分）'), ...a.views24.filter(v => v.v != null).map(v => numRow(v.p, '再生', kfmt(v.v)))],
+    ]);
+  }));
+}
+const HOWTO = [
+  'SNS司令室の使い方',
+  '',
+  '自動で届くもの',
+  '・8:00 朝のまとめ（昨日の結果と日報）',
+  '・13:00 昼のまとめ',
+  '・22:30 夜のまとめ（今日の結果）',
+  '・見張りが直したときの連絡',
+  '',
+  'ボタン',
+  '・ストック：まだ投稿してない動画（予約済み・承認待ち・書き出し前）',
+  '・承認待ち：3アカウントの承認待ち。ボタンでそのアカウントのLINEを開ける',
+  '・今日の投稿：今日の予定と今の再生',
+  '・いま回ってる：直近3時間で伸びてる動画',
+  '・いまの数字：フォロワーと24時間の再生',
+  '',
+  '承認そのものは、各アカウントのLINE（下の 承認待ち ボタン）でする。',
+].join('\n');
+
 // ---- LINE ----
 async function reply(token, messages) {
   const r = await fetch('https://api.line.me/v2/bot/message/reply', { method: 'POST', headers: { 'content-type': 'application/json', authorization: `Bearer ${LINE_TOKEN}` }, body: JSON.stringify({ replyToken: token, messages: [].concat(messages).slice(0, 5) }) });
@@ -142,7 +308,7 @@ async function reply(token, messages) {
   return true;
 }
 const text = t => ({ type: 'text', text: t });
-const HELP = 'ストック と送ると、まだ投稿してない動画を3アカウント分カードで返す。\n1日3回（8:00・13:00・22:30）のまとめは自動で届く。';
+const HELP = '下のメニューのボタンを押すか、ストック・承認待ち・今日の投稿・いま回ってる・いまの数字・使い方 のどれかを送ってみて。';
 
 // LINE Developers の 検証 で送られてくるテスト用の偽ユーザー（これを持ち主にしない）
 const DUMMY = /^Udeadbeef/i;
@@ -156,6 +322,13 @@ async function onEvent(ev) {
   if (!state.owner) { state.owner = uid; save(); log('owner set'); }
   // 友だちになっている人（＝ゆうと）からの メッセージにはそのまま返す。持ち主の照合で返事が止まらないように、ここでは弾かない
   const msg = ev.message.text.trim();
+  const CMDS = [[/^(承認待ち|承認)$/, pendingMessage], [/^今日(の投稿)?$/, todayMessage], [/^(いま|今)回って(る|いる)/, trendMessage], [/^(いま|今)の数字$|^数字$/, numbersMessage]];
+  for (const [re, fn] of CMDS) if (re.test(msg)) {
+    try { const m = await fn(); if (!(await reply(ev.replyToken, m))) await reply(ev.replyToken, text('カードが送れへんかった。もう一回押してみて。')); }
+    catch (e) { log('cmd error', e); await reply(ev.replyToken, text(`集められへんかった（${String(e.message).slice(0, 80)}）`)); }
+    return;
+  }
+  if (/^(使い方|ヘルプ|help)$/i.test(msg)) { await reply(ev.replyToken, text(HOWTO)); return; }
   if (/^(ストック|すとっく|在庫|stock)/i.test(msg)) {
     try { const m = await stockMessage(); if (!(await reply(ev.replyToken, m))) await reply(ev.replyToken, text('カードが送れへんかった。もう一回 ストック と送ってみて。')); }
     catch (e) { log('stock error', e); await reply(ev.replyToken, text(`ストックが集められへんかった（${String(e.message).slice(0, 80)}）`)); }
@@ -187,4 +360,5 @@ http.createServer(async (req, res) => {
 }).listen(PORT, '127.0.0.1', () => log(`SNS司令室 server on 127.0.0.1:${PORT}${PREFIX}`));
 
 // 動作確認用：node server.mjs --stock で、LINE に送らずにカードの中身を表示する
-if (process.argv.includes('--stock')) { stockMessage().then(m => { console.log(JSON.stringify(m, null, 1)); process.exit(0); }); }
+const TEST = { '--stock': stockMessage, '--pending': pendingMessage, '--today': todayMessage, '--trend': trendMessage, '--numbers': numbersMessage };
+for (const [k, fn] of Object.entries(TEST)) if (process.argv.includes(k)) fn().then(m => { console.log(JSON.stringify(m, null, 1)); process.exit(0); });

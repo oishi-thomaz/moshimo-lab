@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2500" height="1686" viewBox="0 0 2500 1686"><rect width="2500" height="1686" fill="#EEF2F6"/>
+  <rect x="28" y="28" width="2444" height="801" rx="44" fill="#9F1239"/>
+  <g transform="translate(1140 178.5) scale(9.166666666666666)" fill="none" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></g>
+  <text x="1250" y="570.5" font-family="Noto Sans CJK JP, Noto Sans JP, sans-serif" font-weight="900" font-size="150" fill="#FFFFFF" text-anchor="middle">承認待ち</text>
+  <text x="1250" y="671.3" font-family="Noto Sans CJK JP, Noto Sans JP, sans-serif" font-weight="500" font-size="60" fill="#FFE4E6" text-anchor="middle">承認カードをまとめて出す</text>
+  <rect x="28" y="857" width="796" height="801" rx="44" fill="#FFFFFF"/>
+  <g transform="translate(341 1056.5) scale(7.083333333333333)" fill="none" stroke="#9F1239" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></g>
+  <text x="426" y="1365.06" font-family="Noto Sans CJK JP, Noto Sans JP, sans-serif" font-weight="900" font-size="112" fill="#9F1239" text-anchor="middle">投稿した</text>
+  <text x="426" y="1452.5" font-family="Noto Sans CJK JP, Noto Sans JP, sans-serif" font-weight="500" font-size="50" fill="#64748B" text-anchor="middle">この24時間の結果</text>
+  <rect x="852" y="857" width="796" height="801" rx="44" fill="#FFFFFF"/>
+  <g transform="translate(1165 1056.5) scale(7.083333333333333)" fill="none" stroke="#9F1239" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></g>
+  <text x="1250" y="1365.06" font-family="Noto Sans CJK JP, Noto Sans JP, sans-serif" font-weight="900" font-size="112" fill="#9F1239" text-anchor="middle">数字</text>
+  <text x="1250" y="1452.5" font-family="Noto Sans CJK JP, Noto Sans JP, sans-serif" font-weight="500" font-size="50" fill="#64748B" text-anchor="middle">フォロワーと再生</text>
+  <rect x="1676" y="857" width="796" height="801" rx="44" fill="#FFFFFF"/>
+  <g transform="translate(1989 1056.5) scale(7.083333333333333)" fill="none" stroke="#9F1239" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></g>
+  <text x="2074" y="1365.06" font-family="Noto Sans CJK JP, Noto Sans JP, sans-serif" font-weight="900" font-size="112" fill="#9F1239" text-anchor="middle">通数</text>
+  <text x="2074" y="1452.5" font-family="Noto Sans CJK JP, Noto Sans JP, sans-serif" font-weight="500" font-size="50" fill="#64748B" text-anchor="middle">今月のLINEの送信数</text></svg>
