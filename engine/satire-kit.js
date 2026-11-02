@@ -1,6 +1,5 @@
 import * as THREE from 'three';
 import { clamp, easeBack, mat, box, makePerson, SKIN } from './lib.js';
-import { textSprite } from './story.js';
 
 // =====================================================
 // 風刺回（0623〜）でつかう小物：おぢ・女性・部屋・スマホ・看板・檻
@@ -28,13 +27,42 @@ function makeMan(opt = {}) {
   p.userData.ph = 0;
   return p;
 }
-// 文字の看板（textSprite のラッパー）
-function label(text, { w = 768, h = 192, size = 110, color = '#fff', bg = null, stroke = 0, strokeColor, sx = 4 } = {}) {
-  const sp = textSprite(text, { w, h, size, color, bg, stroke, strokeColor, sx });
-  sp.userData.sx = sx; sp.userData.ar = h / w;
+// 文字の看板。2026/11/03 ゆうとの指摘（座布団が短くて文字が切れる・角が欠ける）で作り直し：
+//  ・文字の幅を測って、左右に文字の高さ0.5個分以上の余白が出るまでキャンバスを横に広げる（文字の大きさは変えない）
+//  ・上下も文字の高さの1.55倍以上を確保。座布団は角丸四角で、キャンバスの端から少し内側に描く
+//  ・壁や机にめり込んで角が欠けないよう、座布団つきの看板は depthTest なしで手前に描く
+//  ・set(s) で文字を変えても同じ幅に収まらないときは、その幅に収まるように文字を縮める
+const FONT = (px) => `900 ${px}px "Noto Sans CJK JP", sans-serif`;
+const _mc = document.createElement('canvas').getContext('2d');
+function label(text, { w = 768, h = 192, size = 110, color = '#fff', bg = null, stroke = 0, strokeColor, sx = 4, radius } = {}) {
+  _mc.font = FONT(size);
+  const tw = _mc.measureText(text).width + stroke;
+  const padX = bg ? size * 0.55 : size * 0.15;
+  const H = Math.max(h, Math.ceil(size * (bg ? 1.55 : 1.3)));
+  const W = Math.max(w, Math.ceil(tw + padX * 2 + 16));
+  const c = document.createElement('canvas'); c.width = W; c.height = H;
+  const tex = new THREE.CanvasTexture(c); tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 4;
+  const draw = (str) => {
+    const g = c.getContext('2d'); g.clearRect(0, 0, W, H);
+    if (bg) { g.fillStyle = bg; g.beginPath(); g.roundRect(8, 8, W - 16, H - 16, radius ?? Math.min(28, (H - 16) / 4)); g.fill(); }
+    let px = size; g.font = FONT(px);
+    while (px > 20 && g.measureText(str).width + stroke > W - padX * 2 - 16) { px -= 4; g.font = FONT(px); }
+    g.textAlign = 'center'; g.textBaseline = 'middle';
+    if (stroke) { g.lineJoin = 'round'; g.lineWidth = stroke; g.strokeStyle = strokeColor || 'rgba(0,0,0,.6)'; g.strokeText(str, W / 2, H / 2 + px * 0.04); }
+    g.fillStyle = color; g.fillText(str, W / 2, H / 2 + px * 0.04); tex.needsUpdate = true;
+  };
+  draw(text);
+  const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, depthTest: !bg }));
+  if (bg) sp.renderOrder = 6;
+  const fit = W / w;
+  sp.userData.sx = sx; sp.userData.fit = fit; sp.userData.ar = H / W;
+  sp.scale.set(sx * fit, sx * fit * H / W, 1);
+  let cur = text; sp.userData.set = (str) => { if (str !== cur) { cur = str; draw(str); } };
+  // 大きさを決める（sx は元の w のときの横幅。文字の大きさが変わらないように fit を掛ける）
+  sp.userData.size = (k) => sp.scale.set(k * fit, k * fit * H / W, 1);
   return sp;
 }
-function pop(sp, t, t0 = 0, dur = 0.35, sx = null) { const u = clamp((t - t0) / dur); sp.visible = u > 0; const s = (sx ?? sp.userData.sx) * easeBack(u); sp.scale.set(s, s * sp.userData.ar, 1); }
+function pop(sp, t, t0 = 0, dur = 0.35, sx = null) { const u = clamp((t - t0) / dur); sp.visible = u > 0; const s = (sx ?? sp.userData.sx) * (sp.userData.fit || 1) * easeBack(u); sp.scale.set(s, s * sp.userData.ar, 1); }
 // 部屋（床＋奥の壁＋左の壁）
 function makeRoom({ w = 8, d = 6, h = 3.4, wall = '#e8e1d6', floor = '#b48a5e' } = {}) {
   const g = new THREE.Group();

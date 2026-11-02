@@ -39,10 +39,10 @@ const errFx = makeSparkles(200, 0.25, 0xff5a5a); S.add(errFx.points); errFx.init
 const MX = 50;
 const mfloor = new THREE.Mesh(new THREE.CircleGeometry(9, 40), mat('#3a3044', { depthWrite: false })); mfloor.rotation.x = -Math.PI / 2; mfloor.position.set(MX, 0.02, 0); mfloor.renderOrder = -0.8; S.add(mfloor);
 const CROWD = []; const PH = [];
-{ const r = rng(30); for (let i = 0; i < 15; i++) { const p = makeWoman({ shirt: ['#f2a0b8', '#c9a8d8', '#9fc7a8', '#e9e4da', '#9fc7e8'][i % 5], hair: ['#3a2620', '#1d1a19', '#6b4a33'][i % 3] }); p.position.set(MX - 4.2 + (i % 5) * 2.1 + (r() - .5) * .4, 0, -2 + Math.floor(i / 5) * 2 + (r() - .5) * .4); p.rotation.y = (r() - .5) * 0.6; p.userData.arms[1].rotation.x = -1.3; p.userData.head.rotation.x = 0.35; S.add(p); CROWD.push(p);
+{ const r = rng(30); for (let i = 0; i < 15; i++) { const p = makeWoman({ shirt: ['#f2a0b8', '#c9a8d8', '#9fc7a8', '#e9e4da', '#9fc7e8'][i % 5], hair: ['#3a2620', '#1d1a19', '#6b4a33'][i % 3] }); p.position.set(MX - 2.9 + (i % 5) * 1.45 + (Math.floor(i / 5) % 2) * 0.72 - 0.36, 0, -2.4 + Math.floor(i / 5) * 2.4); p.rotation.y = (r() - .5) * 0.6; p.userData.arms[1].rotation.x = -1.3; p.userData.head.rotation.x = 0.35; S.add(p); CROWD.push(p);
   const ph = makePhone({ w: 0.3, h: 0.6, cw: 180, ch: 360 }); S.add(ph.g); PH.push(ph); } }
 const NUMS = ['700万', '600万', '500万', 'こだわらない'];
-const numLabs = CROWD.map((p, i) => { const l = label('700万', { w: 768, size: 120, color: '#fff', bg: 'rgba(40,40,50,.85)', sx: 1.1 }); S.add(l); return l; });
+const numLabs = CROWD.map((p, i) => { const l = label('700万', { w: 360, h: 150, size: 100, color: '#fff', bg: 'rgba(40,40,50,.88)', sx: 0.62 }); S.add(l); return l; });
 
 // ---------- 結婚相談所（x=100） ----------
 const KX = 100;
@@ -67,8 +67,8 @@ function manForm() { manPhone.draw('m', (g, w, h) => { g.fillStyle = '#f0f6ff'; 
 // 結果：プロフィールの掲示板
 const BX = 240;
 const bwall = box(9, 5, 0.2, mat('#3a3448')); bwall.position.set(BX, 2.5, -2); S.add(bwall);
-const CARDS = []; for (let i = 0; i < 12; i++) { const l = label(['こだわりません', '普通の人', 'こだわりません', '優しい人'][i % 4], { w: 768, size: 96, color: '#333', bg: 'rgba(255,255,255,.95)', sx: 1.7 }); l.position.set(BX - 3.3 + (i % 4) * 2.2, 4.0 - Math.floor(i / 4) * 1.2, -1.8); S.add(l); CARDS.push(l); }
-const normal = label('普通の人でいい', { w: 1024, size: 110, color: '#fff', bg: 'rgba(30,110,170,.95)', sx: 3.2 }); normal.position.set(BX, 5.4, -1.6); S.add(normal);
+const CARDS = []; for (let i = 0; i < 6; i++) { const l = label(['こだわりません', '普通の人', '優しい人', 'こだわりません', 'こだわりません', '普通の人'][i], { w: 768, size: 96, color: '#333', bg: 'rgba(255,255,255,.95)', sx: 1.7 }); l.position.set(BX - 1.2 + (i % 2) * 2.4, 4.5 - Math.floor(i / 2) * 1.0, -1.8); S.add(l); CARDS.push(l); }
+const normal = label('普通の人でいい', { w: 1024, size: 110, color: '#fff', bg: 'rgba(30,110,170,.95)', sx: 3.2 }); normal.position.set(BX, 5.45, -1.6); S.add(normal);
 
 function reset() {
   form('a', 0); errFx.set(0); HER.userData.arms.forEach(a => a.rotation.set(0, 0, 0)); HER.userData.head.rotation.set(0, 0, 0); HER.userData.arms[1].rotation.x = -1.2;
@@ -91,12 +91,12 @@ function shot1(t) { // 婚活に新ルール。求める年収は、自分も稼
 function shot2(t) { // 希望年収700万円。保存しようとすると、エラー
   reset(); lift(60); form(t < 1.2 ? 'a' : 'err', t); errFx.set(t > 1.2 ? clamp((t - 1.2) / 1.5) : 0); if (t > 1.2 && t < 1.4) el.flash.style.opacity = 0.25;
   HER.userData.head.rotation.x = t > 1.4 ? -0.2 : 0;
-  look(1.0, 2.9, 4.6, 1.0, 2.8, -0.4, 52);
+  look(1.0, 2.9, 5.8, 1.0, 2.8, -0.4, 52);
   return S;
 }
 function shot3(t) { // 年収700万円を超える女性は、約6%しかいない
   reset(); lift(110); CROWD.forEach((p, i) => { p.visible = true; p.userData.arms[1].rotation.x = -1.3; });
-  CROWD.forEach((p, i) => { const on = i === 7; numLabs[i].visible = on && t > 0.6; if (on) { numLabs[i].userData.set('700万超'); numLabs[i].position.set(p.position.x, 2.5, p.position.z); } });
+  CROWD.forEach((p, i) => { const on = i === 7; numLabs[i].visible = on && t > 0.6; if (on) { numLabs[i].userData.set('700万超'); numLabs[i].userData.size(1.1); numLabs[i].position.set(p.position.x, 2.7, p.position.z); } });
   look(MX, 7, 10, MX, 0.8, 0, 50);
   setTop('年収700万円を超える女性（2025年）', '約6.3%', fade(t, 0.15, 3.3, 0.25), PINK);
   return S;
@@ -104,13 +104,13 @@ function shot3(t) { // 年収700万円を超える女性は、約6%しかいな�
 function phonesUp(t) { CROWD.forEach((p, i) => { p.updateMatrixWorld(true); const v = new THREE.Vector3(0, -0.62, 0.1); p.userData.arms[1].localToWorld(v); PH[i].g.visible = true; PH[i].g.position.copy(v); PH[i].g.rotation.set(-0.6, p.rotation.y, 0); PH[i].draw('x', (g, w, h) => { g.fillStyle = '#ff9ec7'; g.fillRect(0, 0, w, h); }); }); }
 function shot4(t) { // 一晩で、希望年収の欄が一斉に書き換わる
   reset(); lift(110); phonesUp(t);
-  CROWD.forEach((p, i) => { numLabs[i].visible = true; numLabs[i].position.set(p.position.x, 2.45, p.position.z); const k = Math.min(3, Math.floor(clamp((t - 0.4 - (i % 5) * 0.12) / 2.6) * 3.99)); numLabs[i].userData.set(NUMS[Math.max(0, k)] + (k < 3 ? '' : '')); });
-  look(MX, 4.4, 9.4, MX, 1.6, 0, 50);
+  CROWD.forEach((p, i) => { numLabs[i].visible = true; numLabs[i].userData.size(0.62); numLabs[i].position.set(p.position.x, 2.45, p.position.z); const k = Math.min(3, Math.floor(clamp((t - 0.4 - (i % 5) * 0.12) / 2.6) * 3.99)); numLabs[i].userData.set(NUMS[Math.max(0, k)] + (k < 3 ? '' : '')); });
+  look(MX, 5.4, 11.8, MX, 1.4, 0, 50);
   return S;
 }
 function shot5(t) { // 700万が600万、500万、そして、こだわりません
   reset(); lift(60); form('b', t); HER.userData.arms[1].rotation.x = -1.3 + Math.sin(t * 8) * 0.08;
-  look(1.0, 2.9, 4.6, 1.0, 2.8, -0.4, 52);
+  look(1.0, 2.9, 5.8, 1.0, 2.8, -0.4, 52);
   return S;
 }
 function shot6(t) { // 結婚相談所のカウンセラーが、初めて大きくうなずく
@@ -137,30 +137,30 @@ function shot8(t) { // 今度は男性が、女性の年収で選び始める
 }
 function shot9(t) { // 男性の希望欄にも、年収600万以上の文字
   reset(); lift(60); manForm(); MAN1.userData.arms[1].rotation.x = -1.2;
-  look(HX + 41, 2.9, 4.6, HX + 40, 2.8, -0.4, 52);
+  look(HX + 41, 2.9, 5.8, HX + 40, 2.8, -0.4, 52);
   return S;
 }
 function shot10(t) { // 高望みと言われていた条件は、自分に返った瞬間に消えた
-  reset(); lift(110); phonesUp(t); CROWD.forEach((p, i) => { numLabs[i].visible = true; numLabs[i].position.set(p.position.x, 2.45, p.position.z); numLabs[i].userData.set('こだわらない'); });
-  const u = ease(clamp(t / 3.6)); look(MX + lerp(-2, 2, u), 5, 10, MX, 1.4, 0, 50);
+  reset(); lift(110); phonesUp(t); CROWD.forEach((p, i) => { numLabs[i].visible = true; numLabs[i].userData.size(0.62); numLabs[i].position.set(p.position.x, 2.45, p.position.z); numLabs[i].userData.set('こだわらない'); });
+  const u = ease(clamp(t / 3.6)); look(MX + lerp(-1, 1, u), 5.4, 11.8, MX, 1.4, 0, 50);
   setTop('高望みの条件', '一晩で消えた', fade(t, 0.15, 3.5, 0.25), GOLD);
   return S;
 }
 function shot11(t) { // プロフィールの年収欄は、どんどん空白になる
   reset(); lift(60); form('c', t); HER.userData.head.rotation.x = 0.15;
-  look(1.0, 2.9, 4.6, 1.0, 2.8, -0.4, 52);
+  look(1.0, 2.9, 5.8, 1.0, 2.8, -0.4, 52);
   setTop('年収の欄', 'こだわりません', fade(t, 0.15, 3.5, 0.25), GREEN);
   return S;
 }
 function shot12(t) { // 結果：婚活市場から、高望みが消えた
-  reset(); lift(80); CARDS.forEach((c, i) => { pop(c, t, 0.2 + i * 0.12, 0.25, 1.7); });
-  const u = ease(clamp(t / 6)); look(BX, lerp(2.8, 3.0, u), lerp(14, 12.5, u), BX, 2.8, -1.8, 52);
+  reset(); lift(80); CARDS.forEach((c, i) => { pop(c, t, 0.2 + i * 0.18, 0.25, 1.9); });
+  const u = ease(clamp(t / 6)); look(BX, 3.0, lerp(8.0, 7.4, u), BX, 3.0, -1.8, 52);
   setTop('結果', '高望みが消えた', fade(t, 0.15, 5.8, 0.25), GOLD);
   return S;
 }
 function shot13(t) { // 普通の人でいい、という言葉が初めて本当の意味で使われる
-  reset(); lift(80); CARDS.forEach(c => { c.visible = true; c.scale.set(1.7, 1.7 * c.userData.ar, 1); }); pop(normal, t, 0.5, 0.35, 3.0);
-  look(BX, 3.2, 13, BX, 3.1, -1.8, 52);
+  reset(); lift(80); CARDS.forEach(c => { c.visible = true; c.userData.size(1.9); }); pop(normal, t, 0.5, 0.35, 2.4);
+  look(BX, 3.4, 8.4, BX, 3.4, -1.8, 52);
   setTop('婚活の合言葉', '普通の人でいい', fade(t, 0.3, 5.8, 0.25), BLUE);
   return S;
 }

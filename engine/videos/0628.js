@@ -83,7 +83,7 @@ const itable = box(3.6, 0.75, 1.4, mat('#5a3a24')); itable.position.set(IX, 0.37
 const BOSS = makeOji(rng(28), { shirt: '#4a4f5c' }); BOSS.position.set(IX - 1.2, 0, -1.2); S.add(BOSS);
 const JRW = makeWoman({ shirt: '#ffffff', hair: '#3a2620' }); JRW.position.set(IX + 1.6, 0, 1.2); JRW.rotation.y = Math.PI; S.add(JRW);
 const JRM = makeMan({ shirt: '#4f6a8f' }); JRM.position.set(IX - 1.0, 0, 1.2); JRM.rotation.y = Math.PI; S.add(JRM);
-const tonari = label('隣に座らせる係 廃止', { w: 1024, size: 96, color: '#fff', bg: 'rgba(200,60,90,.92)', sx: 3.0 }); tonari.position.set(IX, 2.9, 0); S.add(tonari);
+const tonari = label('隣に座らせる係 廃止', { w: 1024, size: 96, color: '#fff', bg: 'rgba(200,60,90,.92)', sx: 2.4 }); tonari.position.set(IX, 2.55, 0.4); S.add(tonari);
 // 結果：ベンチのおぢ
 const BX = 250;
 const bench = box(2.4, 0.45, 0.8, mat('#7a5a3a')); bench.position.set(BX, 0.22, 0); S.add(bench);
@@ -114,7 +114,7 @@ function shot1(t) { // ある日、男は年下を好きになれなくなった
 }
 function shot2(t) { // 50代のおぢのアプリから20代の写真が全部消える
   reset(); lift(60); const sw = Math.floor(t * 2) % 2 === 0 && t < 1.6; appScreen(sw, t); youngLab.position.set(0.9, 5.4, -0.2); pop(youngLab, t, 0.2, 0.3, 1.0); youngLab.visible = t < 1.6;
-  look(0.8, 2.7, 4.2, 0.9, 2.6, -0.4, 50);
+  look(0.8, 2.6, 5.4, 0.9, 2.5, -0.4, 50);
   setTop('アプリのおすすめ', t < 1.6 ? '20代' : '全部 50代', fade(t, 0.15, 3.2, 0.25), PINK);
   return S;
 }
@@ -223,7 +223,7 @@ runStory({
     titleHtml: 'もしも男が年下に<br>興味がなかったら？',
     mood: 'mystery', seed: 628, hits: [0.5, 42.9, 48.9], risers: [39.1], impacts: [10.0, 13.5, 17.1, 24.3, 31.7, 42.9, 48.9],
     sfx: [[0.5, 'poof'], [10.3, 'bubble'], [13.8, 'buzz'], [17.4, 'buzz'], [26.1, 'buzz'], [32.9, 'alarm'], [49.4, 'whoosh']],
-    narr: { 'おぢ': 'おじ', '結果：': '結果、' },
+    narr: { 'おぢ': 'おじ', '年下': 'としした', '年上': 'としうえ', '結果：': '結果、' },
     ask: '年の差恋愛、あり？なし？',
     caption: 'もしも男が、同い年以上しか好きになれなかったら？\n\n50代のおぢのアプリから、20代の写真が全部消える。初めてマッチした同い年の女性からの質問は、年収は？持ち家は？健康診断の結果は？親の介護はどうする？\n若い子の前で通じた武勇伝が一言も通じない。若さで埋めていた差が全部むき出しになる。\n一方、20代の女性は話しかけられなくなって快適。\n\n結果：年下が好きだったのは、比べられたくなかったから。\n選ぶ側だと思っていた人が、初めて選ばれる側に回る。\n\n年の差恋愛、あり？なし？ コメントで教えて。\n\n※風刺ネタです',
     hashtags: ['もしもラボ', 'もしも', '年の差恋愛', 'マッチングアプリ', 'おぢ'],

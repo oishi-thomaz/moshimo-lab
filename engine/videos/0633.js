@@ -53,10 +53,10 @@ const yA = label('', { w: 512, size: 100, color: '#ddd', sx: 1.0 }); S.add(yA);
 const yB = label('', { w: 512, size: 100, color: '#ddd', sx: 1.0 }); S.add(yB);
 // 給与明細（手取りの矢印が横ばい）
 const slipC = document.createElement('canvas'); slipC.width = 512; slipC.height = 720; { const g = slipC.getContext('2d'); g.fillStyle = '#fbfaf6'; g.fillRect(0, 0, 512, 720); g.fillStyle = '#3f7fd0'; g.fillRect(0, 0, 512, 110); g.fillStyle = '#fff'; g.font = '900 54px "Noto Sans CJK JP", sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('給与明細', 256, 56);
-  [['総支給', '#222'], ['健康保険', '#c33'], ['厚生年金', '#c33'], ['所得税・住民税', '#c33'], ['手取り', '#222']].forEach(([s, c], i) => { g.fillStyle = c; g.font = '900 44px "Noto Sans CJK JP", sans-serif'; g.textAlign = 'left'; g.fillText(s, 40, 190 + i * 110); g.fillStyle = '#ccc'; g.fillRect(330, 170 + i * 110, 140, 40); }); }
+  [['総支給', '#222'], ['健康保険', '#c33'], ['厚生年金', '#c33'], ['税金', '#c33'], ['手取り', '#222']].forEach(([s, c], i) => { g.fillStyle = c; g.font = '900 44px "Noto Sans CJK JP", sans-serif'; g.textAlign = 'left'; g.fillText(s, 40, 190 + i * 110); g.fillStyle = '#ccc'; g.fillRect(330, 170 + i * 110, 140, 40); }); }
 const slipT = new THREE.CanvasTexture(slipC); slipT.colorSpace = THREE.SRGBColorSpace;
 const SLIP = new THREE.Mesh(new THREE.PlaneGeometry(2.4, 3.375), new THREE.MeshBasicMaterial({ map: slipT })); SLIP.position.set(BX + 30, 2.4, 0); S.add(SLIP);
-const flat = label('手取り → 横ばい', { w: 1024, size: 100, color: '#fff', bg: 'rgba(90,90,100,.92)', sx: 2.0 }); flat.position.set(BX + 30, 4.6, 0.1); S.add(flat);
+const flat = label('手取り → 横ばい', { w: 1024, size: 100, color: '#fff', bg: 'rgba(90,90,100,.92)', sx: 2.0 }); flat.position.set(BX + 30, 4.45, 0.1); S.add(flat);
 
 // ---------- C：家（x=110） ----------
 const CX = 110;
@@ -120,23 +120,23 @@ function shot3(t) { // スーパーでは、卵と牛乳とお米だけで予算
   look(1.6, 2.4, 4.8, 2.2, 1.5, -1.0, 52);
   return S;
 }
-function slipCam() { look(BX + 30, 2.9, 8.0, BX + 30, 2.9, 0, 52); }
+function slipCam() { look(BX + 30, 2.7, 8.4, BX + 30, 2.4, 0, 52); }
 function shot4(t) { // 次に給料。手取りは、思ったほど増えていない
   reset(); lift(150); slipCam(); pop(flat, t, 0.9, 0.3, 2.0);
   return S;
 }
 function bars(t, a, b, la, lb, ya, yb, H) { const u = easeOut(clamp((t - 0.2) / 1.2)); barA.scale.y = Math.max(0.001, a * H * u); barB.scale.y = Math.max(0.001, b * H * u);
-  [vA, vB, yA, yB].forEach(l => l.visible = true); vA.userData.set(la); vB.userData.set(lb); yA.userData.set(ya); yB.userData.set(yb);
+  [vA, vB].forEach(l => l.visible = true); vA.userData.set(la); vB.userData.set(lb); yA.userData.set(ya); yB.userData.set(yb);
   vA.position.set(BX - 1.3, a * H * u + 0.5, -5.4); vB.position.set(BX + 1.3, b * H * u + 0.5, -5.4); yA.position.set(BX - 1.3, -0.35, -5.2); yB.position.set(BX + 1.3, -0.35, -5.2);
   look(BX, 2.8, 4.4, BX, 2.5, -6, 52); }
 function shot5(t) { // 厚生年金の保険料率は、12.4%から18.3%へ
-  reset(); lift(150); bars(t, 12.4, 18.3, '12.4%', '18.3%', '1985年', '今', 0.22);
+  reset(); lift(150); bars(t, 12.4, 18.3, '1985年 12.4%', '今 18.3%', '', '', 0.22);
   setTop('厚生年金の保険料率', '12.4% → 18.3%', fade(t, 0.15, 3.4, 0.25), RED);
   return S;
 }
 function shot6(t) { // 金利は低い。でも新築は、首都圏で平均9,182万円
   reset(); lift(110); placeFam(CX, 0.6, 0); F.all.forEach(p => p.userData.head.rotation.x = -0.5);
-  pop(kinri, t, 0.3, 0.3, 1.6); pop(price, t, 1.4, 0.35, 2.6);
+  pop(kinri, t, 0.3, 0.3, 2.0); pop(price, t, 1.4, 0.35, 3.6);
   const u = ease(clamp(t / 3.6)); look(CX + 0.4, lerp(2.2, 4.4, u), lerp(7.4, 12.6, u), CX, lerp(2.0, 4.0, u), -3, 52);
   return S;
 }
@@ -148,13 +148,13 @@ function shot7(t) { // 子ども3人を大学へ。学費の請求書が3通届�
   return S;
 }
 function shot8(t) { // 国立大学の授業料は、18万円から53万円台に
-  reset(); lift(150); bars(t, 18, 53.58, '18万円', '53万5,800円', '1980年', '今（標準額）', 0.075);
+  reset(); lift(150); bars(t, 18, 53.58, '1980年 18万円', '今 53万5,800円', '', '', 0.075);
   setTop('国立大学の授業料（1年）', '約3倍', fade(t, 0.15, 3.4, 0.25), BLUE);
   return S;
 }
 function shot9(t) { // そしてお母さんが気づく。専業主婦じゃ回らない
   reset(); lift(110); F.all.forEach(p => p.visible = false); F.mom.visible = true; F.mom.position.set(HX, 0.3, -1.6); F.mom.userData.legs.forEach(l => l.rotation.x = -Math.PI / 2); F.mom.userData.arms[1].rotation.x = -1.2; F.mom.userData.head.rotation.x = t > 1.4 ? -0.15 : 0.35;
-  ENV.forEach((l, i) => { l.visible = true; l.scale.set(0.8, 0.8 * l.userData.ar, 1); l.position.set(HX - 0.6 + i * 0.6, 0.55, -0.4 + i * 0.1); });
+  ENV.forEach((l, i) => { l.visible = true; l.userData.size(0.8); l.position.set(HX - 0.6 + i * 0.6, 0.55, -0.4 + i * 0.1); });
   mawara.position.set(HX, 2.5, -1.4); pop(mawara, t, 1.5, 0.35, 1.7);
   look(HX + 0.3, 2.1, 3.8, HX, 1.5, -1.2, 52);
   return S;
@@ -181,7 +181,7 @@ function shot12(t) { // 結果：俺らの頃はの正体は、上がる給料�
   return S;
 }
 function shot13(t) { // 根性じゃなくて、時代のボーナスだったのかも
-  reset(); lift(110); S.background.set('#141228'); F.all.forEach(p => p.visible = false); kyuryo.visible = true; kyuryo.scale.set(1.6, 1.6 * kyuryo.userData.ar, 1); tada.visible = true; tada.scale.set(1.7, 1.7 * tada.userData.ar, 1);
+  reset(); lift(110); S.background.set('#141228'); F.all.forEach(p => p.visible = false); kyuryo.visible = true; kyuryo.userData.size(1.6); tada.visible = true; tada.userData.size(1.7);
   pop(bonus, t, 0.5, 0.35, 2.4); confetti.set(clamp((t - 0.5) / 4));
   look(EX, 3.6, 9.4, EX, 3.0, -2.4, 52);
   setTop('俺らの頃はの正体', '時代のボーナス', fade(t, 0.3, 4.0, 0.25), GOLD);

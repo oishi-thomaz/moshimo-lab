@@ -51,7 +51,7 @@ function poseReset(p) { p.userData.arms.forEach(a => a.rotation.set(0, 0, 0)); p
 function reset() {
   [...MEN, HIME, ...NEWW].forEach(poseReset);
   place(MEN, [[-2.6, 0.2, 0.5], [-1.6, 1.0, 0.3], [-0.6, 1.4, 0], [1.6, 1.0, -0.3], [2.6, 0.2, -0.5], [1.8, -0.6, -0.6], [-1.8, -0.6, 0.6]]); place(NEWW, []);
-  HIME.position.set(0, 0, 0.2); HIME.rotation.set(0, 0, 0);
+  HIME.position.set(0, 0, 0.2); HIME.rotation.set(0, 0, 0); crown.scale.setScalar(1);
   arrive.set(0); crown.visible = false; hime.visible = false; himeSeat.visible = false; BOX.visible = false; SWEETS.visible = false; omiyage.visible = false; empty.visible = false; whisper.visible = false; shinjin.visible = false; raku.visible = false;
   bill.visible = false; zero.visible = false; warikan.visible = false; chair.visible = false;
   hemi.intensity = 1.1; S.background.set('#2a2f3a'); el.flash.style.opacity = 0; setHud('', '', 0);
@@ -90,7 +90,7 @@ function shot3(t) { // ただ1人、顔が曇る人がいる。男だらけの�
 function izakaya(n) { place(MEN, [[IX - 1.4, -1.2, 0], [IX, -1.2, 0], [IX + 1.4, -1.2, 0], [IX - 1.4, 1.2, Math.PI], [IX + 1.4, 1.2, Math.PI]]); HIME.position.set(IX, 0, 1.2); HIME.rotation.set(0, Math.PI, 0); if (n) place(NEWW, [[IX - 2.6, 1.2, Math.PI], [IX + 2.6, 1.2, Math.PI], [IX - 2.6, -1.2, 0], [IX + 2.6, -1.2, 0]]); hemi.intensity = 1.0; S.background.set('#c8a878'); }
 function shot4(t) { // 飲み会の会計は、払ったことがない
   reset(); lift(110); izakaya(0); crownOn(HIME);
-  bill.position.set(IX, 2.6, -0.4); pop(bill, t, 0.3, 0.3, 1.1); zero.position.set(IX, 2.6, 1.3); pop(zero, t, 1.4, 0.3, 0.8);
+  bill.position.set(IX, 2.6, -0.4); pop(bill, t, 0.3, 0.3, 1.1); if (t >= 1.4) bill.visible = false; zero.position.set(IX, 2.6, -0.4); pop(zero, t, 1.4, 0.3, 0.9);
   look(IX + 0.4, 3.0, 5.6, IX, 1.3, 0.2, 52);
   return S;
 }
@@ -115,9 +115,9 @@ function shot7(t) { // 飲み会は割り勘。荷物は自分で持つ
 }
 function shot8(t) { // 新しく来た女性たちから、あの人甘やかされてない？
   reset(); lift(110); place(MEN, []); place(NEWW, [[1.4, -0.4, -0.9], [2.0, 0.0, -1.3], [2.4, -0.8, -1.1]]); NEWW[0].userData.head.rotation.y = 0.6; NEWW[1].userData.head.rotation.y = -0.5;
-  HIME.position.set(-1.6, 0, 0.4); HIME.rotation.y = 0.5;
-  whisper.position.set(1.4, 2.5, -0.4); pop(whisper, t, 0.5, 0.3, 1.8);
-  look(0.2, 2.4, 5.4, 0.2, 1.5, -0.2, 52);
+  HIME.position.set(-1.1, 0, 0.4); HIME.rotation.y = 0.5;
+  whisper.position.set(0.4, 2.6, -0.4); pop(whisper, t, 0.5, 0.3, 2.1);
+  look(0.3, 2.5, 7.4, 0.3, 1.5, -0.2, 52);
   return S;
 }
 function shot9(t) { // 男の職場で最強だった人が、女の職場では新人扱い
@@ -129,7 +129,7 @@ function shot9(t) { // 男の職場で最強だった人が、女の職場では
 function shot10(t) { // お土産のお菓子は、最後の1個も回ってこない
   reset(); lift(110); place(MEN, []); place(NEWW, [[-2.0, -0.6, 0.6], [-1.0, -1.1, 0.3], [0.2, -1.2, 0], [1.2, -0.9, -0.3]], 0); HIME.position.set(2.2, 0, 0.2); HIME.rotation.y = -0.8;
   SWEETS.visible = true; const u = clamp(t / 2.6); SWEETS.position.set(lerp(-2.0, 1.4, u), 1.25 + Math.sin(u * 12) * 0.03, lerp(-0.2, 0.2, u)); SWEETS.scale.x = Math.max(0.05, 1 - u);
-  empty.position.set(1.8, 2.5, 0.3); pop(empty, t, 2.6, 0.3, 2.0);
+  empty.position.set(0.5, 2.6, 0.3); pop(empty, t, 2.6, 0.3, 1.7);
   look(0.2, 2.6, 4.8, 0.2, 1.3, -0.2, 52);
   return S;
 }
@@ -156,7 +156,7 @@ function shot13(t) { // 平等を嫌うのは、得をしている人なのか�
   return S;
 }
 function shot14(t) { // 質問。最後は冒頭と同じ構図（女性が増えた事務所。王冠は落ちたまま）
-  reset(); lift(80); place(NEWW, WMIX, Math.PI); NEWW.forEach(p => p.scale.setScalar(0.96)); crown.visible = true; crown.position.set(0.5, 0.1, 0.8); crown.rotation.z = 1.4; HIME.userData.head.rotation.x = 0.3;
+  reset(); lift(80); place(NEWW, WMIX, Math.PI); NEWW.forEach(p => p.scale.setScalar(0.96)); crown.visible = true; crown.position.set(-0.45, 0.08, 0.75); crown.scale.setScalar(1.3); crown.rotation.z = 1.4; HIME.userData.head.rotation.x = 0.3;
   offCam(0, 0);
   return S;
 }

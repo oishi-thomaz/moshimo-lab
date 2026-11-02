@@ -52,7 +52,7 @@ const laundry = []; for (let i = 0; i < 5; i++) { const l = box(0.4, 0.06, 0.3, 
 const BX = 60;
 const bfloor = new THREE.Mesh(new THREE.CircleGeometry(6, 40), mat('#2a2640', { depthWrite: false })); bfloor.rotation.x = -Math.PI / 2; bfloor.position.set(BX, 0.02, 0); bfloor.renderOrder = -0.8; S.add(bfloor);
 const barH = box(1.4, 1, 1.2, mat('#7fb0e8')); barH.geometry.translate(0, 0.5, 0); barH.position.set(BX - 1.3, 0, 0); S.add(barH);
-const barW = box(1.4, 1, 1.2, mat('#ff8ab0')); // 共働きの妻 6.55時間 barW.geometry.translate(0, 0.5, 0); barW.position.set(BX + 1.3, 0, 0); S.add(barW);
+const barW = box(1.4, 1, 1.2, mat('#ff8ab0')); /* 共働きの妻 6.55時間 */ barW.geometry.translate(0, 0.5, 0); barW.position.set(BX + 1.3, 0, 0); S.add(barW);
 const lbH = label('夫', { size: 130, color: '#fff', bg: 'rgba(40,40,50,.85)', sx: 0.8 }); lbH.position.set(BX - 1.3, -0.2, 1.0); S.add(lbH);
 const lbW = label('妻', { size: 130, color: '#fff', bg: 'rgba(40,40,50,.85)', sx: 0.8 }); lbW.position.set(BX + 1.3, -0.2, 1.0); S.add(lbW);
 const vH = label('1時間54分', { w: 768, size: 110, color: '#fff', stroke: 12, strokeColor: '#1a1a22', sx: 1.7 }); S.add(vH);
@@ -93,28 +93,28 @@ function shot2(t) { // 夫は喜ぶ。これで仕事の大変さを分かって
 }
 function shot3(t) { // 夫の疲れ、62
   reset(); lift(80); MH.g.scale.setScalar(1.3); meterOn(MH, HUS, 62); MH.g.position.y = 2.35;
-  look(-2.6, 2.4, 0.2, -3.2, 2.1, -2.6, 46);
+  look(-2.5, 2.5, 1.4, -3.2, 2.2, -2.6, 46);
   setTop('夫の疲れ', '62', fade(t, 0.15, 3.2, 0.25), GOLD);
   return fin();
 }
 function shot4(t) { // ふと隣を見ると、子どもを抱いた妻の疲れ、98
-  reset(); lift(80); MW.g.scale.setScalar(1.3); meterOn(MW, WIFE, 30 + 68 * easeOut(clamp((t - 0.6) / 1.4)), t); KID.userData.arms[0].rotation.x = -1.5 + Math.sin(t * 6) * 0.3;
+  reset(); lift(80); MW.g.scale.setScalar(1.15); meterOn(MW, WIFE, 30 + 68 * easeOut(clamp((t - 0.6) / 1.4)), t); KID.userData.arms[0].rotation.x = -1.5 + Math.sin(t * 6) * 0.3;
   HUS.userData.head.rotation.y = 0.9;
-  const u = ease(clamp(t / 1.2)); look(lerp(-2.6, 1.6, u), 2.4, lerp(0.2, 3.0, u), lerp(-3.2, 0.4, u), 1.9, lerp(-2.6, -0.6, u), 48);
+  const u = ease(clamp(t / 1.2)); look(lerp(-2.5, 1.4, u), 2.5, lerp(1.4, 4.4, u), lerp(-3.2, 0.4, u), 2.0, lerp(-2.6, -0.6, u), 48);
   setTop('子どもを抱いた妻の疲れ', '98', fade(t, 0.9, 3.4, 0.25), RED);
   return fin();
 }
 function shot5(t) { // 夫は言いかけた。俺は仕事で疲れてるから
   reset(); lift(80); HUS.position.set(-1.6, 0, -1.2); HUS.rotation.y = 0.9; HUS.userData.arms[1].rotation.x = -0.9; meterOn(MH, HUS, 62); meterOn(MW, WIFE, 98, t); MH.g.scale.setScalar(1); MW.g.scale.setScalar(1);
-  sorry.position.set(-1.6, 3.4, -1.0); pop(sorry, t, 0.5, 0.35, 2.4);
-  look(-0.5, 2.6, 4.6, -0.6, 2.0, -0.8, 52);
+  sorry.position.set(-0.7, 3.55, -1.0); pop(sorry, t, 0.5, 0.35, 2.0);
+  look(-0.5, 2.7, 5.6, -0.6, 2.1, -0.8, 52);
   return fin();
 }
 function shot6(t) { // メーターが赤く光る。言い訳は通じない
   reset(); lift(80); HUS.position.set(-1.6, 0, -1.2); HUS.rotation.y = 0.9; HUS.userData.head.rotation.x = 0.3; meterOn(MH, HUS, 62); meterOn(MW, WIFE, 98, t * 2); MH.g.scale.setScalar(1); MW.g.scale.setScalar(1.15 + Math.sin(t * 10) * 0.05);
-  sorry.position.set(-1.6, 3.4, -1.0); sorry.visible = true; sorry.scale.set(2.4, 2.4 * sorry.userData.ar, 1); batsu.position.set(-1.6, 3.4, -0.9); pop(batsu, t, 0.6, 0.3, 0.9);
-  if (Math.floor(t * 4) % 2 === 0) hemi.intensity = 0.8;
-  look(-0.5, 2.6, 4.6, -0.6, 2.0, -0.8, 52);
+  sorry.position.set(-0.7, 3.55, -1.0); sorry.visible = true; sorry.userData.size(2.0); batsu.position.set(-0.7, 3.55, -0.9); pop(batsu, t, 0.6, 0.3, 0.9);
+  hemi.intensity = 0.9;
+  look(-0.5, 2.7, 5.6, -0.6, 2.1, -0.8, 52);
   return fin();
 }
 function bars(t, which) { reset(); lift(200); S.background.set('#141228'); const H = 0.55;
@@ -128,21 +128,21 @@ function shot9(t) { // 疲れてるのはお互い様。休んでいたのは片
   HUS.userData.arms[0].rotation.x = -1.3; HUS.updateMatrixWorld(true); const v = new THREE.Vector3(0, -0.62, 0.08); HUS.userData.arms[0].localToWorld(v); PHONE.visible = true; PHONE.position.copy(v);
   WIFE.position.set(-1.2, 0, -2.7); WIFE.rotation.y = Math.PI; holdBaby(WIFE, BABY); WIFE.userData.arms[1].rotation.x = -1.0 + Math.sin(t * 6) * 0.3;
   kyukei.position.set(2.2, 2.6, -2.4); pop(kyukei, t, 0.4, 0.3, 1.0); kado.position.set(-1.2, 2.6, -2.6); pop(kado, t, 1.2, 0.3, 1.0);
-  look(0.5, 2.6, 4.2, 0.5, 1.4, -2.4, 54);
+  look(0.5, 2.8, 6.2, 0.5, 1.6, -2.4, 54);
   return fin();
 }
 function nightRoom() { hemi.intensity = 0.45; S.background.set('#0e0c18'); }
 function shot10(t) { // 夫は初めて、寝かしつけをやってみる
   reset(); lift(110); nightRoom(); jacket.forEach(j => j.visible = false); HUS.position.set(0.6, 0, -1.4); HUS.rotation.y = 0.3 + Math.sin(t * 2) * 0.15; holdBaby(HUS, BABY); WIFE.position.set(-6, 0, 0);
-  clock.position.set(-1.6, 2.8, -3.8); clock.visible = true; clock.userData.set('21:00'); clock.scale.set(1.2, 1.2 * clock.userData.ar, 1);
+  clock.position.set(0.8, 3.25, -3.8); clock.visible = true; clock.userData.set('21:00'); clock.userData.size(1.2);
   look(1.6, 2.2, 3.6, 0.4, 1.5, -1.6, 52);
   setTop('夫の寝かしつけ', '予定 30分', fade(t, 0.15, 3.5, 0.25), GOLD);
   return fin();
 }
 function shot11(t) { // 30分のはずが、2時間たっても寝ない
   reset(); lift(110); nightRoom(); jacket.forEach(j => j.visible = false); HUS.position.set(0.6, 0, -1.4); HUS.rotation.y = 0.3 + Math.sin(t * 4) * 0.25; holdBaby(HUS, BABY); HUS.userData.head.rotation.x = 0.35; WIFE.position.set(-6, 0, 0);
-  const h = 21 + Math.floor(clamp(t / 3) * 2); const m = Math.floor((clamp(t / 3) * 120) % 60); clock.visible = true; clock.userData.set(h + ':' + String(m).padStart(2, '0')); clock.position.set(-1.6, 2.8, -3.8); clock.scale.set(1.2, 1.2 * clock.userData.ar, 1);
-  gyaa.position.set(1.2, 2.3, -1.0); pop(gyaa, t, 0.8, 0.3, 0.9); MH.g.scale.setScalar(1); meterOn(MH, HUS, 62 + 37 * clamp(t / 3.4), t);
+  const h = 21 + Math.floor(clamp(t / 3) * 2); const m = Math.floor((clamp(t / 3) * 120) % 60); clock.visible = true; clock.userData.set(h + ':' + String(m).padStart(2, '0')); clock.position.set(0.8, 3.25, -3.8); clock.userData.size(1.2);
+  gyaa.position.set(0.2, 1.25, -0.2); pop(gyaa, t, 0.8, 0.3, 0.9); MH.g.scale.setScalar(1); meterOn(MH, HUS, 62 + 37 * clamp(t / 3.4), t);
   look(1.6, 2.2, 3.6, 0.4, 1.6, -1.6, 52);
   return fin();
 }

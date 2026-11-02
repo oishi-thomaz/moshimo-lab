@@ -110,7 +110,7 @@ function shot0(t) { // 0秒＝サムネ：働く母親の前で、門がガシ�
   return S;
 }
 function shot1(t) { // 幼稚園が、専業主婦の子ども専用になった
-  reset(); lift(0); gate(1); led.material.color.set('#ff3a3a'); senyo.visible = true; senyo.scale.set(2.4, 2.4 * senyo.userData.ar, 1);
+  reset(); lift(0); gate(1); led.material.color.set('#ff3a3a'); senyo.visible = true; senyo.userData.size(2.4);
   HOUSEWIFE.position.set(-0.3, 0, -1.4); KH.position.set(0.4, 0, -1.3); WORKMOM.position.set(-0.4, 0, 1.4); KW.position.set(0.3, 0, 1.5); WORKMOM.rotation.y = Math.PI; KW.rotation.y = Math.PI; WORKMOM.userData.head.rotation.x = 0.3;
   gateCam(1);
   setTop('幼稚園', '専業主婦の家の子だけ', fade(t, 0.15, 3.2, 0.25), PINK);
@@ -139,12 +139,12 @@ function shot4(t) { // しかも9割の幼稚園が、預かり保育をして�
 function shot5(t) { // 1か月後、園の掲示板に1枚の紙が貼られる
   reset(); lift(60); const u = easeOut(clamp((t - 0.5) / 0.6)); NOTICE.position.set(CX, 2.1 + (1 - u) * 1.5, -0.84 + (1 - u) * 0.6); NOTICE.rotation.z = (1 - u) * 0.4; pin.visible = u > 0.95;
   HOUSEWIFE.position.set(CX - 0.6, 0, 1.8); HOUSEWIFE.rotation.y = Math.PI; KH.position.set(CX + 0.2, 0, 1.9); KH.rotation.y = Math.PI;
-  look(CX + 0.4, 2.4, 6.4, CX, 2.0, -0.8, 52);
+  look(CX + 0.4, 2.4, 6.8, CX, 1.6, -0.8, 52);
   return S;
 }
 function shot6(t) { // 園児が足りないので、来年で閉園します
   reset(); lift(60); HOUSEWIFE.position.set(CX - 0.6, 0, 1.8); HOUSEWIFE.rotation.y = Math.PI; HOUSEWIFE.userData.head.rotation.x = -0.2; KH.position.set(CX + 0.2, 0, 1.9); KH.rotation.y = Math.PI;
-  const u = ease(clamp(t / 3)); look(CX, 2.1, lerp(5.0, 3.4, u), CX, 2.1, -0.8, 52);
+  const u = ease(clamp(t / 3)); look(CX, 2.3, lerp(5.6, 4.2, u), CX, 1.45, -0.8, 52);
   return S;
 }
 function shot7(t) { // 働く母親の家の子どもで、園は成り立っていた
@@ -155,7 +155,7 @@ function shot7(t) { // 働く母親の家の子どもで、園は成り立って
   return S;
 }
 function shot8(t) { // 近くの幼稚園も、次々に閉まっていく
-  reset(); lift(110); XS.forEach((l, i) => pop(l, t, 0.4 + i * 0.5, 0.3, 1.3)); hemi.intensity = lerp(1.15, 0.7, clamp(t / 3)); S.background.set('#8aaecc');
+  reset(); lift(110); XS.forEach((l, i) => pop(l, t, 0.4 + i * 0.5, 0.3, 1.9)); hemi.intensity = lerp(1.15, 0.7, clamp(t / 3)); S.background.set('#8aaecc');
   look(DX, 7.0, 7.0, DX, 1.0, -9, 52);
   return S;
 }
@@ -173,7 +173,7 @@ function shot10(t) { // 一方、働く母親たちは保育園へ移って困�
 function emptyKG() { gate(1); PLAY.forEach(k => k.visible = false); KG.children[0].material = KG.children[0].material; WORKMOM.visible = KW.visible = false; }
 function shot11(t) { // 一番困ったのは、ルールを作った側だった
   reset(); lift(0); emptyKG(); hemi.intensity = 0.75; S.background.set('#7a8a9a'); HOUSEWIFE.position.set(0.0, 0, 1.6); HOUSEWIFE.rotation.y = Math.PI; KH.position.set(0.7, 0, 1.7); KH.rotation.y = Math.PI;
-  HOUSEWIFE.userData.head.rotation.x = 0.4; komatta.position.set(0, 3.0, 1.6); pop(komatta, t, 0.4, 0.3, 2.0);
+  HOUSEWIFE.userData.head.rotation.x = 0.4; komatta.position.set(0, 2.45, 1.6); pop(komatta, t, 0.4, 0.3, 2.0);
   look(0.4, 2.2, 5.6, 0, 1.6, 0.6, 52);
   return S;
 }
@@ -186,14 +186,14 @@ function shot12(t) { // 結果：専業主婦の園は、専業主婦だけじ�
 }
 function shot13(t) { // 嫌ってた相手のお金で、居場所が回っていたのかも
   reset(); lift(0); gate(0); WORKMOM.position.set(1.2, 0, -2.4); KW.position.set(1.9, 0, -2.6); HOUSEWIFE.position.set(-1.6, 0, -2.4); KH.position.set(-0.9, 0, -2.6); HOUSEWIFE.rotation.y = 0.6; WORKMOM.rotation.y = -0.6;
-  coins.set(clamp((t - 0.4) / 3.6)); okane.position.set(0, 4.7, -3.4); pop(okane, t, 0.6, 0.35, 2.3);
+  coins.set(clamp((t - 0.4) / 3.6)); okane.position.set(0, 5.15, -3.4); pop(okane, t, 0.6, 0.35, 2.3);
   look(0, 3.0, 6.0, 0, 2.2, -3.4, 52);
   setTop('園を回していたのは', '嫌ってた相手のお金', fade(t, 0.3, 4.0, 0.25), GOLD);
   return S;
 }
 function shot14(t) { // 質問。最後は冒頭と同じ構図（門が閉まったまま）
   reset(); lift(0); gate(1); led.material.color.set('#ff3a3a'); HOUSEWIFE.position.set(-0.3, 0, -1.4); KH.position.set(0.4, 0, -1.3); HOUSEWIFE.rotation.y = Math.PI; KH.rotation.y = Math.PI;
-  WORKMOM.position.set(-0.4, 0, 1.4); KW.position.set(0.3, 0, 1.5); WORKMOM.rotation.y = Math.PI; KW.rotation.y = Math.PI; senyo.visible = true; senyo.scale.set(2.4, 2.4 * senyo.userData.ar, 1);
+  WORKMOM.position.set(-0.4, 0, 1.4); KW.position.set(0.3, 0, 1.5); WORKMOM.rotation.y = Math.PI; KW.rotation.y = Math.PI; senyo.visible = true; senyo.userData.size(2.4);
   gateCam(0);
   return S;
 }

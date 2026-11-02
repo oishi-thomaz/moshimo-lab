@@ -60,7 +60,7 @@ const pfloor = new THREE.Mesh(new THREE.CircleGeometry(5, 40), mat('#2a2640', { 
 function bbs(t) { big.draw('bbs' + Math.min(5, Math.floor(t * 1.6)), (g, w, h) => { g.fillStyle = '#eef2f7'; g.fillRect(0, 0, w, h); g.fillStyle = '#4a6a90'; g.fillRect(0, 0, w, 120); g.fillStyle = '#fff'; g.font = '900 46px "Noto Sans CJK JP", sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('夫たちの本音掲示板', w / 2, 62);
   const posts = ['妻が家事を手伝ってくれない', '飲み会で毎晩遅い', '誰が食わせてるのって言われた', '僕も外で働きたかった', '妻の実家がつらい'];
   posts.slice(0, Math.min(5, Math.floor(t * 1.6) + 1)).forEach((p, i) => { const y = 150 + i * 150; g.fillStyle = '#fff'; g.fillRect(24, y, w - 48, 130); g.fillStyle = '#888'; g.font = '700 26px "Noto Sans CJK JP", sans-serif'; g.textAlign = 'left'; g.fillText('名無しの夫さん', 44, y + 34); g.fillStyle = '#222'; g.font = '900 36px "Noto Sans CJK JP", sans-serif'; g.fillText(p, 44, y + 86); }); }); }
-function konkatsu(t) { big.draw('kk' + (t > 1.2 ? 1 : 0), (g, w, h) => { g.fillStyle = '#f0f6ff'; g.fillRect(0, 0, w, h); g.fillStyle = '#3f7fd0'; g.fillRect(0, 0, w, 120); g.fillStyle = '#fff'; g.font = '900 46px "Noto Sans CJK JP", sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('女性が男性に求める条件', w / 2, 62);
+function konkatsu(t) { big.draw('kk' + (t > 1.2 ? 1 : t > 0.6 ? 's' : 0), (g, w, h) => { g.fillStyle = '#f0f6ff'; g.fillRect(0, 0, w, h); g.fillStyle = '#3f7fd0'; g.fillRect(0, 0, w, 120); g.fillStyle = '#fff'; g.font = '900 46px "Noto Sans CJK JP", sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('女性が男性に求める条件', w / 2, 62);
   const rows = t > 1.2 ? ['家事ができる', '優しい', '料理が上手', '実家に帰れる'] : ['年収', '学歴', '身長', '職業']; rows.forEach((r, i) => { const y = 170 + i * 150; g.fillStyle = '#fff'; g.fillRect(30, y, w - 60, 130); g.fillStyle = '#222'; g.font = '900 50px "Noto Sans CJK JP", sans-serif'; g.textAlign = 'left'; g.fillText(r, 60, y + 66); if (t <= 1.2 && i === 0 && t > 0.6) { g.strokeStyle = '#d23a3a'; g.lineWidth = 8; g.beginPath(); g.moveTo(50, y + 66); g.lineTo(w - 60, y + 66); g.stroke(); } }); }); }
 // 稼ぐ女たちの飲み会（x=160）
 const IX = 160;
@@ -73,8 +73,8 @@ const WX = 210;
 const wfloor = new THREE.Mesh(new THREE.CircleGeometry(6, 40), mat('#2a2640', { depthWrite: false })); wfloor.rotation.x = -Math.PI / 2; wfloor.position.set(WX, 0.02, 0); wfloor.renderOrder = -0.8; S.add(wfloor);
 const wallet = box(1.6, 1.0, 0.3, mat('#7a4a2a')); wallet.position.set(WX, 1.2, 0); S.add(wallet);
 const yen = label('¥', { w: 256, h: 256, size: 220, color: '#ffd27a', sx: 0.8 }); yen.position.set(WX, 1.2, 0.2); S.add(yen);
-const ropeL = box(2.2, 0.06, 0.06, mat('#c9a070')); ropeL.position.set(WX - 1.9, 1.2, 0); S.add(ropeL);
-const ropeR = box(2.2, 0.06, 0.06, mat('#c9a070')); ropeR.position.set(WX + 1.9, 1.2, 0); S.add(ropeR);
+const ropeL = box(0.9, 0.06, 0.06, mat('#c9a070')); ropeL.position.set(WX - 1.25, 1.2, 0); S.add(ropeL);
+const ropeR = box(0.9, 0.06, 0.06, mat('#c9a070')); ropeR.position.set(WX + 1.25, 1.2, 0); S.add(ropeR);
 const PM = makeMan({ shirt: '#e9e4da' }); PM.position.set(WX - 3.2, 0, 0); PM.rotation.y = Math.PI / 2; S.add(PM);
 const PW = makeWoman({ shirt: '#2b3346' }); PW.position.set(WX + 3.2, 0, 0); PW.rotation.y = -Math.PI / 2; S.add(PW);
 const saifu = label('財布の争い', { size: 120, color: '#fff', bg: 'rgba(200,150,40,.95)', sx: 1.8 }); saifu.position.set(WX, 2.8, 0); S.add(saifu);
@@ -125,7 +125,7 @@ function shot5(t) { // 夫は、機嫌の悪い妻に気をつかい始める
 }
 function shot6(t) { // 飲み会で遅くなる妻。晩ごはんを温め直す夫
   reset(); lift(110); hemi.intensity = 0.5; S.background.set('#0e0c18'); WIFE.position.set(HX - 8, 0, 0); HUS.position.set(HX + 3.0, 0, -2.6); HUS.rotation.y = Math.PI * 0.85; HUS.userData.arms.forEach(a => a.rotation.x = -1.2);
-  clock.visible = true; clock.scale.set(1.1, 1.1 * clock.userData.ar, 1); clock.userData.set(t < 1.8 ? '23:30' : '0:15'); steam.set(0);
+  clock.visible = true; clock.userData.size(1.1); clock.userData.set(t < 1.8 ? '23:30' : '0:15'); steam.set(0);
   look(HX + 1.4, 2.2, 2.2, HX + 2.8, 1.4, -2.8, 52);
   return S;
 }
@@ -138,7 +138,7 @@ function shot9(t) { konkatsu(t + 2); return shot7c(t, '代わりに求められ�
 function shot7c(t, a, b) { lift(60); look(PX, 2.9, 6.6, PX, 2.8, -0.4, 52); setTop(a, b, fade(t, 0.15, 3.4, 0.25), BLUE); return S; }
 function shot10(t) { // 女が言われてきたことを、今度は男が全部言われる
   reset(); lift(110); HUS.position.set(HX, 0, -0.8); HUS.rotation.y = 0; HUS.userData.head.rotation.x = 0.3;
-  PHRASES.forEach((l, i) => { l.position.set(HX + (i % 2 ? 0.55 : -0.55), 3.3 - i * 0.55, -0.4); pop(l, t, 0.3 + i * 0.6, 0.3, 1.45); });
+  PHRASES.forEach((l, i) => { l.position.set(HX + (i % 2 ? 0.55 : -0.55), 3.9 - i * 0.5, -0.4); pop(l, t, 0.3 + i * 0.6, 0.3, 1.85); });
   look(HX, 2.2, 6.4, HX, 2.1, -0.8, 52);
   return S;
 }
@@ -156,14 +156,14 @@ function shot12(t) { // 結果：口が悪くなったのは、男ではなく�
   return S;
 }
 function shot13(t) { // 男女の争いだと思ったものは、財布の争いだったのかも
-  reset(); lift(110); S.background.set('#141228'); const s = Math.sin(t * 3) * 0.25; wallet.position.x = WX + s; ropeL.position.x = WX - 1.9 + s; ropeR.position.x = WX + 1.9 + s; PM.position.x = WX - 3.2 + s; PW.position.x = WX + 3.2 + s;
+  reset(); lift(110); S.background.set('#141228'); const s = Math.sin(t * 3) * 0.25; wallet.position.x = WX + s; ropeL.position.x = WX - 1.25 + s * 0.6; ropeR.position.x = WX + 1.25 + s * 0.6; wallet.position.x = WX + s * 0.6; yen.position.x = WX + s * 0.6; PM.position.x = WX - 1.75 + s * 0.6; PW.position.x = WX + 1.75 + s * 0.6;
   [PM, PW].forEach(p => { p.userData.arms.forEach(a => { a.rotation.x = -1.5; }); p.rotation.z = 0; }); PM.rotation.x = 0; pop(saifu, t, 0.5, 0.35, 1.6);
-  look(WX, 2.4, 7.6, WX, 1.4, 0, 52);
+  look(WX, 2.2, 8.4, WX, 1.6, 0, 52);
   setTop('男女の争いの正体', '財布の争い', fade(t, 0.3, 5.8, 0.25), GOLD);
   return S;
 }
 function shot14(t) { // 質問。最後は冒頭と同じ構図（給与明細は入れ替わったまま）
-  reset(); lift(0); slips(1); slipCam(0, 0);
+  reset(); lift(0); slips(1); look(0, 2.0, 8.6, 0, 1.7, 0, 52);
   return S;
 }
 
