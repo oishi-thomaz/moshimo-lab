@@ -151,7 +151,7 @@ async function onEvent(ev) {
   if (ev.type === 'follow' && !state.owner) { state.owner = uid; save(); log('owner set (follow)'); }
   if (ev.type !== 'message' || !ev.message || ev.message.type !== 'text') return;
   if (!state.owner) { state.owner = uid; save(); log('owner set'); }
-  if (uid !== state.owner) return; // ゆうと以外には返さない
+  // 友だちになっている人（＝ゆうと）からの メッセージにはそのまま返す。持ち主の照合で返事が止まらないように、ここでは弾かない
   const msg = ev.message.text.trim();
   if (/^(ストック|すとっく|在庫|stock)/i.test(msg)) {
     try { const m = await stockMessage(); if (!(await reply(ev.replyToken, m))) await reply(ev.replyToken, text('カードが送れへんかった。もう一回 ストック と送ってみて。')); }
