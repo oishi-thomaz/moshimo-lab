@@ -38,7 +38,7 @@
 
 ## 連絡は SNS司令室 にまとめる（2026/11/02〜）
 - 日報・見張りの直した連絡・午後の見回りの連絡は、全部 SNS司令室（まとめ用の LINE 公式アカウント。Secrets の SNS_LINE_TOKEN）に送る。Claude から各アカウントの LINE には何も送らない（ゆうとの決定。各アカウントの LINE に届くのは承認カードと、投稿サーバー自身の通知だけ）。
-- 送り方は moshimo-analytics の `node tools/run.mjs report <ファイル>`（または `notice`）。朝の日報（reports/outbox/YYYY-MM-DD.json・quiz-…・itsuwa-…）は 7:58 までに push してあれば送らずに終わり、8:00 のまとめに入る。それより後の日報と、-pm・-fix などの連絡はその場で SNS司令室に届く。JSON の形は ANALYST.md の 日報の書き方 と同じ（{card} か {message}）。
+- 送り方は moshimo-analytics の `node tools/run.mjs report <ファイル>`（または `notice`）。朝の日報（reports/outbox/YYYY-MM-DD.json・quiz-…・itsuwa-…）は 7:58 までに push してあれば送らずに終わり、8:00 のまとめに入る。8:00 に間に合わなかった日報は 13:00 の昼のまとめに載る（別には送らない）。-pm・-fix などの連絡はその場で SNS司令室に届く（今月の残りが15通を切ったら送らない）。JSON の形は ANALYST.md の 日報の書き方 と同じ（{card} か {message}）。
 - もしもラボの notice.yml・投稿サーバーの report は使わない（各アカウントの LINE に行くため）。
 - SNS司令室に ストック と送ると、まだ投稿していない動画（予約済み・承認待ち・書き出し前の在庫）が3アカウント分カードで返ってくる。返事係は VPS の server/sns-server.mjs（install-sns.sh で入れる。/var/lib/moshimo・quiz・itsuwa の state.json と、このリポジトリの在庫を読むだけ）。
 - 4つの LINE（SNS司令室・各アカウント）には下にボタンのメニューがある（server/setup-richmenu.mjs で入れる。画像は server/richmenu/）。SNS司令室：ストック・承認待ち・今日の投稿・いま回ってる・いまの数字・使い方。各アカウント：承認待ち・投稿した・数字・通数（もしもラボは 収益 も）。数字・通数・収益はカードで返す。収益は TikTok Studio の記録（moshimo-analytics の data/tiktok-studio.jsonl）を、まとめ（summary.yml）が1日3回もしもラボの投稿サーバーへ送っている。サーバーの中身を入れ替えるときは server/update-servers.sh <コミット>（VPS で root）。
