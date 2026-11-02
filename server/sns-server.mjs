@@ -323,6 +323,7 @@ const HELP = '下のメニューのボタンを押すか、ストック・承認
 const DUMMY = /^Udeadbeef/i;
 if (DUMMY.test(state.owner || '')) { log('owner was the test user, cleared'); state.owner = env.LINE_OWNER_USER_ID || ''; save(); }
 async function onEvent(ev) {
+  if (ev.type === 'postback' && /^menu:/.test(String(ev.postback && ev.postback.data))) ev = { ...ev, type: 'message', message: { type: 'text', text: String(ev.postback.data).slice(5) } };
   const uid = ev.source && ev.source.userId;
   log('event', ev.type, ev.message ? ev.message.type : '', uid ? uid.slice(0, 6) + '…' : '-', uid && uid === state.owner ? 'owner' : 'not-owner');
   if (!uid || DUMMY.test(uid) || /^0+$|^f+$/i.test(ev.replyToken || '')) return;

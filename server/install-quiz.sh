@@ -326,7 +326,9 @@ async function onLineWebhook(req, res) {
   if (!LINE_SECRET || sig !== req.headers['x-line-signature']) return send(res, 401, { ok: false });
   send(res, 200, { ok: true });
   const { events = [] } = JSON.parse(raw.toString('utf8'));
-  for (const ev of events) {
+  for (let ev of events) {
+    // リッチメニューのボタン（押すとメニューが閉じる postback。data は menu:承認待ち）は、その文字を送ったのと同じに扱う
+    if (ev.type === 'postback' && /^menu:/.test(String(ev.postback && ev.postback.data))) ev = { ...ev, type: 'message', message: { type: 'text', text: String(ev.postback.data).slice(5) } };
     const uid = ev.source && ev.source.userId;
     if (!state.owner && uid && (ev.type === 'follow' || ev.type === 'message')) {
       state.owner = uid; save();
