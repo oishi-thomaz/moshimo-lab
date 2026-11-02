@@ -185,7 +185,7 @@ runStory({
     id: '0160',
     v2: true,
     hookLine: '全人類が、同時に叫んだ。',
-    series: '日本人全員で',
+    series: '全員で同時に',
     hookType: 'H1',
     cat: '全員が同時に・極端な数字',
     title: '世界中の人が同時に叫んだら？',

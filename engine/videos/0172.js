@@ -179,7 +179,7 @@ runStory({
     id: '0172',
     v2: true,
     hookLine: '日本中の電気が、一斉に消えた。',
-    series: '日本人全員で',
+    series: '全員で同時に',
     hookType: 'H2',
     cat: '全員が同時に・極端な数字',
     title: '日本人全員が同時に電気を消したら？',

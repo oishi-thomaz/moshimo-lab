@@ -252,7 +252,7 @@ runStory({
     id: '0131',
     v2: true,
     hookLine: '日本中の全員が、1円ずつ出した。',
-    series: '日本人全員で',
+    series: '全員で同時に',
     hookType: 'H1', cat: '全員が同時に・極端な数字',
     title: '日本人全員が1円ずつ出したら？',
     titleHtml: '日本人全員が<br>1円ずつ出したら？',
