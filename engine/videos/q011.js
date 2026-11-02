@@ -20,15 +20,17 @@ const KIM = [
 ];
 const EARTH = mat('#6b5440'), EARTH_D = mat('#4f3d2e');
 
-// ---------- 1. 半地下の家の断面（x=0）。地面は y=0、部屋の床は y=-1.6 ----------
+// ---------- 1段目・6段目. 半地下の家の断面（x=0）。地面は y=0、部屋の床は y=-1.6 ----------
 const FY = -1.6;
 const HOME = new THREE.Group(); qs.add(HOME);
+const HOMEWIN = [];
+const OUTSIDE = []; // 地面と土の断面（1段目は部屋だけを見せるので隠す） // 地面すれすれの窓（半地下とわかる決め手なので6段目まで見せない）
 {
-  const l = box(10, 12, 3.0, EARTH); l.position.set(-7.6, -6, -0.7); HOME.add(l);
-  const r = box(16, 12, 3.0, EARTH); r.position.set(10.6, -6, -0.7); HOME.add(r);
-  const u = box(5.2, 10, 3.0, EARTH_D); u.position.set(0, FY - 5, -0.7); HOME.add(u);
-  for (const [x, w] of [[-7.6, 10], [10.6, 16]]) { const top = box(w, 0.08, 3.0, mat('#8b8f96')); top.position.set(x, -0.04, -0.7); HOME.add(top); }
-  const ground = new THREE.Mesh(new THREE.PlaneGeometry(200, 120), mat('#7d8288')); ground.rotation.x = -Math.PI / 2; ground.position.set(0, 0, -62.2); ground.receiveShadow = true; qs.add(ground);
+  const l = box(10, 12, 3.0, EARTH); l.position.set(-7.6, -6, -0.7); HOME.add(l); OUTSIDE.push(l);
+  const r = box(16, 12, 3.0, EARTH); r.position.set(10.6, -6, -0.7); HOME.add(r); OUTSIDE.push(r);
+  const u = box(5.2, 10, 3.0, EARTH_D); u.position.set(0, FY - 5, -0.7); HOME.add(u); OUTSIDE.push(u);
+  for (const [x, w] of [[-7.6, 10], [10.6, 16]]) { const top = box(w, 0.08, 3.0, mat('#8b8f96')); top.position.set(x, -0.04, -0.7); HOME.add(top); OUTSIDE.push(top); }
+  const ground = new THREE.Mesh(new THREE.PlaneGeometry(200, 120), mat('#7d8288')); ground.rotation.x = -Math.PI / 2; ground.position.set(0, 0, -62.2); ground.receiveShadow = true; qs.add(ground); OUTSIDE.push(ground);
   // 部屋（奥の壁・左右の壁・天井）
   const wall = mat('#b9ab8e');
   const back = box(5.2, 2.45, 0.12, wall); back.position.set(0, FY + 1.225, -2.14); HOME.add(back);
@@ -37,8 +39,8 @@ const HOME = new THREE.Group(); qs.add(HOME);
   const ceil = box(5.5, 0.16, 3.0, mat('#8f8676')); ceil.position.set(0, FY + 2.53, -0.7); HOME.add(ceil);
   const fl = box(5.2, 0.06, 3.0, mat('#7a6a55')); fl.position.set(0, FY + 0.03, -0.7); HOME.add(fl);
   // 地面の上に出ている小さな窓（奥の壁の上のほう）
-  const win = new THREE.Mesh(new THREE.PlaneGeometry(1.8, 0.5), new THREE.MeshBasicMaterial({ color: '#cfe0ee' })); win.position.set(-0.6, 0.45, -2.07); HOME.add(win);
-  for (const dx of [-0.9, 0, 0.9]) { const bar = box(0.05, 0.5, 0.04, mat('#3a3a3a')); bar.position.set(-0.6 + dx, 0.45, -2.05); HOME.add(bar); }
+  const win = new THREE.Mesh(new THREE.PlaneGeometry(1.8, 0.5), new THREE.MeshBasicMaterial({ color: '#cfe0ee' })); win.position.set(-0.6, 0.45, -2.07); HOME.add(win); HOMEWIN.push(win);
+  for (const dx of [-0.9, 0, 0.9]) { const bar = box(0.05, 0.5, 0.04, mat('#3a3a3a')); bar.position.set(-0.6 + dx, 0.45, -2.05); HOME.add(bar); HOMEWIN.push(bar); }
   // 部屋の中：低いテーブルと、内職の小さな箱の山
   const tb = box(1.7, 0.36, 0.9, mat('#5b4532')); tb.position.set(0.2, FY + 0.18, -0.9); HOME.add(tb);
   for (let i = 0; i < 9; i++) { const b = box(0.36, 0.06, 0.36, mat('#e8e2d2')); b.position.set(-0.3 + (i % 3) * 0.08, FY + 0.39 + i * 0.065, -0.95); b.rotation.y = R() * 0.3; HOME.add(b); }
@@ -57,7 +59,7 @@ const tGround = tag('ここが地面', { size: 54, w: 330, bg: '#e6b450', color:
 const WALK = [0, 1, 2].map(i => { const p = makePerson({ skin: '#efcfae', hair: ['#1d1a19', '#6b4a33', '#3a3030'][i], shirt: ['#2f4a7a', '#c8a24a', '#59606e'][i], pants: ['#22262f', '#3b3f4a', '#5a4a3a'][i] }); qs.add(p); return p; });
 function walkers(T) { WALK.forEach((p, i) => { const s = ((T * 1.1 + i * 3.3) % 10) - 5; p.position.set(-1.6 + s * 1.3, 0, -2.75 - i * 0.45); p.rotation.y = Math.PI / 2; poseWalk(p, T * 7 + i, 1); p.position.y = 0; }); }
 
-// ---------- 2. 高台の豪邸（家の右奥） ----------
+// ---------- 3段目. 高台の豪邸（家の右奥） ----------
 const HILL = new THREE.Group(); HILL.position.set(9, 0, -22); qs.add(HILL);
 const MANSION_WIN = [];
 {
@@ -74,7 +76,7 @@ const MANSION_WIN = [];
 const tCEO = tag('IT企業の社長', { size: 72, w: 520, bg: '#e6b450', color: '#14161c' }); tCEO.position.set(7.75, 11.25, -12.7); qs.add(tCEO);
 const HILLL = new THREE.PointLight(0xffd8a0, 0, 22, 1.1); HILLL.position.set(9, 9, -17); qs.add(HILLL);
 
-// ---------- 3. 友だちから仕事をゆずられる（x=30） ----------
+// ---------- 2段目. 友だちから仕事をゆずられる（x=30） ----------
 const STREET = new THREE.Group(); STREET.position.set(30, 0, 0); qs.add(STREET);
 {
   const pave = box(14, 0.06, 8, mat('#8a8f96')); pave.position.set(0, 0.03, -1); STREET.add(pave);
@@ -88,7 +90,7 @@ const NOTE = new THREE.Group();
 qs.add(NOTE);
 const tTutor = tag('家庭教師の仕事', { size: 66, w: 520, bg: '#e6b450', color: '#14161c' }); tTutor.position.set(30, 2.4, 0.3); qs.add(tTutor);
 
-// ---------- 4〜5. 豪邸のリビング（x=60） ----------
+// ---------- 4〜5段目. 豪邸のリビング（x=60） ----------
 const LIV = new THREE.Group(); LIV.position.set(60, 0, 0); qs.add(LIV);
 {
   const fl = box(16, 0.08, 22, mat('#c9b48c')); fl.position.set(0, 0.04, 5.5); LIV.add(fl);
@@ -117,28 +119,20 @@ const POS4 = [[57.9, -0.8], [61.8, -0.4], [59.4, 0.9], [63.6, 0.6]];
 
 // ---------- shots ----------
 const ALL = [tJobless, tGround, tCEO, tTutor, tFake, ...KTAG];
-function base() { S.reset(); WALK.forEach(p => p.visible = true); [L_SON, L_SIS, L_DAD, L_MOM].forEach(p => p.visible = false); ALL.forEach(x => x.visible = false); GLINE.visible = false; ROOML.intensity = 7; HILLL.intensity = 0; MANSION_WIN.forEach(m => m.color.set('#ffe3a8')); NOTE.visible = false; }
+function base() { S.reset(); WALK.forEach(p => p.visible = true); [L_SON, L_SIS, L_DAD, L_MOM].forEach(p => p.visible = false); ALL.forEach(x => x.visible = false); GLINE.visible = false; ROOML.intensity = 7; HILLL.intensity = 0; MANSION_WIN.forEach(m => m.color.set('#ffe3a8')); NOTE.visible = false; HOMEWIN.forEach(m => m.visible = true); OUTSIDE.forEach(m => m.visible = true); HILL.visible = true; }
+function famWork(T) { FAM.forEach((p, i) => { p.userData.arms.forEach((a, k) => a.rotation.x = -0.9 + Math.sin(T * 3 + i + k) * 0.12); }); }
 
-function shotHome(t, T) { // 0〜9：半地下の家の断面と、高台の豪邸（0秒目がサムネ）
-  base(); S.aim(2, -6); lift(0);
-  walkers(T);
-  FAM.forEach((p, i) => { p.userData.arms.forEach((a, k) => a.rotation.x = -0.9 + Math.sin(T * 3 + i + k) * 0.12); });
-  tJobless.userData.pop((T - 2.8) / 0.35); if (T > 5.6) tJobless.visible = false;
-  GLINE.visible = T > 5.6; GLINE.scale.x = Math.max(0.01, easeOut(clamp((T - 5.6) / 0.6)));
-  tGround.userData.pop((T - 6.3) / 0.35);
+function shotJobless(t, T) { // 1段目 0〜9：家族4人、全員が失業中。部屋の中だけを寄りで（窓と地面は見せない。0秒目がサムネ）
+  base(); S.aim(0, -1); lift(60);
+  WALK.forEach(p => p.visible = false); HOMEWIN.forEach(m => m.visible = false); OUTSIDE.forEach(m => m.visible = false); HILL.visible = false;
+  S.darken(1, '#120f0c'); S.hemi.intensity = 0.7; S.key.intensity = 0.6; ROOML.intensity = 9;
+  famWork(T);
+  tJobless.position.set(0.2, 0.55, 0.2); tJobless.userData.pop(1);
   const u = ease(T / 9);
-  look(lerp(0.6, 0.4, u), lerp(2.6, 2.3, u), lerp(13.5, 12.2, u), lerp(1.2, 1.0, u), lerp(5.4, 5.0, u), -6, 56);
+  look(lerp(0.3, 0.2, u), lerp(0.4, 0.2, u), lerp(6.2, 5.4, u), 0.2, lerp(-0.2, -0.3, u), -1.0, 54);
   return qs;
 }
-function shotHill(t) { // 9〜17：高台の豪邸へ
-  base(); S.aim(9, -20); lift(0);
-  walkers(9 + t); WALK.forEach(p => p.visible = t < 1.2);
-  const u = ease(t / 8);
-  look(lerp(0.4, 6.5, u), lerp(2.3, 10.5, u), lerp(12.2, -6.5, u), lerp(1.0, 9, u), lerp(5.0, 8.6, u), lerp(-6, -22, u), 56);
-  tCEO.userData.pop((t - 4.4) / 0.35);
-  return qs;
-}
-function shotFriend(t) { // 17〜25：友だちから家庭教師の仕事をゆずられる
+function shotFriend(t) { // 2段目 9〜17：友だちから家庭教師の仕事をゆずられる
   base(); S.aim(30, 0); lift(60);
   const k = ease((t - 1.0) / 1.6);
   NOTE.visible = true; NOTE.position.set(lerp(30.45, 29.75, k), 1.12 + Math.sin(k * Math.PI) * 0.15, 0.62); NOTE.rotation.set(-0.3, lerp(-0.6, 0.6, k), 0);
@@ -148,6 +142,14 @@ function shotFriend(t) { // 17〜25：友だちから家庭教師の仕事をゆ
   look(lerp(30.7, 30.1, u), lerp(1.9, 1.8, u), lerp(6.4, 5.6, u), 30, 1.45, 0, 54);
   return qs;
 }
+function shotHill(t) { // 3段目 17〜25：高台の大きな豪邸。住んでいるのは IT企業の社長一家（ふもとの家は映さない）
+  base(); S.aim(9, -20); lift(200);
+  WALK.forEach(p => p.visible = false);
+  const u = ease(t / 8);
+  look(lerp(4.0, 6.0, u), lerp(3.0, 9.0, u), lerp(-4.0, -8.0, u), lerp(8.6, 9, u), lerp(7.0, 8.4, u), -22, 56);
+  tCEO.position.set(7.5, 9.85, -14.0); tCEO.userData.pop((t - 4.2) / 0.35);
+  return qs;
+}
 function placeKim(sisIn, dadIn, momIn) {
   L_SON.visible = true;
   L_SON.position.set(59.2, 0, -1.2); L_SON.rotation.y = -0.6;
@@ -155,7 +157,7 @@ function placeKim(sisIn, dadIn, momIn) {
   L_DAD.visible = dadIn > 0; L_DAD.position.set(lerp(66.0, 60.0, dadIn), 0, 0.7); L_DAD.rotation.y = dadIn < 1 ? -Math.PI / 2 : 0; poseWalk(L_DAD, dadIn * 22, dadIn < 1 ? 1 : 0); L_DAD.position.y = 0;
   L_MOM.visible = momIn > 0; L_MOM.position.set(lerp(66.0, 61.3, momIn), 0, 0.9); L_MOM.rotation.y = momIn < 1 ? -Math.PI / 2 : -0.3; poseWalk(L_MOM, momIn * 18, momIn < 1 ? 1 : 0); L_MOM.position.y = 0;
 }
-function shotSister(t) { // 25〜33：妹を他人のふりをさせて、息子の家庭教師に
+function shotSister(t) { // 4段目 25〜33：妹を他人のふりをさせて、息子の家庭教師に
   base(); S.aim(60, -1); lift(150);
   placeKim(ease((t - 0.6) / 2.6), 0, 0);
   tFake.position.set(Math.min(L_SIS.position.x, 61.9), 2.45, L_SIS.position.z); tFake.userData.pop((t - 4.2) / 0.35);
@@ -163,7 +165,7 @@ function shotSister(t) { // 25〜33：妹を他人のふりをさせて、息子
   look(lerp(60.3, 60.5, u), lerp(3.0, 2.8, u), lerp(8.8, 8.2, u), 60.4, 1.1, -0.8, 54);
   return qs;
 }
-function shotAll(t) { // 33〜42：父も母もひとりずつ。一家全員が豪邸で
+function shotAll(t) { // 5段目 33〜42：父も母もひとりずつ豪邸へ（韓国の家族の大胆な計画）
   base(); S.aim(60, -1); lift(170);
   placeKim(1, ease((t - 0.5) / 2.2), ease((t - 2.6) / 2.0));
   const P = [L_SON, L_SIS, L_DAD, L_MOM];
@@ -172,20 +174,23 @@ function shotAll(t) { // 33〜42：父も母もひとりずつ。一家全員が
   look(lerp(60.2, 60.3, u), lerp(3.6, 4.4, u), lerp(9.0, 10.0, u), 60.3, 1.0, -0.4, 54);
   return qs;
 }
+function shotHalf(t, T) { // 6段目 42〜49（決め手）：一家が暮らすのは、地面より低い半地下の家（奥に高台の豪邸）
+  base(); S.aim(2, -6); lift(300);
+  WALK.forEach(p => p.visible = false);
+  famWork(T);
+  tGround.position.set(-1.25, -0.32, 0.9);
+  GLINE.visible = t > 0.6; GLINE.scale.x = Math.max(0.01, easeOut(clamp((t - 0.6) / 0.6)));
+  tGround.userData.pop((t - 1.3) / 0.35);
+  const u = ease(t / 7);
+  look(lerp(0.1, 0.4, u), lerp(0.25, 0.45, u), lerp(7.6, 9.4, u), lerp(0.1, 0.4, u), lerp(-0.1, 0.3, u), -2.0, 56);
+  return qs;
+}
 const DARK = '#070a12';
 function night(d) {
   S.hemi.intensity = lerp(1.25, 0.16, d); S.key.intensity = lerp(1.5, 0, d); S.darken(d, DARK);
   HILLL.intensity = 30 * d; ROOML.intensity = 7;
 }
-function shotTwist(t) { // 42〜49：夜。高台の豪邸から、ふもとの半地下へ
-  base(); S.aim(4, -10); lift(0);
-  night(ease(t / 1.3));
-  WALK.forEach(p => p.visible = false);
-  const k = ease(t / 7);
-  look(lerp(7.0, 4.5, k), lerp(11.5, 6.0, k), lerp(-7.0, 12.0, k), lerp(9, 3, k), lerp(8.6, 2.6, k), lerp(-22, -9, k), 56);
-  return qs;
-}
-function shotQuiz(t) { // 49〜56：この映画わかった？
+function shotQuiz(t) { // 49〜56：この映画わかった？（夜。高台の豪邸とふもとの半地下）
   base(); S.aim(4, -10); lift(0);
   night(1);
   WALK.forEach(p => p.visible = false);
@@ -196,28 +201,28 @@ function shotQuiz(t) { // 49〜56：この映画わかった？
 }
 
 const SHOTS = [
-  { a: 0, b: 9, f: (t, T) => shotHome(t, T) },
-  { a: 9, b: 17, f: shotHill },
-  { a: 17, b: 25, f: shotFriend },
+  { a: 0, b: 9, f: (t, T) => shotJobless(t, T) },
+  { a: 9, b: 17, f: shotFriend },
+  { a: 17, b: 25, f: shotHill },
   { a: 25, b: 33, f: shotSister },
   { a: 33, b: 42, f: shotAll },
-  { a: 42, b: 49, f: shotTwist },
+  { a: 42, b: 49, f: (t, T) => shotHalf(t, T) },
   { a: 49, b: 56, f: shotQuiz },
   { a: 56, b: 64, f: endCard },
 ];
 const SUBS = [
   [2.5, 5.6, '家族4人、<br>全員が失業中。'],
-  [5.6, 9.0, '暮らしているのは、<br>半地下の家。'],
-  [9.2, 13.2, '一方、高台の<br>大きな豪邸には'],
-  [13.2, 17.0, 'IT企業の<br>社長一家。'],
-  [17.2, 21.0, '長男が友だちから<br>ゆずられたのは、'],
-  [21.0, 25.0, 'その豪邸の娘の、<br>家庭教師の仕事。'],
+  [5.6, 9.0, '小さな内職で、<br>なんとか暮らす毎日。'],
+  [9.2, 13.2, '長男が友だちから<br>ゆずられたのは、'],
+  [13.2, 17.0, 'お金持ちの娘の、<br>家庭教師の仕事。'],
+  [17.2, 21.0, '向かった先は、<br>高台の大きな豪邸。'],
+  [21.0, 25.0, '住んでいるのは、<br>IT企業の社長一家。'],
   [25.2, 29.0, '次は妹に、<br>他人のふりをさせて'],
   [29.0, 33.0, 'あの家の息子の<br>家庭教師に推薦。'],
-  [33.2, 37.4, 'さらに父も、母も、<br>ひとりずつ。'],
-  [37.4, 41.8, '気づけば一家全員が、<br>豪邸で働いていた。'],
-  [42.2, 45.4, 'でも、この計画は'],
-  [45.4, 49.0, '誰も予想しない<br>方向へ転がり出す。'],
+  [33.2, 37.4, 'さらに父も母も、<br>ひとりずつ豪邸へ。'],
+  [37.4, 41.8, '韓国の家族が仕掛ける、<br>大胆な計画。'],
+  [42.2, 45.4, '一家が暮らすのは、<br>半地下の家。'],
+  [45.4, 49.0, '計画は、誰も予想しない<br>方向へ転がり出す。'],
   [49.2, 52.0, 'この映画、<br>わかった？'],
   [52.0, 55.8, 'カウントダウンの間に、<br>当ててみて。'],
   [56.4, 59.6, '答えは、パラサイト<br>半地下の家族。'],
@@ -232,11 +237,11 @@ runStory({
     title: 'この映画のタイトルは？',
     titleHtml: 'この映画の<br>タイトルは？',
     mood: 'tension', seed: 1111,
-    hits: [5.6, 21.0, 56.4], risers: [52.0],
-    impacts: [0.3, 3.0, 37.4, 56.4],
-    sfx: [[0.2, 'whoosh'], [9.0, 'whoosh'], [17.0, 'whoosh'], [25.0, 'whoosh'], [33.0, 'whoosh'], [42.2, 'drone'], [49.0, 'meter', 0.5]],
-    narr: { '4人': 'よにん', '失業中': 'しつぎょうちゅう', '暮らして': 'くらして', '半地下': 'はんちか', '一方': 'いっぽう', '高台': 'たかだい', '豪邸': 'ごうてい', 'IT企業': 'アイティーきぎょう', '社長一家': 'しゃちょういっか', '長男': 'ちょうなん', '友だち': 'ともだち', '家庭教師': 'かていきょうし', '他人': 'たにん', '推薦': 'すいせん', '一家全員': 'いっかぜんいん', '働いて': 'はたらいて', '計画': 'けいかく', '誰も': 'だれも', '予想': 'よそう', '方向': 'ほうこう', '転がり出す': 'ころがりだす', '答え': 'こたえ', '何秒': 'なんびょう', '感想': 'かんそう' },
-    caption: 'この映画のタイトル、わかる？\n家族4人、全員が失業中。暮らしているのは半地下の家。長男が友だちからゆずられたのは、高台の豪邸に住むIT企業の社長の娘の家庭教師の仕事だった。\n\n答えは動画の最後で。何秒でわかった？どこでわかった？コメントで教えて。観た人は感想も聞かせて。',
+    hits: [13.2, 29.0, 42.2, 56.4], risers: [37.4, 52.0],
+    impacts: [0.3, 3.0, 25.2, 42.2, 56.4],
+    sfx: [[0.2, 'whoosh'], [9.0, 'whoosh'], [17.0, 'whoosh'], [25.0, 'whoosh'], [33.0, 'whoosh'], [42.0, 'drone'], [49.0, 'meter', 0.5]],
+    narr: { '社長一家': 'しゃちょういっか', '一家が': 'いっかが', '失業中': 'しつぎょうちゅう', '暮らして': 'くらして', '暮らす': 'くらす', '家庭教師': 'かていきょうし', '転がり出す': 'ころがりだす', '仕掛ける': 'しかける', 'お金持ち': 'おかねもち', 'IT企業': 'アイティーきぎょう', '半地下': 'はんちか', '内職': 'ないしょく', '毎日': 'まいにち', '4人': 'よにん', '高台': 'たかだい', '豪邸': 'ごうてい', '長男': 'ちょうなん', '友だち': 'ともだち', '他人': 'たにん', '推薦': 'すいせん', '韓国': 'かんこく', '大胆': 'だいたん', '計画': 'けいかく', '誰も': 'だれも', '予想': 'よそう', '方向': 'ほうこう', '答え': 'こたえ', '何秒': 'なんびょう', '感想': 'かんそう' },
+    caption: 'この映画のタイトル、わかる？\n家族4人、全員が失業中。小さな内職でなんとか暮らす毎日。長男が友だちからゆずられたのは、高台の大きな豪邸に住むお金持ちの娘の、家庭教師の仕事だった。\n\n答えは動画の最後で。何秒でわかった？どこでわかった？コメントで教えて。観た人は感想も聞かせて。',
     hashtags: ['タイトル当てクイズ', 'ネトフリ', 'Netflix', '韓国映画', '名作映画'],
   },
 });
