@@ -23,7 +23,7 @@ const SUITS = { s: ['♠', '#1a1a22'], h: ['♥', '#d6283a'], d: ['♦', '#d6283
 function cardTex(suit, num) { const [sym, col] = SUITS[suit]; return canvasTex(256, 360, (g, w, h) => { g.fillStyle = '#fbfaf5'; g.beginPath(); g.roundRect(4, 4, w - 8, h - 8, 22); g.fill(); g.strokeStyle = '#c9c4b4'; g.lineWidth = 4; g.stroke(); g.fillStyle = col; g.font = '900 64px "Noto Sans CJK JP", sans-serif'; g.textAlign = 'left'; g.textBaseline = 'top'; g.fillText(num, 22, 16); g.font = '900 150px "Noto Sans CJK JP", sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(sym, w / 2, h / 2 + 14); }); }
 function card(suit, num, s = 1) { const g = new THREE.Group(); const f = new THREE.Mesh(new THREE.PlaneGeometry(1.0 * s, 1.4 * s), new THREE.MeshBasicMaterial({ map: cardTex(suit, num), transparent: true, side: THREE.FrontSide })); g.add(f); const bk = new THREE.Mesh(new THREE.PlaneGeometry(1.0 * s, 1.4 * s), new THREE.MeshBasicMaterial({ color: '#7a1a24' })); bk.rotation.y = Math.PI; g.add(bk); return g; }
 
-// ---------- 1〜2. 交差点（x=0） ----------
+// ---------- 1〜3段目. 交差点（x=0） ----------
 const CITY = new THREE.Group(); CITY.position.set(0, 0, 0); qs.add(CITY);
 const SCREENS = [];
 { const road = box(30, 0.04, 30, mat('#3a3c44')); road.position.y = 0.02; CITY.add(road);
@@ -41,7 +41,7 @@ const tEmpty = tag('人が消えた', { size: 84, bg: '#e2483c' }); tEmpty.posit
 const FLASH = new THREE.PointLight(0xffffff, 0, 60, 0.6); FLASH.position.set(0, 12, 2); qs.add(FLASH);
 const MOONL = new THREE.PointLight(0xb8c8ff, 0, 12, 1.2); MOONL.position.set(0, 3.2, 4.5); qs.add(MOONL);
 
-// ---------- 3. 夜のゲーム会場（x=26） ----------
+// ---------- 4段目. 夜のゲーム会場（x=26） ----------
 const VENUE = new THREE.Group(); VENUE.position.set(26, 0, 0); qs.add(VENUE);
 let LAMPS = [];
 { const bld = box(9, 6, 4, mat('#3a3e48')); bld.position.set(0, 3, -4.2); VENUE.add(bld);
@@ -53,7 +53,7 @@ let LAMPS = [];
 const H3 = [HERO, PAL1, PAL2].map((o, i) => { const p = makePerson(o); p.position.set(25.1 + i * 0.9, 0, 1.2); p.rotation.y = Math.PI; qs.add(p); return p; });
 const tLife = tag('命がけ', { size: 90, bg: '#e2483c' }); tLife.position.set(26, 2.45, -0.4); qs.add(tLife);
 
-// ---------- 4. トランプのルール（x=50） ----------
+// ---------- 6段目（決め手）. トランプのルール（x=50） ----------
 const RULES = new THREE.Group(); RULES.position.set(50, 0, 0); qs.add(RULES);
 const CARDS = [['s', 'A', '体力'], ['h', '7', '心理'], ['d', 'Q', '知能'], ['c', '3', 'バランス']].map(([su, n, lab], i) => { const c = card(su, n, 0.72); const x = 48.08 + i * 0.95, y = 2.7; c.userData.home = new THREE.Vector3(x, y, -0.5); c.position.copy(c.userData.home); qs.add(c); const t = tag(lab, { size: lab.length > 2 ? 46 : 60, w: 250, bg: '#14161c' }); t.position.set(x, 3.55 + (i % 2) * 0.0, -0.3); qs.add(t); c.userData.t = t; return c; });
 const NUMS = [['s', '2'], ['s', '5'], ['s', '9'], ['s', 'K']].map(([su, n], i) => { const c = card(su, n, 0.7); c.position.set(48.0 + i * 1.0, 2.6, -0.5); qs.add(c); return c; });
@@ -61,7 +61,7 @@ const tNum = tag('数字＝むずかしさ', { size: 66, w: 560 }); tNum.positio
 const ARROW = new THREE.Mesh(new THREE.ConeGeometry(0.16, 0.4, 3), new THREE.MeshBasicMaterial({ color: '#e6b450' })); ARROW.rotation.z = -Math.PI / 2; qs.add(ARROW);
 const BAR = box(3.0, 0.08, 0.02, new THREE.MeshBasicMaterial({ color: '#e6b450' })); qs.add(BAR);
 
-// ---------- 5. ビザの日数（x=74） ----------
+// ---------- 5段目. ビザの日数（x=74） ----------
 const ROOM = new THREE.Group(); ROOM.position.set(74, 0, 0); qs.add(ROOM);
 const VISA_C = document.createElement('canvas'); VISA_C.width = 768; VISA_C.height = 512;
 const VISA_T = new THREE.CanvasTexture(VISA_C); VISA_T.colorSpace = THREE.SRGBColorSpace;
@@ -71,42 +71,60 @@ drawVisa(1, false);
 { const back = box(10, 4.6, 0.2, mat('#2a2e36')); back.position.set(0, 2.3, -3); ROOM.add(back);
   const scr = new THREE.Mesh(new THREE.PlaneGeometry(3.6, 2.4), new THREE.MeshBasicMaterial({ map: VISA_T })); scr.position.set(0, 2.6, -2.88); ROOM.add(scr);
   const gl = new THREE.PointLight(0xc8d8ff, 4, 8, 1.3); gl.position.set(0, 2.4, -1.0); ROOM.add(gl); }
-const hero5 = makePerson(HERO); hero5.position.set(75.9, 0, 0.6); hero5.rotation.y = Math.PI * 0.85; qs.add(hero5);
+const hero5 = makePerson(HERO); hero5.position.set(75.2, 0, 0.9); hero5.rotation.y = Math.PI * 0.92; qs.add(hero5);
 const tVisa = tag('勝てば日数がのびる', { size: 64, w: 600, bg: '#e6b450', color: '#14161c' }); tVisa.position.set(74, 4.25, -2.6); qs.add(tVisa);
 const tOut = tag('切れたら終わり', { size: 70, w: 520, bg: '#e2483c' }); tOut.position.set(74, 4.25, -2.6); qs.add(tOut);
 
-// ---------- 6〜7. 夜の無人の街に、浮かぶカード（x=0 の交差点を夜に） ----------
+// ---------- クイズの間：夜の無人の街に、浮かぶカード（x=0 の交差点を夜に） ----------
 const SKYCARDS = [['h', 'K'], ['s', '10'], ['d', '4'], ['c', 'J'], ['h', '2']].map(([su, n], i) => { const c = card(su, n, 1.3); c.userData.a = i / 5 * Math.PI * 2; qs.add(c); return c; });
+
+// ---------- 1段目の光（空に浮かぶ白い光。だんだん大きくなる） ----------
+const glowTex = canvasTex(256, 256, (g, w, h) => { const gr = g.createRadialGradient(w / 2, h / 2, 0, w / 2, h / 2, w / 2); gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(0.25, 'rgba(255,250,235,.9)'); gr.addColorStop(0.6, 'rgba(220,235,255,.35)'); gr.addColorStop(1, 'rgba(200,220,255,0)'); g.fillStyle = gr; g.fillRect(0, 0, w, h); });
+const GLOW = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, fog: false }));
+GLOW.position.set(0.5, 5.7, -3.0); GLOW.renderOrder = 5; qs.add(GLOW);
 
 // ---------- shots ----------
 const ALLTAG = [tPals, tEmpty, tLife, tNum, tVisa, tOut, ...CARDS.map(c => c.userData.t)];
-function base() { S.reset(); ALLTAG.forEach(x => x.visible = false); FLASH.intensity = 0; MOONL.intensity = 0; VENUE.userData.gl.intensity = 0; SKYCARDS.forEach(c => c.visible = false); ARROW.visible = false; BAR.visible = false; }
+function base() { S.reset(); ALLTAG.forEach(x => x.visible = false); FLASH.intensity = 0; MOONL.intensity = 0; VENUE.userData.gl.intensity = 0; SKYCARDS.forEach(c => c.visible = false); ARROW.visible = false; BAR.visible = false; GLOW.visible = false; CARDS.forEach(c => c.visible = false); NUMS.forEach(c => c.visible = false); CITY.userData.vis.visible = true; CROWD.forEach(p => p.visible = true); [hero, pal1, pal2].forEach(p => { p.visible = true; p.userData.head.rotation.set(0, 0, 0); }); }
 function walkCrowd(T) { CROWD.forEach((p, i) => { const d = p.userData.dir, s = ((T * 0.7 + i * 0.37) % 4) - 2; p.position.set(p.userData.base.x + Math.cos(d) * s, 0, p.userData.base.z + Math.sin(d) * s * 0.6); p.rotation.y = Math.atan2(Math.cos(d), Math.sin(d) * 0.6); const ph = T * 8 + i; p.userData.legs[0].rotation.x = Math.sin(ph) * 0.45; p.userData.legs[1].rotation.x = -Math.sin(ph) * 0.45; }); }
+function whiteOut(k) { if (k <= 0) return; S.scene.background.lerp(new THREE.Color('#ffffff'), k); S.scene.fog.color.copy(S.scene.background); }
 
-function shotCrowd(t, T) { // 0〜9：人であふれる交差点（0秒目がサムネ）
-  base(); S.aim(0, 0); lift(150);
-  CROWD.forEach(p => p.visible = true); walkCrowd(T);
-  CITY.userData.vis.material.color.set(Math.floor(T * 1.5) % 2 ? '#4fa3d1' : '#e05a4f');
-  hero.userData.head.rotation.x = 0.25;
-  tPals.userData.pop((T - 5.8) / 0.35);
-  const u = ease(T / 9);
-  look(lerp(1.0, 0.4, u), lerp(4.6, 3.6, u), lerp(11.0, 8.2, u), 0, lerp(2.6, 2.0, u), -1.0, 54);
+function shotGlow(t) { // 1段目 0〜9：人であふれる交差点の空に、白い光（0秒目がサムネ）
+  base(); S.aim(0, 0); lift(120);
+  walkCrowd(3.1); // 歩いていた人がみんな足を止めて、空を見上げている
+  CROWD.forEach((p, i) => { p.userData.legs[0].rotation.x = 0; p.userData.legs[1].rotation.x = 0; p.rotation.y = Math.PI + (i % 5 - 2) * 0.25; p.userData.head.rotation.x = -0.55; });
+  [hero, pal1, pal2].forEach(p => { p.rotation.y = Math.PI; p.userData.head.rotation.x = -0.55; });
+  CITY.userData.vis.visible = false;
+  GLOW.visible = true; const gs = lerp(5.5, 10, ease(t / 6.5)) * (1 + 0.06 * Math.sin(t * 9)); GLOW.scale.set(gs, gs, 1);
+  const fl = clamp((t - 6.0) / 2.2);
+  FLASH.intensity = 30 + fl * 260; whiteOut(0.15 + fl * 0.85);
+  const u = ease(t / 9);
+  look(lerp(0.6, 0.2, u), lerp(1.6, 1.3, u), lerp(10.4, 9.0, u), 0.3, lerp(4.6, 5.4, u), -2.0, 58);
   return qs;
 }
-function shotFlash(t) { // 9〜17：突然の閃光。街から人が消える
+function shotFlash(t) { // 2段目 9〜17：光が消えると、街から人が消えていた（主人公と親友2人）
   base(); S.aim(0, 0); lift(200);
-  const fl = t > 1.6 && t < 2.6 ? Math.sin(clamp((t - 1.6) / 1.0) * Math.PI) : 0;
-  FLASH.intensity = fl * 220; S.darken(0); if (fl > 0) { S.scene.background.lerp(new THREE.Color('#ffffff'), fl); S.scene.fog.color.copy(S.scene.background); }
-  const gone = t > 2.1;
-  CROWD.forEach(p => p.visible = !gone); if (!gone) walkCrowd(9 + t);
-  CITY.userData.vis.material.color.set(gone ? '#1a1c22' : '#4fa3d1');
-  [hero, pal1, pal2].forEach((p, i) => { p.userData.head.rotation.y = gone ? Math.sin(t * 1.5 + i * 2) * 0.6 : 0; });
-  if (gone) tEmpty.userData.pop((t - 4.2) / 0.35);
+  CROWD.forEach(p => p.visible = false);
+  whiteOut(1 - clamp(t / 1.4)); FLASH.intensity = (1 - clamp(t / 1.4)) * 200;
+  CITY.userData.vis.material.color.set('#1a1c22');
+  [hero, pal1, pal2].forEach((p, i) => { p.rotation.y = 0; p.userData.head.rotation.y = t > 1.6 ? Math.sin(t * 1.5 + i * 2) * 0.6 : 0; });
+  tEmpty.userData.pop((t - 4.4) / 0.35);
   const u = ease(t / 8);
   look(lerp(0.4, 0.2, u), lerp(3.4, 5.6, u), lerp(8.0, 9.6, u), 0, lerp(2.0, 1.4, u), 0, 54);
   return qs;
 }
-function shotVenue(t) { // 17〜25：命がけのゲームに参加するしかない
+const DARK = '#05070e';
+function shotEmpty(t) { // 3段目 17〜25：静まり返った無人の街。日が暮れていく
+  base(); S.aim(0, 0); lift(170);
+  CROWD.forEach(p => p.visible = false); CITY.userData.vis.material.color.set('#1a1c22');
+  const d = 0.35 + 0.45 * ease(t / 8);
+  S.hemi.intensity = lerp(1.25, 0.25, d); S.key.intensity = lerp(1.5, 0, d); S.darken(d, DARK); MOONL.intensity = 5 * d;
+  [hero, pal1, pal2].forEach((p, i) => { p.rotation.y = Math.PI + (i - 1) * 0.5; p.userData.head.rotation.y = Math.sin(t * 0.8 + i) * 0.4; });
+  const u = ease(t / 8);
+  look(lerp(-3.0, 3.0, u), lerp(7.5, 6.0, u), lerp(14.0, 12.5, u), 0, 1.6, -1.0, 56);
+  return qs;
+}
+function shotVenue(t) { // 4段目 25〜33：生き延びるには、命がけのゲームに参加するしかない
   base(); S.aim(26, -1); lift(200);
   S.hemi.intensity = 0.35; S.key.intensity = 0.2; S.darken(0.75, '#0a0c14');
   VENUE.userData.gl.intensity = 8;
@@ -117,45 +135,32 @@ function shotVenue(t) { // 17〜25：命がけのゲームに参加するしか�
   look(lerp(26.6, 26.0, u), lerp(2.4, 2.6, u), lerp(7.8, 7.0, u), 26, 2.0, -1.6, 54);
   return qs;
 }
-function shotRules(t) { // 25〜33：マークは種類、数字は難しさ
-  base(); S.aim(50, 0); lift(200);
-  S.hemi.intensity = 0.4; S.key.intensity = 0.2; S.darken(0.85, '#0c0e16');
-  const phase2 = t > 4.0;
-  CARDS.forEach((c, i) => { const k = easeOut(clamp((t - 0.4 - i * 0.45) / 0.45)); c.visible = !phase2 && k > 0; c.position.copy(c.userData.home); c.rotation.y = (1 - k) * Math.PI; c.userData.t.visible = !phase2 && k >= 1; });
-  NUMS.forEach((c, i) => { const k = easeOut(clamp((t - 4.2 - i * 0.3) / 0.4)); c.visible = phase2 && k > 0; c.rotation.y = (1 - k) * Math.PI; c.position.y = 2.4 + i * 0.12; });
-  if (phase2) { tNum.userData.pop((t - 5.6) / 0.35); BAR.visible = t > 5.4; BAR.position.set(49.5, 1.7, -0.45); ARROW.visible = BAR.visible; ARROW.position.set(51.05, 1.7, -0.45); }
-  const u = ease(t / 8);
-  look(lerp(49.6, 49.5, u), lerp(2.6, 2.6, u), lerp(7.6, 6.9, u), 49.5, 2.6, -0.5, 54);
-  return qs;
-}
-function shotVisa(t) { // 33〜42：勝てばビザの日数がのびる。切れたら……
+function shotVisa(t) { // 5段目 33〜42：舞台は人の消えた渋谷。勝てばビザの日数がのびていく
   base(); S.aim(74, 0); lift(200);
   S.hemi.intensity = 0.35; S.key.intensity = 0.2; S.darken(0.75, '#0a0c14');
-  const up = t > 2.0 && t < 4.4;
-  drawVisa(t < 2.0 ? 1 : t < 4.4 ? 4 : t < 6.4 ? 1 : 0, t >= 4.4);
-  tVisa.userData.pop((t - 2.1) / 0.35);
-  if (t > 4.4) { tVisa.visible = false; tOut.userData.pop((t - 6.5) / 0.35); }
+  drawVisa(t < 4.6 ? 1 : t < 6.4 ? 4 : 7, false);
+  tVisa.userData.pop((t - 4.6) / 0.35);
   const u = ease(t / 9);
   look(lerp(74.8, 74.2, u), lerp(2.4, 2.6, u), lerp(6.8, 6.2, u), 74, 2.5, -1.8, 54);
   return qs;
 }
-const DARK = '#05070e';
-function shotNight(t) { // 42〜49：ここはどこなのか
-  base(); S.aim(0, 0); lift(190);
-  const d = ease(t / 1.3);
-  S.hemi.intensity = lerp(1.25, 0.2, d); S.key.intensity = lerp(1.5, 0, d); S.darken(d, DARK); MOONL.intensity = 6 * d;
-  CROWD.forEach(p => p.visible = false); CITY.userData.vis.material.color.set('#1a1c22');
-  [hero, pal1, pal2].forEach((p, i) => { p.userData.head.rotation.x = -0.5; p.userData.head.rotation.y = 0; });
-  SKYCARDS.forEach((c, i) => { c.visible = t > 1.0; const a = c.userData.a + t * 0.25; c.position.set(Math.cos(a) * 2.6, 4.3 + Math.sin(t + i) * 0.2, Math.sin(a) * 1.4 - 1.4); c.rotation.y = Math.sin(a) * 0.35; c.scale.setScalar(easeOut(clamp((t - 1.0 - i * 0.15) / 0.5))); });
-  const k = ease(t / 6.5);
-  look(0, lerp(1.9, 1.8, k), lerp(10.0, 8.8, k), 0, lerp(3.0, 3.4, k), 0, 56);
+function shotRules(t) { // 6段目 42〜49（決め手）：トランプのマークは種類、数字はむずかしさ
+  base(); S.aim(50, 0); lift(200);
+  S.hemi.intensity = 0.4; S.key.intensity = 0.2; S.darken(0.85, '#0c0e16');
+  const phase2 = t > 3.4;
+  CARDS.forEach((c, i) => { const k = easeOut(clamp((t - 0.3 - i * 0.35) / 0.4)); c.visible = !phase2 && k > 0; c.position.copy(c.userData.home); c.rotation.y = (1 - k) * Math.PI; c.userData.t.visible = !phase2 && k >= 1; });
+  NUMS.forEach((c, i) => { const k = easeOut(clamp((t - 3.5 - i * 0.25) / 0.35)); c.visible = phase2 && k > 0; c.rotation.y = (1 - k) * Math.PI; c.position.y = 2.4 + i * 0.12; });
+  if (phase2) { tNum.userData.pop((t - 4.6) / 0.35); BAR.visible = t > 4.4; BAR.position.set(49.5, 1.7, -0.45); ARROW.visible = BAR.visible; ARROW.position.set(51.05, 1.7, -0.45); }
+  const u = ease(t / 7);
+  look(lerp(49.6, 49.5, u), 2.6, lerp(7.6, 6.9, u), 49.5, 2.6, -0.5, 54);
   return qs;
 }
-function shotQuiz(t) { // 49〜56：このドラマわかった？
+function shotQuiz(t) { // 49〜56：このドラマわかった？（夜の無人の街に浮かぶカード）
   base(); S.aim(0, 0); lift(190);
   S.hemi.intensity = 0.2; S.key.intensity = 0; S.darken(1, DARK); MOONL.intensity = 6;
   CROWD.forEach(p => p.visible = false); CITY.userData.vis.material.color.set('#1a1c22');
-  SKYCARDS.forEach((c, i) => { c.visible = true; const a = c.userData.a + (t + 7) * 0.25; c.position.set(Math.cos(a) * 2.6, 4.3 + Math.sin(t + 7 + i) * 0.2, Math.sin(a) * 1.4 - 1.4); c.rotation.y = Math.sin(a) * 0.35; c.scale.setScalar(1); });
+  [hero, pal1, pal2].forEach(p => { p.userData.head.rotation.x = -0.5; });
+  SKYCARDS.forEach((c, i) => { c.visible = true; const a = c.userData.a + (t + 7) * 0.25; c.position.set(Math.cos(a) * 2.6, 4.3 + Math.sin(t + 7 + i) * 0.2, Math.sin(a) * 1.4 - 1.4); c.rotation.y = Math.sin(a) * 0.35; c.scale.setScalar(easeOut(clamp((t - i * 0.15) / 0.5))); });
   const k = ease(t / 7);
   look(0, lerp(1.8, 3.0, k), lerp(8.8, 11.4, k), 0, lerp(3.4, 3.2, k), 0, 56);
   countdown(t);
@@ -163,28 +168,28 @@ function shotQuiz(t) { // 49〜56：このドラマわかった？
 }
 
 const SHOTS = [
-  { a: 0, b: 9, f: (t, T) => shotCrowd(t, T) },
+  { a: 0, b: 9, f: shotGlow },
   { a: 9, b: 17, f: shotFlash },
-  { a: 17, b: 25, f: shotVenue },
-  { a: 25, b: 33, f: shotRules },
+  { a: 17, b: 25, f: shotEmpty },
+  { a: 25, b: 33, f: shotVenue },
   { a: 33, b: 42, f: shotVisa },
-  { a: 42, b: 49, f: shotNight },
+  { a: 42, b: 49, f: shotRules },
   { a: 49, b: 56, f: shotQuiz },
   { a: 56, b: 64, f: endCard },
 ];
 const SUBS = [
-  [2.5, 5.6, '人生に、意味を<br>見いだせない青年。'],
-  [5.6, 9.0, '親友2人と、<br>渋谷の街へくり出した。'],
-  [9.2, 13.2, 'その時、<br>突然の閃光。'],
+  [2.5, 5.6, '人であふれる、<br>いつもの交差点。'],
+  [5.6, 9.0, 'その時、<br>突然の閃光。'],
+  [9.2, 13.2, '人生に意味を見いだせない<br>青年と、親友2人。'],
   [13.2, 17.0, '気がつくと、<br>街から人が消えていた。'],
-  [17.2, 21.0, '生き延びるには、'],
-  [21.0, 25.0, '命がけのゲームに、<br>参加するしかない。'],
-  [25.2, 29.0, 'トランプのマークは、<br>ゲームの種類。'],
-  [29.0, 33.0, '数字は、<br>むずかしさ。'],
-  [33.2, 37.4, '勝てば、ビザの日数が<br>のびていく。'],
-  [37.4, 41.8, 'でも、その期限が<br>切れたら……'],
-  [42.2, 45.4, 'ここは、いったい<br>どこなのか。'],
-  [45.4, 49.0, '誰が、何のために<br>ゲームを開くのか。'],
+  [17.2, 21.0, '静まり返った、<br>無人の街。'],
+  [21.0, 25.0, 'ここは、いったい<br>どこなのか。'],
+  [25.2, 29.0, '生き延びるには、'],
+  [29.0, 33.0, '命がけのゲームに、<br>参加するしかない。'],
+  [33.2, 37.4, '舞台は、人の消えた<br>渋谷の街。'],
+  [37.4, 41.8, '勝てば、ビザの日数が<br>のびていく。'],
+  [42.2, 45.6, 'トランプのマークは、<br>ゲームの種類。'],
+  [45.6, 49.0, '数字は、むずかしさ。<br>誰が、何のために？'],
   [49.2, 52.0, 'このドラマ、<br>わかった？'],
   [52.0, 55.8, 'カウントダウンの間に、<br>当ててみて。'],
   [56.4, 59.6, '答えは、<br>今際の国のアリス。'],
@@ -199,11 +204,11 @@ runStory({
     title: 'このドラマのタイトルは？',
     titleHtml: 'このドラマの<br>タイトルは？',
     mood: 'mystery', seed: 1010,
-    hits: [10.8, 21.0, 56.4], risers: [52.0],
-    impacts: [0.3, 10.8, 37.4, 56.4],
-    sfx: [[0.2, 'whoosh'], [9.0, 'whoosh'], [17.0, 'whoosh'], [25.0, 'whoosh'], [33.0, 'whoosh'], [42.2, 'drone'], [49.0, 'meter', 0.5]],
-    narr: { '見いだせない': 'みいだせない', '親友': 'しんゆう', '2人': 'ふたり', '渋谷': 'しぶや', '閃光': 'せんこう', '生き延びる': 'いきのびる', '命がけ': 'いのちがけ', '種類': 'しゅるい', '期限': 'きげん', '今際の国': 'いまわのくに', '誰': 'だれ', '開く': 'ひらく' },
-    caption: 'このドラマのタイトル、わかる？\n人生に意味を見いだせない青年が、親友2人と渋谷へ。突然の閃光のあと、街から人が消えた。生き延びるには、命がけのゲームに参加するしかない。\n\n答えは動画の最後で。何秒でわかった？どこでわかった？コメントで教えて。観た人は感想も聞かせて。',
+    hits: [7.6, 29.0, 42.2, 56.4], risers: [5.6, 52.0],
+    impacts: [0.3, 7.6, 13.4, 42.2, 56.4],
+    sfx: [[0.2, 'whoosh'], [9.0, 'whoosh'], [17.0, 'drone'], [25.0, 'whoosh'], [33.0, 'whoosh'], [42.0, 'whoosh'], [49.0, 'meter', 0.5]],
+    narr: { '見いだせない': 'みいだせない', '静まり返った': 'しずまりかえった', '生き延びる': 'いきのびる', '今際の国': 'いまわのくに', '交差点': 'こうさてん', '命がけ': 'いのちがけ', '親友': 'しんゆう', '2人': 'ふたり', '渋谷': 'しぶや', '閃光': 'せんこう', '種類': 'しゅるい', '誰': 'だれ' },
+    caption: 'このドラマのタイトル、わかる？\n人であふれるいつもの交差点に、突然の閃光。人生に意味を見いだせない青年と親友2人が気がつくと、街から人が消えていた。ここは、いったいどこなのか。\n\n答えは動画の最後で。何秒でわかった？どこでわかった？コメントで教えて。観た人は感想も聞かせて。',
     hashtags: ['タイトル当てクイズ', 'ネトフリ', 'Netflix', '日本のドラマ', 'サバイバル'],
   },
 });
