@@ -12,7 +12,9 @@ import crypto from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 
 const args = Object.fromEntries(process.argv.slice(2).reduce((a, x, i, arr) => (x.startsWith('--') ? a.concat([[x.slice(2), arr[i + 1]]]) : a), []));
-const KEY = process.env.GEMINI_API_KEY || '';
+let KEY = process.env.GEMINI_API_KEY || '';
+// 2026/11/03 ゆうと：もしもラボの声が上限のときは、その日まだ使っていない別アカウントの鍵（いつわ劇場など）で同じ声のまま作る。それも上限なら予備のモデルへ
+const ALT_KEYS = String(process.env.GEMINI_API_KEY_ALT || '').split(',').map(x => x.trim()).filter(x => x && x !== KEY);
 const MOCK = process.env.MOCK_TTS === '1';
 if (!KEY && !MOCK) { console.log('narrate: GEMINI_API_KEY が無いのでナレーションなし'); process.exit(2); }
 let MODEL = process.env.TTS_MODEL || 'gemini-3.8-flash-tts';
@@ -137,6 +139,7 @@ for (;;) {
   catch (e) {
     if (!isDaily(e)) throw e;
     console.log(`narrate: 1日の上限エラー（${MODEL}）: ${String(e.message).slice(0, 400)}`);
+    if (ALT_KEYS.length && !MOCK) { KEY = ALT_KEYS.shift(); console.log(`narrate: ${MODEL} がこの鍵で今日の上限。別の鍵で同じ声のまま作り直す`); continue; }
     const next = FALLBACK.shift();
     // 声なしの動画が投稿されないよう、書き出しごと失敗させる（終了コード 3）。上限が戻ったら同じ番号でやり直す
     if (!next || MOCK) { console.log('narrate: 今日の上限に達した。声なしでは作らずに止める'); process.exit(3); }

@@ -83,6 +83,7 @@ jobs:
         env:
           CHROME_PATH: /usr/bin/google-chrome
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_API_KEY_ALT: ${{ secrets.GEMINI_API_KEY_DRAMA }}   # もしもラボの声が上限のとき、いつわ劇場の鍵で同じ声のまま作る
         run: |
           # 一時的な失敗（ブラウザ・声のAPI）は1回だけやり直す
           ID="${{ steps.pick.outputs.id }}"
