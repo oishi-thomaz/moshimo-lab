@@ -19,9 +19,9 @@ const GIRL = { skin: '#f4dccb', hair: '#121214', shirt: '#1c1c22', pants: '#1c1c
 
 // ---------- 1. 学校のプール（x=0）。0秒目がサムネ ----------
 const POOL = new THREE.Group(); POOL.position.set(0, 0, 0); qs.add(POOL);
-{ const deck = box(16, 0.2, 14, mat('#d8d4c8')); deck.position.set(0, -0.1, -3); POOL.add(deck);
-  const water = new THREE.Mesh(new THREE.PlaneGeometry(8, 8), new THREE.MeshLambertMaterial({ color: '#3aa0c8', transparent: true, opacity: 0.9 })); water.rotation.x = -Math.PI / 2; water.position.set(0, 0.02, -5); POOL.add(water);
-  for (let i = 0; i < 4; i++) { const ln = box(0.08, 0.06, 8, mat(i % 2 ? '#e2483c' : '#f4f1ea')); ln.position.set(-3 + i * 2, 0.06, -5); POOL.add(ln); }
+{ const deck = box(16, 0.2, 14, mat('#d8d4c8')); deck.position.set(0, -0.06, -3); POOL.add(deck);
+  const water = new THREE.Mesh(new THREE.PlaneGeometry(8, 8), new THREE.MeshLambertMaterial({ color: '#3aa0c8', transparent: true, opacity: 0.9 })); water.rotation.x = -Math.PI / 2; water.position.set(0, 0.07, -5); POOL.add(water);
+  for (let i = 0; i < 4; i++) { const ln = box(0.08, 0.06, 8, mat(i % 2 ? '#e2483c' : '#f4f1ea')); ln.position.set(-3 + i * 2, 0.1, -5); POOL.add(ln); }
   const wall = box(18, 6, 0.3, mat('#b8c4cc')); wall.position.set(0, 3, -10); POOL.add(wall);
   for (let i = 0; i < 6; i++) { const w = new THREE.Mesh(new THREE.PlaneGeometry(2, 2.2), new THREE.MeshBasicMaterial({ color: '#dfeaf2' })); w.position.set(-7.5 + i * 3, 3.6, -9.84); POOL.add(w); }
   const bleach = box(6, 0.5, 1.2, mat('#7a8a9a')); bleach.position.set(-5.5, 0.25, 0.8); POOL.add(bleach); }
@@ -113,7 +113,7 @@ function shotPool(t, T) { // 0〜9：学校のプールに、何かが放たれ�
   S.hemi.intensity = 1.35;
   const pour = clamp((T - 0.0) / 1.2);
   bucket.position.set(2.0, 1.0, -1.1); bucket.rotation.x = -1.2 * pour; girl1.userData.arms.forEach(a => a.rotation.x = -1.3);
-  FISH.forEach((f, i) => { const a = f.userData.a + T * (1.4 + (i % 3) * 0.3); f.position.set(Math.cos(a) * f.userData.r * 1.2, 0.0, -5 + Math.sin(a) * f.userData.r); f.rotation.y = -a; });
+  FISH.forEach((f, i) => { const a = f.userData.a + T * (1.4 + (i % 3) * 0.3); f.position.set(Math.cos(a) * f.userData.r * 1.2, 0.03, -5 + Math.sin(a) * f.userData.r); f.rotation.y = -a; });
   SWIM.forEach((p, i) => { const panic = clamp((T - 2.2 - i * 0.3) / 0.6); p.position.y = -1.05 + Math.abs(Math.sin(T * 9 + i)) * 0.25 * panic; p.userData.arms.forEach((a, k) => a.rotation.x = -Math.PI * (0.6 + 0.35 * Math.sin(T * 10 + i + k * 2)) * panic); });
   const u = ease(T / 9);
   look(lerp(4.6, 4.0, u), lerp(3.6, 3.0, u), lerp(2.4, 3.4, u), lerp(0.6, 0.2, u), 0.4, -4.4, 56);
