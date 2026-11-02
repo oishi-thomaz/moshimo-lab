@@ -1,13 +1,16 @@
 # SNS アカウントの運用（定期タスクの手順書）
 
-ゆうと（トーマス合同会社の代表）の SNS アカウントは、アカウントの数に関係なく、次の4本の定期タスクで回す。アカウントが増えたら、下の アカウント一覧 に1行足して、そのアカウントの手順書を用意するだけにする（タスクは増やさない）。
+ゆうと（トーマス合同会社の代表）の SNS アカウントは、アカウントの数に関係なく、次の4本の定期タスク（Claude）と、Claude を使わないまとめ1本で回す。アカウントが増えたら、下の アカウント一覧 に1行足して、そのアカウントの手順書を用意するだけにする（タスクは増やさない）。
 
 | タスク | いつ | やること |
 |---|---|---|
-| 朝の仕事 | 毎日 6:15 | 全アカウントの解析と日報（8:00 に各アカウントの LINE へ）→ 今日の分の書き出し（承認カードが LINE に届く） |
-| 見張り | 毎日 7:37〜23:37 の毎時 | 書き出し・送信の失敗を直して上げきる。15時台の回は午後の見回りも |
+| 朝の仕事 | 毎日 6:15 | 全アカウントの解析と日報（8:00 の SNS司令室のまとめに入る）→ 今日の分の書き出し（承認カードが各アカウントの LINE に届く） |
+| 見張り | 毎日 8:37・11:37・15:37・17:37 | 書き出し・送信の失敗を直して上げきる。15時台の回は午後の見回りも。何もなければ手順書を読まずにすぐ終わる |
 | 動画制作 | 毎日 10:47・16:47 | 在庫が減ったアカウントの動画を作る（アカウントごとにサブエージェントで並行） |
-| TikTok 予約 | 毎時 7:07〜23:07（ゆうとの Mac） | LINE で承認された回を、インスタと同じ時間で TikTok に予約する（何もなければすぐ終わる） |
+| TikTok 予約 | 毎日 8:07・10:07・11:07・14:07・17:07・20:07・23:07（ゆうとの Mac） | LINE で承認された回を、インスタと同じ時間で TikTok に予約する（何もなければすぐ終わる） |
+| まとめ（Claude なし） | 毎日 8:00・13:00・22:30 | moshimo-analytics の summary.yml（GitHub Actions）が3アカウントのまとめを SNS司令室 に送る。朝は日報も入る |
+
+回数を減らしたのは 2026/11/02 のゆうとの決定（トークンのムダをなくすため）。見張りと TikTok 予約は Sonnet、朝の仕事と動画制作は Opus で動く。
 
 リポジトリ：oishi-thomaz/moshimo-lab（公開。動画・台本・この手順書）と oishi-thomaz/moshimo-analytics（非公開。数字・日報・TikTok の記録）。/home/claude/moshimo-lab と /home/claude/moshimo-analytics に clone して使う（すでにあれば git pull --rebase）。
 
@@ -19,7 +22,12 @@
 | タイトル当てクイズ（quiz、@title_ate_quiz） | 映画・ドラマのタイトル当て3D（約64秒） | 1日5本 12:00・15:00・18:00・20:00・22:00（立ち上げの1か月） | plan/quiz-queue.txt にあって state/quiz-rendered.txt にない本数 | docs/QUIZ.md | quiz-render.yml を1回（count=5） | この下の 日報（サーバー型） | docs/QUIZ-TIKTOK.md（Claude アプリのブラウザ） |
 | いつわ劇場（itsuwa、@itsuwa_drama） | 1話3分・全5話のショートドラマ | 1日1話 20:00 | docs/ITSUWA-AUTO.md の 1 | docs/ITSUWA-AUTO.md | なし（作った話をその場で送る） | この下の 日報（サーバー型） | なし（投稿サーバーが TikTok の下書きに送る） |
 
-各アカウントの投稿サーバー（VPS）は別々で、LINE の公式アカウントもアカウントごとに別。承認はゆうとが LINE でする。
+各アカウントの投稿サーバー（VPS）は別々で、承認用の LINE 公式アカウントもアカウントごとに別。承認はゆうとが LINE でする。
+
+## 連絡は SNS司令室 にまとめる（2026/11/02〜）
+- 日報・見張りの直した連絡・午後の見回りの連絡は、全部 SNS司令室（まとめ用の LINE 公式アカウント。Secrets の SNS_LINE_TOKEN）に送る。Claude から各アカウントの LINE には何も送らない（ゆうとの決定。各アカウントの LINE に届くのは承認カードと、投稿サーバー自身の通知だけ）。
+- 送り方は moshimo-analytics の `node tools/run.mjs report <ファイル>`（または `notice`）。朝の日報（reports/outbox/YYYY-MM-DD.json・quiz-…・itsuwa-…）は 7:58 までに push してあれば送らずに終わり、8:00 のまとめに入る。それより後の日報と、-pm・-fix などの連絡はその場で SNS司令室に届く。JSON の形は ANALYST.md の 日報の書き方 と同じ（{card} か {message}）。
+- もしもラボの notice.yml・投稿サーバーの report は使わない（各アカウントの LINE に行くため）。
 
 ## 声（Gemini TTS）の1日の上限
 - 1つのキー（Google Cloud プロジェクト）につき、gemini-3.8-flash-tts が1日100回、予備の gemini-3.8-flash-lite-tts も1日100回（Tier 1）。1行の字幕につき1回使う（もしもラボ1本で約15回、クイズ1本で約17回。同じ文は前に作った声を使い回すので数えない）。
@@ -40,6 +48,7 @@
    - もしもラボ：moshimo-analytics の ANALYST.md の 毎朝の手順（月曜は 毎週月曜の朝にやること も）。
    - クイズ・いつわ劇場：下の 日報（サーバー型）。
    - 月曜はマネタイズの確認も：下の 収益化の条件 を見て、届きそうなものや申請できるものがあれば、そのアカウントの日報の お願い に1行で書く。
+   - 日報の カード は SNS司令室の朝のまとめに、分かったこと・やったこと・お願い（と キャプション の section）が載る（数字はまとめ側が自分で出すので、カードの数字の section は載らない）。なので 分かったこと・やったこと・お願い を必ず items で書く。
 3. 書き出し：解析で在庫の順番を変えたものを push してから、アカウント一覧の 書き出し を全部動かす。
    - もしもラボ：daily-render.yml を番号なしで3回。同時に1本しか待機できない（2本目を予約すると前の待機分が取り消される）ので、1本目が in_progress になってから次を予約する。1本20分くらい。
    - クイズ：quiz-render.yml を1回だけ（inputs[count]=5）。1本10〜12分で、1本できるごとに LINE に承認カードが届く。
@@ -52,7 +61,7 @@
 3. 打てる手：
    - クイズ：plan/quiz-queue.txt の、まだ書き出していない回の並びを変えてよい（番号は消さない）。伸びたジャンル・国・映画かドラマか、を notes/quiz-insights.md に書く（動画制作がそれを読んで次の作品を選ぶ）。
    - いつわ劇場：伸びた話・離脱の多い話と、その理由の仮説を notes/itsuwa-insights.md に書く（動画制作が次の作品の作りに使う）。
-4. 日報を書く：reports/<アカウント>-YYYY-MM-DD.md に全文、reports/outbox/<アカウント>-YYYY-MM-DD.json に LINE 用のカード（形は ANALYST.md の 日報の書き方 と同じ。title は タイトル当てクイズ 日報 11/2 のように。at は今日8:00の日本時間のミリ秒。8:00を過ぎていたら at を省く）。commit・push してから `node tools/run.mjs report reports/outbox/<アカウント>-YYYY-MM-DD.json --account=<quiz|itsuwa>`。
+4. 日報を書く：reports/<アカウント>-YYYY-MM-DD.md に全文、reports/outbox/<アカウント>-YYYY-MM-DD.json に LINE 用のカード（形は ANALYST.md の 日報の書き方 と同じ。title は タイトル当てクイズ 日報 11/2 のように。at は書かなくてよい）。commit・push してから `node tools/run.mjs report reports/outbox/<アカウント>-YYYY-MM-DD.json`（7:58 までなら送らずに終わり、8:00 の SNS司令室のまとめに入る。過ぎていればその場で SNS司令室に届く）。
 5. まだ数字がほとんどない日（投稿が少ない・インサイトが0）は、取れてない と正直に書いて短くする。QUIZ_AN・ITSUWA_AN が未設定で collect が落ちるときは、そのアカウントの日報は飛ばし、最後の返答に1行で書く。
 
 ### 収益化の条件（月曜に確認。2026年11月時点。変わっていそうなら公式で確かめる）
@@ -60,20 +69,22 @@
 - YouTube（パートナープログラム）：登録者1,000人以上かつ直近90日のショートの再生1,000万回以上で広告収益。登録者500人以上・直近90日に3本以上の公開・ショートの再生300万回以上でメンバーシップなどのファン収益。
 - インスタ：日本ではリールの再生への報酬はない。フォロワーが増えてきたら、ブランドとのタイアップ（ブランドコンテンツ）を日報の お願い で提案する。
 
-## 2. 見張り（毎時 :37、7時台〜23時台）
+## 2. 見張り（8:37・11:37・15:37・17:37）
+書き出しが動くのは朝の仕事の中だけ（いつわ劇場の送信は動画制作の中）なので、見張りは1日4回。17:37 は声の1日の上限が戻った（17:00）あとのやり直し用。
+0. まず moshimo-lab だけを用意して `node tools/watch-check.mjs` を実行する（今日6:00以降の実行から、未解決・報告だけ・実行中を出す）。最後の行が 異常なし で、15時台の回でもなければ、この先は読まずに 異常なし とだけ返して終わる。実行中 だけなら5分待ってもう一度（最大3回。まだ実行中なら 実行中なので次の回で見る と返して終わる）。要対応・報告だけ があるか、15時台の回なら、moshimo-analytics も用意して下へ進む。
 1. 両方のリポジトリを用意する。
-2. 直近3時間の moshimo-lab のワークフロー実行（`gh api "repos/oishi-thomaz/moshimo-lab/actions/runs?per_page=50"`）で、daily-render・preflight・quiz-render・quiz-cdn・drama-tts・drama-publish を見る。
+2. watch-check の結果と、今日6:00以降の moshimo-lab のワークフロー実行（`gh api "repos/oishi-thomaz/moshimo-lab/actions/runs?per_page=50"`）で、daily-render・preflight・quiz-render・quiz-cdn・drama-tts・drama-publish を見る。
    - daily-render は同じ動画番号（ログの video: NNNN）で failure のあとに success がないもの、quiz-render はログで書き出しに失敗した回（クイズ qNNN の書き出しに失敗）が state/quiz-rendered.txt にないもの、preflight は最新が failure なら、未解決。cancelled は同じ番号のあとの実行がないときだけ未解決。実行中のものは待つ。
    - drama-tts・drama-publish・quiz-cdn の失敗は、直さずに最後の返答に1行で書く（動画制作・TikTok 予約が次の回にやり直す）。
 3. 未解決があれば、ログでエラーを特定して直す：
    - 書き出し側のコード（tools/、engine/）のバグなら直す。台本（engine/videos/NNNN.js・qNNN.js）が原因なら、中身（数字・出典・構成・答え）は変えずに書き方だけ直す。ナレーションのはみ出しは字幕の時間を広げるか言い回しを短くする。
    - 直したら手元で `bash tools/smoke.sh NNNN`（もしもラボ。影響がありそうなら引数なしで在庫の次の10本も）を通してから commit・push。クイズは `bash tools/build.sh qNNN` が通ることを確かめる。
    - 一時的な失敗（ネットワーク・ブラウザ・声のAPIの1分あたりの上限）は直さずにやり直す。
-   - ログに ナレーションの1日の上限に達した が出ているときは、声の1日の上限（Gemini の TTS は1モデル1日100回・キーを作った Google Cloud プロジェクトごと）。上限が戻るのは毎日17:00（日本時間。米国の夏時間のあいだは16:00）なので、それまではやり直さない（何度やっても落ちる）。戻った後の見張りの回でやり直す。投稿枠に間に合わない回があれば、そのアカウントの LINE に1行で知らせる。声なしの動画は作らない。
+   - ログに ナレーションの1日の上限に達した が出ているときは、声の1日の上限（Gemini の TTS は1モデル1日100回・キーを作った Google Cloud プロジェクトごと）。上限が戻るのは毎日17:00（日本時間。米国の夏時間のあいだは16:00）なので、それまではやり直さない（何度やっても落ちる）。戻った後の見張りの回でやり直す。投稿枠に間に合わない回があれば、SNS司令室に1行で知らせる（下の 5 と同じ送り方）。声なしの動画は作らない。
 4. 同じ番号でやり直す：もしもラボは daily-render.yml に inputs[id]=NNNN、クイズは quiz-render.yml に inputs[id]=qNNN。終わるまで待って success を確かめる。最大3回。3回直しても上がらないときは、枠に穴があかないよう在庫の次の回（もしもラボは node tools/next.mjs、クイズは node tools/quiz-next.mjs 1）を代わりに上げる。落ちた回は在庫に残す。
-5. 直したときだけ、そのアカウントの LINE に1件だけ知らせる（もしもラボは notice.yml に inputs[message]、クイズ・いつわ劇場は moshimo-analytics で reports/outbox/<アカウント>-YYYY-MM-DD-fix.json に {"message": "..."} を書いて `node tools/run.mjs report <ファイル> --account=<quiz|itsuwa>`）。何が・なぜ落ちて・どう直して・今は承認待ちに入ったか。
+5. 直したときだけ、SNS司令室に1件だけ知らせる：moshimo-analytics で reports/outbox/<アカウント>-YYYY-MM-DD-fix.json（もしもラボは YYYY-MM-DD-fix.json）に {"account": "moshimo|quiz|itsuwa", "card": {"title": "見張り（アカウント名）", "sections": [{"head": "直した", "items": ["…"]}]}} を書いて commit・push し、`node tools/run.mjs notice <ファイル>`。何が・なぜ落ちて・どう直して・今は承認待ちに入ったか。
 6. 15時台の回だけ：もしもラボは ANALYST.md の 午後の回 もやる。
-7. 何もなければ 異常なし とだけ返して終わる（LINE には送らない）。
+7. 何もなければ 異常なし とだけ返して終わる（どこにも送らない）。
 
 ## 3. 動画制作（10:47・16:47）
 1. 両方のリポジトリを用意する。
@@ -88,8 +99,8 @@
 4. 全部のサブエージェントが終わったら、作業フォルダが全部 push 済みか確かめて、作業フォルダを消す。
 5. 最後の返答：アカウントごとに、作った番号・タイトル（クイズは作品名・映画かドラマか・Filmarks の点数、もしもラボはシリーズの区分と hookLine）と在庫。作らなかったアカウントは 在庫は足りてる。
 
-## 4. TikTok 予約（毎時 7:07〜23:07、ゆうとの Mac）
-TikTok はインスタと同じ時間に出す（2026/11/1 ゆうとの決定）。承認された回を、そのインスタの投稿時間で予約する。両方のアカウントとも、予約する回がなければブラウザを開かずに すぐ終わる。
+## 4. TikTok 予約（8:07・10:07・11:07・14:07・17:07・20:07・23:07、ゆうとの Mac）
+TikTok はインスタと同じ時間に出す（2026/11/1 ゆうとの決定）。承認された回を、そのインスタの投稿時間で予約する。承認が遅れてインスタの時間を過ぎた回は、次の回で 今 で出す（遅れは最大3時間）。予約する回がなければブラウザを開かずに すぐ終わる。23:07 の回は TIKTOK.md の 3.5・3.6（プレイリスト・ピン留め・TikTok Studio の数字の記録）もやる。
 1. 両方のリポジトリを用意する。
 2. もしもラボ：moshimo-analytics の TIKTOK.md を最後まで読んで完全に従う（notes/tiktok-schedule.md・notes/tiktok-crp.md も）。Chrome（Claude in Chrome）を使う。Chrome の操作の前に chrome-browser のスキルを読む。
 3. クイズ：（2026/11/2 から停止中。docs/QUIZ-TIKTOK.md の先頭を見る）docs/QUIZ-TIKTOK.md を最後まで読んで完全に従う（state/quiz-tiktok.md も）。Claude アプリのブラウザ（built-in browser、mcp__remote-devices__Claude_Browser__*）を使う。操作の前に built-in-browser のスキルを読む。Chrome は絶対に使わない（Chrome は @moshimo__lab でログインしているので、取り違えるとクイズの動画がもしもラボに出てしまう）。
