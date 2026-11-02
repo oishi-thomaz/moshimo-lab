@@ -19,6 +19,8 @@ setenv /etc/moshimo.env QUIET 1
 setenv /etc/quiz.env QUIET 1
 setenv /etc/itsuwa.env QUIET 1
 setenv /etc/quiz.env TT_UPLOAD 1
+# 2026/11/03〜：いつわ劇場の TikTok も数字を読む（Sandbox itsuwa に user.info.stats・video.list を足した。ゆうとが いつわ劇場の LINE で TikTok つなぎ直し と送って許可し直す）
+setenv /etc/itsuwa.env TT_SCOPE user.info.basic,user.info.stats,video.list,video.upload
 put() { local src=$1 dst=$2 svc=$3; [ -f "$dst" ] || { echo "× $dst がない（$svc は飛ばす）"; return; }; cp "$dst" "$BK/$svc.mjs"; cp "$src" "$dst"; systemctl restart "$svc"; echo "○ $svc を入れ替えた"; }
 put "$TMP/moshimo-server.mjs" /opt/moshimo-lab/server/moshimo-server.mjs moshimo
 put "$TMP/moshimo-server.mjs" /opt/quiz/server.mjs quiz

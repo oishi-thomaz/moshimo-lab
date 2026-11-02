@@ -38,6 +38,7 @@ import crypto from 'node:crypto';
 const env = process.env;
 const PORT = Number(env.PORT || 8787);
 const PREFIX = (env.PREFIX || '/moshimo').replace(/\/$/, '');
+const VERSION = '2026-11-03a';                                 // update-servers.sh で入れ替わったかの確かめ用（/health に出る）
 const BRAND = env.BRAND || 'もしもラボ';                           // LINE の文言に出す名前
 const APPROVAL_NOW = env.APPROVAL_NOW === '1';                    // 1：動画が届いたらすぐ承認カードを送る（まとめを待たない）
 const TT_UPLOAD = env.TT_UPLOAD === '1';                          // 1：投稿と同時に TikTok の下書きへ送る
@@ -287,6 +288,11 @@ async function doAction(act, id) {
   if (!it) return `${id} が見つからへん`;
   if (act === 'cap') return captionText(id) || 'キャプションがない';
   if (act === 'ttcap') return ttCaption(id) || 'キャプションがない';
+  if (act === 'ttdraft') { // 投稿済みの回も TikTok の下書きへ送る（順番に1本ずつ。結果は items[id].tt に残る）
+    if (!state.tt || !state.tt.refresh) return 'TikTokにつながってない';
+    if (it.tt && it.tt.ok) return `${meta(id).title || id} はもう下書きに送ってある`;
+    delete it.tt; save(); ttQueue = ttQueue.then(() => tiktokDraft(id)).catch(e => log('ttdraft', id, e)); return `${meta(id).title || id} を TikTok の下書きに送る（順番待ち）`;
+  }
   if (it.status === 'published') return `${id} はもう投稿済み`;
   if (act === 'approve') { it.status = 'approved'; it.publishAt = nextSlot(); save(); return `OK。${meta(id).title || id} は ${fmt(it.publishAt)} に投稿する`; }
   if (act === 'now') { it.status = 'approved'; it.publishAt = Date.now(); it.ttNow = true; save(); return `OK。${meta(id).title || id} を今から投稿する`; }
@@ -806,6 +812,11 @@ function ttCommand(msg) {
     const q = new URLSearchParams({ client_key: key, scope: TT_SCOPE, response_type: 'code', redirect_uri: ttRedirect(), state: state.tt.oauthState });
     return `次のリンクを開いて、${BRAND}のTikTokアカウント（@${TT_USER}）でログインして許可して。\n\nhttps://www.tiktok.com/v2/auth/authorize/?${q}`;
   }
+  if (/つなぎ直|再接続|やり直/.test(msg) && state.tt && state.tt.clientKey) { // 許可を足したときなど：今の接続は残したまま、新しい許可のリンクを出す
+    state.tt.oauthState = crypto.randomBytes(16).toString('hex'); save();
+    const q = new URLSearchParams({ client_key: state.tt.clientKey, scope: TT_SCOPE, response_type: 'code', redirect_uri: ttRedirect(), state: state.tt.oauthState });
+    return `つなぎ直しのリンク。${BRAND}のTikTokアカウント（@${TT_USER}）でログインして許可して（もしもラボの TikTok にログインしてるブラウザでは開かない）。\n\nhttps://www.tiktok.com/v2/auth/authorize/?${q}`;
+  }
   if (state.tt && state.tt.refresh) return TT_UPLOAD ? `TikTokは接続済み（${state.tt.name || TT_USER}）。インスタに投稿するときに、下書きへ動画を送る` : `TikTokは接続済み（${state.tt.name || TT_USER}）。動画ごとの再生数を取ってて、「今すぐ投稿」のときは下書きへ動画を送る`;
   return `TikTokの接続で使うリダイレクトURI：\n${ttRedirect()}\n\nTikTok for Developers でアプリを作るときに Login Kit のリダイレクトURIにこれを入れて。できたら このLINEに\nTikTok設定 クライアントキー シークレット\nと送る`;
 }
@@ -823,6 +834,16 @@ async function ttCallback(u, res) {
 
 // --- TikTok の下書き（受信箱）へ送る：Content Posting API の Upload（video.upload）。審査なしで使える ---
 // 送ると TikTok アプリに通知が来る。キャプション・公開範囲はアプリで決めて投稿する（API ではキャプションを渡せない）
+// TikTok の下書きは、投稿してないものが24時間で5本までしか受け付けない（spam_risk_too_many_pending_share）。
+// その理由で落ちた回は、30分ごとに古い順から1本ずつ送り直す（3日まで）
+let ttQueue = Promise.resolve();
+const TT_CAP = /pending_share|daily upload cap/i;
+async function ttRetryTick() {
+  if (!state.tt || !state.tt.refresh) return;
+  const list = Object.entries(state.items).filter(([, i]) => i.tt && !i.tt.ok && TT_CAP.test(i.tt.error || '') && (i.publishedAt || i.receivedAt || 0) > Date.now() - 3 * 86400e3).sort((a, b) => (a[1].publishedAt || 0) - (b[1].publishedAt || 0));
+  for (const [id] of list) { const r = await tiktokDraft(id); if (!r.ok) break; await pushPosted(id, { tt: r }).catch(() => {}); }
+}
+setInterval(() => { ttQueue = ttQueue.then(ttRetryTick).catch(e => log('tt retry', e.message)); }, 30 * 60e3);
 async function tiktokDraft(id) {
   const it = state.items[id] || (state.items[id] = { status: 'manual', receivedAt: Date.now() });
   if (!state.tt || !state.tt.refresh) return { ok: false, error: 'TikTokにつながってない（LINEで TikTok と送ると手順が出る）' };
@@ -1089,6 +1110,7 @@ function exportData(hours) {
     alerts: (state.an.alerts || []).filter(a => a.t > now - 7 * 86400e3), line: state.an.line || null,
     flags: { igInsights: state.an.igIns || 'unknown', yt: !!(state.yt && state.yt.refresh), ytScope: !!(state.yt && state.yt.scopeV2), tt: state.tt && state.tt.refresh ? 'api' : 'embed' },
     postTimesToday: postTimesOn(dayStart(now)), postTimesDefault: POST_TIMES, postTimesOverride: state.postTimes || null,
+    scripts: state.scripts || {}, version: VERSION,
   };
 }
 // 日報を預かって指定の時刻に送る（1回の送信で吹き出し最大5つ。LINEの通数は1通）
@@ -1289,7 +1311,7 @@ http.createServer(async (req, res) => {
         : `<h1>${BRAND} 投稿ツール プライバシーポリシー</h1><p>このツールが扱うのは、運営者自身のアカウントの認証情報と、運営者が制作した動画・キャプションだけです。第三者の個人情報は集めません。認証情報は運営者のサーバー内にのみ保存し、投稿以外の目的には使いません。</p><p>This tool only handles the operator's own account credentials and the operator's own videos and captions. No personal data of other people is collected. Credentials are stored only on the operator's server and used only for uploading.</p>`;
       return send(res, 200, `<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>${BRAND}</title><body style="font-family:sans-serif;max-width:720px;margin:auto;padding:24px;line-height:1.8">${body}</body>`, 'text/html; charset=utf-8');
     }
-    if (p === '/health') return send(res, 200, { ok: true, owner: !!state.owner, ig: !!state.igToken, yt: !!state.yt?.refresh, items: Object.keys(state.items).length });
+    if (p === '/health') return send(res, 200, { ok: true, v: VERSION, owner: !!state.owner, ig: !!state.igToken, yt: !!state.yt?.refresh, items: Object.keys(state.items).length });
     if ((req.method === 'GET' || req.method === 'HEAD') && p.startsWith('/media/')) return serveMedia(req, res, p.slice(7));
     if (req.method === 'PUT' && p.startsWith('/upload/')) {
       if (!authed(req)) return send(res, 401, { ok: false });
@@ -1343,6 +1365,26 @@ http.createServer(async (req, res) => {
         if (it.status === 'published') return send(res, 200, { ok: false, message: 'もう投稿済み' });
         it.status = 'rejected'; it.feedback = [...(it.feedback || []), { t: Date.now(), text: String(body.text || '').slice(0, 2000) }]; delete it.feedbackDone; save();
         return send(res, 200, { ok: true });
+      }
+      // ---- 台本の承認（Claude が書いた台本の候補を SNS司令室の 承認待ち に出して、承認・修正・見送りを記録する）----
+      if (req.method === 'GET' && p === '/an/scripts') return send(res, 200, { ok: true, brand: BRAND, items: Object.entries(state.scripts || {}).filter(([, x]) => x.status === 'waiting').map(([id, x]) => ({ id, ...x })).sort((a, b) => a.sentAt - b.sentAt || a.id.localeCompare(b.id)) });
+      if (req.method === 'POST' && p === '/an/scripts') {
+        state.scripts = state.scripts || {}; const out = {};
+        if (Array.isArray(body.add)) { // [{id, title, pillar, lines, ask, note}]。決まった台本は上書きしない（replace:true なら待ちに戻す）
+          let n = 0; for (const x of body.add.slice(0, 30)) { const id = String(x.id || '').slice(0, 20); if (!id) continue; const cur = state.scripts[id]; if (cur && cur.status !== 'waiting' && !body.replace) continue;
+            state.scripts[id] = { title: String(x.title || '').slice(0, 120), pillar: String(x.pillar || '').slice(0, 40), lines: (x.lines || []).slice(0, 30).map(l => String(l).slice(0, 200)), ask: String(x.ask || '').slice(0, 120), note: String(x.note || '').slice(0, 300), status: 'waiting', feedback: [], sentAt: Date.now() }; n++; }
+          out.added = n;
+        }
+        if (body.act && body.id) { // ok（承認）・fix（直してから動画に）・skip（見送り）
+          const x = state.scripts[String(body.id)]; if (!x) return send(res, 404, { ok: false, error: 'no script' });
+          if (!/^(ok|fix|skip)$/.test(body.act)) return send(res, 400, { ok: false, error: 'act' });
+          x.status = body.act; x.at = Date.now(); if (body.text) x.feedback = [...(x.feedback || []), { t: Date.now(), text: String(body.text).slice(0, 2000) }];
+          out.message = body.act === 'ok' ? `${x.title} を承認した。次の動画制作で動画にする` : body.act === 'fix' ? `${x.title} の修正を記録した。Claude が直してから動画にする` : `${x.title} は見送りにした`;
+        }
+        if (Array.isArray(body.done)) { for (const id of body.done) if (state.scripts[id]) state.scripts[id].done = Date.now(); out.done = body.done.length; }
+        // 動画にした・見送った台本は30日で消す
+        for (const [id, x] of Object.entries(state.scripts)) if (x.status !== 'waiting' && (x.done || x.at || 0) < Date.now() - 30 * 86400e3) delete state.scripts[id];
+        save(); return send(res, 200, { ok: true, ...out });
       }
       if (req.method === 'POST' && p === '/an/revenue') { // TikTok の収益（moshimo-analytics のまとめから）
         if (!Array.isArray(body.days)) return send(res, 400, { ok: false, error: 'days' });

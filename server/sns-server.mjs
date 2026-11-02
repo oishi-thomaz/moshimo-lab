@@ -281,23 +281,41 @@ function approvalBubble(acc, it, slotText) {
       pb('承認する', `ap:${acc.key}:approve:${it.id}`, `${short(it.title, 20)} を承認`, 'primary', acc.color),
       { type: 'box', layout: 'horizontal', spacing: 'sm', contents: [pb('修正して', `fb:${acc.key}:${it.id}`, `${short(it.title, 20)} を修正して`), pb('却下', `ap:${acc.key}:reject:${it.id}`, `${short(it.title, 20)} を却下`)] }] } };
 }
+// 台本の承認：Claude が書いた台本の候補（投稿サーバーの /an/scripts）。承認・直してOK・見送り
+function scriptBubble(acc, x) {
+  const lines = (x.lines || []).map((l, i) => ({ type: 'box', layout: 'horizontal', spacing: 'sm', contents: [{ type: 'text', text: String(i + 1), size: 'xxs', color: '#999999', flex: 0 }, { type: 'text', text: nz(l), size: 'xs', color: '#222222', wrap: true, flex: 1 }] }));
+  return { type: 'bubble', size: 'mega',
+    header: { type: 'box', layout: 'vertical', backgroundColor: acc.color, paddingAll: '12px', spacing: 'xs', contents: [
+      line1(`台本 ${x.id}${x.pillar ? `・${x.pillar}` : ''}`, { color: '#E5E7EB', size: 'xxs' }),
+      { type: 'text', text: nz(x.title), color: '#ffffff', weight: 'bold', size: 'md', wrap: true, maxLines: 3 }] },
+    body: { type: 'box', layout: 'vertical', paddingAll: '12px', spacing: 'xs', contents: [
+      ...lines,
+      ...(x.ask ? [{ type: 'text', text: `質問：${x.ask}`, size: 'xs', color: '#0A7D3C', wrap: true, margin: 'md' }] : []),
+      ...(x.note ? [{ type: 'text', text: x.note, size: 'xxs', color: '#888888', wrap: true, margin: 'sm' }] : [])] },
+    footer: { type: 'box', layout: 'vertical', spacing: 'sm', contents: [
+      pb('この台本でOK', `sc:${acc.key}:ok:${x.id}`, `台本 ${short(x.title, 20)} を承認`, 'primary', acc.color),
+      { type: 'box', layout: 'horizontal', spacing: 'sm', contents: [pb('直してOK', `scfb:${acc.key}:${x.id}`, `台本 ${short(x.title, 20)} を直して`), pb('見送り', `sc:${acc.key}:skip:${x.id}`, `台本 ${short(x.title, 20)} は見送り`)] }] } };
+}
 async function pendingMessage() {
-  const all = await Promise.all(ACCOUNTS.map(async acc => { try { return { acc, P: await api(acc, 'GET', '/an/pending') }; } catch (e) { return { acc, err: e.message }; } }));
+  const all = await Promise.all(ACCOUNTS.map(async acc => { try { const P = await api(acc, 'GET', '/an/pending'); let S = []; try { S = (await api(acc, 'GET', '/an/scripts')).items || []; } catch {} return { acc, P, S }; } catch (e) { return { acc, err: e.message, S: [] }; } }));
   const total = all.reduce((n, x) => n + (x.P ? x.P.items.length : 0), 0);
+  const scripts = all.reduce((n, x) => n + x.S.length, 0);
   // 1枚目：アカウントごとの本数と まとめて承認
   const rows = all.map(({ acc, P, err }, i) => ({ type: 'box', layout: 'vertical', spacing: 'sm', margin: i ? 'lg' : 'none', contents: [
     { type: 'box', layout: 'horizontal', alignItems: 'center', contents: [line1(acc.name, { flex: 1, weight: 'bold' }), { type: 'text', text: err ? '読めなかった' : `${P.items.length}本`, size: 'sm', weight: 'bold', flex: 0, color: err ? '#C62828' : P.items.length ? '#C62828' : '#0A7D3C' }] },
+    ...(all[i].S.length ? [{ type: 'box', layout: 'horizontal', contents: [line1('台本の返事待ち', { flex: 1, size: 'xs', color: '#555555' }), { type: 'text', text: `${all[i].S.length}本`, size: 'xs', weight: 'bold', flex: 0, color: '#C62828' }] }] : []),
     ...(P && P.items.length > 1 ? [pb(`${acc.name}を全部承認`, `apall:${acc.key}`, `${acc.name}の承認待ちを全部承認`, 'primary', acc.color)] : [])] }));
   const head1 = { type: 'bubble', size: 'mega',
-    header: { type: 'box', layout: 'vertical', backgroundColor: '#16324F', paddingAll: '14px', contents: [line1(`承認待ち ${total}本`, { color: '#ffffff', weight: 'bold', size: 'lg' }), line1('右にスワイプで1本ずつ見られる', { color: '#E5E7EB', size: 'xs' })] },
+    header: { type: 'box', layout: 'vertical', backgroundColor: '#16324F', paddingAll: '14px', contents: [line1(`承認待ち ${total}本${scripts ? `＋台本 ${scripts}本` : ''}`, { color: '#ffffff', weight: 'bold', size: 'lg' }), line1('右にスワイプで1本ずつ見られる', { color: '#E5E7EB', size: 'xs' })] },
     body: { type: 'box', layout: 'vertical', paddingAll: '14px', contents: rows },
-    footer: { type: 'box', layout: 'vertical', paddingAll: '10px', contents: [{ type: 'text', text: '修正して を押すと、直してほしいところを書ける。その回は却下になって、Claude が直してもう一回ここに出す', size: 'xxs', color: '#888888', wrap: true }] } };
-  if (!total) return { type: 'flex', altText: '承認待ちはない', contents: head1 };
+    footer: { type: 'box', layout: 'vertical', paddingAll: '10px', contents: [{ type: 'text', text: '修正して を押すと、直してほしいところを書ける。その回は却下になって、Claude が直してもう一回ここに出す。台本は 直してOK で書いたとおりに Claude が直してから動画にする', size: 'xxs', color: '#888888', wrap: true }] } };
+  if (!total && !scripts) return { type: 'flex', altText: '承認待ちはない', contents: head1 };
   const bubbles = [];
   for (const { acc, P } of all) if (P) P.items.forEach((it, k) => bubbles.push(approvalBubble(acc, it, k === 0 ? (P.nextSlot ? when(P.nextSlot) : '-') : '承認した順に次の枠')));
+  for (const { acc, S } of all) for (const x of S) bubbles.push(scriptBubble(acc, x));
   const msgs = [], chunks = [[head1, ...bubbles.slice(0, 11)]];
   for (let i = 11; i < bubbles.length; i += 12) chunks.push(bubbles.slice(i, i + 12));
-  for (const c of chunks.slice(0, 5)) msgs.push({ type: 'flex', altText: `承認待ち ${total}本`, contents: { type: 'carousel', contents: c } });
+  for (const c of chunks.slice(0, 5)) msgs.push({ type: 'flex', altText: `承認待ち ${total}本${scripts ? `・台本 ${scripts}本` : ''}`, contents: { type: 'carousel', contents: c } });
   return msgs;
 }
 async function onApproval(data, uid) {
@@ -310,6 +328,11 @@ async function onApproval(data, uid) {
     for (const it of P.items) { const r = await api(acc, 'POST', '/an/action', { act: 'approve', id: it.id }); out.push(`・${r.message}`); }
     return text(out.length ? `${acc.name}を全部承認した\n${out.join('\n')}` : '承認待ちはなかった');
   }
+  if (kind === 'sc') { const r = await api(acc, 'POST', '/an/scripts', { act: a3, id: a4 }); return text(r.message || 'OK'); }
+  if (kind === 'scfb') {
+    state.awaitFb = { key, id: a3, kind: 'script', until: Date.now() + 15 * 60e3 }; save();
+    return text('台本の直してほしいところを、このまま送って（例：3行目の数字を変えて、オチをもっと強く など）。直したら確認なしで動画にする。15分以内に送ったぶんを記録する。やめるときは やめる と送って');
+  }
   if (kind === 'fb') {
     state.awaitFb = { key, id: a3, until: Date.now() + 15 * 60e3 }; save();
     return text('直してほしいところを、このまま送って（例：冒頭の言い回しをもっと皮肉っぽく、数字を大きく見せて など）。15分以内に送ったぶんを記録する。やめるときは やめる と送って');
@@ -318,8 +341,9 @@ async function onApproval(data, uid) {
 }
 async function onFeedbackText(msg) {
   const f = state.awaitFb; delete state.awaitFb; save();
-  if (/^(やめる|キャンセル)$/.test(msg)) return text('修正の指示はやめた（その回はまだ承認待ちのまま）');
+  if (/^(やめる|キャンセル)$/.test(msg)) return text(`修正の指示はやめた（その${f.kind === 'script' ? '台本' : '回'}はまだ承認待ちのまま）`);
   const acc = accOf(f.key);
+  if (f.kind === 'script') { const r = await api(acc, 'POST', '/an/scripts', { act: 'fix', id: f.id, text: msg }); return text(r.ok ? '記録した。次の動画制作の回（10:47 か 16:47）で Claude が直してから動画にする。できた動画はいつもどおり 承認待ち に出る' : `記録できへんかった（${r.error || ''}）`); }
   const r = await api(acc, 'POST', '/an/feedback', { id: f.id, text: msg });
   if (!r.ok) return text(`記録できへんかった（${r.message || r.error || ''}）`);
   return text(`記録した。その回はいったん却下にして、次の動画制作の回（10:47 か 16:47）で Claude が直して、もう一回 承認待ち に出す。\n同じ指摘は今後の台本のルールにも入れる。`);
@@ -361,7 +385,7 @@ const HOWTO = [
   '',
   'ボタン',
   '・ストック：まだ投稿してない動画（予約済み・承認待ち・書き出し前）',
-  '・承認待ち：3アカウントの承認待ちをここで承認・修正・却下（まとめて承認もできる）',
+  '・承認待ち：3アカウントの承認待ちをここで承認・修正・却下（まとめて承認もできる）。Claude が書いた台本の候補もここに出る（この台本でOK・直してOK・見送り）',
   '・今日の投稿：今日の予定と今の再生。クイズといつわ劇場は TikTok のキャプションもここから出せる',
   '・いま回ってる：直近3時間で伸びてる動画',
   '・いまの数字：フォロワーと24時間の再生',
@@ -434,7 +458,7 @@ async function watchFailures() {
       if (!bad.length || state.alerted[k]) continue;
       state.alerted[k] = Date.now();
       let title = x.id; try { title = JSON.parse(fs.readFileSync(path.join(path.dirname(acc.state), 'media', `${x.id}.json`), 'utf8')).title || x.id; } catch {}
-      out.push({ acc, id: x.id, title, why: bad.map(p => `${PLAT[p]}：${String(r[p].error || '失敗').slice(0, 80)}`).join('\n'), ig: bad.includes('ig') });
+      out.push({ acc, id: x.id, title, why: bad.map(p => p === 'tt' && /pending_share|daily upload cap/i.test(String(r[p].error || '')) ? 'TikTok：下書きの上限（投稿してない下書きは24時間で5本まで）。枠が空いたら自動で送り直す' : `${PLAT[p]}：${String(r[p].error || '失敗').slice(0, 80)}`).join('\n'), ig: bad.includes('ig') });
     }
   }
   for (const k of Object.keys(state.alerted)) if (state.alerted[k] < Date.now() - 3 * 86400e3) delete state.alerted[k];
