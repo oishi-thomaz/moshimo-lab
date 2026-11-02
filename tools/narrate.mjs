@@ -140,7 +140,7 @@ for (;;) {
     if (!isDaily(e)) throw e;
     console.log(`narrate: 1日の上限エラー（${MODEL}）: ${String(e.message).slice(0, 400)}`);
     if (ALT_KEYS.length && !MOCK) { KEY = ALT_KEYS.shift(); console.log(`narrate: ${MODEL} がこの鍵で今日の上限。別の鍵で同じ声のまま作り直す`); continue; }
-    const next = FALLBACK.shift();
+    const next = process.env.TTS_NO_LITE === '1' ? null : FALLBACK.shift();
     // 声なしの動画が投稿されないよう、書き出しごと失敗させる（終了コード 3）。上限が戻ったら同じ番号でやり直す
     if (!next || MOCK) { console.log('narrate: 今日の上限に達した。声なしでは作らずに止める'); process.exit(3); }
     console.log(`narrate: ${MODEL} が今日の上限。${next} で作り直す`); MODEL = next;

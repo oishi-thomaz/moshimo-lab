@@ -83,7 +83,8 @@ jobs:
         env:
           CHROME_PATH: /usr/bin/google-chrome
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          GEMINI_API_KEY_ALT: ${{ secrets.GEMINI_API_KEY_DRAMA }}   # もしもラボの声が上限のとき、いつわ劇場の鍵で同じ声のまま作る
+          GEMINI_API_KEY_ALT: ${{ secrets.GEMINI_API_KEY_DRAMA }},${{ secrets.GEMINI_API_KEY_QUIZ }}   # もしもラボの声が上限のとき、いつわ劇場→タイトル当てクイズの鍵の順で同じ声のまま作る
+          TTS_NO_LITE: '1'   # 2026/11/03 ゆうと：予備の声（はみ出す）では作らずに止める
         run: |
           # 一時的な失敗（ブラウザ・声のAPI）は1回だけやり直す
           ID="${{ steps.pick.outputs.id }}"
