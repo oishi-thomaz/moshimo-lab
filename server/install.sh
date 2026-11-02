@@ -993,6 +993,7 @@ async function detectBuzz(snap) {
       if (fg >= FFLOOR[p] && once(`f:${p}`, 6 * 3600e3)) alerts.push({ t: now, p, kind: 'followers', gain: fg, total: f1 });
     }
   }
+  await buzzCheck(snap, prev, cur, hrs).catch(e => log('buzz', e.message));
   for (const key of Object.keys(vh)) if (!vh[key].length || now - vh[key][vh[key].length - 1][0] > 8 * 3600e3) delete vh[key];
   delete state.an.gains;
   for (const [k, t] of Object.entries(state.an.alerted)) if (now - t > 30 * 86400e3 && !k.startsWith('m:')) delete state.an.alerted[k];
@@ -1004,6 +1005,45 @@ async function detectBuzz(snap) {
   if (!big.length) return; // 勢いとフォロワーの伸びは日報で見る。10万回以上の節目だけすぐ送る
   try { await pushChecked(flexAlert(big, now)); }
   catch (e) { log('flex alert failed', e.message); await push(text(`【伸びてる】\n${big.map(a => a.kind === 'followers' ? `${PLAT[a.p]} フォロワー +${a.gain}/時（今 ${kfmt(a.total)}）` : `${PLAT[a.p]} ${a.title} +${kfmt(a.gain || 0)}/時（累計 ${kfmt(a.total)}）`).join('\n')}`)); }
+}
+// ---- 完全にバズってる動画だけ、このアカウントの LINE に知らせる（2026/11/02 ゆうとと決めた条件。QUIET でも送る）----
+//  インスタか TikTok で、1本の動画が1時間で もしもラボ +1万再生以上／クイズ・いつわ劇場 +3,000再生以上（1本につき最初の1回だけ）
+//  そのあと同じ動画が累計 10万・30万・100万 を超えたときに、もう1回ずつ
+const BUZZ_PER_HOUR = Number(env.BUZZ_PER_HOUR) || (PREFIX === '/moshimo' ? 10000 : 3000);
+const BUZZ_MS = [100000, 300000, 1000000];
+const mediaUrl = (p, k) => { if (p === 'tt') return `https://www.tiktok.com/@${TT_USER}/video/${k}`; if (p === 'yt') return `https://youtube.com/shorts/${k}`; const it = Object.values(state.items).find(i => i.mediaId === k); return it && it.permalink ? it.permalink : ''; };
+async function buzzCheck(snap, prev, cur, hrs) {
+  const b = state.an.buzz = state.an.buzz || {};
+  const hits = [];
+  for (const p of ['ig', 'tt']) {
+    const gains = Object.entries(cur.v[p] || {}).map(([k, v]) => ({ k, v, g: prev.v[p] && prev.v[p][k] != null ? Math.round((v - prev.v[p][k]) / hrs) : null })).filter(x => x.g != null);
+    const medOthers = k => { const pos = gains.filter(x => x.k !== k).map(x => x.g).filter(g => g > 0).sort((a, c) => a - c); return pos.length ? pos[Math.floor(pos.length / 2)] : 0; }; // ふだん＝ほかの動画の1時間の伸びの真ん中
+    const f0 = prev.f[p], f1 = cur.f[p], fg = f0 != null && f1 != null ? Math.round((f1 - f0) / hrs) : null;
+    for (const x of gains) {
+      const key = `${p}:${x.k}`, rec = (snap[p] && snap[p].media && snap[p].media[x.k]) || {};
+      const base = { p, k: x.k, gain: x.g, total: x.v, times: (m => (m > 0 ? Math.round(x.g / m) : null))(medOthers(x.k)), fg, title: titleOf(p, x.k, rec), url: mediaUrl(p, x.k) };
+      if (!b[key] && x.g >= BUZZ_PER_HOUR) { b[key] = { t: snap.t, ms: BUZZ_MS.filter(m => x.v >= m) }; hits.push({ ...base, kind: 'start' }); continue; }
+      if (b[key]) { const m = BUZZ_MS.find(m => x.v >= m && !b[key].ms.includes(m)); if (m) { b[key].ms.push(...BUZZ_MS.filter(n => n <= m && !b[key].ms.includes(n))); hits.push({ ...base, kind: 'milestone', ms: m }); } }
+    }
+  }
+  for (const [k, v] of Object.entries(b)) if (snap.t - v.t > 60 * 86400e3) delete b[k];
+  save();
+  if (!hits.length) return;
+  const rowsOf = h => [
+    { type: 'box', layout: 'horizontal', alignItems: 'center', contents: [tag(PLAT[h.p], PCOL[h.p]), { type: 'text', text: h.kind === 'milestone' ? `${kfmt(h.ms)}再生 突破` : `+${kfmt(h.gain)}／1時間`, size: 'md', weight: 'bold', color: '#C62828', flex: 1, align: 'end' }] },
+    { type: 'text', text: String(h.title || h.k).replace(/^もしも/, ''), size: 'md', weight: 'bold', wrap: true, maxLines: 2, color: '#111111' },
+    nrow({ label: '累計', value: `${kfmt(h.total)}再生` }),
+    nrow({ label: '1時間の伸び', value: `+${kfmt(h.gain)}`, delta: h.times && h.times >= 2 ? `ふだんの${h.times}倍` : '' }),
+    ...(h.fg != null ? [nrow({ label: 'この1時間のフォロワー', value: sgnK(h.fg) })] : []),
+    ...(h.url ? [{ type: 'button', style: 'primary', color: ACOL, height: 'sm', margin: 'md', action: { type: 'uri', label: '動画を開く', uri: h.url } }] : []),
+  ];
+  const body = [];
+  hits.slice(0, 5).forEach((h, i) => { if (i) body.push({ type: 'separator', margin: 'lg' }); body.push({ type: 'box', layout: 'vertical', spacing: 'sm', margin: i ? 'lg' : 'none', contents: rowsOf(h) }); });
+  const msg = { type: 'flex', altText: `バズってる：${hits.map(h => String(h.title || '').replace(/^もしも/, '').slice(0, 16)).join('・')}`.slice(0, 390), contents: { type: 'bubble', size: 'giga',
+    header: { type: 'box', layout: 'vertical', backgroundColor: '#C62828', paddingAll: '14px', contents: [one(`🔥 ${BRAND} がバズってる`, { color: '#ffffff', weight: 'bold', size: 'lg' }), one(`${fmt(snap.t)} 時点`, { color: '#FFE4E6', size: 'xs' })] },
+    body: { type: 'box', layout: 'vertical', paddingAll: '14px', contents: body } } };
+  const ok = await pushForce(msg);
+  if (ok === false) await pushForce(text(`【バズってる】${BRAND}\n${hits.map(h => `${PLAT[h.p]} ${h.title}：${h.kind === 'milestone' ? `${kfmt(h.ms)}再生突破` : `+${kfmt(h.gain)}/1時間`}（累計 ${kfmt(h.total)}）`).join('\n')}`));
 }
 let collecting = false;
 async function collect() {
@@ -1336,6 +1376,18 @@ http.createServer(async (req, res) => {
 }).listen(PORT, '127.0.0.1', () => log(`${BRAND} server on 127.0.0.1:${PORT}${PREFIX}`));
 // 動作確認用：node moshimo-server.mjs --cards で、数字・通数・収益のカードの中身を表示して終わる（LINE には送らない）
 if (process.argv.includes('--cards')) { (async () => { globalThis.fetch = async u => ({ json: async () => (/consumption/.test(u) ? { totalUsage: 37 } : { type: 'limited', value: 200 }) }); console.log(JSON.stringify({ numbers: numbersCard(), revenue: revenueCard(), quota: await quotaCard() }, null, 1)); process.exit(0); })(); }
+// 動作確認用：node moshimo-server.mjs --buzztest で、作りものの数字でバズのお知らせの中身を表示して終わる（LINE には送らない）
+if (process.argv.includes('--buzztest')) { (async () => {
+  globalThis.fetch = async (u, o) => { console.log(JSON.stringify(JSON.parse(o.body).messages, null, 1)); return { ok: true, text: async () => '' }; };
+  state.owner = 'U1'; state.an.buzz = {};
+  const t = Date.now(), prev = { t: t - 3600e3, v: { ig: { a: 50000, b: 1000, c: 300 }, tt: { x: 80000, y: 500 } }, f: { ig: 2600, tt: 25000 } };
+  const cur = { t, v: { ig: { a: 62000, b: 1100, c: 350 }, tt: { x: 101000, y: 520 } }, f: { ig: 2680, tt: 25300 } };
+  const snap = { t, ig: { media: { a: { id: '0623', cap: 'もしもオトナのお店が消えたら？' } } }, tt: { media: { x: { cap: 'もしも日本から女性が全員消えたら…' } } } };
+  await buzzCheck(snap, prev, cur, 1);
+  console.log('--- 2回目（同じ動画は節目のときだけ）');
+  await buzzCheck({ ...snap, t: t + 3600e3 }, cur, { t: t + 3600e3, v: { ig: { a: 75000 }, tt: { x: 125000 } }, f: cur.f }, 1);
+  process.exit(0);
+})(); }
 MOSHIMO_EOF
 
 cat > /etc/systemd/system/moshimo.service <<'MOSHIMO_EOF'
