@@ -28,6 +28,8 @@
 - 日報・見張りの直した連絡・午後の見回りの連絡は、全部 SNS司令室（まとめ用の LINE 公式アカウント。Secrets の SNS_LINE_TOKEN）に送る。Claude から各アカウントの LINE には何も送らない（ゆうとの決定。各アカウントの LINE に届くのは承認カードと、投稿サーバー自身の通知だけ）。
 - 送り方は moshimo-analytics の `node tools/run.mjs report <ファイル>`（または `notice`）。朝の日報（reports/outbox/YYYY-MM-DD.json・quiz-…・itsuwa-…）は 7:58 までに push してあれば送らずに終わり、8:00 のまとめに入る。それより後の日報と、-pm・-fix などの連絡はその場で SNS司令室に届く。JSON の形は ANALYST.md の 日報の書き方 と同じ（{card} か {message}）。
 - もしもラボの notice.yml・投稿サーバーの report は使わない（各アカウントの LINE に行くため）。
+- SNS司令室に ストック と送ると、まだ投稿していない動画（予約済み・承認待ち・書き出し前の在庫）が3アカウント分カードで返ってくる。返事係は VPS の server/sns-server.mjs（install-sns.sh で入れる。/var/lib/moshimo・quiz・itsuwa の state.json と、このリポジトリの在庫を読むだけ）。
+- まとめの TikTok の数字は、投稿サーバーで取れていないアカウント（クイズ・いつわ劇場）は公開ページから読む（moshimo-analytics の data/<アカウント>/tiktok-embed/ に貯まる）。いま回ってる動画 は直近およそ3時間（公開ページの分は前回のまとめから）で再生が大きく増えた動画。
 
 ## 声（Gemini TTS）の1日の上限
 - 1つのキー（Google Cloud プロジェクト）につき、gemini-3.8-flash-tts が1日100回、予備の gemini-3.8-flash-lite-tts も1日100回（Tier 1）。1行の字幕につき1回使う（もしもラボ1本で約15回、クイズ1本で約17回。同じ文は前に作った声を使い回すので数えない）。
