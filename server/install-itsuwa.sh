@@ -410,7 +410,15 @@ async function publish(id) {
   it.status = 'publishing'; save();
   try {
     const caption = `${m.caption || ''}\n\n${(m.hashtags || []).slice(0, 5).map(h => '#' + h).join(' ')}`.trim();
-    const c = await ig('POST', `/${IG_USER_ID}/media`, { media_type: 'REELS', video_url: `${BASE_URL}/media/${id}.mp4`, caption, share_to_feed: true }, 2);
+    // 挑戦枠の回（META.trial）はインスタのお試しリールで出す：まずフォロワー以外にだけ見せ、数字がよければインスタが自動で一覧（グリッド）に出す。
+    // コケた回は一覧に載らないので、プロフィールの見え方を崩さずに新しい型を試せる（2026/11/02 ゆうとの決定）。使えないアカウント・エラーのときはふつうのリールで出す
+    const params = { media_type: 'REELS', video_url: `${BASE_URL}/media/${id}.mp4`, caption, share_to_feed: true };
+    let c = null;
+    if (m.trial) {
+      try { c = await ig('POST', `/${IG_USER_ID}/media`, { ...params, trial_params: { graduation_strategy: 'SS_PERFORMANCE' } }, 2); it.igTrial = true; }
+      catch (e) { log('IG trial reel failed, posting as normal reel', id, String(e.message).slice(0, 200)); it.igTrial = false; }
+    }
+    if (!c) c = await ig('POST', `/${IG_USER_ID}/media`, params, 2);
     let status = 'IN_PROGRESS';
     for (let k = 0; k < 40 && status === 'IN_PROGRESS'; k++) { await sleep(15000); status = (await ig('GET', `/${c.id}`, { fields: 'status_code' })).status_code; }
     if (status !== 'FINISHED') throw new Error(`container status ${status}`);
