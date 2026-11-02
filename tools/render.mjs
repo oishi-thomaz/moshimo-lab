@@ -3,6 +3,7 @@
 //   node tools/render.mjs --video 0001 --out out/0001_video.mp4 [--fps 30] [--from 0 --to 65]
 //   node tools/render.mjs --video 0001 --stills 1,8.6,40 --outdir out/stills
 //   node tools/render.mjs --video 0001 --meta out/0001.json        (just dump the video's META)
+//   --glonly をつけると静止画は 3D（canvas#gl）だけを写す（字幕・数字などの文字は隠す。チラつき検査用）
 //
 // Chromium: uses $CHROME_PATH if set, otherwise Playwright's default install.
 import { chromium } from 'playwright-core';
@@ -46,6 +47,7 @@ if (args.meta) {
   console.log('meta ->', args.meta);
 } else if (args.stills) {
   const out = args.outdir || 'out/stills'; fs.mkdirSync(out, { recursive: true });
+  if (args.glonly) await page.addStyleTag({ content: 'body > *:not(#stage), #stage > *:not(#gl) { visibility: hidden !important; }' });
   for (const t of String(args.stills).split(',').map(Number)) {
     await page.evaluate(t => window.renderAt(t), t);
     await page.screenshot({ path: `${out}/${video}_t${t.toFixed(2).padStart(6, '0')}.jpg`, type: 'jpeg', quality: 88, clip });
