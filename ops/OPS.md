@@ -101,6 +101,7 @@
 
 ## 4. TikTok 予約（8:07・10:07・11:07・14:07・17:07・20:07・23:07、ゆうとの Mac）
 TikTok はインスタと同じ時間に出す（2026/11/1 ゆうとの決定）。承認された回を、そのインスタの投稿時間で予約する。承認が遅れてインスタの時間を過ぎた回は、次の回で 今 で出す（遅れは最大3時間）。予約する回がなければブラウザを開かずに すぐ終わる。23:07 の回は TIKTOK.md の 3.5・3.6（プレイリスト・ピン留め・TikTok Studio の数字の記録）もやる。
+0. まず moshimo-analytics だけを用意して `node tools/run.mjs collect && node tools/tiktok-todo.mjs`。最後の行が 候補なし で23時台でなければ、Chrome も手順書も開かずに 予約する回なし と返して終わる。
 1. 両方のリポジトリを用意する。
 2. もしもラボ：moshimo-analytics の TIKTOK.md を最後まで読んで完全に従う（notes/tiktok-schedule.md・notes/tiktok-crp.md も）。Chrome（Claude in Chrome）を使う。Chrome の操作の前に chrome-browser のスキルを読む。
 3. クイズ：（2026/11/2 から停止中。docs/QUIZ-TIKTOK.md の先頭を見る）docs/QUIZ-TIKTOK.md を最後まで読んで完全に従う（state/quiz-tiktok.md も）。Claude アプリのブラウザ（built-in browser、mcp__remote-devices__Claude_Browser__*）を使う。操作の前に built-in-browser のスキルを読む。Chrome は絶対に使わない（Chrome は @moshimo__lab でログインしているので、取り違えるとクイズの動画がもしもラボに出てしまう）。
