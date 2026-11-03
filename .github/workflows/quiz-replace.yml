@@ -46,7 +46,7 @@ jobs:
             if [ "$RUN" != "$P" ]; then
               rm -rf "dl-$ID"; gh run download "$RUN" -n "preview-$ID" -D "dl-$ID" -R "${{ github.repository }}"
               [ -s "dl-$ID/$ID.mp4" ] || { echo "::error::$ID の動画がない"; exit 1; }
-              cp "dl-$ID/$ID.mp4" "out/$N.mp4"; cp "dl-$ID/${ID}_cover.jpg" "out/${N}_cover.jpg"
+              cp "dl-$ID/$ID.mp4" "out/$N.mp4"; if [ -f "plan/covers/$ID.jpg" ]; then cp "plan/covers/$ID.jpg" "out/${N}_cover.jpg"; else cp "dl-$ID/${ID}_cover.jpg" "out/${N}_cover.jpg"; fi
               FILES="$N.mp4 $N.json ${N}_cover.jpg"
             fi
             for f in $FILES; do
