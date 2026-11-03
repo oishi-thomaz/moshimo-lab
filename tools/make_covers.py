@@ -4,7 +4,7 @@ import json,glob,os,re
 from PIL import Image, ImageDraw, ImageFont
 F='/usr/share/fonts/opentype/noto/NotoSansCJK-Black.ttc'
 TT=json.load(open('plan/cover-lines.json'))
-COL={'図星':(226,52,64),'人体の限界':(52,128,230),'絶滅ボタン':(46,170,90),'お財布のもしも':(222,168,30),'ヤバい順':(140,80,220),'全員で同時に':(240,120,40),'社会の消えたら':(214,70,170)}
+COL={'図星':(226,52,64),'人体の限界':(52,128,230),'絶滅ボタン':(46,170,90),'お財布のもしも':(222,168,30),'ヤバい順':(140,80,220),'全員で同時に':(240,120,40),'社会の消えたら':(214,70,170),'もしもラボ':(40,190,170)}
 P={}
 for v in '0730 0531 0271 0612 0613 0295 0614 0611 0733 0735 0037'.split(): P[v]='人体の限界'
 for v in '0701 0704 0102 0439 0620'.split(): P[v]='絶滅ボタン'
@@ -15,6 +15,17 @@ for v in '0029 0009 0038 0621'.split(): P[v]='社会の消えたら'
 for v in '0623 0624 0625 0628 0629 0630 0631 0632 0633 0634'.split(): P[v]='図星'
 PICK={'0037':'pick/0037/*t040*','0038':'pick/0038/*t014*','0625':'pick/0625/*t014*','0624':'pick/0624/*t030*','0008':'pick/0008/*t048*',
       '0531':'pick2/0531/*t009*','0611':'pick2/0611/*t018*','0613':'pick/0613/*t040*','0614':'pick2/0614/*t018*'}
+
+# 2026/11/03 過去回（YouTube・インスタ用）
+for v in '0010 0032 0004 0025'.split(): P[v]='人体の限界'
+for v in '0467 0275 0501 0601 0027 0021 0007 0002'.split(): P[v]='絶滅ボタン'
+for v in '0534 0016 0028 0033 0022 0602 0003 0034'.split(): P[v]='お財布のもしも'
+for v in '0532 0024 0013 0005'.split(): P[v]='全員で同時に'
+for v in '0603 0012 0006 0031 0001'.split(): P[v]='社会の消えたら'
+P['0035']='ヤバい順'
+for v in '0533 0036 0604'.split(): P[v]='もしもラボ'
+T10=dict(x.split(':') for x in '0532:036 0533:026 0534:006 0024:046 0036:036 0467:006 0016:026 0010:016 0604:016 0275:006 0028:016 0013:006 0603:016 0012:026 0033:036 0022:006 0602:006 0501:006 0006:054 0601:036 0027:054 0005:046 0032:046 0031:046 0021:006 0004:006 0007:006 0003:006 0035:006 0002:026 0025:046 0001:006 0034:036'.split())
+for v,t in T10.items(): PICK[v]=f'out/cover10/{v}/*t{t}*'
 def font(s): return ImageFont.truetype(F,s,index=0)
 BRK='がをにのはでとへ、'
 def chunks(t):
@@ -61,7 +72,7 @@ def make(v):
   lines=json.load(open('plan/cover-lines.json'))[v].split('|')
   size=164 if len(lines)<4 else 140
   while max(font(size).getlength(x) for x in lines)>960: size-=4
-  srcp=glob.glob('out/cover7/'+PICK[v]+'.jpg')[0] if v in PICK else (glob.glob(f'out/cover/{v}/*.jpg') or glob.glob(f'out/cover7/{v}/*.jpg'))[0]
+  srcp=glob.glob((PICK[v] if PICK[v].startswith('out/') else 'out/cover7/'+PICK[v])+'.jpg')[0] if v in PICK else (glob.glob(f'out/cover/{v}/*.jpg') or glob.glob(f'out/cover7/{v}/*.jpg'))[0]
   top=478+len(lines)*(size+12)
   off=max(380,top-430)+{'0629':-180,'0634':60}.get(v,0)
   src=Image.open(srcp).convert('RGB').resize((1080,1920))
@@ -76,7 +87,8 @@ def make(v):
     d.text((540,y+size*0.5),s,font=font(size),fill=(255,214,70) if i==len(lines)-1 else (255,255,255),anchor='mm',stroke_width=14,stroke_fill=(0,0,0)); y+=size+12
   return bg,lines,size
 os.makedirs('out/cover9',exist_ok=True)
-for v in TT:
+import sys
+for v in (sys.argv[1:] or TT):
   im,l,s=make(v); im.save(f'out/cover9/{v}_cover.jpg',quality=95); print(v,s,l)
 ims=sorted(glob.glob('out/cover9/*_cover.jpg'))
 S=Image.new('RGB',(180*7,240*5),'white')
