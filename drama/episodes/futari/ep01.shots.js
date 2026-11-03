@@ -15,14 +15,16 @@ const dark = g => bg(g, '#141a17', '#090d0b');
 const face = (g, lt, D, S, ids = [], o = {}) => {
   dark(g);
   const tk = talking(lt, S, ids);
-  smartSpeaker(g, 190, 1180, 1.3, { on: 0.25 + tk * 0.9, t: lt });
+  smartSpeaker(g, 190, 1010, 1.3, { on: 0.25 + tk * 0.9, t: lt });
   g.save(); cam(g, { x: 540, y: 800, z: slow(lt, D, o.z0 ?? 1.0, o.z1 ?? 1.06) });
-  close(g, P.sawako, { y: 780, s: 4.0, talk: tk * 0.5, lightFrom: 'left', phoneLight: true, ...o });
+  close(g, P.sawako, { y: 630, s: 4.0, talk: tk * 0.5, lightFrom: 'left', phoneLight: true, ...o });
   g.restore();
 };
 const phone = (g, lt, D, draw, o = {}) => { bg(g); g.save(); cam(g, { x: 540, y: 960, z: slow(lt, D, o.z0 ?? 1.0, o.z1 ?? 1.04) }); phoneFrame(g, 140, 80, 800, 1000, draw, { rot: o.rot || 0 }); g.restore(); };
 const room = (g, lt, D, o = {}) => { g.save(); cam(g, { x: o.x ?? 540, y: o.y ?? 1100, z: slow(lt, D, o.z0 ?? 1.0, o.z1 ?? 1.06) }); chanoma(g, { t: lt, ...o.set }); g.restore(); };
-const officer = t => (q, w, h) => figure(q, P.takagi, { x: w * 0.5, y: h * 1.25, s: 0.55, eyes: 'narrow', arms: [10, 0, 60, -110] });
+const officer = t => (q, w, h) => figure(q, P.takagi, { x: w * 0.5, y: h * 1.4, s: 0.55, eyes: 'narrow', arms: [10, 0, 60, -110] });
+// 字幕の下地（寄りの画面で字幕が絵と重なるとき）
+const subBand = (g, a = 1) => { if (a <= 0) return; g.save(); g.globalAlpha = a; vgrad(g, 0, 1140, W, 330, [[0, 'rgba(6,9,8,0)'], [0.2, 'rgba(6,9,8,.92)'], [0.75, 'rgba(6,9,8,.92)'], [1, 'rgba(6,9,8,0)']]); g.restore(); };
 const yen = (g, n, a = 1) => { g.save(); g.globalAlpha = a; text(g, '示談金', 540, 560, { size: 54, color: '#c9d6cf' }); text(g, `${Math.round(n / 10000)}万円`, 540, 720, { size: 190, color: F.green, weight: 900, stroke: '#05060a', sw: 18 }); g.restore(); };
 
 export function cover(g, lt = 9) {
@@ -38,15 +40,15 @@ const SHOTS = [
   { at: 'cold', off: -0.3, finish: { vignette: 0.6 }, draw(g, lt, D) { phone(g, lt, D, (p, w, h) => twoLines(p, w, h, { t: lt, active: 1, sec1: 48, sec2: 0, alarm: 1 }), { z0: 1.06, z1: 1.06 }); mood(g, { red: 0.12 }); } },
   { at: 'h1', finish: { vignette: 0.6 }, draw(g, lt, D) { phone(g, lt, D, (p, w, h) => twoLines(p, w, h, { t: lt, active: 1, sec1: 48, sec2: 0, alarm: 1 }), { z0: 1.06, z1: 1.12 }); mood(g, { red: 0.12 * (1 - inv(0, 0.6, lt)) }); } },
   { at: 'h2', finish: { vignette: 0.6 }, draw(g, lt, D) { phone(g, lt, D, (p, w, h) => twoLines(p, w, h, { t: lt, active: 2, sec1: 50, sec2: 2, alarm: 1 }), { z0: 1.12, z1: 1.18 }); } },
-  { at: 'h3', finish: { vignette: 0.7 }, draw(g, lt, D, S) { dark(g); speedLines(g, 540, 760, { inner: 470, t: lt, color: 'rgba(200,255,220,.16)' }); g.save(); cam(g, { x: 540, y: 800, z: slow(lt, D, 1.0, 1.1) }); close(g, P.sawako, { y: 780, s: 4.0, eyes: 'wide', brow: -0.6, mouth: 'line', lightFrom: 'left', phoneLight: true }); g.restore(); } },
+  { at: 'h3', finish: { vignette: 0.7 }, draw(g, lt, D, S) { dark(g); speedLines(g, 540, 760, { inner: 470, t: lt, color: 'rgba(200,255,220,.16)' }); g.save(); cam(g, { x: 540, y: 800, z: slow(lt, D, 1.0, 1.1) }); close(g, P.sawako, { y: 680, s: 4.0, eyes: 'wide', brow: -0.6, mouth: 'line', lightFrom: 'left', phoneLight: true }); g.restore(); } },
   { at: 'title', noSubs: true, finish: { vignette: 0.55, grainA: 0.1 }, draw(g, lt) { bg(g, '#030504', '#080b09'); cover(g, lt); } },
   // ── 最初の1本
   { at: 'o1', draw(g, lt, D) { const k = ease(inv(0, D, lt)); g.save(); cam(g, { x: lerp(300, 470, k), y: lerp(470, 1430, k), z: lerp(2.2, 2.2, k) }); chanoma(g, { t: lt, ring: 1 }); g.restore(); } },
   { at: 'o2', draw(g, lt, D) { phone(g, lt, D, (p, w, h) => twoCalls(p, w, h, { t: lt, phase: 0, sec: Math.floor(lt) })); } },
-  { at: 'o3', finish: { vignette: 0.7 }, draw(g, lt, D, S) { dark(g); speedLines(g, 540, 760, { inner: 470, t: lt, color: 'rgba(200,255,220,.18)' }); g.save(); cam(g, { x: 540, y: 800, z: slow(lt, D, 1.0, 1.14) }); close(g, P.sawako, { y: 780, s: 4.0, eyes: 'wide', brow: -0.6, mouth: 'open', lightFrom: 'left', phoneLight: true }); g.restore(); } },
+  { at: 'o3', finish: { vignette: 0.7 }, draw(g, lt, D, S) { dark(g); speedLines(g, 540, 760, { inner: 470, t: lt, color: 'rgba(200,255,220,.18)' }); g.save(); cam(g, { x: 540, y: 800, z: slow(lt, D, 1.0, 1.14) }); close(g, P.sawako, { y: 680, s: 4.0, eyes: 'wide', brow: -0.6, mouth: 'open', lightFrom: 'left', phoneLight: true }); g.restore(); } },
 
   // ── 1. 私と息子
-  { at: 'a1', draw(g, lt, D, S) { face(g, lt, D, S, [], { eyes: 'normal', mouth: 'line' }); const a = inv(0.2, 0.5, lt); g.save(); g.globalAlpha = a; fillRR(g, 290, 330, 500, 130, 20, 'rgba(8,12,10,.88)'); text(g, '宮下佐和子（58）', 540, 380, { size: 48, color: '#fff' }); text(g, '郊外の一軒家', 540, 432, { size: 30, color: '#b9c9c0' }); g.restore(); } },
+  { at: 'a1', draw(g, lt, D, S) { face(g, lt, D, S, [], { eyes: 'normal', mouth: 'line' }); const a = inv(0.2, 0.5, lt); g.save(); g.globalAlpha = a; fillRR(g, 290, 190, 500, 130, 20, 'rgba(8,12,10,.88)'); text(g, '宮下佐和子（58）', 540, 240, { size: 48, color: '#fff' }); text(g, '郊外の一軒家', 540, 292, { size: 30, color: '#b9c9c0' }); g.restore(); } },
   { at: 'a2', draw(g, lt, D) { room(g, lt, D, { x: 540, y: 960, z0: 1.0, z1: 1.04, set: { phone: 0, ring: 0, lamp: 0.4 } }); } },
   { at: 'a3', draw(g, lt, D) { dark(g); photo(g, 540, 700, 560, 640, (q, w, h) => { vgrad(q, 0, 0, w, h, [[0, '#9fb7c7'], [1, '#d8d0c0']]); close(q, P.haruto, { x: w / 2, y: h * 0.48, s: 2.2, eyes: 'normal', mouth: 'smile', lightFrom: 'left' }); }, { rot: -0.04 + 0.02 * ease(inv(0, D, lt)) }); text(g, 'ハルト（29）', 540, 1080, { size: 44, color: '#2a2a2a', alpha: inv(0.3, 0.7, lt) }); } },
   { at: 'a4', draw(g, lt, D) { phone(g, lt, D, (p, w, h) => callLog(p, w, h, { t: lt })); } },
@@ -62,9 +64,9 @@ const SHOTS = [
 
   // ── 3. もう1本
   { at: 'c1', draw(g, lt, D) { phone(g, lt, D, (p, w, h) => twoCalls(p, w, h, { t: lt + 1, phase: 1, sec: 47 })); } },
-  { at: 'c2', draw(g, lt, D) { const k = ease(inv(0, D + 1.3, lt)); bg(g); g.save(); cam(g, { x: lerp(540, 470, k), y: lerp(960, 280, k), z: lerp(1.0, 2.0, k) }); phoneFrame(g, 140, 80, 800, 1000, (p, w, h) => twoCalls(p, w, h, { t: lt + 1, phase: 1, sec: 47 })); g.restore(); } },
-  { at: 'name', finish: { vignette: 0.6 }, draw(g, lt, D) { bg(g); g.save(); cam(g, { x: 470, y: 280, z: lerp(2.0, 2.3, ease(inv(0, D, lt))), ...{ sx: noise1(lt * 30, 1) * 6 * (1 - inv(0, 0.5, lt)) } }); phoneFrame(g, 140, 80, 800, 1000, (p, w, h) => twoCalls(p, w, h, { t: lt + 1, phase: 1, sec: 47 })); g.restore(); } },
-  { at: 'c3', finish: { vignette: 0.6 }, draw(g, lt, D) { bg(g); g.save(); cam(g, { x: 470, y: 280, z: 2.3 }); phoneFrame(g, 140, 80, 800, 1000, (p, w, h) => twoCalls(p, w, h, { t: lt + 1, phase: 1, sec: 47 })); g.restore(); } },
+  { at: 'c2', draw(g, lt, D) { const k = ease(inv(0, D + 1.3, lt)); bg(g); g.save(); cam(g, { x: lerp(540, 470, k), y: lerp(960, 280, k), z: lerp(1.0, 2.0, k) }); phoneFrame(g, 140, 80, 800, 1000, (p, w, h) => twoCalls(p, w, h, { t: lt + 1, phase: 1, sec: 47 })); g.restore(); subBand(g, inv(0, 0.35, lt)); } },
+  { at: 'name', finish: { vignette: 0.6 }, draw(g, lt, D) { bg(g); g.save(); cam(g, { x: 470, y: 280, z: lerp(2.0, 2.3, ease(inv(0, D, lt))), ...{ sx: noise1(lt * 30, 1) * 6 * (1 - inv(0, 0.5, lt)) } }); phoneFrame(g, 140, 80, 800, 1000, (p, w, h) => twoCalls(p, w, h, { t: lt + 1, phase: 1, sec: 47 })); g.restore(); subBand(g); } },
+  { at: 'c3', finish: { vignette: 0.6 }, draw(g, lt, D) { bg(g); g.save(); cam(g, { x: 470, y: 280, z: 2.3 }); phoneFrame(g, 140, 80, 800, 1000, (p, w, h) => twoCalls(p, w, h, { t: lt + 1, phase: 1, sec: 47 })); g.restore(); subBand(g); } },
   { at: 'c4', draw(g, lt, D) { phone(g, lt, D, (p, w, h) => twoLines(p, w, h, { t: lt, active: 2, sec1: 49, sec2: 0, alarm: 1 - inv(0, 0.8, lt) })); } },
   { at: 'c5', draw(g, lt, D) { phone(g, lt, D, (p, w, h) => twoLines(p, w, h, { t: lt, active: 2, sec1: 49, sec2: 4 })); } },
 
@@ -85,7 +87,7 @@ const SHOTS = [
   // ── 5. 引き
   { at: 'bell', draw(g, lt, D) { room(g, lt, D, { x: 540, y: 900, z0: 1.15, z1: 1.0, set: { phone: 1, ring: 0, lamp: 0.25 } }); mood(g, { dark: 0.2 }); } },
   { at: 'e1', draw(g, lt, D) { bg(g, '#1c1814', '#0e0c0a'); intercom(g, 540, 640, 1.7, { t: lt, ring: 1, video: (p, w, h) => doorCam(p, w, h, { t: lt, draw: officer(lt) }) }); } },
-  { at: 'e2', draw(g, lt, D) { bg(g, '#1c1814', '#0e0c0a'); g.save(); cam(g, { x: 500, y: 600, z: slow(lt, D, 1.2, 1.45) }); intercom(g, 540, 640, 1.7, { t: lt, ring: 0, video: (p, w, h) => doorCam(p, w, h, { t: lt, draw: officer(lt) }) }); g.restore(); } },
+  { at: 'e2', draw(g, lt, D) { bg(g, '#1c1814', '#0e0c0a'); g.save(); cam(g, { x: 500, y: 830, z: slow(lt, D, 1.2, 1.45) }); intercom(g, 540, 640, 1.7, { t: lt, ring: 0, video: (p, w, h) => doorCam(p, w, h, { t: lt, draw: officer(lt) }) }); g.restore(); } },
   { at: 'e4', draw(g, lt, D) { phone(g, lt, D, (p, w, h) => twoLines(p, w, h, { t: lt, active: 1, sec1: 140, sec2: 90, alarm: 1 })); mood(g, { red: 0.08 }); } },
   { at: 'turn', noSubs: true, draw(g, lt) { g.fillStyle = '#000'; g.fillRect(0, 0, W, H); } },
   { at: 'e5', finish: { vignette: 0.7 }, draw(g, lt, D) { phone(g, lt, D, (p, w, h) => twoLines(p, w, h, { t: lt, active: 2, sec1: 141, sec2: 91, alarm: 1 }), { z0: 1.12, z1: 1.18 }); } },
