@@ -1,11 +1,12 @@
 name: cover-upload
 
 # 書き出し済みの回のカバーだけを VPS に送り直す（plan/covers/NNNN.jpg → NNNN_cover.jpg）。承認の状態は変えない
+# クイズは q 始まりの番号で（plan/covers/qNNN.jpg → クイズの投稿サーバーの 5NNN_cover.jpg）
 on:
   workflow_dispatch:
     inputs:
       ids:
-        description: '番号（カンマ区切り。例 0628,0629）'
+        description: '番号（カンマ区切り。例 0628,0629。クイズは q010,q011）'
         required: true
 
 jobs:
@@ -14,11 +15,16 @@ jobs:
     env:
       BASE: ${{ secrets.MOSHIMO_BASE_URL }}
       SECRET: ${{ secrets.MOSHIMO_SECRET }}
+      QBASE: ${{ secrets.QUIZ_BASE_URL }}
+      QSECRET: ${{ secrets.QUIZ_SECRET }}
     steps:
       - uses: actions/checkout@v4
       - name: Upload covers
         run: |
           for id in $(echo "${{ github.event.inputs.ids }}" | tr ',' ' '); do
             if [ ! -f "plan/covers/$id.jpg" ]; then echo "::warning::$id のカバーがない"; continue; fi
-            curl -fsS --retry 3 -T "plan/covers/$id.jpg" -H "X-Moshimo-Secret: $SECRET" "$BASE/upload/${id}_cover.jpg"; echo " $id"
+            case "$id" in
+              q*) N=$((5000 + 10#${id#q})); curl -fsS --retry 3 -T "plan/covers/$id.jpg" -H "X-Moshimo-Secret: $QSECRET" "$QBASE/upload/${N}_cover.jpg"; echo " $id -> $N" ;;
+              *) curl -fsS --retry 3 -T "plan/covers/$id.jpg" -H "X-Moshimo-Secret: $SECRET" "$BASE/upload/${id}_cover.jpg"; echo " $id" ;;
+            esac
           done
