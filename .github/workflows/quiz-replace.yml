@@ -54,6 +54,3 @@ jobs:
             done
             echo "REPLACED $N $ID $FILES"
           done
-            GOT=$(curl -fsSI "$BASE/media/$N.mp4" | awk 'tolower($1)=="content-length:"{print $2}' | tr -d '\r')
-            echo "REPLACED $N $ID local=$(stat -c %s out/$N.mp4) server=$GOT"
-          done
