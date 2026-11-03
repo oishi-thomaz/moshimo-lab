@@ -37,6 +37,12 @@ TikTok Claude の定期タスクが Mac の Claude アプリのブラウザ（@t
 - META：id・v2: true・answer（作品名）・title・titleHtml・mood・seed・hits・impacts・sfx・narr（読み方）・caption・hashtags（1つ目は タイトル当てクイズ）
 - 歌詞は使わない（著作権）。曲の回を作るときは、リリース年・主題歌になったドラマ・MVの設定・売れた数などのヒントで曲名を当てる形にする
 - 確認：`CHROME_PATH=<chrome> node tools/render.mjs --video qNNN --stills 0,0.4,3,10,15,19,23,27,31,35,40,44,47,51,58 --outdir out/stills` の静止画を全部見る（主役が隠れていないか・文字と札がかぶっていないか・札が画面から切れていないか）
+- カバー（表紙 1080x1920。2026/11/03 ゆうとの決定）：plan/quiz-covers.json に {"qNNN": {"t": 場面の秒数, "text": "1行目|2行目|3行目"}} を足す。書き出し（tools/build.sh）が tools/make_quiz_cover.py で作り、投稿サーバーがインスタに cover_url で付ける
+  - 上の札は種類で色分け：この映画なに？＝赤、このドラマなに？＝青、この曲なに？＝緑（META.title の この映画／このドラマ／この曲 から自動）
+  - 大きい字は答えがわからない程度のキャッチコピー（1〜3段目の中身から。決め手・国名・作品名・人物名は書かない）。3行・1行6文字前後まで（長い行があると全部の字が小さくなる）。最後の行が黄色
+  - 場面は1〜3段目の、その回にしかない絵。`node tools/render.mjs --video qNNN --stills 1,4,7,11,15 --glonly --outdir out/cv/qNNN` で見て選ぶ。札（tag）とコピーが同じ言葉にならない秒を選ぶ
+  - 作ったら `python3 tools/make_quiz_cover.py qNNN 絵.jpg plan/covers/qNNN.jpg` で一度作って目で見る（plan/covers/qNNN.jpg があれば書き出しはそれを使う）
+  - 書き出し済みの回のカバーだけ差し替えるときは plan/covers/qNNN.jpg を更新して cover-upload ワークフロー（inputs[ids]=q010,q011）
 - できたら plan/quiz-queue.txt の末尾に番号を足して main に push
 
 ## 自動投稿のセットアップ（1回だけ）

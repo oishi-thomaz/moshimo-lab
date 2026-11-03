@@ -28,7 +28,7 @@ jobs:
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y -qq ffmpeg fonts-noto-cjk
-          pip install --quiet numpy scipy
+          pip install --quiet numpy scipy pillow
       - name: Node packages
         run: npm ci --no-audit --no-fund
       - name: Narration cache

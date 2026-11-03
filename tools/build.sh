@@ -48,8 +48,15 @@ elif python3 -c "import json,sys;sys.exit(0 if '$ID' in json.load(open('plan/cov
     && python3 tools/make_covers.py --one "$ID" "$(ls out/cv_${ID}/*.jpg | head -1)" "out/${ID}_cover.jpg" \
     || echo "::warning::カバーが作れなかったので0秒目のまま"
   rm -rf "out/cv_${ID}"
+elif [[ "$ID" == q* ]] && python3 -c "import json,sys;sys.exit(0 if '$ID' in json.load(open('plan/quiz-covers.json')) else 1)"; then
+  # クイズ：plan/quiz-covers.json の文字（キャッチコピー）と場面の秒数から作る（tools/make_quiz_cover.py）
+  T=$(python3 -c "import json;print(json.load(open('plan/quiz-covers.json'))['$ID']['t'])")
+  node tools/render.mjs --video "$ID" --stills "$T" --glonly --outdir "out/cv_${ID}" >/dev/null \
+    && python3 tools/make_quiz_cover.py "$ID" "$(ls out/cv_${ID}/*.jpg | head -1)" "out/${ID}_cover.jpg" \
+    || echo "::warning::カバーが作れなかったので0秒目のまま"
+  rm -rf "out/cv_${ID}"
 else
-  echo "::warning::カバーの文字（plan/cover-lines.json）か場面（plan/cover-picks.json）がないので0秒目のまま"
+  echo "::warning::カバーの文字（plan/cover-lines.json・クイズは plan/quiz-covers.json）か場面がないので0秒目のまま"
 fi
 rm -rf "out/${ID}_video.mp4" "out/${ID}_bgm.wav" "out/${ID}_narr.wav" "out/${ID}_narr" "out/${ID}_sfx.wav" out/${ID}_*_trim.wav
 echo "built out/${ID}.mp4"
