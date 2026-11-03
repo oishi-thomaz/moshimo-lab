@@ -2,11 +2,14 @@
 # 仕上がった話を投稿サーバーへ送る（drama-out ブランチに置いて、drama-publish を動かす）
 #   bash drama/publish/send.sh kakusan 2
 #   NO_DISPATCH=1 で置くだけ（あとで drama-publish に 1001,1002 のようにまとめて渡す）
+#   表紙だけ差し替えるとき：NO_DISPATCH=1 で置いてから drama-publish を cover_only=true で動かす（承認の状態は変えない）
 set -euo pipefail
 S="${1:?series}"; N="${2:?no}"; NN=$(printf %02d "$N")
 cd "$(dirname "$0")/../.."
 MP4="out/drama/${S}_ep${NN}.mp4"; COV="out/drama/${S}_ep${NN}_cover.jpg"
 [ -f "$MP4" ] && [ -f "$COV" ] || { echo "動画か表紙がない：$MP4"; exit 1; }
+# 表紙に印を付ける（投稿サーバーは印のある表紙だけを インスタの cover_url・YouTube のサムネイルに使う。中身の絵はそのまま）
+python3 -c 'import sys;from PIL import Image;p=sys.argv[1];im=Image.open(p);im.load();assert im.size==(1080,1920),im.size;(b"moshimo-cover" in open(p,"rb").read(4096)) or im.convert("RGB").save(p,quality=95,comment=b"moshimo-cover")' "$COV"
 META=$(node drama/publish/meta.mjs "$S" "$N" "$MP4")
 ID=$(printf '%s' "$META" | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>console.log(JSON.parse(s).id))')
 W=$(mktemp -d)
