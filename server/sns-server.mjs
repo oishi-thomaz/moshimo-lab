@@ -283,7 +283,9 @@ function approvalBubble(acc, it, slotText) {
 }
 // 台本の承認：Claude が書いた台本の候補（投稿サーバーの /an/scripts）。承認・直してOK・見送り
 function scriptBubble(acc, x) {
-  const lines = (x.lines || []).map((l, i) => ({ type: 'box', layout: 'horizontal', spacing: 'sm', contents: [{ type: 'text', text: String(i + 1), size: 'xxs', color: '#999999', flex: 0 }, { type: 'text', text: nz(l), size: 'xs', color: '#222222', wrap: true, flex: 1 }] }));
+  // 台本は1つの文にまとめる（行ごとに部品を分けると、カルーセルの上限 50KB をすぐ超える）
+  const body = (x.lines || []).map((l, i) => `${i + 1}. ${String(l).trim()}`).join('\n');
+  const lines = body ? [{ type: 'text', text: body, size: 'xs', color: '#222222', wrap: true, lineSpacing: '3px' }] : [];
   return { type: 'bubble', size: 'mega',
     header: { type: 'box', layout: 'vertical', backgroundColor: acc.color, paddingAll: '12px', spacing: 'xs', contents: [
       line1(`台本 ${x.id}${x.pillar ? `・${x.pillar}` : ''}`, { color: '#E5E7EB', size: 'xxs' }),
@@ -313,8 +315,9 @@ async function pendingMessage() {
   const bubbles = [];
   for (const { acc, P } of all) if (P) P.items.forEach((it, k) => bubbles.push(approvalBubble(acc, it, k === 0 ? (P.nextSlot ? when(P.nextSlot) : '-') : '承認した順に次の枠')));
   for (const { acc, S } of all) for (const x of S) bubbles.push(scriptBubble(acc, x));
-  const msgs = [], chunks = [[head1, ...bubbles.slice(0, 11)]];
-  for (let i = 11; i < bubbles.length; i += 12) chunks.push(bubbles.slice(i, i + 12));
+  // 1つのカルーセルは12枚まで・JSON で 50KB まで（日本語は1文字3バイト）。余裕を見て 40KB で区切る
+  const msgs = [], chunks = [[head1]];
+  for (const b of bubbles) { const cur = chunks.at(-1); if (cur.length >= 12 || Buffer.byteLength(JSON.stringify([...cur, b])) > 40000) chunks.push([b]); else cur.push(b); }
   for (const c of chunks.slice(0, 5)) msgs.push({ type: 'flex', altText: `承認待ち ${total}本${scripts ? `・台本 ${scripts}本` : ''}`, contents: { type: 'carousel', contents: c } });
   return msgs;
 }
