@@ -137,6 +137,7 @@ CHROME_PATH=<chromium> node tools/render.mjs --video NNNN --stills 0,0.4,1,2,3,1
 - scenes/cedar.js：スギの人工林（林道・手前の大きなスギ HERO・斜面に並ぶ森・遠くの山）と花粉の雲。makeCedarTree(h, seed)（雄花の粒つき、.userData.flowers(on)）、setPollen(k, t)（花粉の粒）、puff(k, t)（黄色い花粉の雲）、setForest(k)（森の量）、setCedarEnv で day / haze / clear
 - scenes/foodlineup.js：ブランドなしのローポリ食べ物（makeRiceBowl / makeRiceBag / makeOil / makeBread / makeSugar / makeSoy / makeEgg）と、メーター付きの5つの台座のラインナップ（fLineup、FSLOTS、setFoods(makers, names, scales)、setFSlot(i, {show, meter, word, glow, t, label})、fLineupIdle）。ヤバい順の食べ物回用
 - scenes/office.js：会社のオフィスの部品（0635 から）。makeMeetingRoom()（会議室：左の窓・長机・椅子6脚・ホワイトボード。userData.board.set(['行', ...], {color}) で文字、chairs・seats）、makeDeskIsland(n)（向かい合わせの事務机とモニター。userData.seats）、makeSuit({old, bald, glasses, woman, tie, jacket})（スーツの会社員）、ポーズ poseClear / poseSit / poseBelly(p, k, t, {stand})（お腹を押さえてうずくまる・立ったまま前かがみ）/ poseSlump（机に突っ伏す）/ poseCheer / posePoint、makeSweat()（冷や汗。頭に付けて userData.set(k, t)）
+- scenes/hanko.js：判子と書類の部品（どのシーンにも置ける）。makeHanko()（大きな判子。原点が印面）と hankoSlam(h, [x,y,z], t, 押す秒, {from, up}) でドンと押す、makeMark(文字, {sub}) は押した跡（赤い丸枠の文字。手前に描く）、makeDoc({title, rows, head, w, h}) は見出しの帯と記入欄の書類（userData.fill(i, 文字) で欄に書く）。出禁・取消・課税のハンコ、ノルマ表・申告書に使う
 
 ## 着地は人への影響で言い切る（2026/10/20 ゆうとの指摘・最重要）
 - 結果は「何がいくつ消えた」で終わらせない。それで人間の暮らし・お金・体・心がどう変わったかを数字で言い切る（例：蚊の回＝マラリアだけで年61万人が助かる）。
