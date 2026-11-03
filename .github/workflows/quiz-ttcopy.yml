@@ -1,0 +1,29 @@
+# TikTok の下書きを送り直すための写し：投稿サーバーの NNNN（動画・説明・カバー）を別の番号 MMMM に写して受け付けさせる。
+# 送った扱いになっていて下書きを送り直せない回を、MMMM として /an/action ttdraft で送り直すため。写したあとは MMMM を却下にする（インスタには出ない）
+# 使い方：inputs[pairs]=5008:5108 5010:5110
+name: quiz-ttcopy
+
+on:
+  workflow_dispatch:
+    inputs:
+      pairs:
+        description: '元の番号:写す番号（スペース区切り）'
+        required: true
+
+jobs:
+  copy:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      BASE: ${{ secrets.QUIZ_BASE_URL }}
+      SECRET: ${{ secrets.QUIZ_SECRET }}
+    steps:
+      - name: Copy
+        run: |
+          for P in ${{ github.event.inputs.pairs }}; do
+            A=${P%%:*}; B=${P##*:}
+            curl -fsS "$BASE/media/$A.mp4" -o "$B.mp4"; curl -fsS "$BASE/media/$A.json" -o "$B.json"; curl -fsS "$BASE/media/${A}_cover.jpg" -o "${B}_cover.jpg" || true
+            for f in "$B.mp4" "$B.json" "${B}_cover.jpg"; do [ -s "$f" ] && { curl -fsS --retry 3 -T "$f" -H "X-Moshimo-Secret: $SECRET" "$BASE/upload/$f"; echo; }; done
+            curl -fsS -X POST "$BASE/hook/new" -H "X-Moshimo-Secret: $SECRET" -H 'content-type: application/json' -d "{\"id\":\"$B\"}"; echo
+            echo "COPIED $A -> $B $(stat -c %s $B.mp4)"
+          done
