@@ -18,7 +18,7 @@
 
 | アカウント | 中身 | 投稿 | 在庫の数え方 | 作り方 | 書き出し | 解析・日報 | TikTok |
 |---|---|---|---|---|---|---|---|
-| もしもラボ（moshimo、@moshimo__lab） | もしも○○したら？の3D解説（約60秒） | 1日3本 12:00・18:00・20:30（インスタ・YouTube 自動） | plan/queue.txt にあって state/rendered.txt にない本数 | docs/PRODUCTION.md・plan/STRATEGY.md・plan/RULES.md | daily-render.yml を3回（1本ずつ順番に） | moshimo-analytics の ANALYST.md | moshimo-analytics の TIKTOK.md（Chrome・Claude in Chrome） |
+| もしもラボ（moshimo、@moshimo__lab） | もしも○○したら？の3D解説（約60秒） | 1日4本 12:00・16:00・19:00・22:00（インスタ・YouTube 自動。2026/11/03〜） | plan/queue.txt にあって state/rendered.txt にない本数 | docs/PRODUCTION.md・plan/STRATEGY.md・plan/RULES.md | daily-render.yml を3回（1本ずつ順番に） | moshimo-analytics の ANALYST.md | moshimo-analytics の TIKTOK.md（Chrome・Claude in Chrome） |
 | タイトル当てクイズ（quiz、@title_ate_quiz） | 映画・ドラマのタイトル当て3D（約64秒） | 1日5本 12:00・15:00・18:00・20:00・22:00（立ち上げの1か月） | plan/quiz-queue.txt にあって state/quiz-rendered.txt にない本数 | docs/QUIZ.md | quiz-render.yml を1回（count=5） | この下の 日報（サーバー型） | docs/QUIZ-TIKTOK.md（Claude アプリのブラウザ） |
 | いつわ劇場（itsuwa、@itsuwa_drama） | 1話3分・全5話のショートドラマ | 1日1話 20:00 | docs/ITSUWA-AUTO.md の 1 | docs/ITSUWA-AUTO.md | なし（作った話をその場で送る） | この下の 日報（サーバー型） | なし（投稿サーバーが TikTok の下書きに送る） |
 
@@ -49,7 +49,7 @@
 
 ## 声（Gemini TTS）の1日の上限
 - 1つのキー（Google Cloud プロジェクト）につき、gemini-3.8-flash-tts が1日100回、予備の gemini-3.8-flash-lite-tts も1日100回（Tier 1）。1行の字幕につき1回使う（もしもラボ1本で約15回、クイズ1本で約17回。同じ文は前に作った声を使い回すので数えない）。
-- キーはアカウントごとに分ける：もしもラボ GEMINI_API_KEY（1日3本で約45回）、クイズ GEMINI_API_KEY_QUIZ（1日5本で約85回。未登録のあいだは GEMINI_API_KEY を使う）、いつわ劇場 GEMINI_API_KEY_DRAMA（1話で約30〜45行、撮り直しを入れて40〜60回なので1日1話まで）。
+- キーはアカウントごとに分ける：もしもラボ GEMINI_API_KEY（1日4本で約60回）、クイズ GEMINI_API_KEY_QUIZ（1日5本で約85回。未登録のあいだは GEMINI_API_KEY を使う）、いつわ劇場 GEMINI_API_KEY_DRAMA（1話で約30〜45行、撮り直しを入れて40〜60回なので1日1話まで）。
 - 上限に当たると声なしでは作らずに書き出しが止まる。上限が戻るのは毎日17:00（日本時間。米国の夏時間のあいだは16:00）。
 
 ## 共通の決めごと
@@ -69,7 +69,7 @@
    - 月曜はマネタイズの確認も：下の 収益化の条件 を見て、届きそうなものや申請できるものがあれば、そのアカウントの日報の お願い に1行で書く。
    - 日報の カード は SNS司令室の朝のまとめに、分かったこと・やったこと・お願い（と キャプション の section）が載る（数字はまとめ側が自分で出すので、カードの数字の section は載らない）。なので 分かったこと・やったこと・お願い を必ず items で書く。
 3. 書き出し：解析で在庫の順番を変えたものを push してから、アカウント一覧の 書き出し を全部動かす。
-   - もしもラボ：daily-render.yml を番号なしで3回。同時に1本しか待機できない（2本目を予約すると前の待機分が取り消される）ので、1本目が in_progress になってから次を予約する。1本20分くらい。
+   - もしもラボ：daily-render.yml を番号なしで4回（2026/11/03〜 1日4本投稿のため）。同時に1本しか待機できない（2本目を予約すると前の待機分が取り消される）ので、1本目が in_progress になってから次を予約する。1本20分くらい。
    - クイズ：quiz-render.yml を1回だけ（inputs[count]=5）。1本10〜12分で、1本できるごとに LINE に承認カードが届く。
    - 両方とも終わるまで待つ。落ちた回は 2. 見張り の直し方で直して、同じ番号で1回だけやり直す（同じ回を二重に上げない。もしもラボは state/rendered.txt、クイズは state/quiz-rendered.txt を確かめてから）。在庫が空なら その旨だけ。
 4. 月曜だけ：週の振り返りを SNS司令室に1通送る。reports/outbox/week-YYYY-MM-DD.json に {"card": {"title": "週の振り返り M/D", "sections": [{"head": "<アカウント名>", "items": ["伸びた型（数字つき）", "やめる型", "来週の方針", "実際に変えたこと"]}, …3アカウント分]}} を書いて commit・push し、`node tools/run.mjs notice reports/outbox/week-YYYY-MM-DD.json`。収益化の条件（下の 収益化の条件）に近づいたアカウントがあれば、その数字も items に入れる。
@@ -111,13 +111,13 @@
 2. 先に 修正の指示を取り込む（上）をやる。そのあと、アカウントごとに在庫を数えて、作るかどうかを決める：
    - もしもラボ（2026/11/03〜 台本は承認制。ゆうとの決定）：
      a. 返事を取り込む：collect のあとの moshimo-analytics の data/state.json の scripts を見る。status が ok（この台本でOK）と fix（直してOK。feedback の指示どおりに直す）で done がないものを、今回ぜんぶ動画にする（下の 3.）。plan/scripts.md の状態を 承認済み（fix は 承認済み（修正あり）と指示を書き写す）にし、動画にしたら 制作済み NNNN にする。skip は 見送り にする。動画にした台本は reports/outbox/scripts-done-YYYY-MM-DD.json に {"done": ["S11", ...]} を書いて `node tools/run.mjs scripts <ファイル>`。
-     b. 台本の候補を出す：在庫（投稿サーバーの承認待ちと承認済み＋書き出し前の回＋承認済みでまだ動画にしてない台本）が15本（5日分）を下回っていて、返事待ちの台本（scripts の status が waiting）がなければ、台本の候補を10本書く。ゆうとの作業は毎朝8:00の1回だけなので、台本の候補（この日）→ 返事（翌朝8:00）→ 動画にする（翌日10:47）→ 書き出し（翌々日6:15）→ 動画の承認（同8:00）→ 投稿（次の空き枠）と3日ほどかかる。切れる前に出す。plan/STRATEGY.md の 00（皮肉回が主軸。当たっている柱で自信があるものも入れてよい、自信がないものは入れない）と docs/PRODUCTION.md の 2. 構成 に従う。plan/reserve.txt の回も、作り直して自信があるものは候補にしてよい。番号は plan/scripts.md の続き（S11〜）。1本ごとに 14行前後の台本・質問・根拠（なぜ当たるか、どの数字に近いか）を書き、数字は一次資料で確かめたものだけ。
+     b. 台本の候補を出す：在庫（投稿サーバーの承認待ちと承認済み＋書き出し前の回＋承認済みでまだ動画にしてない台本）が20本（5日分）を下回っていて、返事待ちの台本（scripts の status が waiting）がなければ、台本の候補を12本書く。ゆうとの作業は毎朝8:00の1回だけなので、台本の候補（この日）→ 返事（翌朝8:00）→ 動画にする（翌日10:47）→ 書き出し（翌々日6:15）→ 動画の承認（同8:00）→ 投稿（次の空き枠）と3日ほどかかる。切れる前に出す。plan/STRATEGY.md の 00（皮肉回が主軸。当たっている柱で自信があるものも入れてよい、自信がないものは入れない）と docs/PRODUCTION.md の 2. 構成 に従う。plan/reserve.txt の回も、作り直して自信があるものは候補にしてよい。番号は plan/scripts.md の続き（S11〜）。1本ごとに 14行前後の台本・質問・根拠（なぜ当たるか、どの数字に近いか）を書き、数字は一次資料で確かめたものだけ。
      c. plan/scripts.md に 返事待ち で足して commit・push し、moshimo-analytics の reports/outbox/scripts-YYYY-MM-DD.json に {"add": [{"id": "S11", "title": "もしも〇〇が消えたら？", "pillar": "社会の消えたら", "lines": ["1行目", ...], "ask": "質問", "note": "根拠を1行"}, ...]} を書いて commit・push、`node tools/run.mjs scripts <ファイル>` で SNS司令室の 承認待ち に出す。続けて reports/outbox/scripts-YYYY-MM-DD-notice.json に {"message": "もしもラボの台本の候補を10本、承認待ちに入れた。この台本でOK・直してOK・見送り を押して。"} を書いて `node tools/run.mjs notice <ファイル>`（1通）。
      d. 返事が来るまで、承認されていない台本は動画にしない。
    - クイズ：在庫が20本を下回っていたら20本になるまで作る（1回で最大6本。品質を落として数を合わせない）。
    - いつわ劇場：docs/ITSUWA-AUTO.md の 1。作るのは1日1話まで（今日すでに1話送っていれば作らない）。
 3. 作るアカウントごとに、サブエージェント（Agent ツール、general-purpose）を1つずつ同時に立てて任せる。同じフォルダで同時に git を使うとぶつかるので、先に `cp -r /home/claude/moshimo-lab /home/claude/work-<アカウント>` でアカウントごとの作業フォルダを作り、そこで作業させる（push の前に git pull --rebase）。サブエージェントへの依頼には、作業フォルダ、作る本数、そのアカウントの作り方（下）、共通の決めごと、最後に作った番号・作品名・在庫を返すこと、を書く。
-   - もしもラボ：作るのは a. で取り込んだ承認済みの台本だけ（台本の文はそのまま使う。fix は指示どおりに直してから）。moshimo-analytics の notes/insights.md・最新の analysis/YYYY-MM-DD.md の 傾向・data/tiktok-studio.jsonl を読んで、伸びている型・避ける型を反映する。plan/STRATEGY.md（最優先。特に 0. 2026/11/02〜の方針 と 8. TikTok基準の作り）→ docs/PRODUCTION.md（最後まで。2. 構成 の v2 の形）→ plan/RULES.md の順に読んで完全に従う。何を作るかは PRODUCTION.md の決め方（blueprint の priority → 1日3本＝社会の消えたら2本＋人体の限界1本、挑戦は週3本まで（挑戦の回は META に trial: true）→ 柱は series ごとに no 順）。新しい回は全部 META に v2: true と hookLine と series。0秒目＝サムネ・0.6秒以内に異変・いつもの日常なし・10〜12秒ごとに次を見たくなる一言・61〜65秒。在庫に v2 になっていない回が残っていたら v2 に作り直す（見本は engine/videos/0102.js）。queue には 社会の消えたら・人体の限界・社会の消えたら の並びで差し込む。数字は必ず WebSearch・WebFetch で一次資料まで確かめ、確かめられない数字は使わない。1本ごとに静止画（0・0.4・1・2・3秒を含む15枚）を書き出して全部目で見て、0秒目がサムネとして成り立つか・0.6秒までに異変があるか・隠れ・文字のかぶり・はみ出し・暗すぎ・エラーがないかを確かめてから commit。新しい再利用シーンは PRODUCTION.md のシーン一覧に足す。避けるもの：実在の国が消える話・戦争・実在の人物（政治家・有名人・ネットミームの元の人も）・実在ブランドの見た目・生々しいグロ・食事や水を極端に削るお題。
+   - もしもラボ：作るのは a. で取り込んだ承認済みの台本だけ（台本の文はそのまま使う。fix は指示どおりに直してから）。moshimo-analytics の notes/insights.md・最新の analysis/YYYY-MM-DD.md の 傾向・data/tiktok-studio.jsonl を読んで、伸びている型・避ける型を反映する。plan/STRATEGY.md（最優先。特に 0. 2026/11/02〜の方針 と 8. TikTok基準の作り）→ docs/PRODUCTION.md（最後まで。2. 構成 の v2 の形）→ plan/RULES.md の順に読んで完全に従う。何を作るかは PRODUCTION.md の決め方（blueprint の priority → 1日4本＝社会の消えたら3本＋人体の限界1本（2026/11/03〜。4本目は当たり型だけ）、挑戦は週3本まで（挑戦の回は META に trial: true）→ 柱は series ごとに no 順）。新しい回は全部 META に v2: true と hookLine と series。0秒目＝サムネ・0.6秒以内に異変・いつもの日常なし・10〜12秒ごとに次を見たくなる一言・61〜65秒。在庫に v2 になっていない回が残っていたら v2 に作り直す（見本は engine/videos/0102.js）。queue には 皮肉（社会の消えたら・図星）・人体の限界・皮肉・皮肉（2026/11/03〜 1日4本。皮肉が続くところは 社会の消えたら と 図星 を交互にする） の並びで差し込む。数字は必ず WebSearch・WebFetch で一次資料まで確かめ、確かめられない数字は使わない。1本ごとに静止画（0・0.4・1・2・3秒を含む15枚）を書き出して全部目で見て、0秒目がサムネとして成り立つか・0.6秒までに異変があるか・隠れ・文字のかぶり・はみ出し・暗すぎ・エラーがないかを確かめてから commit。新しい再利用シーンは PRODUCTION.md のシーン一覧に足す。避けるもの：実在の国が消える話・戦争・実在の人物（政治家・有名人・ネットミームの元の人も）・実在ブランドの見た目・生々しいグロ・食事や水を極端に削るお題。
    - クイズ：docs/QUIZ.md を最後まで読んで完全に従う。見本は engine/videos/q001.js〜q003.js と quiz-kit.js。moshimo-analytics の notes/quiz-insights.md があれば作品選びに反映する。作品はこれまでの回（engine/videos/q*.js の META.answer）と重ならないこと、日本の Netflix・U-NEXT・Prime Video・DMM TV・Hulu・FOD・Disney+ のどれかで今見放題か（JustWatch 日本版かサービスの作品ページを実際に開く）、誰でも知ってる作品か（Filmarks のレビュー数が映画5万件以上・ドラマとアニメはシーズン1で3万件以上。曲はストリーミング認定プラチナ以上）、Filmarks の点数が目安3.8以上か（作品ページを実際に開く）を確かめる。サービスは偏らせない。動画とキャプションで登録やリンクを勧める宣伝はしない（サービス名は答えのカードとハッシュタグだけ）。オールジャンル・国やジャンルが続かない・映画とドラマ半々。あらすじの事実は公式か信頼できる紹介ページで確かめたものだけ、結末・犯人・どんでん返しの中身は書かない。作品の映像・ポスター・俳優の顔・ロゴ・有名なシーンの構図は使わない。歌詞は使わない。1本ごとに静止画15枚以上を全部目で見て120点にし、カバー（docs/QUIZ.md の カバー。plan/quiz-covers.json と plan/covers/qNNN.jpg）も作って目で見てから plan/quiz-queue.txt の末尾に足して commit。
    - いつわ劇場：docs/ITSUWA-AUTO.md の 2〜5。moshimo-analytics の notes/itsuwa-insights.md があれば反映する。
 4. 全部のサブエージェントが終わったら、作業フォルダが全部 push 済みか確かめて、作業フォルダを消す。
