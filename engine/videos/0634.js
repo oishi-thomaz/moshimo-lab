@@ -4,7 +4,7 @@ import { cam, lift, look, runStory, endCard, makeSparkles, setTop, setHud, el } 
 import { makeWoman, makeMan, label, pop } from '../satire-kit.js';
 
 // もしも幼稚園が専業主婦専用になったら？（皮肉回・台本 S10）
-// 2026/11/02 ゆうと承認（専業ママ→専業主婦に修正）。元ネタ：Togetter「預かり保育をやめてほしい、ワーママが風邪を広めるから」
+// 2026/11/02 ゆうと承認（専業ママ→専業主婦に修正）。2026/11/03 ゆうとの修正の指示で、専業主婦側の言い分（働く母親の子が風邪を持ち込む）のくだりを 6.7秒に足した。元ネタ：Togetter「預かり保育をやめてほしい、ワーママが風邪を広めるから」
 // 数字（裏取り済み）：
 //  幼稚園の在園者数 1,339,761人（平成28年度）→ 627,450人（令和8年度 速報）文部科学省 学校基本調査
 //  預かり保育を実施している幼稚園 90.9%（令和5年度 幼児教育実態調査）文部科学省
@@ -43,6 +43,10 @@ const HOUSEWIFE = makeWoman({ shirt: '#f2c6d0', hair: '#3a2620' }); S.add(HOUSEW
 const WORKMOM = makeWoman({ shirt: '#2b3346', hair: '#1d1a19' }); S.add(WORKMOM); const bag = box(0.36, 0.28, 0.12, mat('#5a3a2a')); bag.position.set(0.32, 0.8, 0); WORKMOM.add(bag);
 const KH = kid(0), KW = kid(1); S.add(KH); S.add(KW);
 const PLAY = [0, 1, 2, 3, 4, 5].map(i => { const k = kid(i); S.add(k); return k; });
+const HW2 = makeWoman({ shirt: '#f6dca8', hair: '#5a3a28' }); S.add(HW2);
+const HW3 = makeWoman({ shirt: '#d8c4ec', hair: '#2a1e1a' }); S.add(HW3);
+const sneeze = label('くしゅん', { w: 512, size: 100, color: '#222', bg: 'rgba(255,255,255,.95)', sx: 1.15 }); S.add(sneeze);
+const hiso = label('ひそひそ…', { w: 640, size: 96, color: '#fff', bg: 'rgba(120,70,110,.92)', sx: 1.35 }); S.add(hiso);
 const kaze = label('これで風邪をもらわない', { w: 1024, size: 96, color: '#222', bg: 'rgba(255,255,255,.95)', sx: 2.2 }); S.add(kaze);
 
 // ---------- B：数字（x=60） ----------
@@ -89,10 +93,10 @@ const okane = label('嫌ってた相手のお金', { w: 1024, size: 110, color: 
 const coins = makeSparkles(160, 0.22, 0xffd27a); S.add(coins.points); coins.init([[0, 2.2, -4]], 3.5, 2.5);
 
 function reset() {
-  [HOUSEWIFE, WORKMOM, KH, KW, ...PLAY, ...WMS, ...WKS].forEach(p => { poseReset(p); p.visible = true; p.rotation.set(0, 0, 0); });
+  [HOUSEWIFE, HW2, HW3, WORKMOM, KH, KW, ...PLAY, ...WMS, ...WKS].forEach(p => { poseReset(p); p.visible = true; p.rotation.set(0, 0, 0); });
   HOUSEWIFE.position.set(-0.5, 0, 1.6); KH.position.set(0.2, 0, 1.7); WORKMOM.position.set(-0.4, 0, 2.6); KW.position.set(0.3, 0, 2.7);
   PLAY.forEach((k, i) => k.position.set(-3 + i * 1.2, 0, -3.4 + (i % 2) * 0.8));
-  gate(0); led.material.color.set('#22e06a'); senyo.visible = false; kaze.visible = false; KG.visible = true; kgSign.material.opacity = 1;
+  gate(0); led.material.color.set('#22e06a'); senyo.visible = false; kaze.visible = false; HW2.visible = HW3.visible = false; sneeze.visible = hiso.visible = false; KG.visible = true; kgSign.material.opacity = 1;
   barA.scale.y = barB.scale.y = 0.001; vA.visible = vB.visible = false; DOTS.forEach(d => d.material.color.set('#cfd6de')); azukari.visible = false;
   NOTICE.visible = true; XS.forEach(l => l.visible = false); min30.visible = false; car.position.set(DX - 30, 0, -1); komaranai.visible = false;
   komatta.visible = false; okane.visible = false; coins.set(0);
@@ -114,6 +118,19 @@ function shot1(t) { // 幼稚園が、専業主婦の子ども専用になった
   HOUSEWIFE.position.set(-0.3, 0, -1.4); KH.position.set(0.4, 0, -1.3); WORKMOM.position.set(-0.4, 0, 1.4); KW.position.set(0.3, 0, 1.5); WORKMOM.rotation.y = Math.PI; KW.rotation.y = Math.PI; WORKMOM.userData.head.rotation.x = 0.3;
   gateCam(1);
   setTop('幼稚園', '専業主婦の家の子だけ', fade(t, 0.15, 3.2, 0.25), PINK);
+  return S;
+}
+function shotM(t) { // 専業主婦たちの言い分：働く母親の子が風邪を持ち込む（ルールができた理由）
+  reset(); lift(220); gate(0); KH.visible = false;
+  HW2.visible = HW3.visible = true;
+  [[HOUSEWIFE, -1.55, 1.6], [HW2, -0.95, 2.0], [HW3, -0.35, 1.6]].forEach(([w, x, z], i) => { w.position.set(x, 0, z); w.rotation.y = 0.75 - i * 0.1; w.userData.head.rotation.y = 0.25; w.userData.arms[0].rotation.x = -0.5; w.userData.arms[1].rotation.x = -0.35 - (i === 2 ? 0.6 * clamp((t - 1.6) / 0.3) : 0); });
+  HW2.userData.head.rotation.z = 0.25 * Math.sin(clamp((t - 1.3) / 0.4) * Math.PI);
+  WORKMOM.position.set(1.55, 0, 1.7); WORKMOM.rotation.y = -0.5; KW.position.set(0.85, 0, 1.95); KW.rotation.y = -0.7;
+  const sn = clamp((t - 0.7) / 0.25) * (1 - clamp((t - 1.2) / 0.3)); KW.userData.head.rotation.x = sn * 0.6;
+  sneeze.position.set(0.6, 1.32, 2.1); pop(sneeze, t, 0.75, 0.25, 1.0);
+  hiso.position.set(-0.95, 2.35, 1.9); pop(hiso, t, 1.3, 0.3, 1.35);
+  look(0.1, 2.6, 9.6, 0.1, 1.0, 1.0, 52);
+  setTop('ルールができた理由', '風邪は預かり保育から', fade(t, 0.15, 3.6, 0.25), PINK);
   return S;
 }
 function shot2(t) { // 専業主婦は喜ぶ。これで風邪をもらってこない
@@ -188,7 +205,7 @@ function shot13(t) { // 嫌ってた相手のお金で、居場所が回って�
   reset(); lift(0); gate(0); WORKMOM.position.set(1.2, 0, -2.4); KW.position.set(1.9, 0, -2.6); HOUSEWIFE.position.set(-1.6, 0, -2.4); KH.position.set(-0.9, 0, -2.6); HOUSEWIFE.rotation.y = 0.6; WORKMOM.rotation.y = -0.6;
   coins.set(clamp((t - 0.4) / 3.6)); okane.position.set(0, 5.15, -3.4); pop(okane, t, 0.6, 0.35, 2.3);
   look(0, 3.0, 6.0, 0, 2.2, -3.4, 52);
-  setTop('園を回していたのは', '嫌ってた相手のお金', fade(t, 0.3, 4.0, 0.25), GOLD);
+  setTop('園を回していたのは', '嫌ってた相手のお金', fade(t, 0.3, 4.2, 0.25), GOLD);
   return S;
 }
 function shot14(t) { // 質問。最後は冒頭と同じ構図（門が閉まったまま）
@@ -200,25 +217,26 @@ function shot14(t) { // 質問。最後は冒頭と同じ構図（門が閉ま�
 
 const SUBS = [
   [3.2, 6.6, '幼稚園が、専業主婦の<br>子ども専用になった。'],
-  [6.7, 10.2, '専業主婦は喜ぶ。<br>これで風邪をもらってこない。'],
-  [10.3, 13.9, '園児は10年で、<br>134万から63万に。'],
-  [14.0, 17.6, 'しかも9割の幼稚園が、<br>預かり保育をしている。'],
-  [17.7, 21.3, '1か月後、園の掲示板に<br>1枚の紙が貼られる。'],
-  [21.4, 25.0, '園児が足りないので、<br>来年で閉園します。'],
-  [25.1, 28.8, '働く母親の家の子どもで、<br>園は成り立っていた。'],
-  [28.9, 32.5, '近くの幼稚園も、<br>次々に閉まっていく。'],
-  [32.6, 36.3, '専業主婦は毎朝、車で<br>30分かけて遠くの園へ。'],
-  [36.4, 40.0, '一方、働く母親たちは<br>保育園へ移って困っていない。'],
-  [40.1, 44.2, '一番困ったのは、<br>ルールを作った側だった。'],
-  [44.3, 50.0, '結果：専業主婦の園は、<br>専業主婦だけじゃ守れない。'],
-  [50.1, 55.0, '嫌ってた相手のお金で、<br>居場所が回っていたのかも。'],
-  [55.1, 61.3, '専業主婦と働く母親、<br>分かり合える？'],
+  [6.7, 10.5, '専業主婦の言い分。<br>働く母親の子が風邪を持ち込む。'],
+  [10.6, 14.1, '専業主婦は喜ぶ。<br>これで風邪をもらってこない。'],
+  [14.2, 17.8, '園児は10年で、<br>134万から63万に。'],
+  [17.9, 21.5, 'しかも9割の幼稚園が、<br>預かり保育をしている。'],
+  [21.6, 25.0, '1か月後、園の掲示板に<br>1枚の紙が貼られる。'],
+  [25.1, 28.2, '園児が足りないので、<br>来年で閉園します。'],
+  [28.3, 32.0, '働く母親の家の子どもで、<br>園は成り立っていた。'],
+  [32.1, 35.4, '近くの幼稚園も、<br>次々に閉まっていく。'],
+  [35.5, 39.2, '専業主婦は毎朝、車で<br>30分かけて遠くの園へ。'],
+  [39.3, 42.9, '一方、働く母親たちは<br>保育園へ移って困っていない。'],
+  [43.0, 46.4, '一番困ったのは、<br>ルールを作った側だった。'],
+  [46.5, 52.2, '結果：専業主婦の園は、<br>専業主婦だけじゃ守れない。'],
+  [52.3, 56.6, '嫌ってた相手のお金で、<br>居場所が回っていたのかも。'],
+  [56.7, 61.3, '専業主婦と働く母親、<br>分かり合える？'],
 ];
 const shots = [
-  { a: 0, b: 3.2, f: shot0 }, { a: 3.2, b: 6.7, f: shot1 }, { a: 6.7, b: 10.3, f: shot2 }, { a: 10.3, b: 14.0, f: shot3 },
-  { a: 14.0, b: 17.7, f: shot4 }, { a: 17.7, b: 21.4, f: shot5 }, { a: 21.4, b: 25.1, f: shot6 }, { a: 25.1, b: 28.9, f: shot7 },
-  { a: 28.9, b: 32.6, f: shot8 }, { a: 32.6, b: 36.4, f: shot9 }, { a: 36.4, b: 40.1, f: shot10 }, { a: 40.1, b: 44.3, f: shot11 },
-  { a: 44.3, b: 50.1, f: shot12 }, { a: 50.1, b: 55.1, f: shot13 }, { a: 55.1, b: 61.6, f: shot14 }, { a: 61.6, b: 65.6, f: endCard },
+  { a: 0, b: 3.2, f: shot0 }, { a: 3.2, b: 6.7, f: shot1 }, { a: 6.7, b: 10.6, f: shotM }, { a: 10.6, b: 14.2, f: shot2 }, { a: 14.2, b: 17.9, f: shot3 },
+  { a: 17.9, b: 21.6, f: shot4 }, { a: 21.6, b: 25.1, f: shot5 }, { a: 25.1, b: 28.3, f: shot6 }, { a: 28.3, b: 32.1, f: shot7 },
+  { a: 32.1, b: 35.5, f: shot8 }, { a: 35.5, b: 39.3, f: shot9 }, { a: 39.3, b: 43.0, f: shot10 }, { a: 43.0, b: 46.5, f: shot11 },
+  { a: 46.5, b: 52.3, f: shot12 }, { a: 52.3, b: 56.7, f: shot13 }, { a: 56.7, b: 61.6, f: shot14 }, { a: 61.6, b: 65.6, f: endCard },
 ];
 runStory({
   shots, subs: SUBS, duration: 65.6, camera: cam,
@@ -231,11 +249,11 @@ runStory({
     cat: '社会・仕事',
     title: 'もしも幼稚園が専業主婦専用になったら？',
     titleHtml: 'もしも幼稚園が<br>専業主婦専用に<br>なったら？',
-    mood: 'tension', seed: 634, hits: [0.5, 44.3, 50.1], risers: [40.1], impacts: [6.7, 10.3, 14.0, 21.4, 25.1, 28.9, 36.4, 44.3],
-    sfx: [[0.5, 'whoosh'], [0.8, 'buzz'], [7.3, 'bubble'], [18.2, 'whoosh'], [29.3, 'buzz'], [29.8, 'buzz'], [30.3, 'buzz'], [37.2, 'bubble'], [50.6, 'whoosh']],
+    mood: 'tension', seed: 634, hits: [0.5, 46.5, 52.3], risers: [43.0], impacts: [10.6, 14.2, 17.9, 25.1, 28.3, 32.1, 39.3, 46.5],
+    sfx: [[0.5, 'whoosh'], [0.8, 'buzz'], [8.0, 'whoosh'], [11.2, 'bubble'], [22.1, 'whoosh'], [32.5, 'buzz'], [33.0, 'buzz'], [33.5, 'buzz'], [40.1, 'bubble'], [52.8, 'whoosh']],
     narr: { '134万': 'ひゃくさんじゅうよんまん', '63万': 'ろくじゅうさんまん', '9割': 'きゅうわり', '結果：': '結果、', '専業主婦': 'せんぎょうしゅふ' },
     ask: '専業主婦と働く母親、分かり合える？',
-    caption: 'もしも幼稚園が、専業主婦の家の子ども専用になったら？\n\n専業主婦は喜ぶ。これで風邪をもらってこない。\nでも幼稚園の子どもは、10年で134万人から63万人に。しかも9割の幼稚園が、預かり保育をしている。\n1か月後、園の掲示板に1枚の紙。園児が足りないので、来年で閉園します。\n近くの幼稚園も次々に閉まって、専業主婦は毎朝、車で30分かけて遠くの園へ。\n一方、働く母親たちは保育園へ移って、何も困っていない。\n\n結果：専業主婦の園は、専業主婦だけじゃ守れない。\n嫌ってた相手のお金で、居場所が回っていたのかもしれない。\n\n専業主婦と働く母親、分かり合える？ コメントで教えて。\n\n※風刺ネタです\n出典：文部科学省「学校基本調査」（幼稚園の在園者数 平成28年度 1,339,761人→令和8年度速報 627,450人）／文部科学省「令和5年度 幼児教育実態調査」（預かり保育の実施 90.9%）',
+    caption: 'もしも幼稚園が、専業主婦の家の子ども専用になったら？\n\n言い出したのは専業主婦たち。働く母親の家の子が、預かり保育で風邪をもらってきて園に広める、と。\n専業主婦は喜ぶ。これで風邪をもらってこない。\nでも幼稚園の子どもは、10年で134万人から63万人に。しかも9割の幼稚園が、預かり保育をしている。\n1か月後、園の掲示板に1枚の紙。園児が足りないので、来年で閉園します。\n近くの幼稚園も次々に閉まって、専業主婦は毎朝、車で30分かけて遠くの園へ。\n一方、働く母親たちは保育園へ移って、何も困っていない。\n\n結果：専業主婦の園は、専業主婦だけじゃ守れない。\n嫌ってた相手のお金で、居場所が回っていたのかもしれない。\n\n専業主婦と働く母親、分かり合える？ コメントで教えて。\n\n※風刺ネタです\n出典：文部科学省「学校基本調査」（幼稚園の在園者数 平成28年度 1,339,761人→令和8年度速報 627,450人）／文部科学省「令和5年度 幼児教育実態調査」（預かり保育の実施 90.9%）',
     hashtags: ['もしもラボ', 'もしも', '幼稚園', '専業主婦', 'ワーママ'],
     endStats: [['幼稚園の子ども', '134万→63万人', '2016→2026年'], ['預かり保育をしている園', '90.9%', '2023年度'], ['園を回していたのは', '嫌ってた相手', 'かもしれない']],
     sources: '出典：文部科学省「学校基本調査」「幼児教育実態調査」',
