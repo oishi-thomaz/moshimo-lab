@@ -94,8 +94,7 @@ jobs:
                 continue
               fi
             fi
-            # LINE のカードで見分けられるよう、タイトルに答えを足す（インスタのキャプションは caption を使うので見る人には出ない）
-            node -e "const fs=require('fs');const f='out/$ID.json';const m=JSON.parse(fs.readFileSync(f,'utf8'));m.id='$N';m.quizId='$ID';if(m.answer)m.title=m.answer+'｜'+m.title;fs.writeFileSync('out/$N.json',JSON.stringify(m,null,2))"
+            node tools/quiz-meta.mjs "$ID"   # 答え付きの title（LINE 用）と、答えなしの TikTok キャプション ttCaption
             cp "out/$ID.mp4" "out/$N.mp4"; cp "out/${ID}_cover.jpg" "out/${N}_cover.jpg"
             for f in "$N.mp4" "$N.json" "${N}_cover.jpg"; do
               curl -fsS --retry 3 -T "out/$f" -H "X-Moshimo-Secret: $SECRET" "$BASE/upload/$f"; echo
