@@ -155,3 +155,6 @@ CHROME_PATH=<chromium> node tools/render.mjs --video NNNN --stills 0,0.4,1,2,3,1
 - バッジ（META.series）は、その柱シリーズの回だけに付ける。違うシリーズ名を付けない。
 - カバー画像は tools/make_covers.py で作る（文字の改行は plan/cover-lines.json に手で書く。1行7文字前後、区切りのいい所で）。絵は動画の中の、その回にしかないシーンを使う（似た回で同じ絵を使い回さない）。
 - 付け方：TikTok は TikTok Studio の投稿編集 → カバーを編集 → 今のカバーの×で消す → カバーをアップロード → 保存 → ページ下の保存（投稿後7日以内・1日1回まで。予約中の投稿は編集できない）。YouTube は Studio の動画の詳細 → サムネイル → ファイルをアップロード → 保存（期限なし）。インスタはスマホのアプリから。
+- 新しい回を作ったら、その場でカバーも決める（2026/11/03 ゆうと：今後は予約のときにカバーも付ける）：plan/cover-lines.json に文字（| で改行）、plan/cover-picks.json に場面の秒数（その回にしかない絵。`node tools/render.mjs --video NNNN --stills 6,16,26,36,46,54 --glonly --outdir out/cv/NNNN` で見て選ぶ）。手で仕上げたいときは plan/covers/NNNN.jpg を置く（そちらが優先）。柱の色は META.series から決まる（柱がない回はミントの もしもラボ）。
+- 書き出し（tools/build.sh）がカバーを作って VPS に送る。投稿サーバーはインスタに cover_url、YouTube に thumbnails.set で付けて出す（JPEG のコメント moshimo-cover が付いたカバーだけ）。TikTok は予約の定期タスクが TikTok Studio でカバーをアップロードする（moshimo-analytics の TIKTOK.md 3.4）。
+- 書き出し済みの回のカバーだけ差し替えるときは plan/covers/NNNN.jpg を更新して cover-upload ワークフロー（ids に番号）を動かす。承認の状態は変わらない。

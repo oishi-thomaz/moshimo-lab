@@ -26,6 +26,16 @@ P['0035']='ヤバい順'; P['0721']='ヤバい順'; PICK['0721']='out/cover10/07
 for v in '0533 0036 0604'.split(): P[v]='もしもラボ'
 T10=dict(x.split(':') for x in '0532:036 0533:026 0534:006 0024:046 0036:036 0467:006 0016:026 0010:016 0604:016 0275:006 0028:016 0013:006 0603:016 0012:026 0033:036 0022:006 0602:006 0501:006 0006:054 0601:036 0027:054 0005:046 0032:046 0031:046 0021:006 0004:006 0007:006 0003:006 0035:006 0002:026 0025:046 0001:006 0034:036'.split())
 for v,t in T10.items(): PICK[v]=f'out/cover10/{v}/*t{t}*'
+SER={'図星':'図星','人体の限界':'人体の限界','絶滅ボタン':'絶滅ボタン','お財布のもしも':'お財布のもしも','ヤバい順':'ヤバい順','全員で同時に':'全員で同時に','社会の消えたら':'社会の消えたら'}
+def pillar(v):
+  if v in P: return P[v]
+  try:
+    m=re.search(r"series:\s*['\"]([^'\"]+)",open(f'engine/videos/{v}.js').read())
+    if m and m.group(1) in SER: return SER[m.group(1)]
+  except Exception: pass
+  return 'もしもラボ'
+# これからの回：場面の秒数は plan/cover-picks.json（{"0635": 26} のように）。書き出し（tools/build.sh）がその秒の絵を撮ってカバーを作る
+PK=json.load(open('plan/cover-picks.json')) if os.path.exists('plan/cover-picks.json') else {}
 def font(s): return ImageFont.truetype(F,s,index=0)
 BRK='がをにのはでとへ、'
 def chunks(t):
@@ -68,11 +78,12 @@ def layout(t,maxw=960):
   c4=best.get(4)
   if c3 and (not c4 or c3[0]>=c4[0]-16): return c3
   return c4 or c3
+SRC=None
 def make(v):
   lines=json.load(open('plan/cover-lines.json'))[v].split('|')
   size=164 if len(lines)<4 else 140
   while max(font(size).getlength(x) for x in lines)>960: size-=4
-  srcp=glob.glob((PICK[v] if PICK[v].startswith('out/') else 'out/cover7/'+PICK[v])+'.jpg')[0] if v in PICK else (glob.glob(f'out/cover/{v}/*.jpg') or glob.glob(f'out/cover7/{v}/*.jpg'))[0]
+  srcp=SRC or (glob.glob((PICK[v] if PICK[v].startswith('out/') else 'out/cover7/'+PICK[v])+'.jpg')[0] if v in PICK else (glob.glob(f'out/cover/{v}/*.jpg') or glob.glob(f'out/cover7/{v}/*.jpg'))[0])
   top=478+len(lines)*(size+12)
   off=max(380,top-430)+{'0629':-180,'0634':60}.get(v,0)
   src=Image.open(srcp).convert('RGB').resize((1080,1920))
@@ -80,7 +91,7 @@ def make(v):
   grad=Image.new('L',(1080,1920),0); gd=ImageDraw.Draw(grad)
   for y in range(1920): gd.line([(0,y),(1080,y)],fill=int(255*max(0,min(1,(top+70-y)/230))))
   bg=Image.composite(Image.new('RGB',(1080,1920),(12,12,22)),bg,grad); d=ImageDraw.Draw(bg)
-  name=P[v]; f=font(68); w=d.textlength(name,font=f)
+  name=pillar(v); f=font(68); w=d.textlength(name,font=f)
   d.rounded_rectangle([540-w/2-48,330,540+w/2+48,446],radius=58,fill=COL[name]); d.text((540,386),name,font=f,fill=(255,255,255),anchor='mm')
   y=478
   for i,s in enumerate(lines):
@@ -88,8 +99,11 @@ def make(v):
   return bg,lines,size
 os.makedirs('out/cover9',exist_ok=True)
 import sys
+if len(sys.argv)>1 and sys.argv[1]=='--one':
+  # 書き出し用：python3 tools/make_covers.py --one NNNN 絵.jpg 出力.jpg
+  SRC=sys.argv[3]; im,l,sz=make(sys.argv[2]); im.save(sys.argv[4],quality=92,comment=b'moshimo-cover'); print('cover',sys.argv[2],sz,l); sys.exit(0)
 for v in (sys.argv[1:] or TT):
-  im,l,s=make(v); im.save(f'out/cover9/{v}_cover.jpg',quality=95); print(v,s,l)
+  im,l,s=make(v); im.save(f'out/cover9/{v}_cover.jpg',quality=95,comment=b'moshimo-cover'); print(v,s,l)
 ims=sorted(glob.glob('out/cover9/*_cover.jpg'))
 S=Image.new('RGB',(180*7,240*5),'white')
 for i,f in enumerate(ims): S.paste(Image.open(f).crop((0,240,1080,1680)).resize((180,240)),((i%7)*180,(i//7)*240))

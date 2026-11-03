@@ -20,7 +20,7 @@ import crypto from 'node:crypto';
 const env = process.env;
 const PORT = Number(env.PORT || 8787);
 const PREFIX = (env.PREFIX || '/moshimo').replace(/\/$/, '');
-const VERSION = '2026-11-03a';                                 // update-servers.sh で入れ替わったかの確かめ用（/health に出る）
+const VERSION = '2026-11-03b';                                 // update-servers.sh で入れ替わったかの確かめ用（/health に出る）
 const BRAND = env.BRAND || 'もしもラボ';                           // LINE の文言に出す名前
 const APPROVAL_NOW = env.APPROVAL_NOW === '1';                    // 1：動画が届いたらすぐ承認カードを送る（まとめを待たない）
 const TT_UPLOAD = env.TT_UPLOAD === '1';                          // 1：投稿と同時に TikTok の下書きへ送る
@@ -421,6 +421,10 @@ async function igOnce(method, p, params = {}) {
   return j;
 }
 const sleep = ms => new Promise(r => setTimeout(r, ms));
+// 文字入りのカバーか（tools/make_covers.py が JPEG のコメントに moshimo-cover と書いている。0秒目の切り出しには付かない）
+function isCover(id) {
+  try { return fs.readFileSync(path.join(MEDIA, `${id}_cover.jpg`)).subarray(0, 4096).includes('moshimo-cover'); } catch { return false; }
+}
 
 async function publish(id) {
   const it = state.items[id]; const m = meta(id);
@@ -430,6 +434,8 @@ async function publish(id) {
     // 挑戦枠の回（META.trial）はインスタのお試しリールで出す：まずフォロワー以外にだけ見せ、数字がよければインスタが自動で一覧（グリッド）に出す。
     // コケた回は一覧に載らないので、プロフィールの見え方を崩さずに新しい型を試せる（2026/11/02 ゆうとの決定）。使えないアカウント・エラーのときはふつうのリールで出す
     const params = { media_type: 'REELS', video_url: `${BASE_URL}/media/${id}.mp4`, caption, share_to_feed: true };
+    // 2026/11/03 ゆうと：カバー（文字入りの表紙）を付けて出す。NNNN_cover.jpg が 1080x1920 の表紙のときだけ（0秒目の切り出しは付けない）
+    if (isCover(id)) params.cover_url = `${BASE_URL}/media/${id}_cover.jpg`;
     let c = null;
     if (m.trial) {
       try { c = await ig('POST', `/${IG_USER_ID}/media`, { ...params, trial_params: { graduation_strategy: 'SS_PERFORMANCE' } }, 2); it.igTrial = true; }
@@ -590,6 +596,10 @@ async function youtube(id, quiet = false) {
     }
     it.yt = { videoId, at: Date.now() }; save();
     log('youtube', id, videoId);
+    if (isCover(id)) { // カバーをサムネイルに（失敗しても投稿はそのまま）
+      try { await yt('POST', `https://www.googleapis.com/upload/youtube/v3/thumbnails/set?videoId=${videoId}`, fs.readFileSync(path.join(MEDIA, `${id}_cover.jpg`)), { 'content-type': 'image/jpeg' }); it.yt.thumb = true; save(); log('yt thumb', id); }
+      catch (e) { log('yt thumb error', id, String(e.message).slice(0, 200)); }
+    }
     if (m.ask) await yt('POST', 'https://www.googleapis.com/youtube/v3/commentThreads?part=snippet', JSON.stringify({ snippet: { videoId, topLevelComment: { snippet: { textOriginal: `${m.ask} コメントで教えて！` } } } }), { 'content-type': 'application/json' }).catch(e => log('yt comment', e.message));
     return done({ ok: true, url: `https://youtube.com/shorts/${videoId}` });
   } catch (e) {

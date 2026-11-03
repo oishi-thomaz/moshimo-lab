@@ -38,5 +38,18 @@ fi
 # cover image（0秒目＝サムネイル。v2 の動画は0秒目がサムネになるように作っている）
 if grep -q "v2: *true" "engine/videos/${ID}.js"; then CT=0; else CT=1.2; fi
 ffmpeg -v error -y -ss $CT -i "out/${ID}.mp4" -frames:v 1 -q:v 3 "out/${ID}_cover.jpg"
+# 2026/11/03 ゆうと：カバー（文字入りの表紙 1080x1920）を投稿の時に付ける。plan/covers/NNNN.jpg があればそれ、
+# なければ plan/cover-lines.json（文字）と plan/cover-picks.json（場面の秒数）から作る。どちらもなければ上の0秒目のまま
+if [ -f "plan/covers/${ID}.jpg" ]; then
+  cp "plan/covers/${ID}.jpg" "out/${ID}_cover.jpg"; echo "cover: plan/covers/${ID}.jpg"
+elif python3 -c "import json,sys;sys.exit(0 if '$ID' in json.load(open('plan/cover-lines.json')) and '$ID' in json.load(open('plan/cover-picks.json')) else 1)"; then
+  T=$(python3 -c "import json;print(json.load(open('plan/cover-picks.json'))['$ID'])")
+  node tools/render.mjs --video "$ID" --stills "$T" --glonly --outdir "out/cv_${ID}" >/dev/null \
+    && python3 tools/make_covers.py --one "$ID" "$(ls out/cv_${ID}/*.jpg | head -1)" "out/${ID}_cover.jpg" \
+    || echo "::warning::カバーが作れなかったので0秒目のまま"
+  rm -rf "out/cv_${ID}"
+else
+  echo "::warning::カバーの文字（plan/cover-lines.json）か場面（plan/cover-picks.json）がないので0秒目のまま"
+fi
 rm -rf "out/${ID}_video.mp4" "out/${ID}_bgm.wav" "out/${ID}_narr.wav" "out/${ID}_narr" "out/${ID}_sfx.wav" out/${ID}_*_trim.wav
 echo "built out/${ID}.mp4"
