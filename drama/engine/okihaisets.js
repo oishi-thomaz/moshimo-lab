@@ -276,7 +276,7 @@ export function sakiLock(p, w, h, { t = 0, call = 0, clock = '23:41', num = '090
   figure(p, OP.kenBare, { x: w * 0.66, y: h * 1.04, s: 1.3 * s, eyes: 'normal', mouth: 'smile', lightFrom: 'left', arms: [40, -20, 10, 0], turn: -0.2, shadow: false });
   vgrad(p, 0, 0, w, h * 0.4, [[0, 'rgba(0,0,0,.45)'], [1, 'rgba(0,0,0,0)']]);
   text(p, clock, w / 2, h * 0.14, { size: 150 * s, color: '#fff', weight: 500 });
-  text(p, '11月9日 月曜日', w / 2, h * 0.055, { size: 34 * s, color: 'rgba(255,255,255,.9)', weight: 600 });
+  text(p, '11月6日 金曜日', w / 2, h * 0.055, { size: 34 * s, color: 'rgba(255,255,255,.9)', weight: 600 });
   if (call > 0) {
     p.save(); p.globalAlpha = clamp(call * 2);
     fillRR(p, 0, 0, w, h, 0, 'rgba(8,10,16,.82)');
