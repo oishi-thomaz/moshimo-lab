@@ -52,7 +52,8 @@ function doneToday() {
 const runsToday = () => (ghj(`repos/${REPO}/actions/workflows/${WF}/runs?per_page=50&created=>=${sinceIso}`).workflow_runs || []);
 const logsOf = id => (ghj(`repos/${REPO}/actions/runs/${id}/jobs`).jobs || []).map(j => { try { return gh(`repos/${REPO}/actions/jobs/${j.id}/logs`); } catch { return ''; } }).join('\n');
 function stock(n) {
-  if (process.env.CI) try { execFileSync('git', ['pull', '-q', '--ff-only'], { stdio: 'ignore' }); } catch {}
+  // 在庫は必ず最新の main で数える（古いままだと書き出し済みの回をもう一度選んでしまう）。取れなければ例外で止める
+  if (process.env.CI) { execFileSync('git', ['fetch', '-q', '--depth=1', 'origin', 'main']); execFileSync('git', ['reset', '-q', '--hard', 'origin/main']); }
   const out = execFileSync('node', [acct === 'quiz' ? 'tools/quiz-next.mjs' : 'tools/next.mjs', String(n)], { encoding: 'utf8' }).trim();
   return out ? out.split(/\s+/) : [];
 }
