@@ -283,7 +283,7 @@ export function memoScreen(p, w, h, { t = 0, play = 0, playing = 0 } = {}) {
 // rows=[[日付,摘要,金額]]、hi＝黄色のマーカー 0..1（上から順に引く）
 export function passbook(g, { t = 0, rows = [], hi = 0, title = '普通預金' } = {}) {
   vgrad(g, -300, -300, W + 600, H + 600, [[0, '#2a241c'], [1, '#14110c']]);
-  g.save(); g.translate(540, 700); g.rotate(-0.03);
+  g.save(); g.translate(540, 600); g.rotate(-0.03);
   g.shadowColor = 'rgba(0,0,0,.6)'; g.shadowBlur = 50; fillRR(g, -470, -480, 940, 960, 10, '#efe9d6'); g.shadowColor = 'transparent';
   fillRR(g, -470, -480, 940, 110, 10, '#5a7088'); text(g, title, -420, -425, { size: 46, color: '#fff', align: 'left', weight: 800 }); text(g, '井上 タツオ 様', 420, -425, { size: 36, color: '#fff', align: 'right', weight: 700 });
   const cx = [-430, -180, 160, 420];
@@ -450,4 +450,30 @@ export function wheelchair(g, P, { x = 540, y = 1700, s = 1, ...o } = {}) {
   // ひざかけ
   fillRR(g, x - 170 * s, y - 230 * s, 160 * s, 140 * s, 20 * s, o.blanket || '#8a6a5a');
   head(g, P, x - 6 * s, y - 470 * s - r * 0.9, r, o);
+}
+
+// ---------- 第3話から ----------
+// 家の車の写真（3号棟の前の駐車場・昼）。dent＝前のへこみ（最終話）
+export function carPhoto2(g, w, h, { dent = 0 } = {}) {
+  vgrad(g, 0, 0, w, h, [[0, '#a9c3d6'], [1, '#e6dcc6']]);
+  fillRR(g, 0, h * 0.1, w, h * 0.5, 0, '#c9c4b6'); for (let i = 0; i < 5; i++) fillRR(g, w * 0.04 + i * w * 0.2, h * 0.16, w * 0.13, h * 0.1, 2, '#8a96a2');
+  vgrad(g, 0, h * 0.6, w, h * 0.4, [[0, '#8a8680'], [1, '#6a665e']]);
+  const s = w / 600, x = w * 0.5, y = h * 0.8;
+  g.save(); g.translate(x, y); g.scale(s, s);
+  ell(g, 0, 18, 270, 22, 'rgba(0,0,0,.3)');
+  fillRR(g, -260, -100, 520, 100, 40, '#8a2a2e'); poly(g, [[-150, -100], [-90, -190], [110, -190], [180, -100]], '#8a2a2e');
+  poly(g, [[-130, -104], [-82, -178], [0, -178], [0, -104]], '#bcd0e0'); poly(g, [[14, -104], [14, -178], [100, -178], [160, -104]], '#bcd0e0');
+  for (const wx of [-160, 160]) { circ(g, wx, 0, 46, '#1a1a1a'); circ(g, wx, 0, 20, '#9a9a9a'); }
+  fillRR(g, 230, -70, 30, 20, 6, '#ffe8a8');
+  if (dent) { g.save(); g.globalAlpha = dent; ell(g, 236, -40, 26, 30, 'rgba(30,10,10,.45)'); line(g, 220, -60, 250, -20, 3, '#3a1414'); g.restore(); }
+  g.restore();
+  g.save(); g.globalAlpha = 0.14; g.fillStyle = '#e8c890'; g.fillRect(0, 0, w, h); g.restore();
+}
+// たんすの引き出しの中の通帳の束
+export function passbookDrawer(g, { t = 0, open = 1 } = {}) {
+  vgrad(g, -300, -300, W + 600, H + 600, [[0, '#3a2a1e'], [1, '#1e160f']]);
+  fillRR(g, 90, 520, 900, 700, 10, '#5a4434'); fillRR(g, 120, 550, 840, 640, 6, '#2a1e16');
+  for (let i = 0; i < 9; i++) { const x = 170 + (i % 5) * 150, y = 640 + Math.floor(i / 5) * 230 + (i % 2) * 14; g.save(); g.translate(x + 60, y + 90); g.rotate((i % 3 - 1) * 0.05); fillRR(g, -60, -90, 120, 180, 6, i % 2 ? '#4a6a8a' : '#5a7a98'); fillRR(g, -60, -90, 120, 34, 6, '#3a5272'); text(g, '通帳', 0, 10, { size: 26, color: '#e8eef4', weight: 800 }); g.restore(); }
+  line(g, 170, 980, 900, 980, 6, '#c9b48a'); // 輪ゴムの束
+  fillRR(g, 60, 1220, 960, 70, 8, '#4a3626'); fillRR(g, 470, 1240, 140, 20, 8, '#c9b48a');
 }
