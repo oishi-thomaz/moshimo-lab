@@ -31,7 +31,7 @@ const SHOTS = [
   // ── 冒頭：玄関のリョウ → 母のメッセージ
   { at: 'cold', off: -0.3, finish: { vignette: 0.7 }, draw(g, lt, D) { g.save(); cam(g, { x: 540, y: 800, z: 1.3 }); doorInside(g, { open: 1, P: P.ryo, o: { eyes: 'normal', brow: 0.1 }, porch: 0.8 }); g.restore(); } },
   { at: 'k1', finish: { vignette: 0.7 }, draw(g, lt, D, S) { ryo(g, lt, D, S, ['k1'], { eyes: 'normal', brow: 0.1, mouth: 'line', back: g2 => { bg(g2, '#0e0d12', '#07070a'); glow(g2, 540, 380, 520, 'rgba(255,214,150,1)', 0.25); }, lightFrom: 'right' }); } },
-  { at: 'k2', finish: { vignette: 0.6 }, draw(g, lt, D) { lockS(g, lt, D, { clock: '23:41', notifs: [{ t: -1, name: '母', av: '母', col: '#5a6a7a', body: 'その子に、会わないで。', time: '今' }] }); } },
+  { at: 'k2', finish: { vignette: 0.6 }, draw(g, lt, D) { lockS(g, lt, D, { own: true, clock: '23:41', notifs: [{ t: -1, name: '母', av: '母', col: '#5a6a7a', body: 'その子に、会わないで。', time: '今' }] }); } },
   { at: 'k3', finish: { vignette: 0.65 }, draw(g, lt, D) { ryoAltar(g, lt, D, { x: 420, y: 900, z0: 1.0, z1: 1.12, eyes: 'narrow' }); } },
   { at: 'title', noSubs: true, finish: { vignette: 0.55, grainA: 0.1 }, draw(g, lt) { bg(g, '#030405', '#08090c'); cover(g, lt); } },
 

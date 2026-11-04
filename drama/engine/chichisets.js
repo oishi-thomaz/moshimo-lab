@@ -94,7 +94,7 @@ export function oppView(g, { t = 0, dawn = 0, lit = [[0, 3], [3, 1], [1, 4], [4,
     g.save(); g.globalAlpha = sil; g.beginPath(); g.rect(OPP.x - 106, OPP.y - 86, 212, 152); g.clip();
     const hx = OPP.x + 10, hy = OPP.y - 20;
     ell(g, hx, hy, 30, 36, '#1a1210'); ell(g, hx, hy + 80, 70, 50, '#1a1210');
-    if (wave) { const a = Math.sin(t * 6) * 0.35 * wave; g.save(); g.translate(hx + 50, hy + 50); g.rotate(-0.9 + a); fillRR(g, -10, -80, 20, 80, 10, '#1a1210'); circ(g, 0, -82, 13, '#1a1210'); g.restore(); }
+    if (wave) { const a = Math.sin(t * 6) * 0.25 * wave; g.save(); g.translate(hx + 66, hy + 50); g.rotate(lerp(0.9, 0.15, wave) + a); fillRR(g, -11, -110, 22, 110, 11, '#1a1210'); circ(g, 0, -114, 17, '#1a1210'); g.restore(); }
     g.restore();
   }
   if (ih > 0) { g.save(); g.globalAlpha = ih; ihai(g, OPP.x - 40, OPP.y + 10, 0.55); candle(g, OPP.x + 30, OPP.y + 52, t, 0.6, 1); g.restore(); }
@@ -188,10 +188,10 @@ export function danchiNight(g, { t = 0, dawn = 0, litA = 1, litB = 0 } = {}) {
 // ---------- スマホの画面 ----------
 const AV = (p, x, y, r, s, col = '#6a5a4a') => { circ(p, x, y, r, col); text(p, s, x, y + r * 0.06, { size: r * 1.0, color: '#fff', weight: 900 }); };
 // ロック画面（全画面）。notifs=[{t,name,body,time,av}]。date＝'12月5日 土曜日'
-export function lock(g, { t = 0, date = '12月5日 土曜日', clock = '7:00', notifs = [], dim = 0, glowA = 1 } = {}) {
-  vgrad(g, -300, -300, W + 600, H + 600, [[0, '#121a30'], [0.6, '#0c1222'], [1, '#070a14']]);
-  // 壁紙：夜明けの窓の写真（父が撮った向かいの棟）
-  g.save(); g.globalAlpha = 0.14; oppView(g, { t, dawn: 0.3, frame: 0, tLit: 0, lit: [] }); g.restore();
+export function lock(g, { t = 0, date = '12月5日 土曜日', clock = '7:00', notifs = [], dim = 0, glowA = 1, own = false } = {}) {
+  vgrad(g, -300, -300, W + 600, H + 600, own ? [[0, '#2a1e30'], [0.6, '#160f1c'], [1, '#0a070e']] : [[0, '#121a30'], [0.6, '#0c1222'], [1, '#070a14']]);
+  // 壁紙：父のスマホは夜明けの窓の写真（向かいの棟）。own＝ナツキのスマホ（無地）
+  if (!own) { g.save(); g.globalAlpha = 0.14; oppView(g, { t, dawn: 0.3, frame: 0, tLit: 0, lit: [] }); g.restore(); }
   vgrad(g, -300, -300, W + 600, H + 600, [[0, 'rgba(8,12,24,.55)'], [1, 'rgba(8,12,24,.8)']]);
   text(g, date, 540, 200, { size: 42, color: 'rgba(255,255,255,.85)', weight: 500 });
   text(g, clock, 540, 330, { size: 190, color: '#f4f6fa', weight: 500 });
@@ -379,7 +379,7 @@ export function kazumiRoom(g, { t = 0, dawn = 0, P = {}, ihai: ih = 1, candleOn 
   glow(g, 540, 100, 900, 'rgba(255,230,190,1)', 0.18 * (1 - dawn));
 }
 // 4階から見下ろした交差点（カズミの窓の中）
-export function crossingDown(g, { t = 0, dawn = 0, man = 0 } = {}) {
+export function crossingDown(g, { t = 0, dawn = 0, man = 0, car = -1 } = {}) {
   vgrad(g, 0, 0, W, H, [[0, mix('#1a2030', '#8a96aa', dawn)], [1, mix('#10141e', '#6a7080', dawn)]]);
   // 道路（斜めの十字）
   poly(g, [[-200, 900], [W + 200, 600], [W + 200, 1100], [-200, 1400]], mix('#22252c', '#55575c', dawn));
@@ -389,6 +389,8 @@ export function crossingDown(g, { t = 0, dawn = 0, man = 0 } = {}) {
   line(g, 300, 800, 270, 1300, 10, '#9a9a96'); circ(g, 290, 1040, 22, '#f4f1ea'); circ(g, 270, 1060, 16, '#f4f1ea');
   // 信号
   line(g, 240, 700, 240, 1000, 10, '#3a3c40'); fillRR(g, 210, 660, 60, 90, 8, '#1a1c20'); circ(g, 240, 690, 14, '#ff5a4a'); glow(g, 240, 690, 90, 'rgba(255,90,74,1)', 0.4);
+  // 走り去る赤い車（運転席に女の影）
+  if (car >= 0) { const k = car, x = lerp(1250, -250, k), y = lerp(856, 1160, k); g.save(); g.translate(x, y); g.rotate(-0.2); g.scale(-1, 1); g.shadowColor = 'rgba(0,0,0,.4)'; g.shadowBlur = 20; fillRR(g, -150, -66, 300, 132, 40, '#8a2a2e'); g.shadowColor = 'transparent'; fillRR(g, -60, -54, 150, 108, 26, '#4a1a1e'); fillRR(g, 40, -50, 50, 100, 14, '#9ab0c8'); circ(g, 64, -22, 16, '#1a1210'); circ(g, 76, -34, 9, '#1a1210'); g.restore(); }
   if (man) figure(g, { hair: 'parted', hairC: '#8a8580', top: '#3a3e48', top2: '#2e323a', bottom: '#2a2a30', shoes: '#111', tall: 1 }, { x: 300, y: 1080, s: 0.5, lightFrom: 'left' });
 }
 

@@ -79,9 +79,9 @@ const SHOTS = [
   { at: 'e2', finish: { vignette: 0.7 }, draw(g, lt, D) { shock(g, lt, D, {}); } },
 
   // ── 5. 引き：母から
-  { at: 'buzz', finish: { vignette: 0.6 }, draw(g, lt, D) { const sh = noise1(lt * 40, 3) * 8; g.save(); g.translate(sh, 0); lockS(g, lt, D, { date: '12月5日 土曜日', clock: '23:41', notifs: [{ t: 0.1, name: '母', av: '母', col: '#5a6a7a', body: 'その子に、会わないで。', time: '今' }] }); g.restore(); } },
-  { at: 'e3', finish: { vignette: 0.6 }, draw(g, lt, D) { lockS(g, lt, D, { date: '12月5日 土曜日', clock: '23:41', notifs: [{ t: -1, name: '母', av: '母', col: '#5a6a7a', body: 'その子に、会わないで。', time: '今' }] }); } },
-  { at: 'e4', finish: { vignette: 0.65 }, draw(g, lt, D) { lockS(g, lt, D, { date: '12月5日 土曜日', clock: '23:41', notifs: [{ t: -1, name: '母', av: '母', col: '#5a6a7a', body: 'その子に、会わないで。', time: '今' }], z0: 1.0, z1: 1.12 }); mood(g, { red: 0.06 * inv(0, 1, lt) }); } },
+  { at: 'buzz', finish: { vignette: 0.6 }, draw(g, lt, D) { const sh = noise1(lt * 40, 3) * 8; g.save(); g.translate(sh, 0); lockS(g, lt, D, { own: true, date: '12月5日 土曜日', clock: '23:41', notifs: [{ t: 0.1, name: '母', av: '母', col: '#5a6a7a', body: 'その子に、会わないで。', time: '今' }] }); g.restore(); } },
+  { at: 'e3', finish: { vignette: 0.6 }, draw(g, lt, D) { lockS(g, lt, D, { own: true, date: '12月5日 土曜日', clock: '23:41', notifs: [{ t: -1, name: '母', av: '母', col: '#5a6a7a', body: 'その子に、会わないで。', time: '今' }] }); } },
+  { at: 'e4', finish: { vignette: 0.65 }, draw(g, lt, D) { lockS(g, lt, D, { own: true, date: '12月5日 土曜日', clock: '23:41', notifs: [{ t: -1, name: '母', av: '母', col: '#5a6a7a', body: 'その子に、会わないで。', time: '今' }], z0: 1.0, z1: 1.12 }); mood(g, { red: 0.06 * inv(0, 1, lt) }); } },
   { at: 'e5', finish: { vignette: 0.75 }, draw(g, lt, D) { g.save(); cam(g, { x: 540, y: 800, z: slow(lt, D, 1.12, 1.4) }); ryoDoor(1, { eyes: 'normal', brow: 0.2 })(g); g.restore(); mood(g, { dark: 0.15 + inv(D - 0.8, D, lt) }); } },
   { at: 'end', noSubs: true, draw(g, lt) { endCard(g, lt, { SERIES, EPISODE }); } },
 ];
