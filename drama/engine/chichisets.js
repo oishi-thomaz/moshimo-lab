@@ -477,3 +477,24 @@ export function passbookDrawer(g, { t = 0, open = 1 } = {}) {
   line(g, 170, 980, 900, 980, 6, '#c9b48a'); // 輪ゴムの束
   fillRR(g, 60, 1220, 960, 70, 8, '#4a3626'); fillRR(g, 470, 1240, 140, 20, 8, '#c9b48a');
 }
+
+// ---------- 第4話から ----------
+// 4号棟405の玄関（外の廊下から）。open 0..1、P＝ドアの中に立つ人
+export function door405(g, { t = 0, open = 0, P = null, o = {}, dawn = 0, name = '相馬' } = {}) {
+  vgrad(g, -300, -300, W + 600, H + 600, [[0, mix('#1a1c22', '#5a5e68', dawn)], [1, mix('#101216', '#3a3c42', dawn)]]);
+  toneRect(g, -300, -300, W + 600, H + 600, 'rgba(0,0,0,.2)', 10, 2.2);
+  // 廊下の天井灯
+  fillRR(g, 440, 60, 200, 30, 8, '#e8e4d8'); glow(g, 540, 90, 700, 'rgba(255,240,210,1)', 0.35);
+  // ドア枠
+  fillRR(g, 250, 280, 580, 1200, 4, '#4a4c52');
+  g.save(); rr(g, 270, 300, 540, 1180, 2); g.clip();
+  vgrad(g, 270, 300, 540, 1180, [[0, '#6a5440'], [1, '#3a2c22']]); glow(g, 540, 500, 500, 'rgba(255,214,160,1)', 0.45 * open);
+  if (P && open > 0.2) figure(g, P, { x: 540, y: 1480, s: 1.3, lightFrom: 'right', ...o });
+  g.restore();
+  // ドア（左に開く）
+  const dw = 540 * (1 - ease(clamp(open)));
+  fillRR(g, 270, 300, Math.max(10, dw), 1180, 2, '#7a7e86');
+  if (dw > 120) { fillRR(g, 270 + dw - 70, 860, 26, 110, 10, '#c9ced4'); fillRR(g, 270 + dw / 2 - 90, 420, 180, 70, 6, '#e8e4d8'); text(g, '405', 270 + dw / 2, 446, { size: 38, color: '#2a2a2a', weight: 900 }); text(g, name, 270 + dw / 2, 476, { size: 22, color: '#4a4a4a', weight: 800 }); fillRR(g, 270 + dw / 2 - 60, 640, 120, 24, 4, '#5a5e66'); }
+  // 廊下の床
+  vgrad(g, -300, 1480, W + 600, 700, [[0, mix('#2a2c30', '#6a6a66', dawn)], [1, '#141518']]);
+}
