@@ -1,0 +1,60 @@
+name: render-chain
+
+# 書き出しの自動運転（Claude を使わない。2026/11/05〜）。毎日の定期タスクが待たなくていいように、ここで daily-render・quiz-render を順番に動かして終わるまで見る
+#  5:20（日本時間）：今日の本数（ops/render.json。なければ もしもラボ4・クイズ5）を書き出す → 8:00 の承認に間に合う
+#  17:20：朝が声の1日の上限（17:00 に戻る）で止まった続きだけ。朝の cron が動かなかった日は、ここで今日の分を全部やる
+#  落ちた回は同じ番号で1回だけ自動でやり直す。2回落ちたら止める（毎日の定期タスクの Claude が tools/watch-check.mjs で見て直す）
+#  何回動いても、今日もう書き出せた本数は数えて引くので二重にならない。手で動かすときは workflow_dispatch（dry=true なら動かさずに出すだけ）
+on:
+  schedule:
+    - cron: '20 20 * * *'   # 5:20 JST
+    - cron: '20 8 * * *'    # 17:20 JST
+  workflow_dispatch:
+    inputs:
+      only:
+        description: 'moshimo / quiz（空なら両方）'
+        required: false
+      dry:
+        description: 'true なら動かさずに出すだけ'
+        required: false
+        default: 'false'
+
+permissions:
+  actions: write
+  contents: read
+
+concurrency:
+  group: render-chain
+  cancel-in-progress: false
+
+jobs:
+  moshimo:
+    if: inputs.only == '' || inputs.only == 'moshimo' || github.event_name == 'schedule'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 330
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: daily-render を順番に
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node tools/render-chain.mjs moshimo ${{ inputs.dry == 'true' && '--dry' || '' }}
+  quiz:
+    if: inputs.only == '' || inputs.only == 'quiz' || github.event_name == 'schedule'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 330
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: quiz-render を残りの本数で
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node tools/render-chain.mjs quiz ${{ inputs.dry == 'true' && '--dry' || '' }}

@@ -103,7 +103,7 @@ LINEのコマンド：YouTube（状態）／YouTube 0031（その1本をすぐ�
 
 ## 解析（3媒体の数字を毎日見て日報を出す）
 
-VPS が毎時5分にインスタ・YouTube・TikTok の数字を記録して、急に伸びた動画があればすぐ LINE に知らせる。毎朝6時台に Claude の定期タスクが数字を解析して、在庫の順番やキャプションを直したり、バズに乗る続編を作ったりする。日報は毎朝8:00に LINE に届く。数字と日報は非公開リポジトリ oishi-thomaz/moshimo-analytics に貯まる。
+VPS が毎時5分にインスタ・YouTube・TikTok の数字を記録して、急に伸びた動画があればすぐ LINE に知らせる。毎日 9:23 に Claude の定期タスク（ops/OPS.md）が数字を解析して、在庫の順番やキャプションを直したり、バズに乗る続編の台本を出したりする。日報は 13:00 の SNS司令室の昼のまとめに載る。数字と日報は非公開リポジトリ oishi-thomaz/moshimo-analytics に貯まる。
 
 1. VPSを最新にする（install.sh を貼り直して `sudo bash install.sh`。設定はそのまま残る）
 2. GitHub で非公開リポジトリ moshimo-analytics を作る（中身は空でOK）

@@ -5,7 +5,7 @@
 ## 毎週やること
 
 0. 最初に `plan/STRATEGY.md`（運用戦略）を読む。お題の選び方と並べ方はこれに従う
-   - 2026/11/02 夜〜：作ってよいのは `plan/scripts.md` で状態が「承認済み」の台本だけ（承認なしで動画にしない）。台本の候補の出し方と返事の取り込み方は ops/OPS.md の 3. 動画制作 の もしもラボ。blueprint から説明型のお題を作るのはやめる
+   - 2026/11/02 夜〜：作ってよいのは `plan/scripts.md` で状態が「承認済み」の台本だけ（承認なしで動画にしない）。台本の候補の出し方と返事の取り込み方は ops/make-moshimo.md。blueprint から説明型のお題を作るのはやめる
 1. `plan/queue.txt` と `state/rendered.txt` を見て、まだ書き出されていない在庫が何本あるか数える。在庫の中の 柱（series のある回）と 派生・挑戦 の本数も数える
 2. 在庫が28本を下回っていたら（2026/11/03〜 1日4本投稿なので、1週間分の28本を常に持つ）、在庫が35本になるまで作る（1回のタスクで最低7本）。何を作るかは次の順で決める：
    - `"priority"` が付いた行（解析担当からの依頼）を最優先
@@ -14,7 +14,7 @@
    - 柱の候補が足りないときは、STRATEGY.md の柱シリーズの型で新しいお題を blueprint の末尾に足してから作ってよい（no は 701 以降の空き番号。series と slot を付ける。plan/RULES.md の書式に合わせる）
 3. 1本ごとに、下の手順で `engine/videos/NNNN.js` を作る（NNNN は blueprint の `no` を4桁にしたもの。例 no 2 → 0002、no 701 → 0701。その番号のファイルがもうあるときは 05xx・08xx など空いている番号にして blueprint の made にその番号を書く）
 4. できた番号を `plan/queue.txt` に入れ、blueprint の該当行に `"made": "NNNN"` を付ける。入れる場所：まだ書き出していない在庫の並びが 皮肉（社会の消えたら・図星）・人体の限界・皮肉・皮肉（2026/11/03〜 1日4本。皮肉が続くところは 社会の消えたら と 図星 を交互にする） のくり返しになるように差し込む（挑戦の回はどれかの枠と入れ替え）。同じ series が2本続かないようにする。並びがすでにそうなっているときは末尾でよい
-5. commit して `main` に push する（毎朝6時台の朝の仕事（ops/OPS.md）が queue の順に書き出す）
+5. commit して `main` に push する（毎朝 5:20 の render-chain.yml が queue の順に書き出す）
 
 作れないお題（必要な絵が今のエンジンでは無理、確かな数字が見つからない など）は飛ばして、blueprint の行に `"skip": "理由"` を付けて次へ進む。
 
@@ -158,5 +158,5 @@ CHROME_PATH=<chromium> node tools/render.mjs --video NNNN --stills 0,0.4,1,2,3,1
 - カバー画像は tools/make_covers.py で作る（文字の改行は plan/cover-lines.json に手で書く。1行7文字前後、区切りのいい所で）。絵は動画の中の、その回にしかないシーンを使う（似た回で同じ絵を使い回さない）。
 - 付け方：TikTok は TikTok Studio の投稿編集 → カバーを編集 → 今のカバーの×で消す → カバーをアップロード → 保存 → ページ下の保存（投稿後7日以内・1日1回まで。予約中の投稿は編集できない）。YouTube は Studio の動画の詳細 → サムネイル → ファイルをアップロード → 保存（期限なし）。インスタはスマホのアプリから。
 - 新しい回を作ったら、その場でカバーも決める（2026/11/03 ゆうと：今後は予約のときにカバーも付ける）：plan/cover-lines.json に文字（| で改行）、plan/cover-picks.json に場面の秒数（その回にしかない絵。`node tools/render.mjs --video NNNN --stills 6,16,26,36,46,54 --glonly --outdir out/cv/NNNN` で見て選ぶ）。手で仕上げたいときは plan/covers/NNNN.jpg を置く（そちらが優先）。柱の色は META.series から決まる（柱がない回はミントの もしもラボ）。
-- 書き出し（tools/build.sh）がカバーを作って VPS に送る。投稿サーバーはインスタに cover_url、YouTube に thumbnails.set で付けて出す（JPEG のコメント moshimo-cover が付いたカバーだけ）。TikTok は予約の定期タスクが TikTok Studio でカバーをアップロードする（moshimo-analytics の TIKTOK.md 3.4）。
+- 書き出し（tools/build.sh）がカバーを作って VPS に送る。投稿サーバーはインスタに cover_url、YouTube に thumbnails.set で付けて出す（JPEG のコメント moshimo-cover が付いたカバーだけ）。TikTok は毎日の運用の tiktok のサブエージェントが TikTok Studio でカバーをアップロードする（moshimo-analytics の TIKTOK.md 3.4）。
 - 書き出し済みの回のカバーだけ差し替えるときは plan/covers/NNNN.jpg を更新して cover-upload ワークフロー（ids に番号）を動かす。承認の状態は変わらない。
