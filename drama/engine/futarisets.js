@@ -134,14 +134,14 @@ export function scamRoom(g, { t = 0, phones = 2, wave = 1 } = {}) {
 }
 
 // 玄関の外（インターホンのカメラ映像）：夜の門灯の下に立つ制服の人
-export function doorCam(g, w, h, { t = 0, draw } = {}) {
+export function doorCam(g, w, h, { t = 0, draw, clock = '02:31' } = {}) {
   vgrad(g, 0, 0, w, h, [[0, '#1a2428'], [1, '#0c1214']]);
   glow(g, w * 0.5, h * 0.12, w * 0.7, 'rgba(255,240,200,1)', 0.35);
   fillRR(g, 0, h * 0.82, w, h * 0.2, 0, '#2a3034');
   if (draw) draw(g, w, h);
   // 魚眼っぽいふち
   const gr = g.createRadialGradient(w / 2, h / 2, w * 0.3, w / 2, h / 2, w * 0.75); gr.addColorStop(0, 'rgba(0,0,0,0)'); gr.addColorStop(1, 'rgba(0,0,0,.75)'); g.fillStyle = gr; g.fillRect(0, 0, w, h);
-  text(g, '02:31', w - 16, 22, { size: 20, color: 'rgba(255,255,255,.8)', align: 'right', weight: 700 });
+  text(g, clock, w - 16, 22, { size: 20, color: 'rgba(255,255,255,.8)', align: 'right', weight: 700 });
 }
 
 // 2本の通話を並べた画面（どちらも「ハルト」）。active=1|2 で話している方を緑に、もう一方は保留
