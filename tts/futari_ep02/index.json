@@ -1,0 +1,188 @@
+{
+ "t0": {
+  "dur": 4.331,
+  "voice": "Orus",
+  "text": "みやしたさん、警察です。ここを、開けてください。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "p1": {
+  "dur": 5.088,
+  "voice": "Sulafat",
+  "text": "人をはねたと泣くハルトと、それは俺じゃないと叫ぶハルト。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a1": {
+  "dur": 3.477,
+  "voice": "Sulafat",
+  "text": "インターホンの画面に、制服の男が立っていた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a2": {
+  "dur": 3.909,
+  "voice": "Orus",
+  "text": "みなみまちしょの、たかぎです。事故の通報があって、うかがいました。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a2b": {
+  "dur": 3.357,
+  "voice": "Sulafat",
+  "text": "男は、カメラに警察手帳をかざした。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a3": {
+  "dur": 4.151,
+  "voice": "Sulafat",
+  "text": "本当に…事故が、あったんですか。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a4": {
+  "dur": 4.867,
+  "voice": "Orus",
+  "text": "いちじ、ごじゅっぷんごろ、ななじゅうはっさいの女性が、はねられました。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a5": {
+  "dur": 3.197,
+  "voice": "Orus",
+  "text": "はねたのは、みやしたハルトさんの車です。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a6": {
+  "dur": 6.237,
+  "voice": "Sulafat",
+  "text": "ハルトの話と、同じ。事故は、本当にあったんだ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b1": {
+  "dur": 3.961,
+  "voice": "Iapetus",
+  "text": "母さん、高木さんの言う通りにして。お願いだから…",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b2": {
+  "dur": 5.417,
+  "voice": "Rasalgethi",
+  "text": "お母様。示談金の、さんびゃくまんえんは、そちらの、たかぎさんにお渡しください。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b3": {
+  "dur": 3.016,
+  "voice": "Sulafat",
+  "text": "警察官が、示談金を受け取る？",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b4": {
+  "dur": 3.471,
+  "voice": "Iapetus",
+  "text": "母さん、そいつも仲間だ！絶対に開けるな！",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b5": {
+  "dur": 4.891,
+  "voice": "Sulafat",
+  "text": "電話を、二本とも保留にして、私は、警察署にかけた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c1": {
+  "dur": 1.833,
+  "voice": "Kore",
+  "text": "はい、みなみまち警察署です。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c2": {
+  "dur": 3.745,
+  "voice": "Sulafat",
+  "text": "いま、そちらの、たかぎさんという方が、うちに来ているんですが。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c3": {
+  "dur": 3.365,
+  "voice": "Kore",
+  "text": "たかぎ…ですか。少々お待ちください。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c4": {
+  "dur": 3.213,
+  "voice": "Kore",
+  "text": "みやしたさん。当署に、たかぎという者は、おりません。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c5": {
+  "dur": 2.763,
+  "voice": "Kore",
+  "text": "こんや、事故の通報も、いっけんもありません。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c6": {
+  "dur": 4.891,
+  "voice": "Sulafat",
+  "text": "事故は、なかった。玄関の男は、偽物だ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d1": {
+  "dur": 5.65,
+  "voice": "Kore",
+  "text": "それと、みやしたさん。そのご住所からは、先週も、通報がありました。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d2": {
+  "dur": 2.99,
+  "voice": "Kore",
+  "text": "息子を名乗る電話が、にほん、かかってきた、と。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d3": {
+  "dur": 4.769,
+  "voice": "Sulafat",
+  "text": "先週？そんな電話、私は覚えていない。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d4": {
+  "dur": 5.285,
+  "voice": "Sulafat",
+  "text": "その時。保留にしたはずの電話から、声がした。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d5": {
+  "dur": 4.962,
+  "voice": "Rasalgethi",
+  "text": "警察にかけても、無駄ですよ。先週も、そうでしたから。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e1": {
+  "dur": 5.135,
+  "voice": "Orus",
+  "text": "開けていただけないなら…息子さん本人に、頼んでもらいましょう。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e2": {
+  "dur": 4.36,
+  "voice": "Sulafat",
+  "text": "画面の端から、フードをかぶった若い男が、引き出された。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e3": {
+  "dur": 5.067,
+  "voice": "Sulafat",
+  "text": "うつむいた顔。でも、あのパーカーはハルトのものだ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e4": {
+  "dur": 3.304,
+  "voice": "Iapetus",
+  "text": "かあさん…俺だよ。あけて。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e5": {
+  "dur": 3.248,
+  "voice": "Sulafat",
+  "text": "ハルトが、さんにんになった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "x1": {
+  "dur": 2.117,
+  "voice": "Schedar",
+  "text": "次回。さんにんめ。",
+  "model": "gemini-3.8-flash-tts"
+ }
+}
