@@ -13,5 +13,7 @@ export const VOICES = {
   H2: { name: 'ハルト', voice: 'Iapetus', style: HARUTO + '必死に、早く伝えようとする声。' + PACE, model: m, fx: 'phone' },
   L: { name: '弁護士', voice: 'Rasalgethi', style: STD + '50代の男性。弁護士を名乗る、丁寧で落ち着いた、冷たい声。' + PACE, model: m, fx: 'phone' },
   T: { name: '警察官', voice: 'Orus', style: STD + '40代の男性警察官。夜中のインターホン越しに、低く落ち着いて話す。' + PACE, model: m, fx: 'door' },
+  // 第3話から：詐欺グループのまとめ役・黒田（回線1のハルトの声を途中で切り替えて話す）
+  KR: { name: '黒田', voice: 'Algenib', style: STD + '40代の男性。詐欺グループのまとめ役。低く、ざらついた声で、余裕たっぷりに、相手を見下すように話す。' + PACE, model: m, fx: 'phone' },
   X: { name: '', voice: 'Schedar', style: STD + '感情のない機械の読み上げ音声のように、平坦に、一定の速さで淡々と読む。', model: m, fx: 'robot' },
 };

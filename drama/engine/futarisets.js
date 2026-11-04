@@ -1,6 +1,6 @@
 // 「二人の息子」の場面：夜の実家の茶の間、電話の画面（通話中＋保留）、インターホン、詐欺グループの部屋
 // 手がかり：黒いテレビの画面に佐和子だけ映らない／お茶に湯気がない／カレンダーが2年前／仏間の襖がいつも閉まっている／棚の小さなスピーカーの光
-import { W, H, clamp, lerp, inv, ease, easeOut, rng, noise1, rr, fillRR, circ, ell, poly, line, vgrad, glow, rgba, mix, text, FONT, SERIF } from './core.js';
+import { W, H, clamp, lerp, inv, ease, easeOut, rng, noise1, rr, fillRR, circ, ell, poly, line, vgrad, glow, rgba, mix, text, darkness, FONT, SERIF } from './core.js';
 import { C, toneRect, toneFill } from './noir.js';
 
 export const F = { green: '#36d27f', green2: '#6fe6a4', amber: '#ffb35a', wall: '#3a3330', wall2: '#2a2422', tatami: '#5f5a3e', wood: '#4a3526', wood2: '#33241a' };
@@ -106,16 +106,18 @@ export function twoCalls(p, w, h, { t = 0, phase = 1, sec = 47, holdTop = false 
 }
 
 // 詐欺グループの部屋：ノートPCに声の波形、スマホ2台
-export function scamRoom(g, { t = 0, phones = 2, wave = 1 } = {}) {
+// back＝机より奥に描くもの（黒田など）、labels＝スマホの発信先、sample＝PCの声サンプルの名前（第3話から）
+export function scamRoom(g, { t = 0, phones = 2, wave = 1, back = null, labels = ['ハルト', 'ハルト'], sample = 'ハルト_声サンプル 0:31' } = {}) {
   vgrad(g, -300, -300, W + 600, H + 600, [[0, '#0b0d12'], [1, '#05060a']]);
   toneRect(g, -300, -300, W + 600, H + 600, 'rgba(255,255,255,.035)', 9, 1.8);
+  if (back) back(g);
   // 机
   fillRR(g, -100, 1240, W + 200, 60, 0, '#1a1c22'); fillRR(g, -100, 1300, W + 200, 700, 0, '#0e0f13');
   // ノートPC
   poly(g, [[250, 1240], [830, 1240], [880, 1290], [200, 1290]], '#2a2c33');
   fillRR(g, 270, 860, 540, 380, 16, '#1d1f25'); fillRR(g, 290, 880, 500, 340, 8, '#0a1410');
   text(g, 'VOICE CLONE', 540, 920, { size: 30, color: F.green2, weight: 800, spacing: 6 });
-  text(g, 'ハルト_声サンプル 0:31', 540, 965, { size: 26, color: '#8fb8a0', weight: 600 });
+  text(g, sample, 540, 965, { size: 26, color: '#8fb8a0', weight: 600 });
   g.save(); g.lineWidth = 5; g.strokeStyle = F.green; g.beginPath();
   for (let i = 0; i <= 100; i++) { const x = 310 + i * 4.6, a = Math.sin(i * 0.5 + t * 8) * noise1(i * 0.3 + t * 2, 4) * 70 * wave; i ? g.lineTo(x, 1090 + a) : g.moveTo(x, 1090 + a); }
   g.stroke(); g.restore();
@@ -126,7 +128,7 @@ export function scamRoom(g, { t = 0, phones = 2, wave = 1 } = {}) {
     g.save(); g.translate(x, y); g.rotate(i ? 0.18 : -0.18);
     fillRR(g, -70, -130, 140, 260, 18, '#0e0f14'); fillRR(g, -62, -122, 124, 244, 12, '#123022');
     text(g, '発信中', 0, -60, { size: 22, color: F.green2, weight: 800 });
-    text(g, 'ハルト', 0, -20, { size: 26, color: '#fff', weight: 900 });
+    text(g, labels[i] || 'ハルト', 0, -20, { size: 26, color: '#fff', weight: 900 });
     text(g, `回線${i + 1}`, 0, 30, { size: 20, color: '#8fb8a0', weight: 700 });
     g.restore();
     glow(g, x, y, 200, 'rgba(120,240,170,1)', 0.25);
@@ -145,7 +147,8 @@ export function doorCam(g, w, h, { t = 0, draw, clock = '02:31' } = {}) {
 }
 
 // 2本の通話を並べた画面（どちらも「ハルト」）。active=1|2 で話している方を緑に、もう一方は保留
-export function twoLines(p, w, h, { t = 0, active = 1, sec1 = 92, sec2 = 15, alarm = 0, label1 = '', label2 = '' } = {}) {
+// flat＝話している方の波形を平らに（無言）。第3話から
+export function twoLines(p, w, h, { t = 0, active = 1, sec1 = 92, sec2 = 15, alarm = 0, label1 = '', label2 = '', flat = 0 } = {}) {
   vgrad(p, 0, 0, w, h, [[0, '#14221c'], [1, '#08100c']]);
   text(p, '通話 2件', w / 2, 120, { size: 36, color: '#9ab8a8', weight: 700 });
   const row = (i, y, on, sec, lab, rh = 330) => {
@@ -159,7 +162,7 @@ export function twoLines(p, w, h, { t = 0, active = 1, sec1 = 92, sec2 = 15, ala
     text(p, on ? `通話中　${Math.floor(sec / 60)}:${String(Math.floor(sec % 60)).padStart(2, '0')}` : '保留中', 280, y + 195, { size: 34, color: on ? F.green2 : F.amber, align: 'left', weight: 700 });
     text(p, `回線${i}`, w - 80, y + 70, { size: 26, color: '#8fb8a0', align: 'right', weight: 700 });
     if (lab) text(p, lab, 280, y + 262, { size: 28, color: '#c9d6cf', align: 'left', weight: 600 });
-    if (on) { p.save(); p.lineWidth = 4; p.strokeStyle = F.green; p.beginPath(); for (let k = 0; k <= 40; k++) { const x = 640 + k * 7, a = Math.sin(k * 0.7 + t * 10) * 26 * Math.abs(noise1(t * 3 + k * 0.2, i)); k ? p.lineTo(x, y + 165 + a) : p.moveTo(x, y + 165 + a); } p.stroke(); p.restore(); }
+    if (on) { p.save(); p.lineWidth = 4; p.strokeStyle = F.green; p.beginPath(); for (let k = 0; k <= 40; k++) { const x = 640 + k * 7, a = Math.sin(k * 0.7 + t * 10) * 26 * Math.abs(noise1(t * 3 + k * 0.2, i)) * (1 - flat); k ? p.lineTo(x, y + 165 + a) : p.moveTo(x, y + 165 + a); } p.stroke(); p.restore(); }
     p.restore();
   };
   const cmp = h < 1300, rh = cmp ? 260 : 330;
@@ -224,4 +227,79 @@ export function shiba(g, w, h) {
   circ(g, cx - r * 0.38, cy - r * 0.1, r * 0.1, '#1a1210'); circ(g, cx + r * 0.38, cy - r * 0.1, r * 0.1, '#1a1210');
   ell(g, cx, cy + r * 0.2, r * 0.14, r * 0.1, '#1a1210');
   g.beginPath(); g.arc(cx, cy + r * 0.3, r * 0.2, Math.PI * 0.15, Math.PI * 0.85); g.lineWidth = r * 0.05; g.strokeStyle = '#1a1210'; g.stroke();
+}
+
+// ===== 第3話から =====
+// 玄関のスマートロック（アプリの画面）。k＝0 施錠中 → 1 解錠。mode='lock' なら逆（解錠 → 施錠）
+export function lockApp(p, w, h, { t = 0, k = 0, mode = 'unlock', hold = 0 } = {}) {
+  vgrad(p, 0, 0, w, h, [[0, '#121a16'], [1, '#070c0a']]);
+  text(p, 'スマートロック', w / 2, 120, { size: 40, color: '#9ab8a8', weight: 700 });
+  text(p, '玄関', w / 2, 200, { size: 64, color: '#fff', weight: 900 });
+  const open = mode === 'lock' ? 1 - k : k, cy = h < 1300 ? 470 : 560, R = 170;
+  const col = open > 0.5 ? '#ff7a6a' : F.green;
+  circ(p, w / 2, cy, R + 26, rgba(col, 0.16)); p.lineWidth = 10; p.strokeStyle = col; p.beginPath(); p.arc(w / 2, cy, R, 0, 7); p.stroke();
+  if (hold > 0) { p.lineWidth = 16; p.strokeStyle = '#fff'; p.beginPath(); p.arc(w / 2, cy, R + 26, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * clamp(hold)); p.stroke(); }
+  // 南京錠のアイコン（open で掛け金が持ち上がり、右の足が外れる）
+  const ly = cy + 30, lift = open * 30; fillRR(p, w / 2 - 70, ly - 40, 140, 110, 16, col);
+  p.save(); p.lineWidth = 22; p.strokeStyle = col; p.lineCap = 'round'; p.beginPath();
+  p.moveTo(w / 2 - 44, ly - 40 - lift); p.lineTo(w / 2 - 44, ly - 80 - lift); p.arc(w / 2, ly - 80 - lift, 44, Math.PI, Math.PI * 2); p.lineTo(w / 2 + 44, ly - 40 - lift - open * 30); p.stroke(); p.restore();
+  circ(p, w / 2, ly + 8, 14, '#0b120e'); fillRR(p, w / 2 - 5, ly + 8, 10, 28, 4, '#0b120e');
+  text(p, open > 0.5 ? '解錠中' : '施錠中', w / 2, cy + R + 90, { size: 58, color: col, weight: 900 });
+  const lb = mode === 'lock' ? (k > 0.5 ? '施錠しました' : '長押しで施錠') : (k > 0.5 ? '解錠しました' : '長押しで解錠');
+  fillRR(p, 90, h - (h < 1300 ? 190 : 330), w - 180, 110, 55, k > 0.5 ? rgba(col, 0.9) : 'rgba(255,255,255,.12)');
+  text(p, lb, w / 2, h - (h < 1300 ? 135 : 275), { size: 40, color: k > 0.5 ? '#08100c' : '#e8f0ec', weight: 800 });
+}
+// 仏間：仏壇と遺影、横に金庫。light＝部屋の明るさ、flash＝懐中電灯の光 {x,y,r}（画面の座標）、portrait＝遺影の中身を描く関数
+export function butsuma(g, { t = 0, light = 0.1, flash = null, portrait = null, face = 1, fusuma = 0 } = {}) {
+  vgrad(g, -300, -300, W + 600, H + 600, [[0, '#231d1a'], [1, '#141010']]);
+  toneRect(g, -300, -300, W + 600, 1400, 'rgba(0,0,0,.25)', 9, 2.0);
+  fillRR(g, -300, 250, W + 600, 24, 0, F.wood2);
+  // 畳
+  vgrad(g, -300, 1250, W + 600, 900, [[0, '#4a4530'], [1, '#26241a']]);
+  g.save(); g.globalAlpha = 0.5; for (let i = -2; i < 8; i++) line(g, -300 + i * 260, 1250, -500 + i * 340, 2300, 4, '#2a2818'); g.restore();
+  // 仏壇（黒い漆・金の内側）
+  fillRR(g, 250, 330, 580, 900, 10, '#140e0c'); fillRR(g, 280, 360, 520, 840, 6, '#2a1c10');
+  vgrad(g, 300, 380, 480, 420, [[0, '#6a4a1c'], [1, '#3a2810']]);
+  for (const x of [330, 750]) { fillRR(g, x - 10, 380, 20, 420, 4, '#8a6a2a'); }
+  fillRR(g, 300, 800, 480, 30, 4, '#8a6a2a'); fillRR(g, 300, 1000, 480, 26, 4, '#5a4218');
+  // 遺影（黒い額・上に黒いリボン）
+  const px = 540, py = 560, pw = 230, ph = 290;
+  fillRR(g, px - pw / 2 - 18, py - ph / 2 - 18, pw + 36, ph + 36, 6, '#0b0908');
+  g.save(); g.beginPath(); g.rect(px - pw / 2, py - ph / 2, pw, ph); g.clip();
+  vgrad(g, px - pw / 2, py - ph / 2, pw, ph, [[0, '#9a9aa2'], [1, '#6a6a72']]);
+  if (portrait && face) { g.save(); g.translate(px - pw / 2, py - ph / 2); portrait(g, pw, ph); g.restore(); }
+  g.restore();
+  poly(g, [[px - pw / 2 - 18, py - ph / 2 - 18], [px - pw / 2 + 50, py - ph / 2 - 18], [px - pw / 2 - 18, py - ph / 2 + 50]], '#050505');
+  poly(g, [[px + pw / 2 + 18, py - ph / 2 - 18], [px + pw / 2 - 50, py - ph / 2 - 18], [px + pw / 2 + 18, py - ph / 2 + 50]], '#050505');
+  // ろうそく・りん・花
+  for (const x of [380, 700]) { fillRR(g, x - 9, 880, 18, 90, 4, '#f4f1ea'); fillRR(g, x - 22, 965, 44, 30, 6, '#8a6a2a'); }
+  ell(g, 540, 960, 46, 22, '#a8812e'); ell(g, 540, 952, 40, 14, '#d8b45a');
+  for (const sd of [-1, 1]) { line(g, 540 + sd * 150, 990, 540 + sd * 170, 860, 4, '#3a5a2a'); circ(g, 540 + sd * 172, 852, 16, '#e8e2d4'); circ(g, 540 + sd * 150, 870, 12, '#d8c84a'); }
+  // ほこり（長く誰も触っていない）
+  g.save(); g.globalAlpha = 0.25; for (let i = 0; i < 14; i++) circ(g, 300 + (i * 137) % 480, 805 + (i * 53) % 20, 3, '#cfc4ad'); g.restore();
+  // 金庫（仏壇の右下）
+  fillRR(g, 860, 1060, 200, 220, 10, '#3a3e48'); fillRR(g, 876, 1076, 168, 188, 6, '#4a4f5a'); circ(g, 960, 1170, 40, '#2a2e36'); circ(g, 960, 1170, 30, '#5a606a');
+  // 襖のふち（開きかけ）
+  if (fusuma < 1) { const o = lerp(0, 520, fusuma); fillRR(g, -300, 250, 300 + 540 - o - 10, 1300, 0, '#cfc4ad'); fillRR(g, 540 + o + 10, 250, 800, 1300, 0, '#cfc4ad'); }
+  // 暗がりと懐中電灯
+  const lights = [];
+  if (flash) lights.push({ x: flash.x, y: flash.y, r: flash.r || 420, a: 1, core: 0.45, color: 'rgba(255,240,210,1)', glow: 0.25 });
+  if (light > 0) lights.push({ x: 540, y: 700, r: 1100, a: light });
+  darkness(g, 0.9, '#040306', lights);
+}
+// 「AIの家族」アプリ（ハルトのスマホ）。rows＝見せる行数。架空のアプリ
+export function aiApp(p, w, h, { t = 0, rows = 2, stolen = 0 } = {}) {
+  vgrad(p, 0, 0, w, h, [[0, '#121722'], [1, '#080a10']]);
+  text(p, 'AIの家族', w / 2, 120, { size: 46, color: '#fff', weight: 900 });
+  text(p, 'ハルトの端末', w / 2, 176, { size: 26, color: '#8a93a6', weight: 600 });
+  const card = (i, y, a, name, sub, lines, col) => {
+    if (a <= 0) return; p.save(); p.globalAlpha = a; p.translate(0, (1 - a) * 30);
+    fillRR(p, 50, y, w - 100, 330, 36, 'rgba(255,255,255,.07)'); p.lineWidth = 3; p.strokeStyle = rgba(col, 0.7); rr(p, 50, y, w - 100, 330, 36); p.stroke();
+    circ(p, 150, y + 100, 60, rgba(col, 0.3)); text(p, name[0], 150, y + 104, { size: 56, color: '#fff', weight: 900 });
+    text(p, name, 240, y + 80, { size: 46, color: '#fff', align: 'left', weight: 900 }); text(p, sub, 240, y + 130, { size: 28, color: col, align: 'left', weight: 700 });
+    lines.forEach((s, k) => text(p, s, 90, y + 210 + k * 52, { size: 30, color: '#c9d0dc', align: 'left', weight: 600 }));
+    p.restore();
+  };
+  card(0, 240, easeOut(clamp(t * 2)), '母さん', 'AI　茶の間のスピーカーで起動中', ['記憶のリセット　毎朝 5:00', '玄関の鍵　この端末と母さんだけ'], F.green);
+  if (rows > 1) card(1, 620, easeOut(clamp(t * 2 - 1)), 'ハルト', 'AI　毎晩 21:00 に母さんへ発信', [stolen ? '知らない端末からログイン' : '最終発信　昨日 21:00', stolen ? '10月20日 2:40' : ''], stolen ? '#ff7a6a' : F.amber);
 }
