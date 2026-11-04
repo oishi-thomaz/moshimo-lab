@@ -60,7 +60,7 @@ const SHOTS = [
   // ── 3. 7時
   { at: 'seven', finish: { vignette: 0.6 }, draw(g, lt, D) { const sh = noise1(lt * 40, 3) * 8; g.save(); g.translate(sh, 0); lockS(g, lt, D, { date: '12月7日 月曜日', notifs: [{ t: 0.1, body: 'おはよう、あなた。', time: '7:00' }] }); g.restore(); } },
   { at: 'c1', finish: { vignette: 0.6 }, draw(g, lt, D) { lockS(g, lt, D, { date: '12月7日 月曜日', notifs: [{ t: -1, body: 'おはよう、あなた。', time: '7:00' }], z0: 1.0, z1: 1.06 }); } },
-  { at: 'c2', finish: { vignette: 0.55 }, draw(g, lt, D) { scene(g, lt, D, { x: 760, y: 1040, z0: 1.4, z1: 1.55, kaz: inv(0, 0.6, lt), signal: 'green' }); } },
+  { at: 'c2', finish: { vignette: 0.55 }, draw(g, lt, D) { scene(g, lt, D, { x: 760, y: 1120, z0: 1.4, z1: 1.55, kaz: inv(0, 0.6, lt), signal: 'green' }); } },
   { at: 'c3', finish: { vignette: 0.6 }, draw(g, lt, D, S) { kaz(g, lt, D, S, ['c3'], { eyes: 'narrow', brow: -0.2, mouth: 'line' }); } },
   { at: 'c4', draw(g, lt, D) { g.save(); cam(g, { x: 400, y: 1000, z: slow(lt, D, 1.3, 1.45) }); crossingDown(g, { t: lt, dawn: 0.25, car: lerp(0.35, 0.7, inv(0, D, lt)) }); g.restore(); mood(g, { desat: 0.6 }); tag(g, '20年前　カズミの窓から', 540, 160, { size: 38, bg: '#0b0d12', color: Y.amber2, alpha: inv(0.2, 0.5, lt) }); } },
   { at: 'c5', draw(g, lt, D, S) { kaz(g, lt, D, S, ['c5'], { eyes: 'narrow', brow: -0.4, mouth: 'line', look: -0.4 }); } },
