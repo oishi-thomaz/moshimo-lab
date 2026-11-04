@@ -102,40 +102,35 @@ function makeTimer({ w = 1.6, h = 0.7, cw = 640, frame = '#1b1e26', bg = '#0d0f1
 const fmtMS = (sec) => { const s = Math.max(0, Math.round(sec)); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`; };
 
 function makeStairs({ n = 14, rise = 0.17, run = 0.3, w = 2.4, color = '#b9bcc4', side = '#8a8e98' } = {}) {
-  const g = new THREE.Group(); const m = mat(color), sm = mat(side), nose = mat('#e8c23a');
+  const g = new THREE.Group(); const m = mat(color), sm = mat(side), nose = mat('#e8c23a'), rm = mat('#d8dbe0');
   for (let i = 0; i < n; i++) {
     const st = box(w, rise * (i + 1), run, m); st.position.set(0, rise * (i + 1) / 2, -i * run - run / 2); g.add(st);
     const ln = box(w, 0.012, 0.05, nose); ln.position.set(0, rise * (i + 1) + 0.006, -i * run - 0.04); g.add(ln);
   }
-  const top = box(w, rise * n, 3, m); top.position.set(0, rise * n / 2, -n * run - 1.5); g.add(top);
+  const L = n * run, H = n * rise, len = Math.hypot(L, H), a = Math.atan2(H, L);
   for (const sx of [-1, 1]) {
-    const wall = new THREE.Mesh(new THREE.BufferGeometry(), sm);
-    const L = n * run, H = n * rise;
-    const shape = new THREE.Shape(); shape.moveTo(0, 0); shape.lineTo(-L, H); shape.lineTo(-L - 3, H); shape.lineTo(-L - 3, H + 0.9); shape.lineTo(-L, H + 0.9); shape.lineTo(0.6, 0.9); shape.lineTo(0.6, 0); shape.lineTo(0, 0);
-    wall.geometry = new THREE.ExtrudeGeometry(shape, { depth: 0.12, bevelEnabled: false });
-    wall.rotation.y = Math.PI / 2; wall.position.set(sx * (w / 2 + 0.06) - 0.06, 0, 0); g.add(wall);
-    const rail = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, Math.hypot(L, H) + 0.4, 8), mat('#d8dbe0'));
-    rail.rotation.x = Math.atan2(L, H); rail.position.set(sx * (w / 2 + 0.06), H / 2 + 1.0, -L / 2); g.add(rail);
+    // 横の低い壁（坂に沿った板）と手すり
+    const wall = box(0.12, 0.32, len, sm); wall.rotation.x = a; wall.position.set(sx * (w / 2 + 0.06), H / 2 + 0.02, -L / 2); g.add(wall);
+    for (let k = 0; k <= 4; k++) { const u = k / 4; const post = box(0.05, 0.85, 0.05, rm); post.position.set(sx * (w / 2 + 0.06), H * u + 0.42, -L * u); g.add(post); }
+    const rail = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, len + 0.3, 8), rm); rail.rotation.x = -Math.atan2(L, H); rail.position.set(sx * (w / 2 + 0.06), H / 2 + 0.85, -L / 2); g.add(rail);
   }
-  g.userData = { n, rise, run, w, at: (s) => [rise * clamp(s, 0, n), -run * clamp(s, 0, n)] };
+  g.userData = { n, rise, run, w, L, H, at: (s) => [rise * clamp(s, 0, n), -run * clamp(s, 0, n)] };
   return g;
 }
 function makeEscalator({ n = 14, rise = 0.17, run = 0.3, w = 1.1 } = {}) {
-  const g = new THREE.Group(); const L = n * run, H = n * rise;
+  const g = new THREE.Group(); const L = n * run, H = n * rise, len = Math.hypot(L, H), a = Math.atan2(H, L);
   const steps = []; const sm = mat('#6e737e'), ym = mat('#e8c23a');
-  const N = n + 4;
+  const N = n + 6;
   for (let i = 0; i < N; i++) { const s = new THREE.Group(); const b = box(w, 0.06, run * 0.94, sm); s.add(b); const y = box(w, 0.012, 0.03, ym); y.position.set(0, 0.035, run * 0.45); s.add(y); g.add(s); steps.push(s); }
+  const base = box(w + 0.1, 0.3, len, mat('#3a3e46')); base.rotation.x = a; base.position.set(0, H / 2 - 0.2, -L / 2); g.add(base);
   for (const sx of [-1, 1]) {
-    const shape = new THREE.Shape(); shape.moveTo(-1.0, 0); shape.lineTo(-1.0, 1.0); shape.lineTo(0, 1.0); shape.lineTo(L, H + 1.0); shape.lineTo(L + 1.0, H + 1.0); shape.lineTo(L + 1.0, H); shape.lineTo(L, H - 0.15); shape.lineTo(0, -0.15); shape.lineTo(-1.0, -0.15);
-    const geo = new THREE.ExtrudeGeometry(shape, { depth: 0.1, bevelEnabled: false });
-    const side = new THREE.Mesh(geo, mat('#c9ccd2')); side.rotation.y = -Math.PI / 2; side.position.set(sx * (w / 2 + 0.05) + 0.05, 0, 0); g.add(side);
-    const belt = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.06, Math.hypot(L, H)), mat('#1d1f24')); belt.rotation.x = Math.atan2(H, L); belt.position.set(sx * (w / 2 + 0.05), H / 2 + 1.03, -L / 2); g.add(belt);
+    const side = box(0.08, 0.85, len + 1.2, new THREE.MeshLambertMaterial({ color: '#c9d6e0', transparent: true, opacity: 0.55 })); side.rotation.x = a; side.position.set(sx * (w / 2 + 0.05), H / 2 + 0.5, -L / 2); g.add(side);
+    const belt = box(0.1, 0.08, len + 1.2, mat('#1d1f24')); belt.rotation.x = a; belt.position.set(sx * (w / 2 + 0.05), H / 2 + 0.96, -L / 2); g.add(belt);
   }
-  const base = new THREE.Mesh(new THREE.BoxGeometry(w + 0.2, 0.12, Math.hypot(L, H)), mat('#3a3e46')); base.rotation.x = Math.atan2(H, L); base.position.set(0, H / 2 - 0.1, -L / 2); g.add(base);
   g.userData.flow = (t) => {
     steps.forEach((s, i) => {
-      const u = ((i / N) + t * 0.05) % 1; const d = u * (L + 1.6) - 0.8; // -0.8..L+0.8
-      const z = -d; const y = d < 0 ? 0 : d > L ? H : d * H / L; s.position.set(0, y + 0.03, z);
+      const u = ((i / N) + t * 0.05) % 1; const d = u * (L + 1.6) - 0.8;
+      const y = d < 0 ? 0 : d > L ? H : d * H / L; s.position.set(0, y + 0.03, -d);
     });
   };
   g.userData.flow(0);
