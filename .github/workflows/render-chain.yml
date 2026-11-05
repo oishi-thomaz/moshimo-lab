@@ -8,6 +8,8 @@ name: render-chain
 on:
   schedule:
     - cron: '20 20 * * *'   # 5:20 JST
+    - cron: '13 21 * * *'   # 6:13 JST（予備。GitHub の cron は遅れ・飛びがある。今日の済み本数を引くので何回動いても二重にならない）
+    - cron: '41 21 * * *'   # 6:41 JST（予備）
     - cron: '20 8 * * *'    # 17:20 JST
   workflow_dispatch:
     inputs:
