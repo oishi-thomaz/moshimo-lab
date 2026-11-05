@@ -72,9 +72,9 @@
   "model": "gemini-3.8-flash-tts"
  },
  "b4": {
-  "dur": 3.471,
+  "dur": 2.48,
   "voice": "Iapetus",
-  "text": "母さん、そいつも仲間だ！絶対に開けるな！",
+  "text": "母さん、そいつも仲間だ！ぜったいに、開けるな！",
   "model": "gemini-3.8-flash-tts"
  },
  "b5": {
@@ -168,9 +168,9 @@
   "model": "gemini-3.8-flash-tts"
  },
  "e4": {
-  "dur": 3.304,
+  "dur": 3.261,
   "voice": "Iapetus",
-  "text": "かあさん…俺だよ。あけて。",
+  "text": "かあさん…俺だよ。開けて。",
   "model": "gemini-3.8-flash-tts"
  },
  "e5": {
