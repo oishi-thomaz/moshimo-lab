@@ -67,12 +67,14 @@ async function waitIdle() {
   throw new Error('前の書き出しが3時間たっても終わらない');
 }
 async function dispatchAndWait(inputs) {
-  const before = new Set(runsToday().map(r => r.id));
+  // 始まった回は created で絞らない一覧で探す（created の絞り込みは検索の索引を使うので、数分〜それ以上遅れることがある。11/6 はそれで 始まらない と止まった）
+  const recent = () => (ghj(`repos/${REPO}/actions/workflows/${WF}/runs?per_page=10&event=workflow_dispatch`).workflow_runs || []);
+  const before = new Set([...runsToday(), ...recent()].map(r => r.id));
   const args = ['-X', 'POST', `repos/${REPO}/actions/workflows/${WF}/dispatches`, '-f', 'ref=main'];
   for (const [k, v] of Object.entries(inputs)) args.push('-f', `inputs[${k}]=${v}`);
   gh(...args);
   let run;
-  for (let i = 0; i < 60 && !run; i++) { await sleep(10e3); run = runsToday().find(r => !before.has(r.id) && r.event === 'workflow_dispatch'); }
+  for (let i = 0; i < 120 && !run; i++) { await sleep(10e3); run = recent().find(r => !before.has(r.id)); }
   if (!run) throw new Error(`${WF} が始まらない`);
   log(`${WF} run ${run.id} を開始`);
   for (let i = 0; i < 300 && run.status !== 'completed'; i++) { await sleep(30e3); run = ghj(`repos/${REPO}/actions/runs/${run.id}`); }
