@@ -131,7 +131,7 @@ const SHOTS = [
   { at: 'a1', draw(g, lt, D) { phone(g, lt, D, (p, w, h) => twoLines(p, w, h, { t: lt, active: 2, sec1: 260, sec2: 210, label2: '「開けちゃダメだ」' })); } },
   { at: 'a2', draw(g, lt, D, S) { face(g, lt, D, S, ['a2'], { eyes: 'normal', brow: 0.4, look: 0.5 }); } },
   { at: 'silence', draw(g, lt, D) { phone(g, lt, D, (p, w, h) => twoLines(p, w, h, { t: lt, active: 2, sec1: 266, sec2: 216, flat: 1 }), { z0: 1.0, z1: 1.06 }); } },
-  { at: 'a3', draw(g, lt, D) { phone(g, lt, D, (p, w, h) => twoLines(p, w, h, { t: lt, active: 2, sec1: 268, sec2: 218, flat: 1 }), { x: 540, y: 820, z0: 1.3, z1: 1.45 }); subBand(g); } },
+  { at: 'a3', draw(g, lt, D) { phone(g, lt, D, (p, w, h) => twoLines(p, w, h, { t: lt, active: 2, sec1: 268, sec2: 218, flat: 1 }), { x: 540, y: 900, z0: 1.3, z1: 1.45 }); subBand(g); } },
   { at: 'a4', draw(g, lt, D, S) { face(g, lt, D, S, [], { eyes: 'narrow', brow: 0.3, mouth: 'line', look: -0.6 }); } },
   { at: 'chime', finish: { vignette: 0.6 }, draw(g, lt, D) { phone(g, lt, D, (p, w, h) => twoLines(p, w, h, { t: lt, active: 2, sec1: 275, sec2: 225, flat: 1 }), { x: 540, y: 820, z0: 1.45, z1: 1.5 }); for (let i = 0; i < 3; i++) { const k = ((lt * 1.2 + i / 3) % 1); g.save(); g.globalAlpha = (1 - k) * 0.7; g.lineWidth = 8; g.strokeStyle = '#ffd451'; g.beginPath(); g.arc(700, 760, 120 + k * 320, 0, 7); g.stroke(); g.restore(); } sfxText(g, 'ピンポーン', 540, 1480, { size: 110, color: '#ffd451', alpha: inv(0, 0.15, lt), rot: -0.06 }); } },
   { at: 'a5', finish: { vignette: 0.6 }, draw(g, lt, D) { monitor(g, lt, pair({}), { clock: '02:38', z: slow(lt, D, 1.0, 1.1) }); tag(g, 'ピンポーン', 540, 170, { size: 44, bg: '#2a220a', color: '#ffd451', alpha: inv(0.1, 0.4, lt) }); } },
@@ -172,7 +172,7 @@ const SHOTS = [
   { at: 'e1', finish: { vignette: 0.7 }, draw(g, lt, D, S) { kuroRoom(g, lt, D, S, ['e1'], { z0: 1.0, z1: 1.05 }); } },
   { at: 'e2', draw(g, lt, D) { room(g, lt, D, { x: 540, y: 1000, z0: 1.0, z1: 1.08, set: { phone: 1, lamp: 0.35, speaker: 0.4 } }); } },
   { at: 'pause', draw(g, lt, D) { room(g, lt, D, { x: 560, y: 1100, z0: 1.08, z1: 1.14, set: { phone: 1, lamp: 0.3, speaker: 0.4 } }); mood(g, { dark: 0.15 }); } },
-  { at: 'e3', finish: { vignette: 0.8 }, draw(g, lt, D, S) { kuroRoom(g, lt, D, S, ['e3'], { mouth: 'smile', z0: 1.3, z1: 1.55, cy: 820 }); mood(g, { red: 0.12 * inv(0, D, lt) }); } },
+  { at: 'e3', finish: { vignette: 0.8 }, draw(g, lt, D, S) { kuroRoom(g, lt, D, S, ['e3'], { mouth: 'smile', z0: 1.7, z1: 1.95, cy: 600 }); mood(g, { red: 0.12 * inv(0, D, lt) }); } },
   { at: 'e4', finish: { vignette: 0.75 }, draw(g, lt, D, S) { face(g, lt, D, S, [], { eyes: 'wide', brow: -0.5, mouth: 'line', z0: 1.0, z1: 1.1 }); mood(g, { dark: inv(D - 0.8, D, lt) }); } },
   { at: 'end', noSubs: true, draw(g, lt) { endCard(g, lt, { SERIES, EPISODE }); } },
 ];
