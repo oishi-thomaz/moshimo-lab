@@ -1,0 +1,206 @@
+{
+ "k3": {
+  "dur": 6.513,
+  "voice": "Sulafat",
+  "text": "電話に、ふたり。玄関に、ひとり。本物は、ひとりだけのはずだ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a1": {
+  "dur": 5.35,
+  "voice": "Sulafat",
+  "text": "最初に、あけるな、と叫んだのは、かいせん、にの、ハルトだった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a2": {
+  "dur": 3.25,
+  "voice": "Sulafat",
+  "text": "ハルト。あなた、今どこにいるの？",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a3": {
+  "dur": 5.048,
+  "voice": "Sulafat",
+  "text": "返事は、なかった。通話の時間だけが、進んでいく。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a4": {
+  "dur": 4.956,
+  "voice": "Sulafat",
+  "text": "そのかわり、じゅわぐちから、聞き覚えのある音がした。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a5": {
+  "dur": 3.217,
+  "voice": "Sulafat",
+  "text": "うちの、インターホンの音だった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a6": {
+  "dur": 7.263,
+  "voice": "Sulafat",
+  "text": "かいせん、にの、ハルトは、東京なんかじゃない。この家の、玄関の外にいる。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b1": {
+  "dur": 2.497,
+  "voice": "Sulafat",
+  "text": "そこの人。…顔を、見せて。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b2": {
+  "dur": 2.067,
+  "voice": "Orus",
+  "text": "どうぞ。よく見てください。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b3": {
+  "dur": 4.051,
+  "voice": "Sulafat",
+  "text": "フードの下にあったのは、ハルトの顔だった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b4": {
+  "dur": 3.575,
+  "voice": "Iapetus",
+  "text": "かあさん、ごめん。東京にいるなんて、ウソなんだ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b5": {
+  "dur": 3.197,
+  "voice": "Iapetus",
+  "text": "スマホに知らせが来て、車でこっちに向かってた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b5b": {
+  "dur": 2.174,
+  "voice": "Sulafat",
+  "text": "ハルト…！　けがは、ないの？",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b5c": {
+  "dur": 3.477,
+  "voice": "Iapetus",
+  "text": "大丈夫。母さん、俺の言うことだけ、信じて。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b6": {
+  "dur": 6.58,
+  "voice": "Sulafat",
+  "text": "本物のハルトは、玄関にいる。じゃあ、電話で泣いているハルトは——",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c1": {
+  "dur": 5.647,
+  "voice": "Iapetus",
+  "text": "母さん、だまされないで…俺が本物なんだよ…",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c2": {
+  "dur": 3.903,
+  "voice": "Sulafat",
+  "text": "泣き声が、途中で、ぷつりと止まった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c3": {
+  "dur": 2.773,
+  "voice": "Algenib",
+  "text": "…もういいだろ。芝居は終わりだ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c4": {
+  "dur": 4.465,
+  "voice": "Sulafat",
+  "text": "息子の声が、知らない男の声に変わった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c5": {
+  "dur": 4.462,
+  "voice": "Algenib",
+  "text": "くろだだ。息子さんの声、よくできてただろ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c6": {
+  "dur": 8.132,
+  "voice": "Algenib",
+  "text": "泣き方も、口ぐせも、犬の名前も。全部、本人そっくりだ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c7": {
+  "dur": 3.229,
+  "voice": "Sulafat",
+  "text": "だから、コテツの名前も、答えられたのか。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d1": {
+  "dur": 4.549,
+  "voice": "Algenib",
+  "text": "本物の息子は、うちのたかぎが、あずかってる。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d2": {
+  "dur": 4.285,
+  "voice": "Sulafat",
+  "text": "画面の中で、たかぎが、ハルトの肩を、強くつかんだ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d3": {
+  "dur": 4.422,
+  "voice": "Algenib",
+  "text": "さんびゃくまんは、もういい。この家の鍵を、あけろ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d3b": {
+  "dur": 3.606,
+  "voice": "Algenib",
+  "text": "開けなきゃ、息子とは、ここでお別れだ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d4": {
+  "dur": 4,
+  "voice": "Sulafat",
+  "text": "お金じゃない。欲しいのは、この家？",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d5": {
+  "dur": 1.752,
+  "voice": "Iapetus",
+  "text": "かあさん、あけるな！この家には——",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d6": {
+  "dur": 2.862,
+  "voice": "Sulafat",
+  "text": "ハルトは、何を言いかけたんだろう。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e1": {
+  "dur": 4.551,
+  "voice": "Algenib",
+  "text": "簡単だろ。玄関まで来て、鍵を回すだけだ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e2": {
+  "dur": 2.828,
+  "voice": "Sulafat",
+  "text": "玄関までは、ほんの、じゅっぽ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e3": {
+  "dur": 4.686,
+  "voice": "Algenib",
+  "text": "…あんたに、足があるならな。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e4": {
+  "dur": 4.383,
+  "voice": "Sulafat",
+  "text": "その言葉の意味が、私には、わからなかった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "x1": {
+  "dur": 1.751,
+  "voice": "Schedar",
+  "text": "次回。あきや。",
+  "model": "gemini-3.8-flash-tts"
+ }
+}
