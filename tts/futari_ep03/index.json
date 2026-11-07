@@ -24,9 +24,9 @@
   "model": "gemini-3.8-flash-tts"
  },
  "a4": {
-  "dur": 4.956,
+  "dur": 5.637,
   "voice": "Sulafat",
-  "text": "そのかわり、じゅわぐちから、聞き覚えのある音がした。",
+  "text": "そのかわり、受話口から、聞き覚えのある音がした。",
   "model": "gemini-3.8-flash-tts"
  },
  "a5": {
@@ -90,9 +90,9 @@
   "model": "gemini-3.8-flash-tts"
  },
  "c1": {
-  "dur": 5.647,
+  "dur": 3.747,
   "voice": "Iapetus",
-  "text": "母さん、だまされないで…俺が本物なんだよ…",
+  "text": "かあさん、だまされないで…。おれが、本物なんだよ…",
   "model": "gemini-3.8-flash-tts"
  },
  "c2": {
@@ -150,9 +150,9 @@
   "model": "gemini-3.8-flash-tts"
  },
  "d3b": {
-  "dur": 3.606,
+  "dur": 3.562,
   "voice": "Algenib",
-  "text": "開けなきゃ、息子とは、ここでお別れだ。",
+  "text": "あけなきゃ、息子とは、ここで、お別れだ。",
   "model": "gemini-3.8-flash-tts"
  },
  "d4": {
@@ -162,9 +162,9 @@
   "model": "gemini-3.8-flash-tts"
  },
  "d5": {
-  "dur": 1.752,
+  "dur": 2.609,
   "voice": "Iapetus",
-  "text": "かあさん、あけるな！この家には——",
+  "text": "かあさん！あけるな！この家には——",
   "model": "gemini-3.8-flash-tts"
  },
  "d6": {
