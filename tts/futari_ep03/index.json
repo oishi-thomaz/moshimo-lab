@@ -24,9 +24,9 @@
   "model": "gemini-3.8-flash-tts"
  },
  "a4": {
-  "dur": 5.637,
+  "dur": 6.698,
   "voice": "Sulafat",
-  "text": "そのかわり、受話口から、聞き覚えのある音がした。",
+  "text": "そのかわり、電話の、向こうから、聞き覚えのある音がした。",
   "model": "gemini-3.8-flash-tts"
  },
  "a5": {
