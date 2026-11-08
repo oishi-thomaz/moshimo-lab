@@ -11,16 +11,24 @@ import { SERIES, EPISODE, CAST, LINES } from './ep05.script.js';
 
 const dark = g => bg(g, '#141a17', '#090d0b');
 const hall = g => bg(g, '#1c1814', '#0e0c0a');
+// 透ける体：一度ふつうに描いてから全体を薄くする（首や髪が顔の上に透けて四角く見えないように）
+let ghostCv = null;
+const ghosted = (g, a, fn) => {
+  if (a >= 0.999) { g.save(); fn(g); g.restore(); return; }
+  if (!ghostCv || ghostCv.width !== g.canvas.width || ghostCv.height !== g.canvas.height) { ghostCv = document.createElement('canvas'); ghostCv.width = g.canvas.width; ghostCv.height = g.canvas.height; }
+  const h = ghostCv.getContext('2d');
+  h.setTransform(1, 0, 0, 1, 0, 0); h.clearRect(0, 0, ghostCv.width, ghostCv.height); h.setTransform(g.getTransform());
+  h.save(); fn(h); h.restore();
+  g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.globalAlpha = a; g.drawImage(ghostCv, 0, 0); g.restore();
+};
 // 佐和子のアップ。ghost＝体が透ける（自分がAIだと知ったあと）
 const face = (g, lt, D, S, ids = [], o = {}) => {
   dark(g);
   const tk = talking(lt, S, ids);
   smartSpeaker(g, 190, 1010, 1.3, { on: 0.25 + tk * 0.9 + (o.glowUp || 0), t: lt });
-  g.save(); g.globalAlpha = o.ghost ?? 1; cam(g, { x: 540, y: 800, z: slow(lt, D, o.z0 ?? 1.0, o.z1 ?? 1.06) });
-  close(g, P.sawako, { y: 630, s: 4.0, talk: tk * 0.5, lightFrom: 'left', phoneLight: true, ...o });
-  g.restore();
+  ghosted(g, o.ghost ?? 1, h => { cam(h, { x: 540, y: 800, z: slow(lt, D, o.z0 ?? 1.0, o.z1 ?? 1.06) }); close(h, P.sawako, { y: 630, s: 4.0, talk: tk * 0.5, lightFrom: 'left', phoneLight: true, ...o }); });
 };
-const shock = (g, lt, D, o = {}) => { dark(g); speedLines(g, 540, 760, { inner: 470, t: lt, color: 'rgba(200,255,220,.16)' }); g.save(); g.globalAlpha = o.ghost ?? 1; cam(g, { x: 540, y: 800, z: slow(lt, D, 1.0, 1.1) }); close(g, P.sawako, { y: 680, s: 4.0, eyes: 'wide', brow: -0.6, mouth: 'line', lightFrom: 'left', phoneLight: true, ...o }); g.restore(); };
+const shock = (g, lt, D, o = {}) => { dark(g); speedLines(g, 540, 760, { inner: 470, t: lt, color: 'rgba(200,255,220,.16)' }); ghosted(g, o.ghost ?? 1, h => { cam(h, { x: 540, y: 800, z: slow(lt, D, 1.0, 1.1) }); close(h, P.sawako, { y: 680, s: 4.0, eyes: 'wide', brow: -0.6, mouth: 'line', lightFrom: 'left', phoneLight: true, ...o }); }); };
 const phone = (g, lt, D, draw, o = {}) => { bg(g); g.save(); cam(g, { x: o.x ?? 540, y: o.y ?? 960, z: slow(lt, D, o.z0 ?? 1.0, o.z1 ?? 1.04) }); phoneFrame(g, 140, 80, 800, 1000, draw, { rot: o.rot || 0 }); g.restore(); };
 const subBand = (g, a = 1) => { if (a <= 0) return; g.save(); g.globalAlpha = a; vgrad(g, 0, 1140, W, 330, [[0, 'rgba(6,9,8,0)'], [0.2, 'rgba(6,9,8,.92)'], [0.75, 'rgba(6,9,8,.92)'], [1, 'rgba(6,9,8,0)']]); g.restore(); };
 const room = (g, lt, D, o = {}) => { g.save(); cam(g, { x: o.x ?? 540, y: o.y ?? 1100, z: slow(lt, D, o.z0 ?? 1.0, o.z1 ?? 1.06) }); chanoma(g, { t: lt, clock: [2, 52], ...o.set }); g.restore(); };
@@ -165,7 +173,7 @@ const SHOTS = [
   { at: 'e2', draw(g, lt, D, S) { dawnTwo(g, lt, D, S, [], { hids: ['e2'], brow: 0.6 }); } },
   { at: 'e3', draw(g, lt, D, S) { dawnTwo(g, lt, D, S, ['e3', 'e4'], { eyes: 'normal', brow: 0.7 }); } },
   { at: 'e5', draw(g, lt, D, S) { dawnTwo(g, lt, D, S, [], { hids: ['e5'], mouth: 'smile', eyes: 'closed', z0: 1.05, z1: 1.12 }); } },
-  { at: 'e6', draw(g, lt, D) { room(g, lt, D, { x: 540, y: 1100, z0: 1.0, z1: 1.06, set: { ring: 1, lamp: 0.6, clock: [9, 0] } }); } },
+  { at: 'e6', draw(g, lt, D) { room(g, lt, D, { x: 540, y: 880, z0: 1.0, z1: 1.06, set: { ring: 1, lamp: 0.6, clock: [9, 0] } }); } },
   { at: 'ring', draw(g, lt, D) { phone(g, lt, D, (p, w, h) => incoming(p, w, h, { t: lt })); } },
   { at: 'e7', draw(g, lt, D, S) { face(g, lt, D, S, ['e7'], { eyes: 'normal', brow: 0, mouth: 'smile' }); glow(g, 160, 800, 520, 'rgba(255,190,120,1)', 0.18); } },
   { at: 'e8', draw(g, lt, D, S) { harutoRoom(g, lt, D, S, ['e8']); } },
