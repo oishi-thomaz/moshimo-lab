@@ -65,25 +65,32 @@ const tHouse = tag('先輩の家', { size: 84, bg: '#e6b450', color: '#14161c' }
 const tKoko = tag('こ↑こ↓', { size: 120, w: 540, sx: 3.4, bg: '#e2483c' }); tKoko.position.set(-0.4, 5.2, 0.4); qs.add(tKoko);
 const tYari = tag('やりますねぇ', { size: 92, w: 620, sx: 3.2, bg: '#14161c' }); tYari.position.set(1.8, 3.3, 4.2); qs.add(tYari);
 
-// ---------- 2段目. 夜の道の屋台（x=26） ----------
-const STALL = new THREE.Group(); STALL.position.set(26, 0, 0); qs.add(STALL);
-const STEAM = [];
-{ const road = box(16, 0.04, 10, mat('#3a3c44')); road.position.y = 0.02; STALL.add(road);
-  const cart = box(2.6, 1.0, 1.1, mat('#8a4a2a')); cart.position.set(0, 0.8, -1.2); STALL.add(cart);
-  const counter = box(2.8, 0.1, 1.4, mat('#c9a06a')); counter.position.set(0, 1.35, -1.0); STALL.add(counter);
-  for (const x of [-1.25, 1.25]) { const p = box(0.1, 1.6, 0.1, mat('#5a3a22')); p.position.set(x, 2.15, -1.5); STALL.add(p); }
-  const roof = box(3.0, 0.14, 1.6, mat('#5a3a22')); roof.position.set(0, 2.95, -1.2); STALL.add(roof);
-  const noren = box(2.6, 0.5, 0.04, mat('#e8e2d0')); noren.position.set(0, 2.62, -0.45); STALL.add(noren); // 文字なしののれん
-  const lan = new THREE.Mesh(new THREE.SphereGeometry(0.26, 12, 10), new THREE.MeshBasicMaterial({ color: '#e2483c' })); lan.scale.y = 1.3; lan.position.set(1.5, 2.5, -0.4); STALL.add(lan);
-  for (let i = 0; i < 2; i++) { const bowl = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.12, 0.14, 14), mat('#f2efe8')); bowl.position.set(-0.6 + i * 1.2, 1.47, -0.7); STALL.add(bowl); const soup = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.18, 0.02, 14), mat('#c98a3a')); soup.position.set(-0.6 + i * 1.2, 1.54, -0.7); STALL.add(soup); }
-  for (let i = 0; i < 2; i++) { const st = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.22, 0.6, 10), mat('#3a3a3a')); st.position.set(-0.6 + i * 1.2, 0.3, 0.2); STALL.add(st); }
-  const steamTex = canvasTex(128, 128, (g, w, h) => { const gr = g.createRadialGradient(w / 2, h / 2, 0, w / 2, h / 2, w / 2); gr.addColorStop(0, 'rgba(255,255,255,.7)'); gr.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = gr; g.fillRect(0, 0, w, h); });
-  for (let i = 0; i < 6; i++) { const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: steamTex, transparent: true, depthWrite: false })); sp.userData.i = i; STALL.add(sp); STEAM.push(sp); }
-  const warm = new THREE.PointLight(0xffb070, 0, 9, 1.3); warm.position.set(0, 2.4, 0.4); STALL.add(warm); STALL.userData.warm = warm;
-  for (let i = 0; i < 4; i++) { const b = box(2.4, 5 + i, 2.4, mat('#2a2e38')); b.position.set(-6 + i * 4, (5 + i) / 2, -5.5); STALL.add(b); } }
-const sen2 = makePerson(SENPAI); sen2.position.set(24.8, 0, 1.6); qs.add(sen2);
-const kou2 = makePerson(KOUHAI); kou2.position.set(27.2, 0, 1.6); qs.add(kou2);
-const tRamen = tag('うまいラーメン屋の屋台', { size: 66, w: 760, bg: '#e6b450', color: '#14161c' }); tRamen.position.set(26, 3.7, -0.6); qs.add(tRamen);
+// ---------- 1段目. ソファのインタビュー（x=122）。出演者には似せない（服の色・髪・体つきは別。顔もいつものブロック） ----------
+const INTV = new THREE.Group(); INTV.position.set(122, 0, 0); qs.add(INTV);
+{ const fl = box(8, 0.06, 6, mat('#b8b0a2')); fl.position.y = 0.03; INTV.add(fl);
+  const wall = box(8, 4, 0.2, mat('#e9e8e4')); wall.position.set(0, 2, -1.9); INTV.add(wall);
+  const blind = box(2.2, 2.2, 0.04, mat('#c9d6dc')); blind.position.set(-1.9, 2.4, -1.78); INTV.add(blind);
+  for (let i = 0; i < 13; i++) { const sl = box(2.2, 0.035, 0.03, mat('#9fb0b8')); sl.position.set(-1.9, 1.35 + i * 0.17, -1.74); INTV.add(sl); }
+  const sofa = box(2.6, 0.5, 0.95, mat('#7c8088')); sofa.position.set(0.2, 0.42, -0.9); INTV.add(sofa);
+  const sb = box(2.6, 0.8, 0.28, mat('#6e727a')); sb.position.set(0.2, 0.95, -1.35); INTV.add(sb);
+  for (const x of [-1.15, 1.55]) { const arm = box(0.3, 0.7, 0.95, mat('#6e727a')); arm.position.set(x, 0.55, -0.9); INTV.add(arm); }
+ }
+const GUEST = makePerson({ skin: '#e8b98f', hair: '#1d1a19', shirt: '#3f8f6b', pants: '#4a5a7a' }); GUEST.position.set(122.2, 0.12, -0.75); qs.add(GUEST);
+const t24 = tag('24歳・学生', { size: 86, w: 520, bg: '#e6b450', color: '#14161c' }); t24.position.set(122.2, 2.35, -0.6); qs.add(t24);
+
+// ---------- 2段目. 畳の部屋で3人（x=26） ----------
+const TATAMI = new THREE.Group(); TATAMI.position.set(26, 0, 0); qs.add(TATAMI);
+{ const ttex = canvasTex(256, 256, (g, w, h) => { g.fillStyle = '#c9c48a'; g.fillRect(0, 0, w, h); g.strokeStyle = 'rgba(90,80,40,.25)'; g.lineWidth = 2; for (let x = 0; x < w; x += 6) { g.beginPath(); g.moveTo(x, 0); g.lineTo(x, h); g.stroke(); } g.fillStyle = '#4a5a3a'; g.fillRect(0, 0, w, 10); g.fillRect(0, h - 10, w, 10); }); ttex.repeat.set(3, 2);
+  const fl = new THREE.Mesh(new THREE.BoxGeometry(9, 0.06, 7), new THREE.MeshLambertMaterial({ map: ttex })); fl.position.y = 0.03; TATAMI.add(fl);
+  const wall = box(9, 3.4, 0.2, mat('#d8cdb4')); wall.position.set(0, 1.7, -2.6); TATAMI.add(wall);
+  const shoji = box(2.4, 1.8, 0.05, mat('#f2ede0')); shoji.position.set(-2.0, 1.6, -2.48); TATAMI.add(shoji);
+  for (let i = 1; i < 4; i++) { const v = box(0.04, 1.8, 0.06, mat('#8a6a4a')); v.position.set(-3.2 + i * 0.6, 1.6, -2.45); TATAMI.add(v); const hz = box(2.4, 0.04, 0.06, mat('#8a6a4a')); hz.position.set(-2.0, 0.7 + i * 0.45, -2.45); TATAMI.add(hz); }
+  const table = box(1.6, 0.08, 1.0, mat('#7a5232')); table.position.set(0, 0.4, -0.4); TATAMI.add(table); for (const [x, z] of [[-0.7, -0.8], [0.7, -0.8], [-0.7, 0], [0.7, 0]]) { const lg = box(0.08, 0.36, 0.08, mat('#6a4628')); lg.position.set(x, 0.2, z); TATAMI.add(lg); }
+  for (let i = 0; i < 3; i++) { const cup = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.06, 0.14, 10), mat('#e8e2d0')); cup.position.set(-0.5 + i * 0.5, 0.51, -0.4); TATAMI.add(cup); }
+  const lampT = new THREE.PointLight(0xffe0b0, 0, 8, 1.3); lampT.position.set(0, 2.8, 0); TATAMI.add(lampT); TATAMI.userData.lamp = lampT; }
+const SIT = [{ skin: '#e8b98f', hair: '#c9976f', shirt: '#2f4a7a', pants: '#3b3f4a', bald: true }, { skin: '#f1c9a5', hair: '#2c2421', shirt: '#4fa3d1', pants: '#8a7a5a' }, { skin: '#efcfae', hair: '#4a3426', shirt: '#e9e4da', pants: '#59606e' }]
+  .map((o, i) => { const p = makePerson(o); p.position.set([24.9, 26.0, 27.1][i], -0.55, [-0.05, 0.55, -0.05][i]); p.rotation.y = [0.7, Math.PI, -0.7][i]; qs.add(p); return p; });
+const tRamen = tag('うまいラーメン屋の屋台', { size: 66, w: 760, bg: '#e6b450', color: '#14161c' }); tRamen.position.set(26, 2.05, -0.9); qs.add(tRamen);
 
 // ---------- 3段目. 家の中・アイスティー（x=50） ----------
 const ROOM = new THREE.Group(); ROOM.position.set(50, 0, 0); qs.add(ROOM);
@@ -126,35 +133,32 @@ const tYear = tag('2001年', { size: 110, w: 440, bg: '#14161c' }); tYear.positi
 const tNow = tag('25年たっても語り継がれる', { size: 62, w: 820, bg: '#e6b450', color: '#14161c' }); tNow.position.set(98, 4.4, 0.4); qs.add(tNow);
 
 // ---------- shots ----------
-const ALLTAG = [tHouse, tKoko, tYari, tRamen, tTea, tRoof, tYear, tNow];
-function base() { S.reset(); ALLTAG.forEach(x => x.visible = false); HOUSE.userData.lamp.intensity = 0; LIT.forEach(m => m.emissiveIntensity = 0); STALL.userData.warm.intensity = 0; PHONES.forEach(p => p.visible = false); TAPE.visible = false; TRAY.visible = false; TEA.visible = false; TEA_BIG.visible = false; SUN.visible = false; sen.visible = true; kou.visible = true;
-  for (const p of [sen, kou, sen2, kou2, sen3, kou3, sen4, kou4]) { p.userData.head.rotation.set(0, 0, 0); p.userData.arms.forEach(a => a.rotation.set(0, 0, 0)); p.userData.legs.forEach(l => l.rotation.set(0, 0, 0)); } }
+const ALLTAG = [tHouse, tKoko, tYari, tRamen, tTea, tRoof, tYear, tNow, t24];
+function base() { S.reset(); ALLTAG.forEach(x => x.visible = false); HOUSE.userData.lamp.intensity = 0; LIT.forEach(m => m.emissiveIntensity = 0); TATAMI.userData.lamp.intensity = 0; PHONES.forEach(p => p.visible = false); TAPE.visible = false; TRAY.visible = false; TEA.visible = false; TEA_BIG.visible = false; SUN.visible = false; sen.visible = true; kou.visible = true;
+  for (const p of [sen, kou, sen3, kou3, sen4, kou4, GUEST, ...SIT]) { p.userData.head.rotation.set(0, 0, 0); p.userData.arms.forEach(a => a.rotation.set(0, 0, 0)); p.userData.legs.forEach(l => l.rotation.set(0, 0, 0)); } }
 function walk(p, ph, amp = 0.45) { p.userData.legs[0].rotation.x = Math.sin(ph) * amp; p.userData.legs[1].rotation.x = -Math.sin(ph) * amp; p.userData.arms[0].rotation.x = -Math.sin(ph) * amp * 0.7; p.userData.arms[1].rotation.x = Math.sin(ph) * amp * 0.7; }
 // 階段の高さ（z から）
 const stairY = (z) => clamp((1.9 - z) / 0.48, 0, 6.5) * 0.32 + 0.0;
 
-function shotArrive(t) { // 1段目 0〜9：坂の上の大きな家へ、階段をのぼる2人（0秒目から階段の途中）
-  base(); S.aim(0, -1); lift(150);
-  const z = lerp(1.2, -1.2, ease(t / 9));
-  sen.position.set(0.35, stairY(z - 0.9) + 0.32, z - 0.9); sen.rotation.y = Math.PI; walk(sen, t * 6);
-  kou.position.set(1.25, stairY(z + 0.6) + 0.32, z + 0.6); kou.rotation.y = Math.PI; walk(kou, t * 6 + 1.4);
-  if (t > 5.2) { kou.userData.head.rotation.x = -0.45; }
-  tHouse.userData.pop((t - 5.6) / 0.35);
+function shotInterview(t) { // 1段目 0〜9：ソファに座った若い男のインタビュー。24歳、学生です（0秒目から座っている）
+  base(); S.aim(122, 0); lift(150);
+  S.hemi.intensity = 1.15; S.key.intensity = 1.0;
+  GUEST.rotation.y = 0; GUEST.userData.legs.forEach(l => l.rotation.x = -1.45);
+  GUEST.userData.arms[0].rotation.x = -0.5; GUEST.userData.arms[1].rotation.x = -0.5;
+  GUEST.userData.head.rotation.x = Math.sin(t * 2.4) * 0.05; GUEST.userData.head.rotation.y = Math.sin(t * 0.7) * 0.12;
+  t24.userData.pop((t - 1.6) / 0.35);
   const u = ease(t / 9);
-  look(lerp(6.2, 4.6, u), lerp(3.2, 3.8, u), lerp(14.0, 12.6, u), 0.2, lerp(3.8, 4.4, u), -2.0, 56);
+  look(lerp(122.9, 122.5, u), lerp(1.7, 1.6, u), lerp(5.2, 4.2, u), 122.2, 1.2, -0.8, 50);
   return qs;
 }
-function shotRamen(t) { // 2段目 9〜17：帰り道、後輩が言う。うまいラーメン屋の屋台、来てるらしい
-  base(); S.aim(26, 0); lift(200);
-  S.hemi.intensity = 0.4; S.key.intensity = 0.15; S.darken(0.82, '#0a0c16');
-  STALL.userData.warm.intensity = 9;
-  sen2.rotation.y = 0.9; kou2.rotation.y = -0.9;
-  kou2.userData.arms[1].rotation.x = t > 3.4 ? -1.3 : 0; kou2.userData.arms[1].rotation.z = t > 3.4 ? 0.3 : 0; // 屋台を指さす
-  kou2.userData.head.rotation.y = t > 3.4 ? -0.4 : 0;
-  STEAM.forEach(sp => { const i = sp.userData.i; const k = ((t * 0.5 + i / 6) % 1); sp.position.set(-0.6 + (i % 2) * 1.2 + Math.sin(t + i) * 0.1, 1.7 + k * 1.2, -0.7); sp.material.opacity = (1 - k) * 0.7; const s = 0.4 + k * 0.6; sp.scale.set(s, s, 1); });
+function shotTatami(t) { // 2段目 9〜17：畳の部屋に座りこんだ3人。この辺にぃ、うまいラーメン屋の屋台、来てるらしいっすよ
+  base(); S.aim(26, 0); lift(170);
+  S.hemi.intensity = 0.95; S.key.intensity = 0.7; TATAMI.userData.lamp.intensity = 4;
+  SIT.forEach((p, i) => { p.userData.legs.forEach(l => l.rotation.x = -1.5); p.userData.arms.forEach(a => a.rotation.x = -0.6); p.userData.head.rotation.y = Math.sin(t * 1.1 + i * 2) * 0.25; });
+  const talk = SIT[1]; if (t > 3.4) { talk.userData.arms[1].rotation.x = -1.3; talk.userData.arms[1].rotation.z = 0.4; talk.userData.head.rotation.y = 0.3; SIT[0].userData.head.rotation.y = 0.5; SIT[2].userData.head.rotation.y = -0.5; }
   tRamen.userData.pop((t - 4.2) / 0.35);
   const u = ease(t / 8);
-  look(lerp(26.8, 26.2, u), lerp(3.0, 2.8, u), lerp(9.0, 8.2, u), 26, 1.9, -0.6, 54);
+  look(lerp(26.6, 26.2, u), lerp(2.8, 2.5, u), lerp(5.8, 5.2, u), 26, 0.6, -0.2, 54);
   return qs;
 }
 function shotTea(t) { // 3段目 17〜25：家に着くと、先輩がグラスを差し出す
@@ -218,8 +222,8 @@ function shotQuiz(t) { // 49〜56：この作品、わかった？（夏の夜�
 }
 
 const SHOTS = [
-  { a: 0, b: 9, f: shotArrive },
-  { a: 9, b: 17, f: shotRamen },
+  { a: 0, b: 9, f: shotInterview },
+  { a: 9, b: 17, f: shotTatami },
   { a: 17, b: 25, f: shotTea },
   { a: 25, b: 33, f: shotRoof },
   { a: 33, b: 42, f: shotEra },
@@ -228,18 +232,18 @@ const SHOTS = [
   { a: 56, b: 64, f: endCard },
 ];
 const SUBS = [
-  [2.4, 5.6, '坂の上の、<br>大きな家。'],
-  [5.6, 9.0, 'ある夏の日、後輩は<br>先輩の家に招かれた。'],
-  [9.2, 12.6, '帰り道、<br>後輩が言う。'],
+  [1.0, 4.6, '24歳、<br>学生です。'],
+  [4.6, 9.0, 'ソファで始まる、<br>あるインタビュー。'],
+  [9.2, 12.6, '畳の部屋に、<br>座りこんだ3人。'],
   [12.6, 15.0, 'この辺にぃ、<br>うまいラーメン屋の屋台、'],
   [15.0, 17.0, '来てるらしいっすよ。'],
-  [17.2, 21.0, '家に着くと、先輩が<br>グラスを差し出す。'],
+  [17.2, 21.0, '後輩を家に招いた先輩が、<br>グラスを差し出す。'],
   [21.0, 25.0, 'アイスティーしか<br>なかったんだけど、いいかな？'],
   [25.2, 29.4, 'まず、うちさぁ、屋上<br>あんだけど、焼いてかない？'],
   [29.4, 33.0, 'あぁ〜、<br>いいっすね〜。'],
   [33.2, 37.4, '2001年の夏に<br>出た作品。'],
   [37.4, 41.8, '25年たった今も、<br>ネットで語り継がれる。'],
-  [42.2, 45.6, '家を指さして、<br>こ↑こ↓。'],
+  [42.2, 45.6, '坂の上の家を指さして、<br>こ↑こ↓。'],
   [45.6, 49.0, '名言の数は、数えきれない。<br>やりますねぇ。'],
   [49.2, 52.0, 'この作品、<br>わかった？'],
   [52.0, 55.8, 'カウントダウンの間に、<br>当ててみて。'],
@@ -249,7 +253,7 @@ const SUBS = [
 
 runStory({
   shots: SHOTS, subs: SUBS, duration: 64,
-  dim: (f) => f === shotRamen || f === shotEra,
+  dim: (f) => f === shotEra,
   meta: {
     id: 'q060', v2: true, answer: '真夏の夜の淫夢',
     title: 'この作品名はなに？',
@@ -258,8 +262,8 @@ runStory({
     hits: [5.6, 21.0, 42.6, 56.4], risers: [37.4, 52.0],
     impacts: [0.3, 21.0, 25.4, 42.6, 45.8, 56.4],
     sfx: [[0.2, 'whoosh'], [9.0, 'whoosh'], [17.0, 'whoosh'], [21.2, 'poof'], [25.0, 'whoosh'], [33.0, 'whoosh'], [37.6, 'bubble'], [42.0, 'whoosh'], [42.7, 'poof'], [45.9, 'poof'], [49.0, 'meter', 0.5]],
-    narr: { 'こ↑こ↓': 'ここ', '淫夢': 'いんむ', '真夏の夜': 'まなつのよる', '屋台': 'やたい', '屋上': 'おくじょう', '焼いてかない': 'やいてかない', '先輩': 'せんぱい', '後輩': 'こうはい', '語り継がれる': 'かたりつがれる', 'この辺にぃ': 'このへんにぃ', '2001年': 'にせんいちねん', '25年': 'にじゅうごねん', '招かれた': 'まねかれた', '指さして': 'ゆびさして', '作品名': 'さくひんめい' },
-    caption: 'この作品名、わかる？\n坂の上の大きな家。ある夏の日、後輩は先輩の家に招かれた。帰り道には、うまいラーメン屋の屋台のうわさ。\n\n答えは動画の最後で。何秒でわかった？どこでわかった？コメントで教えて。',
+    narr: { 'こ↑こ↓': 'ここ', '淫夢': 'いんむ', '真夏の夜': 'まなつのよる', '屋台': 'やたい', '屋上': 'おくじょう', '焼いてかない': 'やいてかない', '先輩': 'せんぱい', '後輩': 'こうはい', '語り継がれる': 'かたりつがれる', 'この辺にぃ': 'このへんにぃ', '2001年': 'にせんいちねん', '25年': 'にじゅうごねん', '24歳': 'にじゅうよんさい', '畳': 'たたみ', '3人': 'さんにん', '招かれた': 'まねかれた', '指さして': 'ゆびさして', '作品名': 'さくひんめい' },
+    caption: 'この作品名、わかる？\n24歳、学生です。ソファで始まる、あるインタビュー。畳の部屋では3人が、うまいラーメン屋の屋台のうわさ。\n\n答えは動画の最後で。何秒でわかった？どこでわかった？コメントで教えて。',
     hashtags: ['タイトル当てクイズ', 'ネットミーム', '名言', '伝説', '2001年'],
   },
 });
