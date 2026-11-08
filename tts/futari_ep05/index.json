@@ -1,8 +1,8 @@
 {
  "k2": {
-  "dur": 4.167,
+  "dur": 4.127,
   "voice": "Sulafat",
-  "text": "懐中電灯の光が、ぶつだんの写真を照らした。",
+  "text": "かいちゅうでんとうの光が、ぶつだんの写真を照らした。",
   "model": "gemini-3.8-flash-tts"
  },
  "k3": {
@@ -12,9 +12,9 @@
   "model": "gemini-3.8-flash-tts"
  },
  "a1": {
-  "dur": 2.929,
+  "dur": 2.937,
   "voice": "Orus",
-  "text": "うわっ…！スピーカーが、しゃべった…！",
+  "text": "うわっ！スピーカーが、しゃべった！",
   "model": "gemini-3.8-flash-tts"
  },
  "a2": {
@@ -138,9 +138,9 @@
   "model": "gemini-3.8-flash-tts"
  },
  "d3": {
-  "dur": 6.276,
+  "dur": 5.092,
   "voice": "Sulafat",
-  "text": "たかぎが入ってすぐ、私は、玄関の鍵を、かけ直していた。",
+  "text": "たかぎが、はいってすぐ、わたしは、げんかんの鍵を、かけなおしていた。",
   "model": "gemini-3.8-flash-tts"
  },
  "d4": {
@@ -174,9 +174,9 @@
   "model": "gemini-3.8-flash-tts"
  },
  "e3": {
-  "dur": 3.787,
+  "dur": 4.294,
   "voice": "Sulafat",
-  "text": "消して。…でも、ひとつだけ約束して。",
+  "text": "けして。…でも、ひとつだけ、やくそくして。",
   "model": "gemini-3.8-flash-tts"
  },
  "e4": {
@@ -186,9 +186,9 @@
   "model": "gemini-3.8-flash-tts"
  },
  "e5": {
-  "dur": 2.806,
+  "dur": 5.308,
   "voice": "Iapetus",
-  "text": "…うん。約束する。",
+  "text": "うん。やくそくする。",
   "model": "gemini-3.8-flash-tts"
  },
  "e6": {
