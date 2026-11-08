@@ -63,7 +63,7 @@ function dialStation(p, w, h, { t = 0 } = {}) {
   const hY = h - 80; circ(p, w / 2, hY, 54, '#ff3b4a'); fillRR(p, w / 2 - 28, hY - 8, 56, 16, 8, '#fff');
 }
 // 空き家（近所の人の話）：雨戸の閉まった家の外観を、警察の報告書のメモ風に
-function emptyHouse(g, lt) {
+function emptyHouse(g, lt, r3 = 1) {
   vgrad(g, -300, -300, W + 600, H + 600, [[0, '#0b0f14'], [1, '#141a20']]);
   const a = easeOut(inv(0, 0.5, lt));
   g.save(); g.globalAlpha = a;
@@ -77,7 +77,7 @@ function emptyHouse(g, lt) {
   fillRR(g, 500, 760, 80, 80, 2, '#3a2c28'); fillRR(g, 640, 770, 60, 40, 3, '#9a9488'); fillRR(g, 646, 760, 48, 16, 2, '#e8e2d4');
   g.restore();
   const rows = ['先週　通報により訪問', '応答なし・人の気配なし', '近所の話：2年前から空き家'];
-  rows.forEach((s, i) => text(g, s, 200, 900 + i * 54, { size: 36, color: i === 2 ? '#c0392b' : '#2a2a33', align: 'left', weight: 800, alpha: easeOut(inv(0.4 + i * 0.35, 0.7 + i * 0.35, lt)) }));
+  rows.forEach((s, i) => text(g, s, 200, 900 + i * 54, { size: 36, color: i === 2 ? '#c0392b' : '#2a2a33', align: 'left', weight: 800, alpha: easeOut(inv(0.4 + i * 0.35, 0.7 + i * 0.35, lt)) * (i === 2 ? r3 : 1) }));
   g.restore();
 }
 // 消えたテレビの黒い画面（茶の間が映る。座布団は空）
@@ -145,8 +145,8 @@ const SHOTS = [
   { at: 'a2', draw(g, lt, D) { phone(g, lt, D, (p, w, h) => stationCall(p, w, h, { t: lt, sec: 1 })); } },
   { at: 'a3', draw(g, lt, D, S) { face(g, lt, D, S, ['a3'], { eyes: 'wide', brow: 0.6 }); } },
   { at: 'a4', draw(g, lt, D) { phone(g, lt, D, (p, w, h) => stationCall(p, w, h, { t: lt, sec: 9 }), { z0: 1.02, z1: 1.06 }); } },
-  { at: 'a5', draw(g, lt, D) { emptyHouse(g, lt); } },
-  { at: 'a7', finish: { vignette: 0.6 }, draw(g, lt, D) { g.save(); cam(g, { x: 540, y: 900, z: slow(lt, D, 1.15, 1.25) }); emptyHouse(g, lt + 3); g.restore(); tag(g, '2年前から空き家', 540, 1460, { size: 54, bg: '#3a0c0c', color: '#ff7a6a', alpha: inv(D * 0.4, D * 0.4 + 0.3, lt) }); } },
+  { at: 'a5', draw(g, lt, D) { emptyHouse(g, lt, 0); } },
+  { at: 'a7', finish: { vignette: 0.6 }, draw(g, lt, D) { g.save(); cam(g, { x: 540, y: 960, z: slow(lt, D, 1.15, 1.25) }); emptyHouse(g, lt + 3, easeOut(inv(D * 0.4, D * 0.4 + 0.3, lt))); g.restore(); tag(g, '2年前から空き家', 540, 1460, { size: 54, bg: '#3a0c0c', color: '#ff7a6a', alpha: inv(D * 0.4, D * 0.4 + 0.3, lt) }); } },
   { at: 'a8', finish: { vignette: 0.7 }, draw(g, lt, D) { shock(g, lt, D, { mouth: 'open' }); } },
 
   // ── 2. 黒い画面
