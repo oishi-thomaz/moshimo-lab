@@ -7,7 +7,7 @@
 //  4. Instagram の長期トークンを30日ごとに自動更新する
 //  5. 同じ動画を YouTube（ショート）にも同時に投稿する（LINE の YouTube設定 で接続したとき）
 //  6. インスタ・YouTube・TikTok の数字を毎時記録し、急に伸びたら LINE に知らせる。毎朝の解析の日報を預かって LINE に送る
-//  7. 「今すぐ投稿」を押したとき（TT_UPLOAD=1 なら毎回）、インスタに投稿するのと同時に TikTok アプリの下書き（受信箱）へ動画を送り、キャプションを LINE に送る
+//  7. TT_UPLOAD=1 のときだけ、インスタに投稿するのと同時に TikTok アプリの下書き（受信箱）へ動画を送り、キャプションを LINE に送る（2026/11/09〜 クイズ・いつわ劇場も 0。TikTok は Chrome で予約する）
 //
 // 同じファイルで別のアカウント用のサーバーも動かせる（いつわ劇場：PREFIX=/itsuwa BRAND=いつわ劇場 など。server/itsuwa.env.example）
 //
@@ -292,7 +292,7 @@ async function onPostback(ev) {
   if (act === 'ttretry') { await reply(ev.replyToken, text(`${id} をTikTokの下書きにもう一回送ってみる`)); const tr = await tiktokDraft(id); return pushPosted(id, { tt: tr }); }
   if (it.status === 'published') return reply(ev.replyToken, text(`${id} はもう投稿済み：${it.permalink || ''}`));
   if (act === 'approve') { it.status = 'approved'; it.publishAt = nextSlot(); save(); return reply(ev.replyToken, text(`OK。${id} は ${fmt(it.publishAt)} に投稿する`)); }
-  if (act === 'now') { it.status = 'approved'; it.publishAt = Date.now(); it.ttNow = true; save(); return reply(ev.replyToken, text(`OK。${id} を今から投稿する${state.tt && state.tt.refresh ? '（TikTokは下書きに送る）' : ''}`)); }
+  if (act === 'now') { it.status = 'approved'; it.publishAt = Date.now(); it.ttNow = true; save(); return reply(ev.replyToken, text(`OK。${id} を今から投稿する${TT_UPLOAD && state.tt && state.tt.refresh ? '（TikTokは下書きに送る）' : ''}`)); }
   if (act === 'reject') { it.status = 'rejected'; save(); return reply(ev.replyToken, text(`${id} は却下にした。直したいところがあったら Claude に伝えて`)); }
   if (act === 'retry') { it.status = 'approved'; it.publishAt = Date.now(); it.error = ''; save(); return reply(ev.replyToken, text(`${id} をもう一回投稿してみる`)); }
 }
@@ -318,7 +318,7 @@ function reserve(msg) {
   const j = new Date(Date.now() + JST); const day0 = Date.UTC(j.getUTCFullYear(), j.getUTCMonth(), j.getUTCDate()) - JST;
   const [hh, mm] = hm.split(':').map(Number); let t = day0 + (hh * 60 + mm) * 60e3; if (t < Date.now() + 60e3) t += 86400e3;
   it.status = 'approved'; it.publishAt = t; it.ttNow = true; save(); // 2026/11/01 ゆうと：予約はインスタ・YouTube・TikTok（下書き）全部同じ時間で
-  return `OK。${id} は ${fmt(t)} に投稿する（インスタ・YouTube・TikTokの下書き、全部この時間）`;
+  return `OK。${id} は ${fmt(t)} に投稿する（${TT_UPLOAD ? 'インスタ・YouTube・TikTokの下書き、全部この時間' : 'インスタ・YouTube。TikTok は Chrome の予約で同じ時間に合わせる'}）`;
 }
 // 「インスタトークン 〜」：解析の権限を足して作り直したトークンに差し替える
 async function setIgToken(msg) {
@@ -461,13 +461,13 @@ async function publish(id) {
     Object.assign(it, { status: 'published', mediaId: p.id, permalink: info.permalink || '', publishedAt: Date.now() }); save();
     log('published', id, it.permalink);
     const yr = await youtube(id, true);
-    const tr = (TT_UPLOAD || it.ttNow) ? await tiktokDraft(id) : undefined;
+    const tr = TT_UPLOAD ? await tiktokDraft(id) : undefined; // 2026/11/09〜 TT_UPLOAD=0 なら今すぐ投稿・時間指定でも下書きに送らない（TikTok は Chrome で予約する）
     await pushPosted(id, { ig: { ok: true, url: it.permalink }, yt: yr, tt: tr });
   } catch (e) {
     Object.assign(it, { status: 'error', error: String(e.message || e) }); save();
     log('publish error', id, e);
     const yr = await youtube(id, true); // インスタが失敗しても YouTube は予定どおり出す
-    const tr = (TT_UPLOAD || it.ttNow) ? await tiktokDraft(id) : undefined;
+    const tr = TT_UPLOAD ? await tiktokDraft(id) : undefined; // 2026/11/09〜 TT_UPLOAD=0 なら今すぐ投稿・時間指定でも下書きに送らない（TikTok は Chrome で予約する）
     await pushPosted(id, { ig: { ok: false, error: it.error.slice(0, 200) }, yt: yr, tt: tr });
   }
 }
@@ -809,7 +809,7 @@ function ttCommand(msg) {
     const q = new URLSearchParams({ client_key: state.tt.clientKey, scope: TT_SCOPE, response_type: 'code', redirect_uri: ttRedirect(), state: state.tt.oauthState });
     return `つなぎ直しのリンク。${BRAND}のTikTokアカウント（@${TT_USER}）でログインして許可して（もしもラボの TikTok にログインしてるブラウザでは開かない）。\n\nhttps://www.tiktok.com/v2/auth/authorize/?${q}`;
   }
-  if (state.tt && state.tt.refresh) return TT_UPLOAD ? `TikTokは接続済み（${state.tt.name || TT_USER}）。インスタに投稿するときに、下書きへ動画を送る` : `TikTokは接続済み（${state.tt.name || TT_USER}）。動画ごとの再生数を取ってて、「今すぐ投稿」のときは下書きへ動画を送る`;
+  if (state.tt && state.tt.refresh) return TT_UPLOAD ? `TikTokは接続済み（${state.tt.name || TT_USER}）。インスタに投稿するときに、下書きへ動画を送る` : `TikTokは接続済み（${state.tt.name || TT_USER}）。動画ごとの再生数を取ってる（下書きには送らない。TikTok は Chrome で予約する）`;
   return `TikTokの接続で使うリダイレクトURI：\n${ttRedirect()}\n\nTikTok for Developers でアプリを作るときに Login Kit のリダイレクトURIにこれを入れて。できたら このLINEに\nTikTok設定 クライアントキー シークレット\nと送る`;
 }
 async function ttCallback(u, res) {
@@ -820,7 +820,7 @@ async function ttCallback(u, res) {
   if (!j.refresh_token) { log('tt auth failed', j); return html(`接続に失敗した（${String(j.error_description || j.error || '').slice(0, 100)}）。LINEで TikTok設定 からやり直して。`); }
   state.tt.refresh = j.refresh_token; delete state.tt.oauthState; ttAccess = { token: j.access_token, exp: Date.now() + (j.expires_in || 86400) * 1000 }; save();
   try { const d = await ttApi('GET', 'https://open.tiktokapis.com/v2/user/info/?fields=display_name,follower_count'); state.tt.name = (d.user && d.user.display_name) || ''; save(); } catch (e) { log('tt user', e.message); }
-  await pushForce(text(TT_UPLOAD ? `TikTokにつながった（${state.tt.name || TT_USER}）。これからはインスタに投稿するときに、TikTokの下書きにも動画を送る。` : `TikTokにつながった（${state.tt.name || TT_USER}）。これからは動画ごとの再生数も毎時取る。「今すぐ投稿」を押したときは TikTok の下書きにも動画を送る。`));
+  await pushForce(text(TT_UPLOAD ? `TikTokにつながった（${state.tt.name || TT_USER}）。これからはインスタに投稿するときに、TikTokの下書きにも動画を送る。` : `TikTokにつながった（${state.tt.name || TT_USER}）。これからは動画ごとの再生数も毎時取る（下書きには送らない）。`));
   return html('TikTokにつながった。LINEに戻ってOK。');
 }
 
@@ -831,7 +831,7 @@ async function ttCallback(u, res) {
 let ttQueue = Promise.resolve();
 const TT_CAP = /pending_share|daily upload cap/i;
 async function ttRetryTick() {
-  if (!state.tt || !state.tt.refresh) return;
+  if (!TT_UPLOAD || !state.tt || !state.tt.refresh) return;
   const list = Object.entries(state.items).filter(([, i]) => i.tt && !i.tt.ok && TT_CAP.test(i.tt.error || '') && (i.publishedAt || i.receivedAt || 0) > Date.now() - 3 * 86400e3).sort((a, b) => (a[1].publishedAt || 0) - (b[1].publishedAt || 0));
   for (const [id] of list) { const r = await tiktokDraft(id); if (!r.ok) break; await pushPosted(id, { tt: r }).catch(() => {}); }
 }

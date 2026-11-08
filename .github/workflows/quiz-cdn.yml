@@ -1,15 +1,20 @@
 name: quiz-cdn
 
-# タイトル当てクイズ：TikTok の予約用に、投稿サーバーの動画を Cloudinary にも置く
+# タイトル当てクイズ・いつわ劇場：TikTok の予約用に、動画を Cloudinary にも置く（account：quiz＝投稿サーバーの動画、itsuwa＝drama-out ブランチの posts/<番号>/）
+# 2026/11/09〜 Chrome の別プロフィール（クイズ用・いつわ劇場用）で予約する（moshimo-analytics の TIKTOK.md の 5）
 # TikTok Studio のページは決まった配信元（res.cloudinary.com など）からしか動画を読み込めないため。
-# Claude アプリのブラウザ（@title_ate_quiz でログイン）がここに置いた動画を取り込んで予約する（docs/QUIZ-TIKTOK.md）
-# 置くのは quiz/ の下だけ。14日より前に置いた quiz/ の動画は消す（無料枠の容量を使い切らないため）
+# そのアカウントの Chrome で、ここに置いた動画を fetch して file input に入れて予約する（ファイルを渡す道具の10MBの上限を通らないので、3分のドラマも入る）
+# 置くのは quiz/・itsuwa/ の下だけ。14日より前に置いたそのアカウントの動画は消す（無料枠の容量を使い切らないため）
 on:
   workflow_dispatch:
     inputs:
       ids:
         description: '投稿サーバーの番号（スペース区切り。例 5001 5002）'
         required: true
+      account:
+        description: 'quiz / itsuwa'
+        required: false
+        default: quiz
 
 permissions:
   contents: read
@@ -25,9 +30,10 @@ jobs:
     env:
       BASE: ${{ secrets.QUIZ_BASE_URL }}
       CLD: ${{ secrets.CLOUDINARY_URL }}
+      ACC: ${{ github.event.inputs.account || 'quiz' }}
     steps:
       - name: Check secrets
-        run: '[ -n "$BASE" ] && [ -n "$CLD" ] || { echo "QUIZ_BASE_URL / CLOUDINARY_URL が未設定"; exit 1; }'
+        run: '[ "$ACC" = quiz ] || [ "$ACC" = itsuwa ] || { echo "account は quiz か itsuwa"; exit 1; }; [ -n "$CLD" ] && { [ "$ACC" = itsuwa ] || [ -n "$BASE" ]; } || { echo "QUIZ_BASE_URL / CLOUDINARY_URL が未設定"; exit 1; }'
 
       - name: Upload to Cloudinary
         run: |
@@ -41,11 +47,12 @@ jobs:
           FAIL=0
           for N in ${{ github.event.inputs.ids }}; do
             case "$N" in ''|*[!0-9]*) echo "番号が数字じゃない: $N"; FAIL=1; continue;; esac
-            if ! curl -fsS --retry 3 -o "/tmp/$N.mp4" "$BASE/media/$N.mp4"; then echo "QUIZ_CDN $N NG（投稿サーバーに動画がない）"; FAIL=1; continue; fi
+            if [ "$ACC" = itsuwa ]; then SRC="https://raw.githubusercontent.com/oishi-thomaz/moshimo-lab/drama-out/posts/$N/$N.mp4"; CSRC="https://raw.githubusercontent.com/oishi-thomaz/moshimo-lab/drama-out/posts/$N/${N}_cover.jpg"; else SRC="$BASE/media/$N.mp4"; CSRC="$BASE/media/${N}_cover.jpg"; fi
+            if ! curl -fsS --retry 3 -o "/tmp/$N.mp4" "$SRC"; then echo "QUIZ_CDN $N NG（元の動画がない：$SRC）"; FAIL=1; continue; fi
             TS=$(date +%s)
-            SIG=$(printf 'overwrite=true&public_id=quiz/%s&timestamp=%s%s' "$N" "$TS" "$SEC" | sha1sum | cut -d' ' -f1)
+            SIG=$(printf 'overwrite=true&public_id=%s/%s&timestamp=%s%s' "$ACC" "$N" "$TS" "$SEC" | sha1sum | cut -d' ' -f1)
             RES=$(curl -sS --retry 2 -X POST "https://api.cloudinary.com/v1_1/$CLOUD/video/upload" \
-              -F "file=@/tmp/$N.mp4" -F "public_id=quiz/$N" -F overwrite=true -F "timestamp=$TS" -F "api_key=$KEY" -F "signature=$SIG")
+              -F "file=@/tmp/$N.mp4" -F "public_id=$ACC/$N" -F overwrite=true -F "timestamp=$TS" -F "api_key=$KEY" -F "signature=$SIG")
             URL=$(printf '%s' "$RES" | jq -r '.secure_url // empty')
             if [ -z "$URL" ]; then echo "QUIZ_CDN $N NG $(printf '%s' "$RES" | jq -c '.error // .' | head -c 300)"; FAIL=1; continue; fi
             # 置いたものが元の動画と同じ大きさで返ってくるか確かめる
@@ -53,16 +60,16 @@ jobs:
             if [ "$GOT" != "$WANT" ]; then echo "QUIZ_CDN $N NG（大きさが違う $GOT / $WANT）"; FAIL=1; continue; fi
             echo "QUIZ_CDN $N $URL"
             # カバー（TikTok Studio でカバーをアップロードするため）。quiz/NNNN_cover の画像として置く
-            if curl -fsS --retry 3 -o "/tmp/${N}_cover.jpg" "$BASE/media/${N}_cover.jpg"; then
-              TS=$(date +%s); SIG=$(printf 'overwrite=true&public_id=quiz/%s_cover&timestamp=%s%s' "$N" "$TS" "$SEC" | sha1sum | cut -d' ' -f1)
-              CU=$(curl -sS --retry 2 -X POST "https://api.cloudinary.com/v1_1/$CLOUD/image/upload" -F "file=@/tmp/${N}_cover.jpg" -F "public_id=quiz/${N}_cover" -F overwrite=true -F "timestamp=$TS" -F "api_key=$KEY" -F "signature=$SIG" | jq -r '.secure_url // empty')
+            if curl -fsS --retry 3 -o "/tmp/${N}_cover.jpg" "$CSRC"; then
+              TS=$(date +%s); SIG=$(printf 'overwrite=true&public_id=%s/%s_cover&timestamp=%s%s' "$ACC" "$N" "$TS" "$SEC" | sha1sum | cut -d' ' -f1)
+              CU=$(curl -sS --retry 2 -X POST "https://api.cloudinary.com/v1_1/$CLOUD/image/upload" -F "file=@/tmp/${N}_cover.jpg" -F "public_id=$ACC/${N}_cover" -F overwrite=true -F "timestamp=$TS" -F "api_key=$KEY" -F "signature=$SIG" | jq -r '.secure_url // empty')
               [ -n "$CU" ] && echo "QUIZ_COVER $N $CU" || echo "QUIZ_COVER $N NG"
             fi
           done
           # 14日より前に置いた quiz/ の動画を消す
-          OLD=$(curl -sS -u "$KEY:$SEC" "https://api.cloudinary.com/v1_1/$CLOUD/resources/video/upload?prefix=quiz/&max_results=500" \
+          OLD=$(curl -sS -u "$KEY:$SEC" "https://api.cloudinary.com/v1_1/$CLOUD/resources/video/upload?prefix=$ACC/&max_results=500" \
             | jq -r --arg lim "$(date -u -d '14 days ago' +%Y-%m-%dT%H:%M:%SZ)" '.resources[]? | select(.created_at < $lim) | .public_id')
           for P in $OLD; do
-            case "$P" in quiz/*) curl -sS -u "$KEY:$SEC" -X DELETE "https://api.cloudinary.com/v1_1/$CLOUD/resources/video/upload?public_ids[]=$P" >/dev/null && echo "removed $P";; esac
+            case "$P" in quiz/*|itsuwa/*) curl -sS -u "$KEY:$SEC" -X DELETE "https://api.cloudinary.com/v1_1/$CLOUD/resources/video/upload?public_ids[]=$P" >/dev/null && echo "removed $P";; esac
           done
           exit $FAIL

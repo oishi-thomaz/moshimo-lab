@@ -10,7 +10,7 @@
 | 8:00・13:00・22:30 | moshimo-analytics の summary.yml | SNS司令室のまとめ。数字はまとめ側が出す。Claude の日報は 13:00 の昼のまとめに載る |
 | 8:00 ごろ | ゆうと | SNS司令室で 動画の承認・修正の指示・台本の返事（1日1回） |
 | 8:45 | moshimo-analytics の daily-prep.yml | 3アカウントの collect と集計（analysis/）を commit |
-| いつも | 投稿サーバー（VPS） | 投稿・承認カード・バズの通知・TikTok の下書き（クイズ・いつわ劇場）・下書きの送り直し |
+| いつも | 投稿サーバー（VPS） | 投稿・承認カード・バズの通知（TikTok の下書きに送る仕組みは 2026/11/09 にやめた。TikTok は3アカウントとも Chrome で予約する） |
 
 リポジトリ：oishi-thomaz/moshimo-lab（公開。動画・台本・手順書）と oishi-thomaz/moshimo-analytics（非公開。数字・日報・TikTok の記録）。アカウントや仕組みの細かいこと（アカウント一覧・LINE・声の上限・収益化の条件）は ops/reference.md。要るときだけ読む。
 
@@ -24,7 +24,7 @@
 5. ■ render-fix（書き出しの失敗）：ops/render-fix.md を読んで自分で直す。
 6. ほかのモジュールはサブエージェントに任せる（Agent ツール、general-purpose、run_in_background）。自分では手順書を読まない。依頼文は下の形をそのまま使う：
    `<モジュール>：today.mjs の出力は次のとおり。<そのモジュールの行をそのまま貼る>。/home/claude/moshimo-lab/<手順書> を最後まで読んで、そのとおりにやって。作業フォルダは cp -r /home/claude/moshimo-lab /home/claude/w-<モジュール>-lab と cp -r /home/claude/moshimo-analytics /home/claude/w-<モジュール>-an で作ってそこで作業し、終わる前に全部 push してから消す（push の前に git pull --rebase）。/home/claude/moshimo-lab/ops/rules.md を読んで守る。最後に、やったこと（番号・タイトル）と、できなかったこととその理由を短く返す。`
-   - モデル：feedback・make-moshimo・make-quiz・make-itsuwa・report は model に opus。tiktok は sonnet（ゆうとの Mac の Chrome を使う。手順書は /home/claude/moshimo-analytics/TIKTOK.md）。
+   - モデル：feedback・make-moshimo・make-quiz・make-itsuwa・report は model に opus。tiktok は sonnet（ゆうとの Mac の Chrome を使う。アカウントごとに別のプロフィールで、Claude からは別のブラウザに見える。手順書は /home/claude/moshimo-analytics/TIKTOK.md。もしもラボ・クイズ・いつわ劇場の行をまとめて1つのサブエージェントに渡す。ブラウザの選び直しがぶつかるので、tiktok は2つ立てない）。
    - 順番：feedback・report・tiktok・make-moshimo を先に立て、make-quiz・make-itsuwa は空いたら立てる（同時に動かすのは4つまで。日報は 12:58 までに push すれば昼のまとめに載る）。
 7. 全部のサブエージェントが返ってきたら、両方のリポジトリで git pull --rebase してから `node tools/today.mjs` をもう一度だけ動かして、残りがあれば最後の返答に書く（やり直しはしない。次の回が拾う）。作業フォルダ（/home/claude/w-*）が残っていれば push 済みか確かめて消す。
 8. 最後の返答：関西弁のタメ口で短く。アカウントごとに1〜2行（作った番号・TikTok に予約した回・直したこと・日報の要点）と、ゆうとにやってほしいことがあればそれだけ。

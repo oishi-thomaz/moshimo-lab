@@ -1468,7 +1468,7 @@ POST_TIMES=20:00
 # 動画が届いたらすぐ承認カードを送る
 APPROVAL_NOW=1
 # インスタに投稿するのと同時に TikTok の下書きへ送る
-TT_UPLOAD=1
+TT_UPLOAD=0
 TT_USERNAME=itsuwa_drama
 MOSHIMO_EOF
   SECRET="$(head -c 32 /dev/urandom | base64 | tr -dc 'A-Za-z0-9' | head -c 40)"

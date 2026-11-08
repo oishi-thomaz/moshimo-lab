@@ -122,7 +122,7 @@ body { font-family: "Noto Sans CJK JP", "Noto Sans JP", sans-serif; color: var(-
   <div class="head">
     <div>
       <h1>SNS運用ワークフロー</h1>
-      <div class="lead">もしもラボ・タイトル当てクイズ・いつわ劇場　｜　台本・制作・投稿・分析は自動。<b>担当者の作業は 毎朝8:00の承認（約10分）と TikTok の下書き投稿 だけ</b></div>
+      <div class="lead">もしもラボ・タイトル当てクイズ・いつわ劇場　｜　台本・制作・投稿・分析は自動。<b>担当者の作業は 毎朝8:00の承認（約10分）だけ</b></div>
     </div>
     <div class="ver"><strong>2026年11月版</strong>連絡はすべて LINE「SNS司令室」に届く</div>
   </div>
@@ -158,7 +158,7 @@ body { font-family: "Noto Sans CJK JP", "Noto Sans JP", sans-serif; color: var(-
       </div>
       <div class="legend-mini">
         <span><b>見張り</b>（細い紫）8:37・11:37・15:37・17:37　書き出しの失敗を自動で直す</span>
-        <span><b>TikTok予約</b>（細い水色）8:07〜23:07 の7回　もしもラボの承認済みの回をインスタと同じ時刻で予約</span>
+        <span><b>TikTok予約</b>（細い水色）8:07〜23:07 の7回　3アカウントの承認済みの回を、それぞれの Chrome のプロフィールでインスタと同じ時刻に予約</span>
       </div>
     </div>
 
@@ -169,7 +169,7 @@ body { font-family: "Noto Sans CJK JP", "Noto Sans JP", sans-serif; color: var(-
         <div class="what">もしも○○が消えたら？の3D解説（約60秒）　1日3本</div>
         <dl class="plat">
           <dt>投稿時刻</dt><dd><b>12:00・18:00・20:30</b></dd>
-          <dt>媒体</dt><dd>インスタ・YouTube 自動／TikTok 自動予約</dd>
+          <dt>媒体</dt><dd>インスタ・YouTube 自動／TikTok Chrome で自動予約</dd>
           <dt>台本</dt><dd><b>担当者が承認</b>（候補10本ずつ）</dd>
         </dl>
       </div>
@@ -178,7 +178,7 @@ body { font-family: "Noto Sans CJK JP", "Noto Sans JP", sans-serif; color: var(-
         <div class="what">映画・ドラマのタイトル当て3D（約64秒）　1日5本</div>
         <dl class="plat">
           <dt>投稿時刻</dt><dd><b>12:00・15:00・18:00・20:00・22:00</b></dd>
-          <dt>媒体</dt><dd>インスタ 自動／TikTok <b>下書き（担当者が投稿）</b></dd>
+          <dt>媒体</dt><dd>インスタ 自動／TikTok Chrome で自動予約</dd>
           <dt>台本</dt><dd>自動（作品は条件で選ぶ）</dd>
         </dl>
       </div>
@@ -187,7 +187,7 @@ body { font-family: "Noto Sans CJK JP", "Noto Sans JP", sans-serif; color: var(-
         <div class="what">1話3分・全5話のショートドラマ　1日1話</div>
         <dl class="plat">
           <dt>投稿時刻</dt><dd><b>20:00</b></dd>
-          <dt>媒体</dt><dd>インスタ・YouTube 自動／TikTok <b>下書き</b></dd>
+          <dt>媒体</dt><dd>インスタ・YouTube 自動／TikTok Chrome で自動予約</dd>
           <dt>台本</dt><dd>自動（動画で承認）</dd>
         </dl>
       </div>
@@ -205,7 +205,6 @@ body { font-family: "Noto Sans CJK JP", "Noto Sans JP", sans-serif; color: var(-
           <div class="btns"><span class="btn p">承認する</span><span class="btn">修正して</span><span class="btn">却下</span></div></div></div>
         <div class="step"><div class="no">4</div><div><b>台本を1本ずつ判断</b><p>もしもラボのみ。届いた日だけ</p>
           <div class="btns"><span class="btn p">この台本でOK</span><span class="btn">直してOK</span><span class="btn">見送り</span></div></div></div>
-        <div class="step"><div class="no" style="background:#F9A8D4">5</div><div><b>TikTok の下書きを投稿（各1分）</b><p>クイズ・いつわ劇場の投稿時刻に届く。キャプションは 今日の投稿 から</p></div></div>
       </div>
     </div>
 
@@ -280,9 +279,8 @@ body { font-family: "Noto Sans CJK JP", "Noto Sans JP", sans-serif; color: var(-
     <div class="card fb">
       <h4>動かすための前提</h4>
       <ul>
-        <li><span><b>Mac を起動して Chrome を開いたまま</b>にする（TikTok の自動予約に使う）</span></li>
+        <li><span><b>Mac を起動して Chrome の3つのプロフィール（もしもラボ・タイトル当てクイズ・いつわ劇場）のウィンドウを開いたまま</b>にする（TikTok の自動予約に使う。最小化してよい。閉じるとそのアカウントの予約が止まる）</span></li>
         <li><span>LINE は無料の送信枠（月200通）の中で動く</span></li>
-        <li><span><b>TikTok の下書きは投稿しないまま5本たまると次が届かない</b>（24時間で5本まで）。届いたらその日のうちに投稿する</span></li>
       </ul>
     </div>
   </div>
@@ -299,8 +297,6 @@ const put = (lane, t, html, cls = '', bg = '') => { const e = document.createEle
 const tick = (lane, t, color) => { const e = document.createElement('div'); e.className = 'tick'; e.style.left = X(hm(t)) + '%'; e.style.background = color; document.querySelector(`[data-lane="${lane}"]`).appendChild(e); };
 
 put('me', '8:00', '8:00 承認（約10分）', 'big left');
-for (const t of ['12:00', '15:00', '18:00', '22:00']) put('me', t, 'TikTok', 'tt');
-put('me', '20:00', 'TikTok×2', 'tt');
 
 put('line', '8:00', '8:00 朝のまとめ＋日報', '', 'var(--navy2)');
 put('line', '13:00', '13:00 昼', '', 'var(--navy2)');
