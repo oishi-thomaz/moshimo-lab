@@ -13,7 +13,7 @@
    - 柱は blueprint の `slot: "柱"` の行を、`series` ごとに `no` の順で。派生は `slot: "派生"` の行。挑戦は `slot: "挑戦"` の行から、virality S を優先して `no` の順
    - 柱の候補が足りないときは、STRATEGY.md の柱シリーズの型で新しいお題を blueprint の末尾に足してから作ってよい（no は 701 以降の空き番号。series と slot を付ける。plan/RULES.md の書式に合わせる）
 3. 1本ごとに、下の手順で `engine/videos/NNNN.js` を作る（NNNN は blueprint の `no` を4桁にしたもの。例 no 2 → 0002、no 701 → 0701。その番号のファイルがもうあるときは 05xx・08xx など空いている番号にして blueprint の made にその番号を書く）
-4. できた番号を `plan/queue.txt` に入れ、blueprint の該当行に `"made": "NNNN"` を付ける。入れる場所：まだ書き出していない在庫の並びが 皮肉（社会の消えたら・図星）・人体の限界・皮肉・皮肉（2026/11/03〜 1日4本。皮肉が続くところは 社会の消えたら と 図星 を交互にする） のくり返しになるように差し込む（挑戦の回はどれかの枠と入れ替え）。同じ series が2本続かないようにする。並びがすでにそうなっているときは末尾でよい
+4. できた番号を `plan/queue.txt` に入れ、blueprint の該当行に `"made": "NNNN"` を付ける。入れる場所：まだ書き出していない在庫の並びが 皮肉（社会の消えたら・図星）・人体の限界・皮肉・皮肉（2026/11/03〜 1日4本。皮肉が続くところは 社会の消えたら と 図星 を交互にする） のくり返し（2026/11/09〜 作り直しの回 plan/remake.md がある間は、4本ごとの3番目＝19:00 の枠に作り直しを入れる）になるように差し込む（挑戦の回はどれかの枠と入れ替え）。同じ series が2本続かないようにする。並びがすでにそうなっているときは末尾でよい
 5. commit して `main` に push する（毎朝 5:20 の render-chain.yml が queue の順に書き出す）
 
 作れないお題（必要な絵が今のエンジンでは無理、確かな数字が見つからない など）は飛ばして、blueprint の行に `"skip": "理由"` を付けて次へ進む。
@@ -76,7 +76,7 @@ TikTok では全動画で 0:01〜0:02 に一番離脱されていた（平均視
 - 強調の効果音：META.impacts に秒数の配列（例 [19.0, 34.7]）を入れると、その瞬間にドン＋キンの効果音が鳴り、直前に音楽が一瞬引く（ナレーションで下がらない別トラック）。大きな数字が出る瞬間に使う
 - blueprint にない番号で作る回（0036 以降の空き番号）は、解析で比べられるよう META に hookType（H1〜H6）と cat（blueprint のカテゴリ名）も入れる
 - 挑戦の回（新しい型・ジャンルを試す回。blueprint の slot が 挑戦）は META に trial: true を入れる。投稿サーバーがインスタのお試しリール（フォロワー以外にまず見せ、数字がよければインスタが自動で一覧に出す）で出す。コケてもプロフィールの一覧に載らない。TikTok・YouTube はふつうに出る（2026/11/02 ゆうと決定）
-- META に入れるもの：id, trial（挑戦の回だけ true）, series（blueprint の series をそのまま。柱シリーズの回だけ。入れると表紙にシリーズのバッジ、まとめカードに フォローして次の回を待ってて が出る）, hookType, cat, title, titleHtml, ask（最後の質問。20字以内。まとめカードに出て、キャプションにも 質問＋コメントで教えて。を出典の前に入れる）, mood（tension / mystery / calm / emotional / hopeful）, seed, hits（ドンと鳴らす秒）, risers, caption（検索されそうな言葉を自然に入れる。最後に出典）, hashtags（5個まで。1つ目は もしもラボ）, endStats, sources
+- META に入れるもの：id, trial（挑戦の回と、plan/remake.md の作り直しの回は true）, tt（2026/11/09〜。plan/RULES.md の 9 の TikTok20秒の型が全部守れている回だけ 'main'。19:00 の枠の回は main のときだけ TikTok に出る）, remakeOf（作り直しの回だけ。元の番号）, series（blueprint の series をそのまま。柱シリーズの回だけ。入れると表紙にシリーズのバッジ、まとめカードに フォローして次の回を待ってて が出る）, hookType, cat, title, titleHtml, ask（最後の質問。20字以内。まとめカードに出て、キャプションにも 質問＋コメントで教えて。を出典の前に入れる）, mood（tension / mystery / calm / emotional / hopeful）, seed, hits（ドンと鳴らす秒）, risers, caption（検索されそうな言葉を自然に入れる。最後に出典）, hashtags（5個まで。1つ目は もしもラボ）, endStats, sources
 
 ### 4. 確認（必ずやる）
 ```
