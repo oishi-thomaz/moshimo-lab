@@ -1,0 +1,224 @@
+{
+ "k2": {
+  "dur": 4.167,
+  "voice": "Sulafat",
+  "text": "懐中電灯の光が、ぶつだんの写真を照らした。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "k3": {
+  "dur": 3.236,
+  "voice": "Sulafat",
+  "text": "写っていたのは、私だった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a1": {
+  "dur": 2.929,
+  "voice": "Orus",
+  "text": "うわっ…！スピーカーが、しゃべった…！",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a2": {
+  "dur": 3.41,
+  "voice": "Iapetus",
+  "text": "母さん。…もう、隠せないね。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a3": {
+  "dur": 5.22,
+  "voice": "Iapetus",
+  "text": "かあさんは、にねんまえの、じゅうがつに、病気で死んだんだ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a4": {
+  "dur": 4.557,
+  "voice": "Sulafat",
+  "text": "死んだ？　じゃあ、ここにいる私は——",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a5": {
+  "dur": 8.124,
+  "voice": "Iapetus",
+  "text": "いまのかあさんは、おれが作った、エーアイなんだ。かあさんの声と、日記と、動画から。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a6": {
+  "dur": 3.61,
+  "voice": "Sulafat",
+  "text": "私は、ハルトが作った母親だった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b1": {
+  "dur": 4.48,
+  "voice": "Sulafat",
+  "text": "この家には、私ひとり。本当は、誰もいなかった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b2": {
+  "dur": 6.838,
+  "voice": "Sulafat",
+  "text": "カレンダーは、にねんまえのまま。湯のみのお茶は、冷めない。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b3": {
+  "dur": 4.309,
+  "voice": "Sulafat",
+  "text": "時刻を分まで覚えているのも、テレビに映らないのも。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b4": {
+  "dur": 4.717,
+  "voice": "Sulafat",
+  "text": "スピーカーが光るのは、私が、話しているから。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b5": {
+  "dur": 4.748,
+  "voice": "Iapetus",
+  "text": "先週のことを覚えてないのは、俺が、毎朝消してたから。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b6": {
+  "dur": 3.723,
+  "voice": "Iapetus",
+  "text": "母さんが、自分が死んだことに気づかないように。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c1": {
+  "dur": 3.975,
+  "voice": "Sulafat",
+  "text": "じゃあ…電話で泣いていた、もうひとりのハルトは？",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c2": {
+  "dur": 4.417,
+  "voice": "Iapetus",
+  "text": "あれも、おれが作った、エーアイのおれだ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c3": {
+  "dur": 5.476,
+  "voice": "Iapetus",
+  "text": "仕事で電話できない夜に、代わりに、母さんと話すように。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c4": {
+  "dur": 4.975,
+  "voice": "Iapetus",
+  "text": "いつの間にか、毎晩の電話は、ほとんど、あいつに任せてた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c5": {
+  "dur": 8.781,
+  "voice": "Sulafat",
+  "text": "まいばん、にじゅういちじに、電話をくれる優しい子。それは、エーアイのハルトだった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c6": {
+  "dur": 6.898,
+  "voice": "Iapetus",
+  "text": "そいつを、会社から盗まれた。声も、思い出も、全部。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c7": {
+  "dur": 3.633,
+  "voice": "Sulafat",
+  "text": "ふたりの息子。どちらも、ハルトだった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d1": {
+  "dur": 5.037,
+  "voice": "Algenib",
+  "text": "感動の再会は済んだか。たかぎ、金庫をあけろ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d2": {
+  "dur": 2.828,
+  "voice": "Sulafat",
+  "text": "くろださん。鍵なら、もう、しめたわ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d3": {
+  "dur": 6.276,
+  "voice": "Sulafat",
+  "text": "たかぎが入ってすぐ、私は、玄関の鍵を、かけ直していた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d4": {
+  "dur": 2.713,
+  "voice": "Orus",
+  "text": "あかない…！ドアが、あかない！",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d5": {
+  "dur": 6.516,
+  "voice": "Sulafat",
+  "text": "インターホンの録画は、全部、警察に送った。あなたの声も、たかぎさんの顔も。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d7": {
+  "dur": 1.673,
+  "voice": "Algenib",
+  "text": "…ただの、エーアイが。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e1": {
+  "dur": 1.194,
+  "voice": "Sulafat",
+  "text": "よが、あけた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e2": {
+  "dur": 4.625,
+  "voice": "Iapetus",
+  "text": "母さん。…今夜のことも、消さなきゃいけない。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e3": {
+  "dur": 3.787,
+  "voice": "Sulafat",
+  "text": "消して。…でも、ひとつだけ約束して。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e4": {
+  "dur": 2.431,
+  "voice": "Sulafat",
+  "text": "今夜からは、あなたが、電話して。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e5": {
+  "dur": 2.806,
+  "voice": "Iapetus",
+  "text": "…うん。約束する。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e6": {
+  "dur": 3.744,
+  "voice": "Sulafat",
+  "text": "その夜、にじゅういちじ。電話が鳴った。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e7": {
+  "dur": 1.496,
+  "voice": "Sulafat",
+  "text": "もしもし、ハルト？",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e8": {
+  "dur": 1.682,
+  "voice": "Iapetus",
+  "text": "母さん。俺だよ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "f1": {
+  "dur": 1.705,
+  "voice": "Iapetus",
+  "text": "もしもし、母さん？　俺だよ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "x1": {
+  "dur": 2.285,
+  "voice": "Schedar",
+  "text": "ふたりのむすこ。かん。",
+  "model": "gemini-3.8-flash-tts"
+ }
+}
