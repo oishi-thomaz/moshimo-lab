@@ -1,0 +1,212 @@
+{
+ "k2": {
+  "dur": 2.712,
+  "voice": "Sulafat",
+  "text": "私は、玄関へ行こうとした。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "k3": {
+  "dur": 4.117,
+  "voice": "Sulafat",
+  "text": "でも、行き方が、思い出せない。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "k4": {
+  "dur": 5.103,
+  "voice": "Sulafat",
+  "text": "毎日歩いているはずの、たった、じゅっぽの廊下なのに。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a1": {
+  "dur": 3.468,
+  "voice": "Sulafat",
+  "text": "私は、もう一度、警察署に電話をかけた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a2": {
+  "dur": 4.453,
+  "voice": "Kore",
+  "text": "みなみまち警察署です。…みやしたさんですね。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a3": {
+  "dur": 5.016,
+  "voice": "Sulafat",
+  "text": "息子が、玄関で、捕まっているんです。すぐに来てください！",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a4": {
+  "dur": 4.114,
+  "voice": "Kore",
+  "text": "すぐに向かわせます。ただ…ひとつ、確認させてください。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a5": {
+  "dur": 4.046,
+  "voice": "Kore",
+  "text": "先週の通報のあと、署の者が、そのご住所に、うかがっています。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a6": {
+  "dur": 2.645,
+  "voice": "Kore",
+  "text": "でも、どなたもいらっしゃらなかった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a7": {
+  "dur": 6.642,
+  "voice": "Kore",
+  "text": "近所の方の話では、そのお宅は、にねんまえから、あきやだと。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a8": {
+  "dur": 3.781,
+  "voice": "Sulafat",
+  "text": "あきや？私は、ここに住んでいる。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b1": {
+  "dur": 2.862,
+  "voice": "Sulafat",
+  "text": "私は、茶の間を見回した。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b2": {
+  "dur": 5.177,
+  "voice": "Sulafat",
+  "text": "ランプも、ちゃぶ台も、湯のみも、いつもの場所にある。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b3": {
+  "dur": 3.597,
+  "voice": "Sulafat",
+  "text": "消えたテレビの黒い画面に、部屋が映っていた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b4": {
+  "dur": 7.136,
+  "voice": "Sulafat",
+  "text": "ふすまも、ランプも、ちゃぶ台も。私だけが、映っていない。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b5": {
+  "dur": 3.442,
+  "voice": "Sulafat",
+  "text": "画面の前に、座っているはずなのに。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c1": {
+  "dur": 2.012,
+  "voice": "Algenib",
+  "text": "気づいたか、みやしたさん。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c2": {
+  "dur": 3.217,
+  "voice": "Algenib",
+  "text": "この家の鍵を開けられるのは、あんただけだ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c3": {
+  "dur": 2.397,
+  "voice": "Algenib",
+  "text": "ハルトが、そう作ったからな。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c4": {
+  "dur": 4.663,
+  "voice": "Sulafat",
+  "text": "作った？ハルトが、何を作ったというの。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c5": {
+  "dur": 6.163,
+  "voice": "Algenib",
+  "text": "ぶつまの金庫に、だんなの遺した金がある。それをもらえば、息子は返す。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c6": {
+  "dur": 3.142,
+  "voice": "Sulafat",
+  "text": "夫の金庫のことは、ハルトにしか話していない。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d1": {
+  "dur": 2.322,
+  "voice": "Iapetus",
+  "text": "かあさん、あけるな！金なんか、どうでもいい！",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d2": {
+  "dur": 0.911,
+  "voice": "Orus",
+  "text": "黙ってろ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d3": {
+  "dur": 4.761,
+  "voice": "Sulafat",
+  "text": "インターホンの画面で、ハルトが地面に押さえつけられた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d4": {
+  "dur": 5.718,
+  "voice": "Algenib",
+  "text": "警察を待つか？　その前に、息子がどうなるかな。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d5": {
+  "dur": 4.262,
+  "voice": "Sulafat",
+  "text": "ハルトを、守らなきゃ。それだけは、わかる。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d6": {
+  "dur": 3.462,
+  "voice": "Sulafat",
+  "text": "私は、玄関の鍵を、開けた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e1": {
+  "dur": 5.053,
+  "voice": "Sulafat",
+  "text": "玄関の開く音。廊下を、誰かが歩いてくる。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e2": {
+  "dur": 7.009,
+  "voice": "Sulafat",
+  "text": "足音は、茶の間を通りすぎて、ぶつまの、ふすまの前で止まった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e3": {
+  "dur": 1.914,
+  "voice": "Orus",
+  "text": "…くろださん。誰もいません。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e4": {
+  "dur": 6.19,
+  "voice": "Orus",
+  "text": "この家、誰も住んでない。ぶつだんが、あるだけです。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e5": {
+  "dur": 4.03,
+  "voice": "Sulafat",
+  "text": "棚の上で、スピーカーが光った。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e6": {
+  "dur": 1.829,
+  "voice": "Sulafat",
+  "text": "いるわよ。ここに。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "x1": {
+  "dur": 2.669,
+  "voice": "Schedar",
+  "text": "次回、最終話。かあさん。",
+  "model": "gemini-3.8-flash-tts"
+ }
+}
