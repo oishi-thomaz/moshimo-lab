@@ -9,7 +9,7 @@ if (!/^q\d{3}$/.test(ID || '')) { console.error('usage: node tools/quiz-meta.mjs
 const N = String(5000 + Number(ID.slice(1)));
 const m = JSON.parse(fs.readFileSync(`out/${ID}.json`, 'utf8'));
 const q = String(m.title || 'この映画のタイトルは？');
-const kind = /ドラマ/.test(q) ? 'ドラマ' : /曲/.test(q) ? '曲' : '映画';
+const kind = /ドラマ/.test(q) ? 'ドラマ' : /曲/.test(q) ? '曲' : /作品/.test(q) ? '作品' : '映画';
 // 本文の2行目（1行目は この〇〇のタイトル、わかる？）から、最初の1〜2文（45文字まで）
 const body = String(m.caption || '').split('\n').filter(Boolean)[1] || '';
 let hook = '';
@@ -21,7 +21,8 @@ if (ans && (flat.includes(ans) || (ans.length >= 4 && [...Array(ans.length - 3).
 const SERVICES = ['ネトフリ', 'Netflix', 'アマプラ', 'PrimeVideo', 'U-NEXT', 'UNEXT', 'Hulu', 'DisneyPlus', 'ディズニープラス', 'FOD', 'DMMTV'];
 const svc = (m.hashtags || []).filter(h => SERVICES.includes(String(h).replace(/\s/g, ''))).slice(0, 2);
 // 曲の回（2026/11/04〜）：配信サービスのタグはなく、曲当て用のタグ。絵文字は 🎵
-const tags = kind === '曲' ? ['タイトル当てクイズ', '曲当てクイズ', '名曲', '邦楽', 'カラオケ']
+const tags = kind === '作品' ? (m.hashtags || ['タイトル当てクイズ']).slice(0, 5) // 映画・ドラマ・曲でない回（ネットの名作など）は動画の hashtags をそのまま
+  : kind === '曲' ? ['タイトル当てクイズ', '曲当てクイズ', '名曲', '邦楽', 'カラオケ']
   : ['タイトル当てクイズ', `${kind}クイズ`, ...svc, `おすすめ${kind}`].slice(0, 5);
 m.ttCaption = [`${q}${kind === '曲' ? '🎵' : '🎬'}`, hook, '何秒で、どこでわかった？コメントで教えて👇', tags.map(t => '#' + t).join(' ')].filter(Boolean).join('\n');
 m.id = N; m.quizId = ID;

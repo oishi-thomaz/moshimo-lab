@@ -6,11 +6,11 @@
 import json, re, sys
 from PIL import Image, ImageDraw, ImageFont
 F = '/usr/share/fonts/opentype/noto/NotoSansCJK-Black.ttc'
-KIND = {'映画': ((226, 52, 64), 'この映画なに？'), 'ドラマ': ((52, 128, 230), 'このドラマなに？'), '曲': ((46, 170, 90), 'この曲なに？')}
+KIND = {'映画': ((226, 52, 64), 'この映画なに？'), 'ドラマ': ((52, 128, 230), 'このドラマなに？'), '曲': ((46, 170, 90), 'この曲なに？'), '作品': ((142, 91, 208), 'この作品なに？')}
 def font(s): return ImageFont.truetype(F, s, index=0)
 def kind(qid):
   src = open(f'engine/videos/{qid}.js', encoding='utf-8').read()
-  m = re.search(r"title:\s*'この(映画|ドラマ|曲)", src)
+  m = re.search(r"title:\s*'この(映画|ドラマ|曲|作品)", src)
   return m.group(1) if m else '映画'
 def make(qid, still):
   lines = json.load(open('plan/quiz-covers.json', encoding='utf-8'))[qid]['text'].split('|')
