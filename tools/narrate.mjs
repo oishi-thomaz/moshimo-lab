@@ -4,7 +4,8 @@
 // 読む文：冒頭のタイトル（0.2秒〜）＋ 字幕（META.subs）を字幕の出る時刻から。
 // 1行ずつ声を作り、字幕の時間に収まらないときは少し速める（最大1.35倍）。前の行と重なりそうなら後ろへずらす。
 // 読み方の調整：下の READ（全動画共通）と META.narr（{ 字幕の文字: 読む文字 }、動画ごと）。（）の中は読まない。
-// GEMINI_API_KEY が無いときは何もせず終了コード 2（build.sh はナレーションなしで続ける）。1日の上限で作れないときは終了コード 3（build.sh も失敗する）。
+// GEMINI_API_KEY が無いときは何もせず終了コード 2（build.sh はナレーションなしで続ける）。1日の上限で作れないときは終了コード 3、
+// 声が文字数のわりに長すぎる（語りの指示まで読み上げた事故）のが3回続いたときは終了コード 4（どちらも build.sh ごと失敗する）。
 // MOCK_TTS=1 のときはAPIを呼ばず、文字数に合わせた長さのダミー音で作る（つなぎ方の確認用）。
 import fs from 'node:fs';
 import path from 'node:path';
@@ -122,14 +123,23 @@ for (const [i, L] of lines.entries()) {
     const h = crypto.createHash('md5').update([MODEL, VOICE, L.style, L.text, MOCK].join('|')).digest('hex').slice(0, 16);
     L.raw = path.join(work, `${h}.wav`);
     if (fs.existsSync(L.raw)) { const now = new Date(); fs.utimesSync(L.raw, now, now); }
-    if (!fs.existsSync(L.raw)) {
-      if (MOCK) execFileSync('ffmpeg', ['-v', 'error', '-y', '-f', 'lavfi', '-i', `sine=frequency=${300 + i * 40}:sample_rate=24000:duration=${(L.text.length * 0.14).toFixed(2)}`, '-ac', '1', L.raw]);
-      else { fs.writeFileSync(L.raw, await ttsRetry(L.text, L.style)); await sleep(6500); } // 無料枠は1分あたりの回数に上限があるので間をあける
-    }
-    // 前後の無音を削る
     L.wav = path.join(path.dirname(args.out), `${meta.id}_${String(i).padStart(2, '0')}_trim.wav`);
-    execFileSync('ffmpeg', ['-v', 'error', '-y', '-i', L.raw, '-af', 'silenceremove=start_periods=1:start_threshold=-45dB,areverse,silenceremove=start_periods=1:start_threshold=-45dB,areverse', '-ar', '48000', '-ac', '1', L.wav]);
-    L.len = dur(L.wav);
+    // 2026/11/08 ゆうと（クイズ 5039 香水）：声のAPIがたまに語りの指示（Calm Japanese documentary narrator…）まで英語で読み上げる。
+    // 文字数のわりに長すぎる声は読み上げの事故として作り直す（キャッシュに残った事故の声も捨てる）。3回作り直してもだめなら書き出しを止める（終了コード 4）
+    const limit = 2.0 + 0.25 * L.text.replace(/[、。，,！？!?\s…・「」]/g, '').length;
+    for (let k = 0; ; k++) {
+      if (!fs.existsSync(L.raw)) {
+        if (MOCK) execFileSync('ffmpeg', ['-v', 'error', '-y', '-f', 'lavfi', '-i', `sine=frequency=${300 + i * 40}:sample_rate=24000:duration=${(L.text.length * 0.14).toFixed(2)}`, '-ac', '1', L.raw]);
+        else { fs.writeFileSync(L.raw, await ttsRetry(L.text, L.style)); await sleep(6500); } // 無料枠は1分あたりの回数に上限があるので間をあける
+      }
+      // 前後の無音を削る
+      execFileSync('ffmpeg', ['-v', 'error', '-y', '-i', L.raw, '-af', 'silenceremove=start_periods=1:start_threshold=-45dB,areverse,silenceremove=start_periods=1:start_threshold=-45dB,areverse', '-ar', '48000', '-ac', '1', L.wav]);
+      L.len = dur(L.wav);
+      if (L.len <= limit) break;
+      console.log(`  ! 声が文字数のわりに長すぎる（${L.len.toFixed(2)}s > ${limit.toFixed(2)}s。指示文の読み上げなどの事故）。作り直す: ${L.text}`);
+      fs.rmSync(L.raw, { force: true });
+      if (k >= 2 || MOCK) { console.log('narrate: 3回作り直しても声が長すぎるので止める（事故の声のまま書き出さない）'); process.exit(4); }
+    }
     console.log(`${L.t.toFixed(1)}s  ${L.len.toFixed(2)}s  ${L.text}`);
   }
   

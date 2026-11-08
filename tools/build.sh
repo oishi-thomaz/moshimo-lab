@@ -23,6 +23,8 @@ if node tools/narrate.mjs --meta "out/$ID.json" --out "out/${ID}_narr.wav"; then
   rc=$?
   # 声の1日の上限（3）は声なしで作らずに止める。上限が戻ったら同じ番号でやり直す
   if [ $rc -eq 3 ]; then echo "::error::ナレーションの1日の上限に達したので書き出しを止める（声なしの動画は作らない）"; exit 1; fi
+  # 声の読み上げ事故（4。語りの指示まで英語で読むなど）が作り直しても直らないときも、その声では作らずに止める
+  if [ $rc -eq 4 ]; then echo "::error::ナレーションの声が長すぎる（読み上げの事故）のが直らないので書き出しを止める"; exit 1; fi
   if [ $rc -ne 2 ]; then echo "::warning::ナレーションの作成に失敗したので、ナレーションなしで作る ($rc)"; fi
 fi
 if [ $NARR = 1 ]; then
