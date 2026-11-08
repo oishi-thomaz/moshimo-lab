@@ -72,9 +72,9 @@
   "model": "gemini-3.8-flash-tts"
  },
  "b2": {
-  "dur": 5.177,
+  "dur": 5.848,
   "voice": "Sulafat",
-  "text": "ランプも、ちゃぶ台も、湯のみも、いつもの場所にある。",
+  "text": "ランプも、ちゃぶだいも、ゆのみも、いつもの、ばしょにある。",
   "model": "gemini-3.8-flash-tts"
  },
  "b3": {
@@ -90,9 +90,9 @@
   "model": "gemini-3.8-flash-tts"
  },
  "b5": {
-  "dur": 3.442,
+  "dur": 2.628,
   "voice": "Sulafat",
-  "text": "画面の前に、座っているはずなのに。",
+  "text": "がめんの、まえに、すわっているはずなのに。",
   "model": "gemini-3.8-flash-tts"
  },
  "c1": {
