@@ -52,6 +52,12 @@ jobs:
             GOT=$(curl -sS -o /dev/null -w '%{size_download}' "$URL"); WANT=$(stat -c %s "/tmp/$N.mp4")
             if [ "$GOT" != "$WANT" ]; then echo "QUIZ_CDN $N NG（大きさが違う $GOT / $WANT）"; FAIL=1; continue; fi
             echo "QUIZ_CDN $N $URL"
+            # カバー（TikTok Studio でカバーをアップロードするため）。quiz/NNNN_cover の画像として置く
+            if curl -fsS --retry 3 -o "/tmp/${N}_cover.jpg" "$BASE/media/${N}_cover.jpg"; then
+              TS=$(date +%s); SIG=$(printf 'overwrite=true&public_id=quiz/%s_cover&timestamp=%s%s' "$N" "$TS" "$SEC" | sha1sum | cut -d' ' -f1)
+              CU=$(curl -sS --retry 2 -X POST "https://api.cloudinary.com/v1_1/$CLOUD/image/upload" -F "file=@/tmp/${N}_cover.jpg" -F "public_id=quiz/${N}_cover" -F overwrite=true -F "timestamp=$TS" -F "api_key=$KEY" -F "signature=$SIG" | jq -r '.secure_url // empty')
+              [ -n "$CU" ] && echo "QUIZ_COVER $N $CU" || echo "QUIZ_COVER $N NG"
+            fi
           done
           # 14日より前に置いた quiz/ の動画を消す
           OLD=$(curl -sS -u "$KEY:$SEC" "https://api.cloudinary.com/v1_1/$CLOUD/resources/video/upload?prefix=quiz/&max_results=500" \
