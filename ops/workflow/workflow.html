@@ -46,7 +46,7 @@ body { font-family: "Noto Sans CJK JP", "Noto Sans JP", sans-serif; color: var(-
 .me .ev.big { background: #F59E0B; color: #111; font-size: 7.4pt; padding: .8mm 2.2mm; box-shadow: 0 0 0 .7mm #FDE68A; }
 .ev.tt { background: #FCE7F3; color: #9D174D; border: 1px solid #F9A8D4; font-size: 6.2pt; padding: .3mm 1.2mm; }
 .ev.soft { background: #fff; color: var(--sub); border: 1px solid var(--line); font-weight: 500; }
-.legend-mini { font-size: 6.2pt; color: var(--sub); margin-top: 1.3mm; display: flex; gap: 3.5mm; flex-wrap: wrap; }
+.legend-mini { font-size: 6.1pt; color: var(--sub); margin-top: 1.1mm; display: flex; gap: 3mm; flex-wrap: nowrap; white-space: nowrap; }
 .legend-mini b { color: var(--ink); }
 
 /* accounts */
@@ -141,11 +141,12 @@ body { font-family: "Noto Sans CJK JP", "Noto Sans JP", sans-serif; color: var(-
         <div class="lane-name"><i style="background:var(--navy2)"></i>SNS司令室</div>
         <div class="track" data-lane="line"></div>
 
+        <div class="lane-name"><i style="background:#0EA5E9"></i>各アカウント</div>
+        <div class="track" data-lane="acc"></div>
+
         <div class="lane-name"><i style="background:var(--cl)"></i>自動の作業</div>
         <div class="track tall" data-lane="auto"></div>
 
-        <div class="lane-name"><i style="background:#818CF8"></i>見張り・予約</div>
-        <div class="track" data-lane="watch"></div>
 
         <div class="lane-name"><i style="background:var(--mo)"></i>もしもラボ</div>
         <div class="track" data-lane="mo"></div>
@@ -157,8 +158,8 @@ body { font-family: "Noto Sans CJK JP", "Noto Sans JP", sans-serif; color: var(-
         <div class="track" data-lane="it"></div>
       </div>
       <div class="legend-mini">
-        <span><b>見張り</b>（細い紫）8:37・11:37・15:37・17:37　書き出しの失敗を自動で直す</span>
-        <span><b>TikTok予約</b>（細い水色）8:07〜23:07 の7回　3アカウントの承認済みの回を、それぞれの Chrome のプロフィールでインスタと同じ時刻に予約</span>
+        <span><b>TikTok</b>　9:23 に承認済みの回をインスタと同じ時刻で数日先まで予約（Chrome のアカウント別プロフィール）</span>
+        <span><b>書き出しの失敗</b>　自動で1回やり直し→だめなら 9:23 に Claude が直す</span>
       </div>
     </div>
 
@@ -166,11 +167,11 @@ body { font-family: "Noto Sans CJK JP", "Noto Sans JP", sans-serif; color: var(-
     <div class="accs">
       <div class="acc mo">
         <h3>もしもラボ <span>@moshimo__lab</span></h3>
-        <div class="what">もしも○○が消えたら？の3D解説（約60秒）　1日3本</div>
+        <div class="what">もしも○○が消えたら？の3D解説（約60秒）　1日4本</div>
         <dl class="plat">
-          <dt>投稿時刻</dt><dd><b>12:00・18:00・20:30</b></dd>
-          <dt>媒体</dt><dd>インスタ・YouTube 自動／TikTok Chrome で自動予約</dd>
-          <dt>台本</dt><dd><b>担当者が承認</b>（候補10本ずつ）</dd>
+          <dt>投稿時刻</dt><dd><b>12:00・16:00・19:00・22:00</b></dd>
+          <dt>媒体</dt><dd>インスタ・YouTube・TikTok すべて自動</dd>
+          <dt>台本</dt><dd><b>担当者が承認</b>（候補12本ずつ）</dd>
         </dl>
       </div>
       <div class="acc qz">
@@ -178,7 +179,7 @@ body { font-family: "Noto Sans CJK JP", "Noto Sans JP", sans-serif; color: var(-
         <div class="what">映画・ドラマのタイトル当て3D（約64秒）　1日5本</div>
         <dl class="plat">
           <dt>投稿時刻</dt><dd><b>12:00・15:00・18:00・20:00・22:00</b></dd>
-          <dt>媒体</dt><dd>インスタ 自動／TikTok Chrome で自動予約</dd>
+          <dt>媒体</dt><dd>インスタ・TikTok すべて自動</dd>
           <dt>台本</dt><dd>自動（作品は条件で選ぶ）</dd>
         </dl>
       </div>
@@ -187,7 +188,7 @@ body { font-family: "Noto Sans CJK JP", "Noto Sans JP", sans-serif; color: var(-
         <div class="what">1話3分・全5話のショートドラマ　1日1話</div>
         <dl class="plat">
           <dt>投稿時刻</dt><dd><b>20:00</b></dd>
-          <dt>媒体</dt><dd>インスタ・YouTube 自動／TikTok Chrome で自動予約</dd>
+          <dt>媒体</dt><dd>インスタ・YouTube・TikTok すべて自動</dd>
           <dt>台本</dt><dd>自動（動画で承認）</dd>
         </dl>
       </div>
@@ -199,9 +200,9 @@ body { font-family: "Noto Sans CJK JP", "Noto Sans JP", sans-serif; color: var(-
     <div class="card box">
       <div class="ttl"><span class="n">2</span>担当者の作業</div>
       <div class="steps">
-        <div class="step"><div class="no">1</div><div><b>8:00 朝のまとめを見る</b><p>昨日の結果・日報・今日やること</p></div></div>
-        <div class="step"><div class="no">2</div><div><b>メニューの 承認待ち を開く</b><p>3アカウントの動画と台本が並ぶ</p></div></div>
-        <div class="step"><div class="no">3</div><div><b>動画を1本ずつ判断</b><p>クイズは12:00までの承認で当日5枠に入る</p>
+        <div class="step"><div class="no">1</div><div><b>8:00 朝のまとめを見る</b><p>昨日の結果・今日やること（日報は13:00）</p></div></div>
+        <div class="step"><div class="no">2</div><div><b>メニューの 承認待ち を開く</b><p>SNS司令室は3アカウント分・各アカウントの LINE はそのアカウントだけ</p></div></div>
+        <div class="step"><div class="no">3</div><div><b>動画を1本ずつ判断</b><p>承認した順に次の空き枠に入る</p>
           <div class="btns"><span class="btn p">承認する</span><span class="btn">修正して</span><span class="btn">却下</span></div></div></div>
         <div class="step"><div class="no">4</div><div><b>台本を1本ずつ判断</b><p>もしもラボのみ。届いた日だけ</p>
           <div class="btns"><span class="btn p">この台本でOK</span><span class="btn">直してOK</span><span class="btn">見送り</span></div></div></div>
@@ -215,13 +216,13 @@ body { font-family: "Noto Sans CJK JP", "Noto Sans JP", sans-serif; color: var(-
         <div class="flowset">
           <h4>動画（3アカウント共通）</h4>
           <div class="flow"><span class="k ok">承認する</span><div class="chain"><span class="c">次の空いている投稿枠に入る</span><span class="a">→</span><span class="c g">インスタ・YouTube・TikTok に自動で投稿</span></div></div>
-          <div class="flow"><span class="k fix">修正して</span><div class="chain"><span class="c t">当日 10:47 指示どおり直して作り直す</span><span class="a">→</span><span class="c y">翌朝 8:00 もう一度承認</span></div></div>
+          <div class="flow"><span class="k fix">修正して</span><div class="chain"><span class="c t">当日 9:23 直す</span><span class="a">→</span><span class="c t">翌朝 5:20 書き出し</span><span class="a">→</span><span class="c y">翌朝 8:00 もう一度承認</span></div></div>
           <div class="flow"><span class="k ng">却下</span><div class="chain"><span class="c">その回は使わない（作り直さない）</span><span class="a">→</span><span class="c">枠は在庫の次の回で埋まる</span></div></div>
         </div>
       </div>
       <div class="flowset">
         <h4>台本（もしもラボ）</h4>
-        <div class="flow"><span class="k ok">OK</span><div class="chain"><span class="c t">当日 10:47 動画にする</span><span class="a">→</span><span class="c t">翌朝 6:15 書き出し</span><span class="a">→</span><span class="c y">翌朝 8:00 動画を承認</span></div></div>
+        <div class="flow"><span class="k ok">OK</span><div class="chain"><span class="c t">当日 9:23 動画にする</span><span class="a">→</span><span class="c t">翌朝 5:20 書き出し</span><span class="a">→</span><span class="c y">翌朝 8:00 動画を承認</span></div></div>
         <div class="flow"><span class="k fix">直してOK</span><div class="chain"><span class="c t">指示どおり直して動画にする（確認なし）</span><span class="a">→</span><span class="c">以降は OK と同じ</span></div></div>
         <div class="flow"><span class="k ng">見送り</span><div class="chain"><span class="c">その台本は使わない</span></div></div>
       </div>
@@ -232,28 +233,28 @@ body { font-family: "Noto Sans CJK JP", "Noto Sans JP", sans-serif; color: var(-
       <div class="ttl"><span class="n">4</span>1本ができて投稿されるまで</div>
       <div class="life">
         <div class="lc mo">
-          <h5>もしもラボ <span>在庫が5日分を切ると台本を出す</span></h5>
+          <h5>もしもラボ <span>在庫が5日分（20本）を切ると台本を出す</span></h5>
           <div class="days c5">
-            <div class="d"><em>1日目 10:47</em><div>台本の候補<b>10本</b></div></div>
+            <div class="d"><em>1日目 9:23</em><div>台本の候補<b>12本</b></div></div>
             <div class="d you"><em>2日目 8:00</em><div><b>台本に返事</b></div></div>
-            <div class="d"><em>2日目 10:47</em><div>動画にする</div></div>
+            <div class="d"><em>2日目 9:23</em><div>動画にする</div></div>
             <div class="d you"><em>3日目 8:00</em><div>動画を<b>承認</b></div></div>
-            <div class="d"><em>4日目ごろ</em><div>投稿（3枠）</div></div>
+            <div class="d"><em>次の空き枠</em><div>投稿</div></div>
           </div>
         </div>
         <div class="lc qz">
           <h5>タイトル当てクイズ <span>在庫20本を保つ</span></h5>
           <div class="days c3">
-            <div class="d"><em>前日まで 10:47・16:47</em><div>作品を選んで作る</div></div>
-            <div class="d you"><em>当日 8:00</em><div>朝できた5本を<b>承認</b></div></div>
-            <div class="d"><em>当日 12:00〜22:00</em><div>投稿（5枠）</div></div>
+            <div class="d"><em>1日目 9:23</em><div>作品を選んで作る</div></div>
+            <div class="d you"><em>2日目 8:00</em><div>朝の書き出し分を<b>承認</b></div></div>
+            <div class="d"><em>次の空き枠</em><div>投稿</div></div>
           </div>
         </div>
         <div class="lc it">
           <h5>いつわ劇場 <span>在庫5話を保つ・1日1話まで作る</span></h5>
           <div class="days c3">
-            <div class="d"><em>1日目 10:47・16:47</em><div>1話作って送る</div></div>
-            <div class="d you"><em>2日目 8:00</em><div><b>承認</b></div></div>
+            <div class="d"><em>1日目 9:23</em><div>1話作って送る</div></div>
+            <div class="d you"><em>2日目 8:00</em><div><b>承認</b>（届いた時でも可）</div></div>
             <div class="d"><em>空いている日の 20:00</em><div>投稿</div></div>
           </div>
         </div>
@@ -265,8 +266,8 @@ body { font-family: "Noto Sans CJK JP", "Noto Sans JP", sans-serif; color: var(-
     <div class="card fb">
       <h4>8:00 以外に届くもの（見るだけ・対応不要）</h4>
       <ul>
-        <li><span><b>13:00 昼・22:30 夜のまとめ</b>　その時点の再生と投稿の結果</span></li>
-        <li><span><b>月曜 8:00 週の振り返り</b>　伸びた型・やめる型・来週の方針</span></li>
+        <li><span><b>13:00 昼のまとめ＋日報・22:30 夜のまとめ</b>　その時点の再生と投稿の結果</span></li>
+        <li><span><b>月曜の午前 週の振り返り</b>　伸びた型・やめる型・来週の方針</span></li>
         <li><span><b>投稿の失敗</b>（赤いカード）　もう一回 ボタンを押すだけ</span></li>
         <li><span><b>各アカウントの LINE</b>　承認待ちがそろったら1通（そのまま承認・修正できる）・バズ（1時間で もしもラボ+1万・他+3,000再生）</span></li>
       </ul>
@@ -289,29 +290,28 @@ body { font-family: "Noto Sans CJK JP", "Noto Sans JP", sans-serif; color: var(-
 </div>
 
 <script>
-// 6:00〜24:00 をレーンの横幅に割り当てる
-const H0 = 6, H1 = 24, X = h => ((h - H0) / (H1 - H0) * 100);
+// 5:00〜24:00 をレーンの横幅に割り当てる
+const H0 = 5, H1 = 24, X = h => ((h - H0) / (H1 - H0) * 100);
 const hm = s => { const [a, b] = s.split(':').map(Number); return a + (b || 0) / 60; };
 const axis = document.getElementById('axis');
 for (let h = 6; h <= 24; h += 2) { const s = document.createElement('span'); s.style.left = X(h) + '%'; s.textContent = h + ':00'; axis.appendChild(s); }
-document.querySelectorAll('.track').forEach(t => { for (let h = 8; h < 24; h += 2) { const g = document.createElement('div'); g.className = 'grid-line'; g.style.left = X(h) + '%'; t.appendChild(g); } });
+document.querySelectorAll('.track').forEach(t => { for (let h = 6; h < 24; h += 2) { const g = document.createElement('div'); g.className = 'grid-line'; g.style.left = X(h) + '%'; t.appendChild(g); } });
 const put = (lane, t, html, cls = '', bg = '') => { const e = document.createElement('div'); e.className = 'ev ' + cls; e.style.left = X(hm(t)) + '%'; if (bg) e.style.background = bg; e.innerHTML = html; document.querySelector(`[data-lane="${lane}"]`).appendChild(e); };
-const tick = (lane, t, color) => { const e = document.createElement('div'); e.className = 'tick'; e.style.left = X(hm(t)) + '%'; e.style.background = color; document.querySelector(`[data-lane="${lane}"]`).appendChild(e); };
 
 put('me', '8:00', '8:00 承認（約10分）', 'big left');
 
-put('line', '8:00', '8:00 朝のまとめ＋日報', '', 'var(--navy2)');
-put('line', '13:00', '13:00 昼', '', 'var(--navy2)');
+put('line', '8:00', '8:00 朝のまとめ', '', 'var(--navy2)');
+put('line', '13:00', '13:00 昼のまとめ＋日報', '', 'var(--navy2)');
 put('line', '22:30', '22:30 夜', '', 'var(--navy2)');
 
-put('auto', '6:15', '6:15 朝の仕事<br><small>分析・日報・書き出し</small>', 'left', 'var(--cl)');
-put('auto', '10:47', '10:47 動画制作<br><small>台本・修正・新作</small>', '', 'var(--cl)');
-put('auto', '16:47', '16:47 動画制作<br><small>台本・修正・新作</small>', '', 'var(--cl)');
+put('acc', '7:00', '7:00ごろ 承認待ちがそろった', '', '#0EA5E9');
+put('acc', '11:00', '昼ごろ いつわ劇場の新しい話', 'left', '#0EA5E9');
 
-for (const t of ['8:37', '11:37', '15:37', '17:37']) tick('watch', t, '#7C3AED');
-for (const t of ['8:07', '10:07', '11:07', '14:07', '17:07', '20:07', '23:07']) tick('watch', t, '#38BDF8');
+put('auto', '5:20', '5:20 書き出し<br><small>もしもラボ・クイズ</small>', 'left', 'var(--cl)');
+put('auto', '9:23', '9:23 毎日の運用（Claude）<br><small>修正・日報・台本・新作・TikTok予約</small>', 'left', 'var(--cl)');
+put('auto', '17:20', '17:20 書き出しの続き<br><small>声の上限で止まった分だけ</small>', 'left', 'var(--cl)');
 
-for (const t of ['12:00', '18:00', '20:30']) put('mo', t, t, '', 'var(--mo)');
+for (const t of ['12:00', '16:00', '19:00', '22:00']) put('mo', t, t, '', 'var(--mo)');
 for (const t of ['12:00', '15:00', '18:00', '20:00', '22:00']) put('qz', t, t, '', 'var(--qz)');
 put('it', '20:00', '20:00', '', 'var(--it)');
 </script>

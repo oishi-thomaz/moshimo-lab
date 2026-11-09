@@ -10,7 +10,7 @@ ops/OPS.md から外した、アカウントと仕組みの細かいこと。202
 | タイトル当てクイズ（quiz、@title_ate_quiz） | 映画・ドラマのタイトル当て3D（約64秒） | 1日5本 12:00・15:00・18:00・20:00・22:00（立ち上げの1か月） | plan/quiz-queue.txt にあって state/quiz-rendered.txt にない本数 | ops/make-quiz.md（docs/QUIZ.md） | render-chain.yml が quiz-render.yml を毎朝5本 | ops/report.md の サーバー型 | moshimo-analytics の TIKTOK.md の 5（Chrome のクイズ用プロフィール。2026/11/09〜。下書きに送る仕組みはやめた） |
 | いつわ劇場（itsuwa、@itsuwa_drama） | 1話3分・全5話のショートドラマ | 1日1話 20:00 | docs/ITSUWA-AUTO.md の 1 | ops/make-itsuwa.md（docs/ITSUWA-AUTO.md） | なし（作った話をその場で送る） | ops/report.md の サーバー型 | moshimo-analytics の TIKTOK.md の 5（Chrome のいつわ劇場用プロフィール。2026/11/09〜。下書きに送る仕組みはやめた） |
 
-各アカウントの投稿サーバー（VPS）は別々。承認はゆうとが SNS司令室（LINE）の 承認待ち ボタンからする（2026/11/02〜。承認・修正の指示・却下・まとめて承認がそこでできる）。各アカウントの LINE は QUIET=1 で、自分からは送らない（返事だけ）。
+各アカウントの投稿サーバー（VPS）は別々。承認はゆうとが SNS司令室（LINE）の 承認待ち ボタンからする（2026/11/02〜。承認・修正の指示・却下・まとめて承認がそこでできる）。各アカウントの LINE は QUIET=1 で、投稿サーバーが自分から送るのは 承認待ちがそろった（1回の書き出しで1通。2026/11/09〜）・バズ・接続切れ だけ。そのアカウントの LINE からも承認・修正・却下・台本の返事ができる。
 
 ## ゆうとの役割と Claude の役割（2026/11/02 ゆうとの決定）
 - ゆうとがやるのは、確認・台本の修正の指示・承認だけ。台本の管理、数字の分析、方向性の判断、在庫の並び、投稿時間の調整は Claude が全部やる。収益化前のアカウント（クイズ・いつわ劇場）は、TikTok のフォロワーを増やして収益化の条件に届かせるのが最優先。
@@ -23,7 +23,7 @@ ops/OPS.md から外した、アカウントと仕組みの細かいこと。202
 - 送り方は moshimo-analytics の `node tools/run.mjs report <ファイル>`（または `notice`）。日報（reports/outbox/YYYY-MM-DD.json・quiz-…・itsuwa-…）は、7:58 までに push してあれば 8:00 のまとめに、12:58 までなら 13:00 の昼のまとめに入る（別には送らない。2026/11/05〜 毎日の運用は 9:23 なので昼のまとめに載る）。notice で送るものはその場で SNS司令室に届く（今月の残りが15通を切ったら送らない）。JSON の形は ANALYST.md の 日報の書き方 と同じ（{card} か {message}）。
 - もしもラボの notice.yml・投稿サーバーの report は使わない（各アカウントの LINE に行くため）。
 - SNS司令室に ストック と送ると、まだ投稿していない動画（予約済み・承認待ち・書き出し前の在庫）が3アカウント分カードで返ってくる。返事係は VPS の server/sns-server.mjs（install-sns.sh で入れる。/var/lib/moshimo・quiz・itsuwa の state.json と、このリポジトリの在庫を読むだけ）。
-- 4つの LINE（SNS司令室・各アカウント）には下にボタンのメニューがある（server/setup-richmenu.mjs で入れる。画像は server/richmenu/）。SNS司令室：ストック・承認待ち・今日の投稿・いま回ってる・いまの数字・使い方。各アカウント：承認待ち・投稿した・数字・通数（もしもラボは 収益 も）。数字・通数・収益はカードで返す。収益は TikTok Studio の記録（moshimo-analytics の data/tiktok-studio.jsonl）を、まとめ（summary.yml）が1日3回もしもラボの投稿サーバーへ送っている。サーバーの中身を入れ替えるときは server/update-servers.sh <コミット>（VPS で root）。
+- 4つの LINE（SNS司令室・各アカウント）には下にボタンのメニューがある（server/setup-richmenu.mjs で入れる。画像は server/richmenu/）。SNS司令室：ストック・承認待ち・今日の投稿・いま回ってる・いまの数字・使い方。各アカウント：承認待ち（そのアカウントの動画と台本）・今日の投稿・数字・収益（もしもラボ）／通数（クイズ・いつわ劇場）。2026/11/09〜。数字・通数・収益はカードで返す。収益は TikTok Studio の記録（moshimo-analytics の data/tiktok-studio.jsonl）を、まとめ（summary.yml）が1日3回もしもラボの投稿サーバーへ送っている。サーバーの中身を入れ替えるときは server/update-servers.sh <コミット>（VPS で root）。
 - TikTok の下書き（投稿サーバーから TikTok アプリの受信箱に送る仕組み）は 2026/11/09 にやめた（/etc/quiz.env・/etc/itsuwa.env の TT_UPLOAD=0。今すぐ投稿・時間指定でも送らない）。クイズ・いつわ劇場の TikTok は、ゆうとの Mac の Chrome のアカウントごとのプロフィールで予約する（moshimo-analytics の TIKTOK.md の 5・notes/tiktok-browsers.md）。動画は quiz-cdn.yml で Cloudinary に置いて、TikTok Studio のページで取り込む。
 - いつわ劇場の TikTok は 2026/11/03 に数字を読む許可（user.info.stats・video.list）を Sandbox itsuwa に足した。ゆうとが いつわ劇場の LINE で TikTok つなぎ直し と送って許可し直すと、数字が投稿サーバーで取れるようになる。
 - まとめの TikTok の数字は、投稿サーバーで取れていないアカウント（クイズ・いつわ劇場）は公開ページから読む（moshimo-analytics の data/<アカウント>/tiktok-embed/ に貯まる）。いま回ってる動画 は直近およそ3時間（公開ページの分は前回のまとめから）で再生が大きく増えた動画。
