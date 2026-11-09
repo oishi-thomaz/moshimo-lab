@@ -8,9 +8,9 @@ if [ -z "$NODE_BIN" ]; then echo "Node.js がない。先にもしもラボの i
 REF="${1:-main}"
 
 mkdir -p /opt/news
-curl -fsSL "https://raw.githubusercontent.com/oishi-thomaz/moshimo-lab/$REF/server/news-server.mjs" -o /opt/news/server.mjs.new
-"$NODE_BIN" --check /opt/news/server.mjs.new
-mv /opt/news/server.mjs.new /opt/news/server.mjs
+curl -fsSL "https://raw.githubusercontent.com/oishi-thomaz/moshimo-lab/$REF/server/news-server.mjs" -o /opt/news/server.new.mjs
+"$NODE_BIN" --check /opt/news/server.new.mjs
+mv /opt/news/server.new.mjs /opt/news/server.mjs
 
 cat > /etc/systemd/system/news.service <<EOF
 [Unit]
