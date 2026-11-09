@@ -17,9 +17,10 @@ const wide1plus3 = (top, texts) => { const n = texts.length, X = [...Array(n + 1
 
 const MENUS = [
   { key: 'sns', env: '/etc/sns.env', bar: '司令室メニュー', areas: grid6(['ストック', '承認待ち', '今日の投稿', 'いま回ってる', 'いまの数字', '使い方']) },
-  { key: 'moshimo', env: '/etc/moshimo.env', bar: 'メニュー', areas: wide1plus3('承認待ち', ['投稿した', '数字', '収益', '通数']) },
-  { key: 'quiz', env: '/etc/quiz.env', bar: 'メニュー', areas: wide1plus3('承認待ち', ['投稿した', '数字', '通数']) },
-  { key: 'itsuwa', env: '/etc/itsuwa.env', bar: 'メニュー', areas: wide1plus3('承認待ち', ['投稿した', '数字', '通数']) },
+  // 各アカウント：そのアカウントだけの 承認待ち（動画・台本）・今日の投稿・数字（2026/11/09〜）
+  { key: 'moshimo', env: '/etc/moshimo.env', bar: 'メニュー', areas: wide1plus3('承認待ち', ['今日の投稿', '数字', '収益']) },
+  { key: 'quiz', env: '/etc/quiz.env', bar: 'メニュー', areas: wide1plus3('承認待ち', ['今日の投稿', '数字', '通数']) },
+  { key: 'itsuwa', env: '/etc/itsuwa.env', bar: 'メニュー', areas: wide1plus3('承認待ち', ['今日の投稿', '数字', '通数']) },
 ];
 
 const tokenOf = f => { try { return ((fs.readFileSync(f, 'utf8').match(/^LINE_CHANNEL_TOKEN=(.+)$/m) || [])[1] || '').trim(); } catch { return ''; } };

@@ -20,7 +20,7 @@ import crypto from 'node:crypto';
 const env = process.env;
 const PORT = Number(env.PORT || 8787);
 const PREFIX = (env.PREFIX || '/moshimo').replace(/\/$/, '');
-const VERSION = '2026-11-03b';                                 // update-servers.sh で入れ替わったかの確かめ用（/health に出る）
+const VERSION = '2026-11-09a';                                 // update-servers.sh で入れ替わったかの確かめ用（/health に出る）
 const BRAND = env.BRAND || 'もしもラボ';                           // LINE の文言に出す名前
 const APPROVAL_NOW = env.APPROVAL_NOW === '1';                    // 1：動画が届いたらすぐ承認カードを送る（まとめを待たない）
 const TT_UPLOAD = env.TT_UPLOAD === '1';                          // 1：投稿と同時に TikTok の下書きへ送る
@@ -132,9 +132,9 @@ function card(id, head = '承認待ち') {
       footer: { type: 'box', layout: 'vertical', spacing: 'sm', contents: [
         { type: 'button', style: 'primary', color: '#1DB446', height: 'sm', action: { type: 'postback', label: '承認する', data: `approve:${id}`, displayText: `${id} を承認` } },
         { type: 'box', layout: 'horizontal', spacing: 'sm', contents: [
-          { type: 'button', style: 'secondary', height: 'sm', action: { type: 'postback', label: '今すぐ投稿', data: `now:${id}`, displayText: `${id} を今すぐ投稿` } },
+          { type: 'button', style: 'secondary', height: 'sm', action: { type: 'postback', label: '修正して', data: `fb:${id}`, displayText: `${id} を修正して` } },
           { type: 'button', style: 'secondary', height: 'sm', action: { type: 'postback', label: '却下する', data: `reject:${id}`, displayText: `${id} を却下` } }] },
-        { type: 'button', style: 'link', height: 'sm', action: { type: 'postback', label: 'キャプションを見る', data: `cap:${id}`, displayText: `${id} のキャプション` } }] },
+        { type: 'button', style: 'link', height: 'sm', action: { type: 'postback', label: '今すぐ投稿', data: `now:${id}`, displayText: `${id} を今すぐ投稿` } }] },
     },
   };
 }
@@ -223,6 +223,81 @@ function approvalCarousel(ids) {
   const bubbles = ids.slice(0, 12).map(id => card(id).contents);
   return { type: 'flex', altText: `承認待ち ${ids.length}本：${ids.slice(0, 5).join('、')}`.slice(0, 380), contents: bubbles.length === 1 ? bubbles[0] : { type: 'carousel', contents: bubbles } };
 }
+// カルーセルは1つ12枚・JSON で 50KB まで。超えないように何通かに分ける（返事は5通まで）
+function carousels(bubbles, alt) {
+  const chunks = [[]];
+  for (const b of bubbles) { const cur = chunks.at(-1); if (cur.length && (cur.length >= 12 || Buffer.byteLength(JSON.stringify([...cur, b])) > 40000)) chunks.push([b]); else cur.push(b); }
+  return chunks.filter(c => c.length).slice(0, 5).map((c, i) => ({ type: 'flex', altText: `${alt}${chunks.length > 1 ? `（${i + 1}）` : ''}`.slice(0, 380), contents: c.length === 1 ? c[0] : { type: 'carousel', contents: c } }));
+}
+// 台本の候補（もしもラボ）。SNS司令室と同じ中身で、このアカウントの LINE からも返事できる
+const waitingScripts = () => Object.entries(state.scripts || {}).filter(([, x]) => x.status === 'waiting').map(([id, x]) => ({ id, ...x })).sort((a, b) => a.sentAt - b.sentAt || a.id.localeCompare(b.id));
+function scriptBubble(x) {
+  const bodyText = (x.lines || []).map((l, i) => `${i + 1}. ${String(l).trim()}`).join('\n');
+  const btn = (label, data, style = 'secondary', extra = {}) => ({ type: 'button', style, height: 'sm', ...extra, action: { type: 'postback', label, data, displayText: `台本 ${String(x.title).slice(0, 20)}：${label}` } });
+  return { type: 'bubble', size: 'mega',
+    header: { type: 'box', layout: 'vertical', backgroundColor: ACOL, paddingAll: '12px', spacing: 'xs', contents: [
+      { type: 'text', text: `台本 ${x.id}${x.pillar ? `・${x.pillar}` : ''}`, size: 'xxs', color: '#E5E7EB' },
+      { type: 'text', text: String(x.title || x.id), color: '#ffffff', weight: 'bold', size: 'md', wrap: true, maxLines: 3 }] },
+    body: { type: 'box', layout: 'vertical', paddingAll: '12px', spacing: 'xs', contents: [
+      ...(bodyText ? [{ type: 'text', text: bodyText, size: 'xs', color: '#222222', wrap: true }] : []),
+      ...(x.ask ? [{ type: 'text', text: `質問：${x.ask}`, size: 'xs', color: '#0A7D3C', wrap: true, margin: 'md' }] : []),
+      ...(x.note ? [{ type: 'text', text: x.note, size: 'xxs', color: '#888888', wrap: true, margin: 'sm' }] : [])] },
+    footer: { type: 'box', layout: 'vertical', spacing: 'sm', contents: [
+      btn('この台本でOK', `sc:ok:${x.id}`, 'primary', { color: ACOL }),
+      { type: 'box', layout: 'horizontal', spacing: 'sm', contents: [btn('直してOK', `scfb:${x.id}`), btn('見送り', `sc:skip:${x.id}`)] }] } };
+}
+function setScript(id, act, textIn) {
+  const x = (state.scripts || {})[id]; if (!x) return `${id} の台本が見つからへん`;
+  x.status = act; x.at = Date.now(); if (textIn) x.feedback = [...(x.feedback || []), { t: Date.now(), text: String(textIn).slice(0, 2000) }]; save();
+  return act === 'ok' ? `${x.title} を承認した。次の動画制作で動画にする` : act === 'fix' ? `${x.title} の修正を記録した。Claude が直してから動画にする` : `${x.title} は見送りにした`;
+}
+// 承認待ち（動画＋台本）を返事で出す
+function pendingReply() {
+  const ids = pendingIds(), scr = waitingScripts();
+  if (!ids.length && !scr.length) return [text('承認待ちの動画も台本もない')];
+  return carousels([...ids.map(id => card(id).contents), ...scr.map(scriptBubble)], `承認待ち 動画${ids.length}本${scr.length ? `・台本${scr.length}本` : ''}`);
+}
+// 承認待ちがそろったら1通だけ知らせる（届くたびに20分待って、続けて届かなければ送る。23時〜7時は7時まで待つ）
+const READY_WAIT = 20 * 60e3;
+function markReady(delay = READY_WAIT) { state.readyAt = Date.now() + delay; save(); }
+async function readyTick() {
+  if (!state.readyAt || Date.now() < state.readyAt) return;
+  const h = new Date(Date.now() + JST).getUTCHours();
+  if (h >= 23 || h < 7) { state.readyAt = atToday('07:00') + (h >= 23 ? 86400e3 : 0); save(); return; }
+  state.readyAt = 0; save();
+  const ids = pendingIds(), scr = waitingScripts();
+  if (!ids.length && !scr.length) return;
+  const row = t => ({ type: 'text', text: `・${t}`, size: 'sm', color: '#222222', wrap: true, maxLines: 2 });
+  const bubble = { type: 'bubble', size: 'giga',
+    header: { type: 'box', layout: 'vertical', backgroundColor: ACOL, paddingAll: '14px', contents: [
+      { type: 'text', text: '承認待ちがそろった', color: '#ffffff', size: 'xs' },
+      { type: 'text', text: [ids.length ? `動画 ${ids.length}本` : '', scr.length ? `台本 ${scr.length}本` : ''].filter(Boolean).join('・'), color: '#ffffff', weight: 'bold', size: 'xl' }] },
+    body: { type: 'box', layout: 'vertical', spacing: 'sm', paddingAll: '14px', contents: [
+      ...ids.slice(0, 8).map(id => row(meta(id).title || id)),
+      ...(ids.length > 8 ? [{ type: 'text', text: `ほか ${ids.length - 8}本`, size: 'xs', color: '#888888' }] : []),
+      ...(scr.length ? [{ type: 'separator', margin: 'md' }, { type: 'text', text: `台本の候補 ${scr.length}本（${scr[0].id}〜${scr.at(-1).id}）`, size: 'sm', weight: 'bold', margin: 'md', wrap: true }] : []),
+      ...(ids.length ? [{ type: 'text', text: `承認すると次の空き枠（${fmt(nextSlot())}〜）に入る`, size: 'xs', color: '#888888', wrap: true, margin: 'md' }] : [])] },
+    footer: { type: 'box', layout: 'vertical', contents: [{ type: 'button', style: 'primary', color: ACOL, action: { type: 'postback', label: '承認待ちを開く', data: 'menu:承認待ち', displayText: '承認待ち', inputOption: 'closeRichMenu' } }] } };
+  await pushForce({ type: 'flex', altText: `承認待ちがそろった：${[ids.length ? `動画${ids.length}本` : '', scr.length ? `台本${scr.length}本` : ''].filter(Boolean).join('・')}`, contents: bubble }).catch(e => log('ready push', e));
+}
+// 今日の投稿：予定と結果を1枚に
+function todayCard() {
+  const d0 = dayStart(Date.now()), d1 = d0 + 86400e3;
+  const list = Object.entries(state.items).map(([id, it]) => ({ id, it, t: it.status === 'published' ? (it.publishedAt || it.publishAt) : it.publishAt }))
+    .filter(x => x.t >= d0 && x.t < d1 && (x.it.status === 'approved' || x.it.status === 'published')).sort((a, b) => a.t - b.t);
+  if (!list.length) return text('今日の投稿予定はない');
+  const st = it => it.status === 'published' ? ['投稿済み', '#1DB446'] : it.error ? ['失敗', '#E0453A'] : ['予定', '#888888'];
+  const rows = list.map(({ id, it, t }) => ({ type: 'box', layout: 'horizontal', spacing: 'md', margin: 'md', alignItems: 'center', contents: [
+    { type: 'text', text: fmt(t).split(' ')[1], size: 'sm', weight: 'bold', flex: 0, color: ACOL },
+    { type: 'text', text: meta(id).title || id, size: 'sm', wrap: true, maxLines: 2, flex: 1 },
+    it.status === 'published' && it.permalink ? { type: 'text', text: '投稿済み', size: 'xs', weight: 'bold', flex: 0, color: '#1DB446', action: { type: 'uri', label: '見る', uri: it.permalink } }
+      : { type: 'text', text: st(it)[0], size: 'xs', weight: 'bold', flex: 0, color: st(it)[1] }] }));
+  return { type: 'flex', altText: `今日の投稿 ${list.length}本`, contents: { type: 'bubble', size: 'giga',
+    header: { type: 'box', layout: 'vertical', backgroundColor: ACOL, paddingAll: '14px', contents: [
+      { type: 'text', text: BRAND, color: '#ffffff', size: 'xs' },
+      { type: 'text', text: `今日の投稿 ${fmt(d0).split(' ')[0]}（${list.length}本）`, color: '#ffffff', weight: 'bold', size: 'lg' }] },
+    body: { type: 'box', layout: 'vertical', paddingAll: '14px', contents: rows } } };
+}
 function postedCarousel(list) {
   if (!list.length) return null;
   const bubbles = list.slice(-12).map(x => postedCard(x.id, x.r).contents);
@@ -283,8 +358,16 @@ async function doAction(act, id) {
   return `知らない操作：${act}`;
 }
 async function onPostback(ev) {
-  const [act, id] = String(ev.postback.data).split(':');
+  const data = String(ev.postback.data);
+  if (/^sc:(ok|skip):/.test(data)) { const [, a, sid] = data.split(':'); return reply(ev.replyToken, text(setScript(sid, a))); }
+  if (/^scfb:/.test(data)) { state.awaitFb = { kind: 'script', id: data.slice(5), until: Date.now() + 15 * 60e3 }; save(); return reply(ev.replyToken, text('台本の直してほしいところを、このまま送って。直したら確認なしで動画にする（15分以内。やめるときは やめる）')); }
+  const [act, id] = data.split(':');
   const it = state.items[id];
+  if (act === 'fb' && it) {
+    if (it.status === 'published') return reply(ev.replyToken, text(`${id} はもう投稿済み`));
+    state.awaitFb = { kind: 'video', id, until: Date.now() + 15 * 60e3 }; save();
+    return reply(ev.replyToken, text(`${meta(id).title || id} の直してほしいところを、このまま送って（例：冒頭をもっと強く）。その回は却下になって、Claude が直してもう一回 承認待ち に出す。15分以内。やめるときは やめる`));
+  }
   if (!it) return reply(ev.replyToken, text(`${id} が見つからへん`));
   if (act === 'cap') return reply(ev.replyToken, text(captionText(id) || 'キャプションがない'));
   if (act === 'ytskip') { it.yt = { ...(it.yt || {}), skipped: true }; save(); return reply(ev.replyToken, text(`${id} はYouTubeに上げへんことにした`)); }
@@ -349,13 +432,23 @@ async function onLineWebhook(req, res) {
       continue;
     }
     if (uid !== state.owner) continue;                               // 持ち主以外は無視
+    const msgText = ev.type === 'message' && ev.message.type === 'text' ? ev.message.text.trim() : '';
+    if (msgText && state.awaitFb && state.awaitFb.until > Date.now() && !/^(承認待ち|承認|今日の投稿|数字|解析|収益|通数|投稿した)$/.test(msgText)) {
+      const f = state.awaitFb; delete state.awaitFb; save();
+      if (/^(やめる|キャンセル)$/.test(msgText)) { await reply(ev.replyToken, text('修正の指示はやめた（まだ承認待ちのまま）')); continue; }
+      if (f.kind === 'script') { await reply(ev.replyToken, text(setScript(f.id, 'fix', msgText))); continue; }
+      const it = state.items[f.id];
+      if (!it || it.status === 'published') { await reply(ev.replyToken, text('その回はもう投稿済みか、見つからへん')); continue; }
+      it.status = 'rejected'; it.feedback = [...(it.feedback || []), { t: Date.now(), text: msgText.slice(0, 2000) }]; delete it.feedbackDone; save();
+      await reply(ev.replyToken, text('記録した。次の動画制作の回（10:47 か 16:47）で Claude が直して、もう一回 承認待ち に出す')); continue;
+    }
     if (ev.type === 'postback') await onPostback(ev);
+    else if (msgText === '今日の投稿') await reply(ev.replyToken, todayCard());
     else if (ev.type === 'message' && ev.message.type === 'text' && /^通数$/.test(ev.message.text.trim())) {
       await reply(ev.replyToken, await quotaCard().catch(() => text('通数が取れへんかった')));
     }
     else if (ev.type === 'message' && ev.message.type === 'text' && /^(承認待ち|承認)$/.test(ev.message.text.trim())) {
-      const ac = approvalCarousel(pendingIds());
-      await reply(ev.replyToken, ac ? [ac] : text('承認待ちの動画はない'));
+      await reply(ev.replyToken, pendingReply());
     }
     else if (ev.type === 'message' && ev.message.type === 'text' && /^(投稿|投稿した)$/.test(ev.message.text.trim())) {
       const pc = postedCarousel((state.postedLog || []).filter(x => x.t > Date.now() - 86400e3));
@@ -1264,6 +1357,7 @@ setInterval(async () => {
     await refreshToken();
     await remind().catch(e => log('remind failed', e));
     await digestTick().catch(e => log('digest failed', e));
+    await readyTick().catch(e => log('ready failed', e));
     await flushOutbox().catch(e => log('outbox failed', e));
   } finally { busy = false; }
   // 毎時5分に3媒体の数字を取る（投稿の処理とは別に動かす）
@@ -1319,7 +1413,8 @@ http.createServer(async (req, res) => {
       if (!validId(id) || !fs.existsSync(path.join(MEDIA, `${id}.mp4`))) return send(res, 400, { ok: false, error: 'missing video' });
       const prev = state.items[id];
       if (prev && prev.status === 'published') return send(res, 409, { ok: false, error: 'already published' });
-      state.items[id] = { status: 'pending', receivedAt: Date.now() }; save(); // 承認カードはまとめて送る（朝・夕方・「承認待ち」と送ったとき）
+      state.items[id] = { status: 'pending', receivedAt: Date.now() }; save(); // 承認カードは、続けて届くのが止まったら1通で知らせる（readyTick）
+      markReady();
       if (APPROVAL_NOW) { await pushApproval(id).catch(e => log('approval push', e)); state.digestSeen = { ...(state.digestSeen || {}), [id]: 1 }; save(); }
       return send(res, 200, { ok: true });
     }
@@ -1365,7 +1460,7 @@ http.createServer(async (req, res) => {
         if (Array.isArray(body.add)) { // [{id, title, pillar, lines, ask, note}]。決まった台本は上書きしない（replace:true なら待ちに戻す）
           let n = 0; for (const x of body.add.slice(0, 30)) { const id = String(x.id || '').slice(0, 20); if (!id) continue; const cur = state.scripts[id]; if (cur && cur.status !== 'waiting' && !body.replace) continue;
             state.scripts[id] = { title: String(x.title || '').slice(0, 120), pillar: String(x.pillar || '').slice(0, 40), lines: (x.lines || []).slice(0, 30).map(l => String(l).slice(0, 200)), ask: String(x.ask || '').slice(0, 120), note: String(x.note || '').slice(0, 300), status: 'waiting', feedback: [], sentAt: Date.now() }; n++; }
-          out.added = n;
+          out.added = n; if (n) markReady(2 * 60e3);
         }
         if (body.act && body.id) { // ok（承認）・fix（直してから動画に）・skip（見送り）
           const x = state.scripts[String(body.id)]; if (!x) return send(res, 404, { ok: false, error: 'no script' });
@@ -1420,5 +1515,13 @@ if (process.argv.includes('--buzztest')) { (async () => {
   await buzzCheck(snap, prev, cur, 1);
   console.log('--- 2回目（同じ動画は節目のときだけ）');
   await buzzCheck({ ...snap, t: t + 3600e3 }, cur, { t: t + 3600e3, v: { ig: { a: 75000 }, tt: { x: 125000 } }, f: cur.f }, 1);
+  process.exit(0);
+})(); }
+// 動作確認用：node moshimo-server.mjs --acctest で、承認待ち・そろった知らせ・今日の投稿のカードを表示して終わる（LINE には送らない）
+if (process.argv.includes('--acctest')) { (async () => {
+  let pushed = null; state.owner = 'Utest'; globalThis.fetch = async (u, o) => { pushed = JSON.parse(o.body).messages; return { ok: true, status: 200, text: async () => '{}', json: async () => ({}) }; };
+  state.readyAt = 1; const h = new Date(Date.now() + JST).getUTCHours(); if (h >= 23 || h < 7) console.error('（夜なので知らせは7時まで待つ）');
+  await readyTick();
+  console.log(JSON.stringify({ messages: [...(pushed || []), ...pendingReply(), todayCard()] }));
   process.exit(0);
 })(); }

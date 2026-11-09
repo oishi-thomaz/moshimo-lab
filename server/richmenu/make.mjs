@@ -58,12 +58,11 @@ out.sns = svg(dark, grid6([
 // 各アカウント：アカウントの色の大きい 承認待ち ＋ 白い3マス
 for (const [key, color, light] of [['moshimo', '#0F766E', '#CCFBF1'], ['quiz', '#B45309', '#FEF3C7'], ['itsuwa', '#9F1239', '#FFE4E6']]) {
   out[key] = svg('#EEF2F6', wide1plus3(
-    { bg: color, fg: '#FFFFFF', sub: light, icon: 'check', label: '承認待ち', note: '承認カードをまとめて出す' },
+    { bg: color, fg: '#FFFFFF', sub: light, icon: 'check', label: '承認待ち', note: key === 'moshimo' ? 'このアカウントの動画と台本' : 'このアカウントの動画' },
     [
-      { bg: '#FFFFFF', fg: color, sub: '#64748B', icon: 'send', label: '投稿した', note: 'この24時間の結果' },
+      { bg: '#FFFFFF', fg: color, sub: '#64748B', icon: 'calendar', label: '今日の投稿', note: '予定と結果' },
       { bg: '#FFFFFF', fg: color, sub: '#64748B', icon: 'chart', label: '数字', note: 'フォロワーと再生' },
-      ...(key === 'moshimo' ? [{ bg: '#FFFFFF', fg: color, sub: '#64748B', icon: 'yen', label: '収益', note: 'TikTokの収益' }] : []),
-      { bg: '#FFFFFF', fg: color, sub: '#64748B', icon: 'msg', label: '通数', note: '今月の送信数' },
+      key === 'moshimo' ? { bg: '#FFFFFF', fg: color, sub: '#64748B', icon: 'yen', label: '収益', note: 'TikTokの収益' } : { bg: '#FFFFFF', fg: color, sub: '#64748B', icon: 'msg', label: '通数', note: '今月の送信数' },
     ]));
 }
 const dir = new URL('.', import.meta.url).pathname;
