@@ -90,7 +90,7 @@ def one(dirp):
     meta['invalid'] = '使える写真がない'; json.dump(meta, open(mp, 'w', encoding='utf-8'), ensure_ascii=False, indent=2); print('×', meta['id'], '使える写真がない'); return
   # 1枚目に向く写真：横長すぎず大きいもの
   def good(im): r = im.width / im.height; return (0.55 < r < 1.6) * 2 + min(im.width, 2000) / 1000
-  first = max(range(len(ims)), key=lambda i: good(ims[i]) - i * 0.3)
+  first = max(range(len(ims)), key=lambda i: good(ims[i]) - i * 1.5)
   order = [first] + [i for i in range(len(ims)) if i != first]
   slides = [cover(ims[first], meta['title'], meta.get('brand', ''), meta['source']['site'])]
   for i in order[:4]: slides.append(plain(ims[i], meta.get('brand', '')))
