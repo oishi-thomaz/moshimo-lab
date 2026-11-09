@@ -211,7 +211,7 @@ async function main() {
     catch (e) { log('投稿サーバーに聞けない（重複チェックなしで続ける）', e.message); }
   }
   // 同じ実行の中でも重複させない（ローカルの記録も足す）
-  const localUsed = 'state/news-used.txt';
+  const localUsed = path.join(OUT, '.used.txt'); // 同じ実行の中だけで使う（リポジトリの state/ には書かない）
   if (fs.existsSync(localUsed)) used.urls = (used.urls || []).concat(fs.readFileSync(localUsed, 'utf8').split('\n').filter(Boolean));
 
   const cands = await collect(used);
@@ -250,7 +250,7 @@ async function main() {
       const caption = `${w.body.trim()}\n\n${w.ask ? w.ask.trim() + '\n\n' : ''}📸 ${site}\n\n${hashtags.map(h => '#' + h).join(' ')}`;
       const meta = { id, title, caption, body: w.body, ask: w.ask, hashtags, category: w.category, type: p.type, score: p.score, why: p.why, source: { url: finalUrl, link: c.link, title: c.title, site, feed: c.feed, date: c.date }, srcFiles: files, brand: BRAND, madeAt: Date.now() };
       fs.writeFileSync(path.join(dir, 'meta.json'), JSON.stringify(meta, null, 2));
-      fs.mkdirSync('state', { recursive: true }); fs.appendFileSync(localUsed, c.link + '\n');
+      fs.appendFileSync(localUsed, c.link + '\n');
       made++;
       log(`○ ${id}｜${title.join(' / ')}｜${site}｜score ${p.score}`);
     } catch (e) { log(`× 失敗：${c.title}（${e.message}）`); }
