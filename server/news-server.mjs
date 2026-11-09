@@ -1,7 +1,7 @@
 // ニュースアカウント（インスタのみ・完全自動）の投稿サーバー。ConoHa VPS で常駐（Node.js 18以上、外部パッケージなし）
 //
 // 役割
-//  1. GitHub Actions（news-make.yml）から投稿画像（1080x1350 の JPEG）とキャプションを受け取って並べておく
+//  1. GitHub Actions（news-build.yml）から投稿画像（1080x1350 の JPEG）とキャプションを受け取って並べておく
 //  2. POST_TIMES の時刻ごとに1本、インスタにカルーセル（画像1枚ならふつうの写真）で投稿する。承認は挟まない
 //  3. 古くなったネタ（EXPIRE_H 時間より前に届いたもの）は出さずに捨てる
 //  4. インスタの長期トークンを20日ごとに自動更新する
@@ -137,7 +137,7 @@ async function tick() {
     state.slots[t] = 'taken'; save();
     for (const k of Object.keys(state.slots)) if (Number(k) < now - 3 * 86400e3) delete state.slots[k];
     const id = pickNext();
-    if (!id) { log('slot empty', jstStr(t)); state.slots[t] = 'empty'; save(); await alert('empty', `${BRAND}：${jstStr(t)} の枠に出すネタがなかった（自動のネタ集めが止まっているかも。GitHub の news-make を見て）`); return; }
+    if (!id) { log('slot empty', jstStr(t)); state.slots[t] = 'empty'; save(); await alert('empty', `${BRAND}：${jstStr(t)} の枠に出すネタがなかった（朝の運用か news-collect・news-build が止まっているかも）`); return; }
     state.slots[t] = id; save();
     await publish(id);
     return;

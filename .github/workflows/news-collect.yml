@@ -1,0 +1,39 @@
+name: news-collect
+
+# ニュースアカウント（インスタのみ）：毎朝 8:41 にネタの候補を集めて news-data ブランチの candidates.json に置く（Claude も Gemini も使わない）
+# 9:23 の定期タスク（SNS 毎日の運用）の today.mjs がこれを見て ■ make-news を出し、Claude が見出しとキャプションを書く。決めごとは docs/NEWS.md
+on:
+  schedule:
+    - cron: '41 23 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: news-data
+  cancel-in-progress: false
+
+jobs:
+  collect:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      NEWS_BASE_URL: ${{ secrets.NEWS_BASE_URL }}
+      NEWS_SECRET: ${{ secrets.NEWS_SECRET }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: news-data branch
+        run: bash tools/news/data-branch.sh news-data
+      - name: Collect
+        run: node tools/news/collect.mjs news-data/candidates.json
+      - name: Push
+        run: |
+          cd news-data
+          git add candidates.json
+          git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -q -m "candidates $(TZ=Asia/Tokyo date +%m/%d\ %H:%M)" || { echo 変化なし; exit 0; }
+          for k in 1 2 3; do git pull -q --rebase origin news-data 2>/dev/null; git push -q origin HEAD:news-data && break; sleep 5; done

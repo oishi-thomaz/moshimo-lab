@@ -1,0 +1,71 @@
+name: news-build
+
+# ニュースアカウント（インスタのみ）：Claude が news-data ブランチの queue/ に書いた投稿から、元記事の写真を取ってきて画像を作り、投稿サーバーに送る
+# Claude が書き終わったら dispatch する（ops/make-news.md）。取りこぼし用に3時間ごとにも見る（queue が空なら何もしない）
+on:
+  schedule:
+    - cron: '13 */3 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: news-data
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      NEWS_BASE_URL: ${{ secrets.NEWS_BASE_URL }}
+      NEWS_SECRET: ${{ secrets.NEWS_SECRET }}
+      NEWS_BRAND: ${{ vars.NEWS_BRAND || 'なにこれ通信' }}
+      NEWS_TAG: ${{ vars.NEWS_TAG || 'なにこれ通信' }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: news-data branch
+        id: q
+        run: |
+          bash tools/news/data-branch.sh news-data
+          N=$(ls news-data/queue/*.json 2>/dev/null | wc -l)
+          echo "queue $N 本"; echo "n=$N" >> "$GITHUB_OUTPUT"
+      - uses: actions/setup-node@v4
+        if: steps.q.outputs.n != '0'
+        with:
+          node-version: 22
+      - name: Fonts and Pillow
+        if: steps.q.outputs.n != '0'
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq fonts-noto-cjk
+          python3 -m pip install --quiet --break-system-packages pillow || python3 -m pip install --quiet pillow
+      - name: Build
+        if: steps.q.outputs.n != '0'
+        run: node tools/news/build.mjs news-data out/news
+      - name: Render
+        if: steps.q.outputs.n != '0'
+        run: python3 tools/news/render.py out/news
+      - name: Send
+        if: steps.q.outputs.n != '0'
+        run: node tools/news/send.mjs out/news
+      - name: Clean up queue
+        if: steps.q.outputs.n != '0' && always()
+        run: |
+          node tools/news/finish.mjs news-data out/news
+          cd news-data
+          git add -A
+          git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -q -m "built $(TZ=Asia/Tokyo date +%m/%d\ %H:%M)" || { echo 変化なし; exit 0; }
+          for k in 1 2 3; do git pull -q --rebase origin news-data 2>/dev/null; git push -q origin HEAD:news-data && break; sleep 5; done
+      - name: Keep previews (7 days)
+        if: steps.q.outputs.n != '0' && always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: news-${{ github.run_id }}
+          path: |
+            out/news/*/meta.json
+            out/news/*/*.jpg
+          retention-days: 7
+          if-no-files-found: ignore

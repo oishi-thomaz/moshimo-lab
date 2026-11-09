@@ -2,18 +2,21 @@
 
 海外のちょっと変わった話・へぇな話・ほっこりする実話を、写真＋見出しのカルーセルで1日数本、承認なしで自動投稿する。手本はモイムード（@moo_i_mood.jp）と soo（@soo.zip_jp）。もしもラボ・クイズ・いつわ劇場とは別のアカウント・別のサーバー。TikTok・YouTube には出さない。
 
-## 全体の流れ
+## 全体の流れ（2026/11/09〜 文章は Claude。Gemini は使わない）
 
 ```
-2時間ごと  GitHub Actions の news-make.yml（Claude なし）
-           1. 投稿サーバーに「この先14時間の枠に足りない本数」を聞く（足りていれば何もしない）
-           2. news/sources.json の海外ニュースの RSS からネタを集める（4日以内・未使用のもの）
-           3. Gemini が候補から シェアされそうな話 を選び、記事の本文だけを根拠に日本語の見出しとキャプションを書く
-           4. tools/news/render.py が 1080x1350 の画像を作る（1枚目：写真＋見出し、2枚目から：写真全体）
-           5. 投稿サーバー（VPS /news/）へ送る
-VPS        POST_TIMES の時刻ごとに1本、インスタにカルーセルで投稿。72時間より古いネタは捨てる
-           数字（閲覧・いいね・保存・シェア）を 24時間・72時間・7日で記録。失敗と在庫切れだけ SNS司令室に知らせる
+8:41   GitHub Actions の news-collect.yml（Claude なし）
+       news/sources.json の海外ニュースの RSS からネタを集め、元記事を開いて本文と写真の候補まで確かめ、
+       news-data ブランチの candidates.json に置く。投稿サーバーに在庫を聞いて、書く本数（次の26時間の枠－在庫＋予備2、最大10）も入れる
+9:23   定期タスク SNS 毎日の運用 の today.mjs が ■ make-news を出す → Opus のサブエージェントが ops/make-news.md のとおりに
+       候補から選んで見出しとキャプションを書き、news-data の queue/ に置いて news-build.yml を dispatch
+すぐ   news-build.yml（Claude なし。3時間ごとにも見る）：元記事の写真を取ってきて tools/news/render.py で 1080x1350 の画像にし、投稿サーバーへ送る。
+       送れた回は done.txt、写真が取れなかった回は failed/ に移す
+VPS    POST_TIMES の時刻ごとに1本、インスタにカルーセルで投稿（承認なし）。72時間より古いネタは捨てる。
+       数字（閲覧・いいね・保存・シェア）を 24時間・72時間・7日で記録。失敗と在庫切れだけ SNS司令室に知らせる
 ```
+
+PC は使わない（全部クラウド・GitHub・VPS で動く）。
 
 ## ネタと文章の決めごと
 
@@ -45,12 +48,14 @@ VPS        POST_TIMES の時刻ごとに1本、インスタにカルーセルで
 
 ## 1回だけのセットアップ
 
+済み（2026/11/09）：アカウント @nanikore.tsushin（Instagram のユーザーID 17841459481206894）、VPS の /news/、GitHub の Secrets。
+
 1. インスタで新しいアカウントを作る（ゆうと）→ プロアカウント（クリエイター）に切り替える → プロフィール写真・名前・自己紹介を入れる
 2. developers.facebook.com のもしもラボのアプリ → Instagram → API setup with Instagram business login → アカウントを追加 → Generate token → `https://graph.instagram.com/v25.0/me?fields=user_id,username&access_token=TOKEN` で user_id を控える（クイズのときと同じ手順）
 3. VPS（Mac のターミナルから ssh で入る）：`curl -fsSL https://raw.githubusercontent.com/oishi-thomaz/moshimo-lab/main/server/install-news.sh -o install-news.sh && sudo bash install-news.sh` → `sudo nano /etc/news.env` に IG_USER_ID と IG_TOKEN を入れる → `sudo systemctl restart news`
-4. GitHub の Settings → Secrets and variables → Actions の Secrets に NEWS_BASE_URL（https://ドメイン/news）と NEWS_SECRET（install-news.sh の最後に出た値）。Gemini は GEMINI_API_KEY をそのまま使う（分けたいときは GEMINI_API_KEY_NEWS）
-5. 同じ画面の Variables に NEWS_BRAND（アカウント名）と NEWS_TAG（1つ目のハッシュタグ）
-6. Actions → news-make → Run workflow（count 2）で試す。できた画像は Actions の実行結果の Artifacts で見られる
+4. GitHub の Settings → Secrets and variables → Actions の Secrets に NEWS_BASE_URL（https://ドメイン/news）と NEWS_SECRET（install-news.sh の最後に出た値）
+5. アカウント名とタグは なにこれ通信 が既定（変えるときは同じ画面の Variables に NEWS_BRAND と NEWS_TAG）
+6. Actions → news-collect → Run workflow で候補を作る。次の 9:23 の運用で Claude が書く。できた画像は news-build の実行結果の Artifacts で見られる
 
 ## 動かし方
 
