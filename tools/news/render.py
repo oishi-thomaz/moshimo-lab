@@ -2,9 +2,9 @@
 #   python3 tools/news/render.py out/news            … out/news/<id>/ を全部
 #   python3 tools/news/render.py out/news/<id>       … 1本だけ
 # 1枚目：写真＋見出し（2〜3行、最後の行が黄色）＋ブランドの札＋出典
-# 2枚目から：写真を切らずに全体を見せる（背景はぼかした同じ写真）
+# 2枚目から：写真＋話の続きの文字（1枚40〜80字で話が進む）。最後は オチ＋問いかけ＋フォロー（pages がない古い形は写真だけ）
 # 小さすぎる写真・ほぼ同じ写真は使わない。使える写真がなければ meta.json に invalid を書く（送らない）
-import json, os, sys, glob
+import json, os, sys, glob, re
 from PIL import Image, ImageDraw, ImageFont, ImageFilter, ImageOps, ImageStat
 
 W, H = 1080, 1350
@@ -75,25 +75,122 @@ def plain(im, brand):
   d.text((W - 36 - tw, H - 52), brand, font=f, fill=(255, 255, 255, 150))
   return Image.alpha_composite(img, o).convert('RGB')
 
+KINSOKU = set('、。，．・：；？！ー」』）】〉》〕…‥ぁぃぅぇぉっゃゅょゎァィゥェォッャュョヮヵヶ')
+def wrap(text, f, width):
+  out = []
+  for para in str(text).split('\n'):
+    line = ''
+    toks = re.findall(r'[A-Za-z0-9.,%〜~\-]+|.', para)   # 数字や英単語の途中では改行しない
+    for t in toks:
+      if f.getlength(line + t) > width and line:
+        if t in KINSOKU: line += t; continue   # 句読点などは行頭に置かない（ぶら下げ）
+        out.append(line); line = t
+      else: line += t
+    out.append(line)
+  return [l for l in out if l.strip()]
+
+def page(im, text, brand, k, n, fy):
+  # 上：写真（切り取る位置を回ごとに変える）／下：文字のパネル
+  PH = 760
+  photo = cover_crop(im, W, PH, fy)
+  img = Image.new('RGB', (W, H), (14, 14, 20)); img.paste(photo, (0, 0))
+  g = Image.new('L', (W, H), 0); gd = ImageDraw.Draw(g)
+  for y in range(PH - 160, PH): gd.line([(0, y), (W, y)], fill=int(255 * (y - (PH - 160)) / 160))
+  img = Image.composite(Image.new('RGB', (W, H), (14, 14, 20)), img, g)
+  o = Image.new('RGBA', (W, H), (0, 0, 0, 0)); d = ImageDraw.Draw(o)
+  pill(d, (48, 48), brand, font(BOLD, 30))
+  size = 52
+  while True:
+    f = font(BOLD, size); ls = wrap(text, f, 940)
+    if len(ls) * int(size * 1.55) <= 470 or size <= 40: break
+    size -= 2
+  lh = int(size * 1.55); top = PH + max(20, (520 - lh * len(ls)) // 2) - 10
+  for i, l in enumerate(ls): d.text((70, top + i * lh), l, font=f, fill=(255, 255, 255))
+  d.rectangle([70, PH - 6, 190, PH - 0], fill=YELLOW)
+  d.text((W - 60, H - 52), f'{k}/{n}', font=font(BOLD, 28), fill=(255, 255, 255, 140), anchor='ra')
+  return Image.alpha_composite(img.convert('RGBA'), o).convert('RGB')
+
+def text_page(im, text, brand, k, n):
+  # 写真が足りないページ：同じ写真をぼかして暗くした背景に、文字を大きく真ん中に
+  img = cover_crop(im, W, H, 0.5).filter(ImageFilter.GaussianBlur(36))
+  img = Image.blend(img, Image.new('RGB', (W, H), (10, 10, 16)), 0.7)
+  o = Image.new('RGBA', (W, H), (0, 0, 0, 0)); d = ImageDraw.Draw(o)
+  pill(d, (48, 48), brand, font(BOLD, 30))
+  size = 60
+  while True:
+    f = font(BOLD, size); ls = wrap(text, f, 900)
+    if len(ls) * int(size * 1.6) <= 700 or size <= 44: break
+    size -= 2
+  lh = int(size * 1.6); top = (H - lh * len(ls)) // 2
+  d.rectangle([90, top - 60, 210, top - 52], fill=YELLOW)
+  for i, l in enumerate(ls): d.text((90, top + i * lh), l, font=f, fill=(255, 255, 255))
+  d.text((W - 60, H - 52), f'{k}/{n}', font=font(BOLD, 28), fill=(255, 255, 255, 140), anchor='ra')
+  return Image.alpha_composite(img.convert('RGBA'), o).convert('RGB')
+
+def end_page(im, punch, ask, brand, k, n):
+  img = cover_crop(im, W, H, 0.5).filter(ImageFilter.GaussianBlur(28))
+  img = Image.blend(img, Image.new('RGB', (W, H), (8, 8, 12)), 0.62)
+  o = Image.new('RGBA', (W, H), (0, 0, 0, 0)); d = ImageDraw.Draw(o)
+  y = 330
+  if punch:
+    f = font(BLACK, 64); ls = wrap(punch, f, 920)
+    for l in ls: d.text((W / 2, y), l, font=f, fill=YELLOW, anchor='mm'); y += 90
+    y += 60
+  if ask:
+    f = font(BOLD, 50); ls = wrap(ask, f, 900)
+    for l in ls: d.text((W / 2, y), l, font=f, fill=(255, 255, 255), anchor='mm'); y += 76
+    d.text((W / 2, y + 30), 'コメントで教えてください', font=font(BOLD, 34), fill=(255, 255, 255, 170), anchor='mm')
+  d.rounded_rectangle([200, 1010, 880, 1120], radius=55, fill=YELLOW)
+  d.text((W / 2, 1065), 'フォローで毎日 世界のへぇ', font=font(BLACK, 44), fill=(16, 18, 28), anchor='mm')
+  d.text((W / 2, 1180), brand, font=font(BOLD, 34), fill=(255, 255, 255, 200), anchor='mm')
+  d.text((W - 60, H - 52), f'{k}/{n}', font=font(BOLD, 28), fill=(255, 255, 255, 140), anchor='ra')
+  return Image.alpha_composite(img.convert('RGBA'), o).convert('RGB')
+
 def one(dirp):
   mp = os.path.join(dirp, 'meta.json')
   if not os.path.exists(mp): return
   meta = json.load(open(mp, encoding='utf-8'))
-  ims, hs = [], []
-  for fn in meta.get('srcFiles', []):
+  ims, hs, src_no = [], [], []
+  for no, fn in enumerate(meta.get('srcFiles', []), 1):
     im = load(os.path.join(dirp, fn))
     if im is None: continue
     h = ahash(im)
     if any(near(h, x) for x in hs): print('  同じ写真', fn); continue
-    ims.append(im); hs.append(h)
+    ims.append(im); hs.append(h); src_no.append(meta.get('srcOrder', list(range(1, 99)))[no - 1] if meta.get('srcOrder') else no)
   if not ims:
     meta['invalid'] = '使える写真がない'; json.dump(meta, open(mp, 'w', encoding='utf-8'), ensure_ascii=False, indent=2); print('×', meta['id'], '使える写真がない'); return
   # 1枚目に向く写真：横長すぎず大きいもの
   def good(im): r = im.width / im.height; return (0.55 < r < 1.6) * 2 + min(im.width, 2000) / 1000
   first = max(range(len(ims)), key=lambda i: good(ims[i]) - i * 1.5)
+  if meta.get('coverImg') in src_no: first = src_no.index(meta['coverImg'])
   order = [first] + [i for i in range(len(ims)) if i != first]
-  slides = [cover(ims[first], meta['title'], meta.get('brand', ''), meta['source']['site'])]
-  for i in order[:4]: slides.append(plain(ims[i], meta.get('brand', '')))
+  brand = meta.get('brand', '')
+  slides = [cover(ims[first], meta['title'], brand, meta['source']['site'])]
+  pages = [p for p in meta.get('pages', []) if str(p).strip()]
+  if pages:
+    # 2枚目から：写真＋話の続き（1枚ずつ話が進む）。写真は1枚1回だけ。足りないページは写真をぼかした背景に文字だけ
+    n = 1 + len(pages) + 1
+    rest = order[1:]   # 表紙に使っていない写真。1枚1回だけ使う
+    # pageImg：ページごとに使う写真（candidates の imgs の何番目か。1から。0／なしは文字だけ）。指定があればそれに合わせ、ない回は順番に
+    want = meta.get('pageImg') or []
+    by_no = {no: i for i, no in enumerate(src_no)}
+    used = {first}
+    plan = []
+    for k in range(len(pages)):
+      w = want[k] if k < len(want) else None
+      if w is not None:
+        i = by_no.get(w)
+        plan.append(i if i is not None and i not in used else None)
+        if plan[-1] is not None: used.add(plan[-1])
+      else: plan.append('auto')
+    free = [i for i in rest if i not in used]
+    for k, t in enumerate(pages):
+      i = plan[k]
+      if i == 'auto': i = free.pop(0) if free else None
+      slides.append(page(ims[i], t, brand, k + 2, n, 0.35) if i is not None else text_page(ims[order[0]], t, brand, k + 2, n))
+    slides.append(end_page(ims[order[-1]], meta.get('punch', ''), meta.get('ask', ''), brand, n, n))
+  else:
+    for i in order[:4]: slides.append(plain(ims[i], brand))
   names = []
   for k, s in enumerate(slides, 1):
     fn = f"{meta['id']}_{k}.jpg"; s.save(os.path.join(dirp, fn), 'JPEG', quality=90, optimize=True, progressive=False); names.append(fn)

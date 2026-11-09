@@ -25,22 +25,24 @@ for (const f of fs.existsSync(qdir) ? fs.readdirSync(qdir).filter(x => x.endsWit
     const title = (p.title || []).map(s => String(s).trim()).filter(Boolean);
     if (title.length < 2 || title.length > 3 || title.some(s => len(s) > 16)) throw new Error(`見出しの形が違う：${JSON.stringify(title)}`);
     if (len(p.body) < 200 || len(p.body) > 700) throw new Error(`本文の長さ ${len(p.body)}字`);
+    const pages = (p.pages || []).map(s => String(s).trim()).filter(Boolean);
+    if (pages.length < 2 || pages.length > 5 || pages.some(s => len(s) > 110)) throw new Error(`スライドの文の形が違う（2〜5枚・1枚110字まで）：${pages.map(len).join(',')}`);
     const c = cands.find(x => x.key === p.key && (!p.source?.url || x.url === p.source.url || x.link === p.source.url)) || cands.find(x => p.source?.url && (x.url === p.source.url || x.link === p.source.url));
     const src = { url: p.source?.url || c?.url, link: c?.link || p.source?.url, title: c?.title || p.source?.title || '', site: p.source?.site || c?.site || '' };
     if (!src.url) throw new Error('元記事のURLがない');
     let imgs = c?.imgs || [];
     if (!imgs.length) { const { text, url } = await getText(src.url, 25000); imgs = article(text, url).imgs; }
     const dir = path.join(OUT, id); fs.mkdirSync(dir, { recursive: true });
-    const files = [];
-    for (const u of imgs) {
+    const files = [], srcOrder = [];
+    for (const [k, u] of imgs.entries()) {
       if (files.length >= 5) break;
       const fp = path.join(dir, `src_${files.length + 1}`);
-      try { await download(u, fp); files.push(path.basename(fp)); } catch (e) { console.log(`  ${id} 写真 NG ${u.slice(0, 90)}（${e.message}）`); }
+      try { await download(u, fp); files.push(path.basename(fp)); srcOrder.push(k + 1); } catch (e) { console.log(`  ${id} 写真 NG ${u.slice(0, 90)}（${e.message}）`); }
     }
     if (!files.length) { fs.rmSync(dir, { recursive: true, force: true }); throw new Error('写真が1枚も取れない'); }
     const hashtags = [...new Set([TAG, ...(p.hashtags || []).map(h => String(h).replace(/^#/, '').replace(/\s+/g, ''))])].filter(Boolean).slice(0, 5);
     const caption = `${String(p.body).trim()}\n\n${p.ask ? String(p.ask).trim() + '\n\n' : ''}📸 ${src.site}\n\n${hashtags.map(h => '#' + h).join(' ')}`;
-    const meta = { id, title, caption, body: p.body, ask: p.ask, hashtags, category: p.category || '', type: p.type || '', score: Number(p.score) || 0, source: src, srcFiles: files, brand: BRAND, madeAt: Date.now(), queueFile: f };
+    const meta = { id, title, pages, punch: String(p.punch || '').trim(), caption, body: p.body, ask: p.ask, hashtags, category: p.category || '', type: p.type || '', score: Number(p.score) || 0, source: src, srcFiles: files, srcOrder, coverImg: Number(p.coverImg) || null, pageImg: Array.isArray(p.pageImg) ? p.pageImg.map(x => (x ? Number(x) : 0)) : null, brand: BRAND, madeAt: Date.now(), queueFile: f };
     fs.writeFileSync(path.join(dir, 'meta.json'), JSON.stringify(meta, null, 2));
     result.ok.push([f, id]);
     console.log(`○ ${id}｜${title.join(' / ')}｜${src.site}｜写真 ${files.length}枚`);
