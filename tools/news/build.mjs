@@ -30,7 +30,7 @@ for (const f of fs.existsSync(qdir) ? fs.readdirSync(qdir).filter(x => x.endsWit
     const c = cands.find(x => x.key === p.key && (!p.source?.url || x.url === p.source.url || x.link === p.source.url)) || cands.find(x => p.source?.url && (x.url === p.source.url || x.link === p.source.url));
     const src = { url: p.source?.url || c?.url, link: c?.link || p.source?.url, title: c?.title || p.source?.title || '', site: p.source?.site || c?.site || '' };
     if (!src.url) throw new Error('元記事のURLがない');
-    let imgs = c?.imgs || [];
+    let imgs = (Array.isArray(p.imgs) && p.imgs.length ? p.imgs : null) || c?.imgs || [];
     if (!imgs.length) { const { text, url } = await getText(src.url, 25000); imgs = article(text, url).imgs; }
     const dir = path.join(OUT, id); fs.mkdirSync(dir, { recursive: true });
     const files = [], srcOrder = [];
