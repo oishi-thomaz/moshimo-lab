@@ -3,7 +3,7 @@
 書く本数は today.mjs の行のとおり（品質を落として数を合わせない。良い候補が足りなければ少なくてよい）。決めごとは docs/NEWS.md の ネタと文章の決めごと。承認は挟まず、そのままインスタに出る。
 
 ## 手順
-1. 作業フォルダの moshimo-lab で `git fetch -q origin news-data && git worktree add -q ../w-news-data origin/news-data -B news-data`（以下 ../w-news-data で作業。news-data は main とは別のブランチ。main には何も足さない）。
+1. 作業フォルダの moshimo-lab で `git fetch -q origin +news-data:refs/remotes/origin/news-data && git worktree add -q ../w-news-data origin/news-data -B news-data`（以下 ../w-news-data で作業。news-data は main とは別のブランチ。main には何も足さない）。
 2. `candidates.json` を読む。items が候補（title・site・url・text＝元記事の本文の先頭2,500字・imgs＝写真の候補）。`queue/` にまだある回、`done.txt` と `failed/` に載っている元記事URLは使わない（同じ話を2回出さない。タイトルが違っても中身が同じ話も避ける）。
 3. 候補を全部読んで、日本の20〜40代が思わず友だちに送りたくなる話を選ぶ。伸びる型：身近な物の知らなかった秘密／動物・自然の珍しい光景／人のやさしさ・恩返しの実話／一般人のありえないうっかり／ギネス記録・世界に1つの物・とんでもない作品／写真1枚で伝わる科学の意外な事実。同じ型・同じ媒体が続かないように混ぜる。いちばん伸びるのは 身近な物の秘密（PS5コントローラーの持ち手は4万個の○△×□、メジャーの先がグラグラなのはわざと のように、誰でも手元で確かめられるもの）と 一般人のありえないうっかり・強運（柵の杭だと思ったら逃げた大蛇、給油機の故障で宝くじ3億円）。この2つを1日の半分以上にする。いい話・かわいい動物だけの回はパンチが弱いので score を下げる。
    - 候補にパンチのある話が足りないときは、自分で WebSearch して探してよい（UPI Odd News、News of the Weird、身近な物の隠れた機能の解説記事など。元記事は1〜2週間以内の話か、いつ読んでも驚ける物の秘密）。その場合は key を "web"、source に元記事の url・site、imgs にその記事に載っている写真のURLを配列で書く（その記事の写真だけ。別サイトの写真を混ぜない。WebFetch で記事を開いて写真のURLを確かめる）。
