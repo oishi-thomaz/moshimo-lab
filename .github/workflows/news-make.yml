@@ -1,0 +1,85 @@
+name: news-make
+
+# ニュースアカウント（インスタのみ・完全自動）：海外の変わった話を集めて、日本語の投稿（画像＋キャプション）を作り、投稿サーバーに送る
+# 2時間ごとに投稿サーバーの在庫を見て、この先14時間の投稿枠に足りない分だけ作る（1回最大4本）。投稿はサーバーが枠の時間に出す
+# 決めごとは docs/NEWS.md
+on:
+  schedule:
+    - cron: '23 */2 * * *'
+  workflow_dispatch:
+    inputs:
+      count:
+        description: '作る本数（空なら在庫の足りない分）'
+        required: false
+        default: ''
+
+permissions:
+  contents: read
+
+concurrency:
+  group: news-make
+  cancel-in-progress: false
+
+jobs:
+  make:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      NEWS_BASE_URL: ${{ secrets.NEWS_BASE_URL }}
+      NEWS_SECRET: ${{ secrets.NEWS_SECRET }}
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY_NEWS || secrets.GEMINI_API_KEY }}
+      NEWS_BRAND: ${{ vars.NEWS_BRAND || 'なにこれ通信' }}
+      NEWS_TAG: ${{ vars.NEWS_TAG || 'なにこれ通信' }}
+    steps:
+      - name: How many to make
+        id: n
+        run: |
+          if [ -z "$NEWS_BASE_URL" ] || [ -z "$NEWS_SECRET" ] || [ -z "$GEMINI_API_KEY" ]; then
+            echo "NEWS_BASE_URL / NEWS_SECRET / GEMINI_API_KEY がまだない（セットアップ前）。何もしない"; echo "count=0" >> "$GITHUB_OUTPUT"; exit 0
+          fi
+          WANT="${{ github.event.inputs.count }}"
+          if [ -n "$WANT" ]; then echo "count=$WANT" >> "$GITHUB_OUTPUT"; exit 0; fi
+          Q=$(curl -fsS --retry 3 -H "x-secret: $NEWS_SECRET" "$NEWS_BASE_URL/an/queue?hours=14") || { echo "投稿サーバーに聞けない"; exit 1; }
+          echo "$Q"
+          PAUSED=$(echo "$Q" | jq -r '.paused'); NEED=$(echo "$Q" | jq -r '.need // 0')
+          if [ "$PAUSED" = "true" ]; then NEED=0; fi
+          [ "$NEED" -gt 4 ] && NEED=4
+          echo "count=$NEED" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/checkout@v4
+        if: steps.n.outputs.count != '0'
+
+      - uses: actions/setup-node@v4
+        if: steps.n.outputs.count != '0'
+        with:
+          node-version: 22
+
+      - name: Fonts and Pillow
+        if: steps.n.outputs.count != '0'
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq fonts-noto-cjk
+          python3 -m pip install --quiet --break-system-packages pillow || python3 -m pip install --quiet pillow
+
+      - name: Make posts
+        if: steps.n.outputs.count != '0'
+        run: node tools/news/make.mjs --count "${{ steps.n.outputs.count }}" --out out/news
+
+      - name: Render images
+        if: steps.n.outputs.count != '0'
+        run: python3 tools/news/render.py out/news
+
+      - name: Send to posting server
+        if: steps.n.outputs.count != '0'
+        run: node tools/news/send.mjs out/news
+
+      - name: Keep previews (7 days)
+        if: steps.n.outputs.count != '0' && always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: news-${{ github.run_id }}
+          path: |
+            out/news/*/meta.json
+            out/news/*/*_1.jpg
+          retention-days: 7
+          if-no-files-found: ignore

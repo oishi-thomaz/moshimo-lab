@@ -1,0 +1,16 @@
+{
+  "_note": "ニュースアカウントのネタ元（RSS）。海外の 変わった話・へぇな話・ほっこり話 が多いところだけ。Reddit は API の商用利用に契約が要るので使わない。weight が大きいほど候補に多く入る。止まっているフィードは自動で飛ばす",
+  "feeds": [
+    { "name": "UPI Odd News", "site": "UPI", "url": "https://rss.upi.com/news/odd_news.rss", "weight": 3 },
+    { "name": "Oddity Central", "site": "Oddity Central", "url": "http://feeds.feedburner.com/OddityCentral", "weight": 3 },
+    { "name": "Bored Panda", "site": "Bored Panda", "url": "https://www.boredpanda.com/feed/", "weight": 2 },
+    { "name": "My Modern Met", "site": "My Modern Met", "url": "https://mymodernmet.com/feed/", "weight": 2 },
+    { "name": "Good News Network", "site": "Good News Network", "url": "https://www.goodnewsnetwork.org/feed/", "weight": 2 },
+    { "name": "Smithsonian Smart News", "site": "Smithsonian", "url": "https://www.smithsonianmag.com/rss/smart-news/", "weight": 2 },
+    { "name": "Live Science", "site": "Live Science", "url": "https://www.livescience.com/feeds/all", "weight": 2 },
+    { "name": "NY Post Weird But True", "site": "New York Post", "url": "https://nypost.com/tag/weird-but-true/feed/", "weight": 3 },
+    { "name": "Sky News Strange", "site": "Sky News", "url": "https://feeds.skynews.com/feeds/rss/strange.xml", "weight": 2 },
+    { "name": "The Guardian Science", "site": "The Guardian", "url": "https://www.theguardian.com/science/rss", "weight": 1 },
+    { "name": "BBC Science", "site": "BBC", "url": "https://feeds.bbci.co.uk/news/science_and_environment/rss.xml", "weight": 1 }
+  ]
+}
