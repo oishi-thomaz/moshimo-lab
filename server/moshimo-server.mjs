@@ -20,7 +20,7 @@ import crypto from 'node:crypto';
 const env = process.env;
 const PORT = Number(env.PORT || 8787);
 const PREFIX = (env.PREFIX || '/moshimo').replace(/\/$/, '');
-const VERSION = '2026-11-09a';                                 // update-servers.sh で入れ替わったかの確かめ用（/health に出る）
+const VERSION = '2026-11-10a';                                 // update-servers.sh で入れ替わったかの確かめ用（/health に出る）
 const BRAND = env.BRAND || 'もしもラボ';                           // LINE の文言に出す名前
 const APPROVAL_NOW = env.APPROVAL_NOW === '1';                    // 1：動画が届いたらすぐ承認カードを送る（まとめを待たない）
 const TT_UPLOAD = env.TT_UPLOAD === '1';                          // 1：投稿と同時に TikTok の下書きへ送る
