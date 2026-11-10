@@ -24,6 +24,7 @@
    - 書き出しの予定を書き換えた：moshimo-lab で ops/render.json だけを commit・push。
    - 書き出しが今日まだ動いていない：`gh api -X POST repos/oishi-thomaz/moshimo-lab/actions/workflows/render-chain.yml/dispatches -f ref=main` を1回だけ。終わるのは待たない。
 5. ■ render-fix（書き出しの失敗）：ops/render-fix.md を読んで自分で直す。
+   ■ news-collect（自分で。手順書なし）：`gh api -X POST repos/oishi-thomaz/moshimo-lab/actions/workflows/news-collect.yml/dispatches -f ref=main` を1回だけ。`gh api "repos/oishi-thomaz/moshimo-lab/actions/workflows/news-collect.yml/runs?per_page=1"` で終わるのを待って（数分）、`node tools/today.mjs` をもう一度動かす（■ make-news が出る）。
 6. ほかのモジュールはサブエージェントに任せる（Agent ツール、general-purpose、run_in_background）。自分では手順書を読まない。依頼文は下の形をそのまま使う：
    `<モジュール>：today.mjs の出力は次のとおり。<そのモジュールの行をそのまま貼る>。/home/claude/moshimo-lab/<手順書> を最後まで読んで、そのとおりにやって。作業フォルダは cp -r /home/claude/moshimo-lab /home/claude/w-<モジュール>-lab と cp -r /home/claude/moshimo-analytics /home/claude/w-<モジュール>-an で作ってそこで作業し、終わる前に全部 push してから消す（push の前に git pull --rebase）。/home/claude/moshimo-lab/ops/rules.md を読んで守る。最後に、やったこと（番号・タイトル）と、できなかったこととその理由を短く返す。`
    - モデル：feedback・make-moshimo・make-quiz・make-itsuwa・make-news・make-carousel・report は model に opus。make-carousel の手順書は ops/make-carousel.md（もしもラボの人気回のカルーセル。2026/11/10〜）。tiktok は sonnet（ゆうとの Mac の Chrome を使う。アカウントごとに別のプロフィールで、Claude からは別のブラウザに見える。手順書は /home/claude/moshimo-analytics/TIKTOK.md。もしもラボ・クイズ・いつわ劇場の行をまとめて1つのサブエージェントに渡す。ブラウザの選び直しがぶつかるので、tiktok は2つ立てない）。
