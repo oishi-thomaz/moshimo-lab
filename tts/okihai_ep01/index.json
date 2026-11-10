@@ -1,0 +1,200 @@
+{
+ "k1": {
+  "dur": 2.309,
+  "voice": "Despina",
+  "text": "頼んでいない箱が、また届いた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "k2": {
+  "dur": 2.969,
+  "voice": "Despina",
+  "text": "中には、写真がいちまい。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "k3": {
+  "dur": 3.401,
+  "voice": "Despina",
+  "text": "写っていたのは、眠っている私だった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "k4": {
+  "dur": 7.228,
+  "voice": "Despina",
+  "text": "日付は、昨日の夜。時刻は、さんじ、じゅうにふん。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a1": {
+  "dur": 2.564,
+  "voice": "Despina",
+  "text": "あいざわみお、にじゅうななさい。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a2": {
+  "dur": 5.731,
+  "voice": "Despina",
+  "text": "駅から遠いアパートの、にかいで、ひとり、デザインの仕事をしている。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a2b": {
+  "dur": 7.019,
+  "voice": "Despina",
+  "text": "この部屋に来て、にかげつ。前の住人あての郵便が、まだときどき届く。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a3": {
+  "dur": 3.553,
+  "voice": "Despina",
+  "text": "玄関の前に箱が届くのは、これで、みっかめ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a4": {
+  "dur": 4.057,
+  "voice": "Despina",
+  "text": "いちにちめは、誰もいない、昼の私の部屋。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a5": {
+  "dur": 3.57,
+  "voice": "Despina",
+  "text": "ふつかめは、机で仕事をしている私。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a6": {
+  "dur": 6.892,
+  "voice": "Despina",
+  "text": "そして今日は、ベッドの私。写真は毎日、私に近づいてくる。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b1": {
+  "dur": 2.631,
+  "voice": "Despina",
+  "text": "誰かが、この部屋の中で撮っている。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b2": {
+  "dur": 4.25,
+  "voice": "Despina",
+  "text": "カーテンの裏。クローゼット。パソコンのカメラ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b3": {
+  "dur": 2.242,
+  "voice": "Despina",
+  "text": "どこにも、カメラはなかった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b4": {
+  "dur": 7.135,
+  "voice": "Despina",
+  "text": "昨夜も、鍵は、にかい確かめた。今朝も、鍵はかかったまま。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b5": {
+  "dur": 3.495,
+  "voice": "Despina",
+  "text": "この部屋の鍵を持っているのは、私だけなのに。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c1": {
+  "dur": 3.061,
+  "voice": "Puck",
+  "text": "相沢さん、おはようございます！ご注文の荷物です。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c2": {
+  "dur": 3.967,
+  "voice": "Despina",
+  "text": "毎朝このアパートを回る、配達員のケンさん。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c3": {
+  "dur": 4.452,
+  "voice": "Despina",
+  "text": "あの…この箱、どこから届いてるか、分かりますか？",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c4": {
+  "dur": 3.864,
+  "voice": "Puck",
+  "text": "うちの伝票ですね。ご依頼主の住所は…",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c5": {
+  "dur": 4.596,
+  "voice": "Puck",
+  "text": "あれ？ここですね。コーポしらかばの、にーまるさん。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c6": {
+  "dur": 3.472,
+  "voice": "Despina",
+  "text": "送り主の住所は、この部屋だった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c7": {
+  "dur": 3.369,
+  "voice": "Puck",
+  "text": "…相沢さん。最近、ちゃんと眠れてます？",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c8": {
+  "dur": 2.166,
+  "voice": "Despina",
+  "text": "どうして、そんなことを聞くんだろう。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d1": {
+  "dur": 4.078,
+  "voice": "Despina",
+  "text": "その夜、電気を消して、寝たふりをした。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d2": {
+  "dur": 2.62,
+  "voice": "Despina",
+  "text": "誰が撮っているのか、この目で見るために。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d3": {
+  "dur": 6.484,
+  "voice": "Despina",
+  "text": "にじ。さんじ。…さんじ、じゅっぷん。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d4": {
+  "dur": 1.936,
+  "voice": "Despina",
+  "text": "気がつくと、朝だった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e1": {
+  "dur": 3.868,
+  "voice": "Despina",
+  "text": "ドアを開けると、よっつめの箱があった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e2": {
+  "dur": 3.148,
+  "voice": "Despina",
+  "text": "伝票の、届け先の名前は——",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e3": {
+  "dur": 3.439,
+  "voice": "Despina",
+  "text": "私じゃなかった。みずのさきさま。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e4": {
+  "dur": 4.867,
+  "voice": "Despina",
+  "text": "それは、この部屋の、前の住人の名前だった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "x1": {
+  "dur": 1.833,
+  "voice": "Schedar",
+  "text": "次回。あいかぎ。",
+  "model": "gemini-3.8-flash-tts"
+ }
+}
