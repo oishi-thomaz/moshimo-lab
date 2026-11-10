@@ -23,7 +23,9 @@ if (imgs.length < 2) { console.error('スライドの画像がない（先に re
 // ---------- 読む文：1枚目は見出し、そのあとはスライドの文、最後はオチと問いかけ ----------
 const clean = s => String(s || '').replace(/[「」『』]/g, '').replace(/…/g, '、').replace(/〜/g, 'から').trim();
 const end = s => /[。！？!?]$/.test(s) ? s : s + '。';
-const texts = [end(clean((meta.title || []).join(''))), ...(meta.pages || []).map(s => end(clean(s)))];
+// 見出しの行は、助詞で終わる行はそのまま続け、それ以外の行の終わりには 、 を入れて読む（給油メーターの横の／小さい三角マーク／… → …三角マーク、給油口の…）
+const joinTitle = ls => ls.map(clean).map((s, i) => i < ls.length - 1 && !/[のがをにはとでもへや、]$/.test(s) ? s + '、' : s).join('');
+const texts = [end(joinTitle(meta.title || [])), ...(meta.pages || []).map(s => end(clean(s)))];
 if (imgs.length > texts.length) texts.push([meta.punch, meta.ask].map(clean).filter(Boolean).map(end).join(''));
 const n = Math.min(imgs.length, texts.length);
 
