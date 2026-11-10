@@ -313,7 +313,7 @@ async function pendingMessage() {
     footer: { type: 'box', layout: 'vertical', paddingAll: '10px', contents: [{ type: 'text', text: '修正して を押すと、直してほしいところを書ける。その回は却下になって、Claude が直してもう一回ここに出す。台本は 直してOK で書いたとおりに Claude が直してから動画にする', size: 'xxs', color: '#888888', wrap: true }] } };
   if (!total && !scripts) return { type: 'flex', altText: '承認待ちはない', contents: head1 };
   const bubbles = [];
-  for (const { acc, P } of all) if (P) P.items.forEach((it, k) => bubbles.push(approvalBubble(acc, it, k === 0 ? (P.nextSlot ? when(P.nextSlot) : '-') : '承認した順に次の枠')));
+  for (const { acc, P } of all) if (P) P.items.forEach((it, k) => bubbles.push(approvalBubble(acc, it, it.carousel ? `カルーセルの枠 ${it.slot || ''}〜` : k === 0 ? (P.nextSlot ? when(P.nextSlot) : '-') : '承認した順に次の枠')));
   for (const { acc, S } of all) for (const x of S) bubbles.push(scriptBubble(acc, x));
   // 1つのカルーセルは12枚まで・JSON で 50KB まで（日本語は1文字3バイト）。余裕を見て 40KB で区切る
   const msgs = [], chunks = [[head1]];

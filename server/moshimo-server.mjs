@@ -55,13 +55,17 @@ function postTimesOn(dayStart) { // dayStart: その日の0時（日本時間）
   if (o && o.times && o.times.length && (!o.until || dayStart <= o.until)) return o.times;
   return POST_TIMES;
 }
-function nextSlot() {
-  // 次に空いている投稿枠（POST_TIMES の各時刻 × 日付）。1枠1本
-  const taken = new Set(Object.values(state.items).filter(i => (i.status === 'approved' || i.status === 'publishing') && i.publishAt).map(i => i.publishAt));
+// カルーセル（もしもラボの人気回を画像でめくる形。2026/11/10〜）は、動画とは別の投稿時刻（CAROUSEL_TIMES）・別の枠
+const CAROUSEL_TIMES = (env.CAROUSEL_TIMES || '12:00,21:00').split(',').map(x => x.trim()).filter(Boolean).sort();
+const isCarousel = id => { try { return JSON.parse(fs.readFileSync(path.join(MEDIA, `${id}.json`), 'utf8')).type === 'carousel'; } catch { return false; } };
+function nextSlot(id) {
+  // 次に空いている投稿枠（POST_TIMES の各時刻 × 日付）。1枠1本。カルーセルは CAROUSEL_TIMES の枠
+  const car = !!(id && isCarousel(id));
+  const taken = new Set(Object.entries(state.items).filter(([k, i]) => (i.status === 'approved' || i.status === 'publishing') && i.publishAt && isCarousel(k) === car).map(([, i]) => i.publishAt));
   const now = Date.now();
   const j = new Date(now + JST);
   const day0 = Date.UTC(j.getUTCFullYear(), j.getUTCMonth(), j.getUTCDate()) - JST;
-  for (let d = 0; d < 400; d++) for (const hm of postTimesOn(day0 + d * 86400e3)) {
+  for (let d = 0; d < 400; d++) for (const hm of (car ? CAROUSEL_TIMES : postTimesOn(day0 + d * 86400e3))) {
     const [hh, mm] = hm.split(':').map(Number);
     const t = day0 + d * 86400e3 + (hh * 60 + mm) * 60e3;
     if (t > now + 5 * 60e3 && !taken.has(t)) return t;
@@ -86,6 +90,7 @@ function authed(req) {
   return SECRET && got.length === want.length && crypto.timingSafeEqual(got, want);
 }
 const validId = id => /^\d{4}$/.test(id);
+const hasMedia = id => fs.existsSync(path.join(MEDIA, `${id}.mp4`)) || (isCarousel(id) && fs.existsSync(path.join(MEDIA, `${id}_01.jpg`)));
 const meta = id => { try { return JSON.parse(fs.readFileSync(path.join(MEDIA, `${id}.json`), 'utf8')); } catch { return {}; } };
 
 // ---------------- LINE ----------------
@@ -109,8 +114,9 @@ const mmss = sec => `${Math.floor(sec / 60)}:${String(Math.round(sec % 60)).padS
 function card(id, head = '承認待ち') {
   const m = meta(id);
   const title = m.title || `動画 ${id}`;
-  const len = m.len || (m.duration ? mmss(Math.max(0, Number(m.duration) - 5)) : '');
-  const where = ['インスタ', state.yt?.refresh ? 'YouTube' : '', TT_UPLOAD && state.tt?.refresh ? 'TikTok下書き' : ''].filter(Boolean).join('＋');
+  const car = m.type === 'carousel';
+  const len = car ? `${m.slides || '?'}枚` : m.len || (m.duration ? mmss(Math.max(0, Number(m.duration) - 5)) : '');
+  const where = car ? 'インスタ（カルーセル）' : ['インスタ', state.yt?.refresh ? 'YouTube' : '', TT_UPLOAD && state.tt?.refresh ? 'TikTok下書き' : ''].filter(Boolean).join('＋');
   const row = (k, v, color = '#111111') => ({ type: 'box', layout: 'horizontal', spacing: 'md', contents: [
     { type: 'text', text: String(k).slice(0, 40), size: 'sm', color: '#888888', flex: 5, wrap: true },
     { type: 'text', text: String(v).slice(0, 40), size: 'sm', color, weight: 'bold', flex: 4, align: 'end', wrap: true }] });
@@ -119,7 +125,7 @@ function card(id, head = '承認待ち') {
     { type: 'text', text: `${head}・${id}`, size: 'xs', color: '#1DB446', weight: 'bold' },
     { type: 'text', text: title, size: 'lg', weight: 'bold', wrap: true, margin: 'sm' },
     { type: 'box', layout: 'vertical', margin: 'lg', spacing: 'sm', contents: [
-      row('長さ', len || '—'), row('投稿先', where), row('承認すると', fmt(nextSlot()), '#1DB446')] },
+      row(car ? '枚数' : '長さ', len || '—'), row('投稿先', where), row('承認すると', fmt(nextSlot(id)), '#1DB446')] },
   ];
   if (m.ask) body.push({ type: 'separator', margin: 'lg' }, { type: 'text', text: '最後の質問', size: 'xs', color: '#888888', margin: 'lg' }, { type: 'text', text: m.ask, size: 'md', weight: 'bold', wrap: true, margin: 'xs' });
   if (stats.length) body.push({ type: 'separator', margin: 'lg' }, { type: 'text', text: '動画の数字', size: 'xs', color: '#888888', margin: 'lg' }, { type: 'box', layout: 'vertical', spacing: 'sm', margin: 'sm', contents: stats });
@@ -127,7 +133,7 @@ function card(id, head = '承認待ち') {
     type: 'flex', altText: `${head} ${id} ${title}`.slice(0, 380),
     contents: {
       type: 'bubble', size: 'mega',
-      hero: { type: 'image', url: `${BASE_URL}/media/${id}_cover.jpg`, size: 'full', aspectRatio: '4:5', aspectMode: 'cover', action: { type: 'uri', uri: `${BASE_URL}/media/${id}.mp4` } },
+      hero: { type: 'image', url: `${BASE_URL}/media/${id}_cover.jpg`, size: 'full', aspectRatio: '4:5', aspectMode: 'cover', action: { type: 'uri', uri: car ? `${BASE_URL}/media/${id}_01.jpg` : `${BASE_URL}/media/${id}.mp4` } },
       body: { type: 'box', layout: 'vertical', contents: body },
       footer: { type: 'box', layout: 'vertical', spacing: 'sm', contents: [
         { type: 'button', style: 'primary', color: '#1DB446', height: 'sm', action: { type: 'postback', label: '承認する', data: `approve:${id}`, displayText: `${id} を承認` } },
@@ -144,7 +150,7 @@ function captionText(id) { const m = meta(id); return `${m.caption || ''}\n\n${(
 function plainApproval(id) {
   const m = meta(id);
   return [text(`【承認待ち】${id}\n${m.title || ''}\n\n${captionText(id)}`.slice(0, 4900)),
-    { type: 'template', altText: `承認待ち ${id}`, template: { type: 'buttons', title: (m.title || `動画 ${id}`).slice(0, 40), text: `承認すると ${fmt(nextSlot())} に投稿する`.slice(0, 60),
+    { type: 'template', altText: `承認待ち ${id}`, template: { type: 'buttons', title: (m.title || `動画 ${id}`).slice(0, 40), text: `承認すると ${fmt(nextSlot(id))} に投稿する`.slice(0, 60),
       actions: [{ type: 'postback', label: '承認する', data: `approve:${id}` }, { type: 'postback', label: '今すぐ投稿', data: `now:${id}` }, { type: 'postback', label: '却下する', data: `reject:${id}` }] } }];
 }
 async function pushApproval(id) {
@@ -351,7 +357,7 @@ async function doAction(act, id) {
     delete it.tt; save(); ttQueue = ttQueue.then(() => tiktokDraft(id)).catch(e => log('ttdraft', id, e)); return `${meta(id).title || id} を TikTok の下書きに送る（順番待ち）`;
   }
   if (it.status === 'published') return `${id} はもう投稿済み`;
-  if (act === 'approve') { it.status = 'approved'; it.publishAt = nextSlot(); save(); return `OK。${meta(id).title || id} は ${fmt(it.publishAt)} に投稿する`; }
+  if (act === 'approve') { it.status = 'approved'; it.publishAt = nextSlot(id); save(); return `OK。${meta(id).title || id} は ${fmt(it.publishAt)} に投稿する`; }
   if (act === 'now') { it.status = 'approved'; it.publishAt = Date.now(); it.ttNow = true; save(); return `OK。${meta(id).title || id} を今から投稿する`; }
   if (act === 'reject') { it.status = 'rejected'; save(); return `${meta(id).title || id} は却下にした`; }
   if (act === 'retry') { it.status = 'approved'; it.publishAt = Date.now(); it.error = ''; save(); return `${meta(id).title || id} をもう一回投稿してみる`; }
@@ -374,7 +380,7 @@ async function onPostback(ev) {
   if (act === 'ytretry') { it.yt = {}; save(); await reply(ev.replyToken, text(`${id} をYouTubeにもう一回上げてみる`)); return youtube(id); }
   if (act === 'ttretry') { await reply(ev.replyToken, text(`${id} をTikTokの下書きにもう一回送ってみる`)); const tr = await tiktokDraft(id); return pushPosted(id, { tt: tr }); }
   if (it.status === 'published') return reply(ev.replyToken, text(`${id} はもう投稿済み：${it.permalink || ''}`));
-  if (act === 'approve') { it.status = 'approved'; it.publishAt = nextSlot(); save(); return reply(ev.replyToken, text(`OK。${id} は ${fmt(it.publishAt)} に投稿する`)); }
+  if (act === 'approve') { it.status = 'approved'; it.publishAt = nextSlot(id); save(); return reply(ev.replyToken, text(`OK。${id} は ${fmt(it.publishAt)} に投稿する`)); }
   if (act === 'now') { it.status = 'approved'; it.publishAt = Date.now(); it.ttNow = true; save(); return reply(ev.replyToken, text(`OK。${id} を今から投稿する${TT_UPLOAD && state.tt && state.tt.refresh ? '（TikTokは下書きに送る）' : ''}`)); }
   if (act === 'reject') { it.status = 'rejected'; save(); return reply(ev.replyToken, text(`${id} は却下にした。直したいところがあったら Claude に伝えて`)); }
   if (act === 'retry') { it.status = 'approved'; it.publishAt = Date.now(); it.error = ''; save(); return reply(ev.replyToken, text(`${id} をもう一回投稿してみる`)); }
@@ -519,7 +525,52 @@ function isCover(id) {
   try { return fs.readFileSync(path.join(MEDIA, `${id}_cover.jpg`)).subarray(0, 4096).includes('moshimo-cover'); } catch { return false; }
 }
 
+async function igWait(cid) {
+  let status = 'IN_PROGRESS';
+  for (let k = 0; k < 40 && status === 'IN_PROGRESS'; k++) { await sleep(k ? 10000 : 3000); status = (await ig('GET', `/${cid}`, { fields: 'status_code' })).status_code; }
+  if (status !== 'FINISHED') throw new Error(`container status ${status}`);
+}
+// カルーセル：画像を1枚ずつ子にして、まとめて1件で公開する（インスタだけ。YouTube・TikTok には出さない）
+async function publishCarousel(id) {
+  const it = state.items[id]; const m = meta(id);
+  it.status = 'publishing'; save();
+  try {
+    const caption = `${m.caption || ''}\n\n${(m.hashtags || []).slice(0, 5).map(h => '#' + h).join(' ')}`.trim();
+    const n = Number(m.slides) || 0;
+    if (n < 2 || n > 20) throw new Error(`枚数がおかしい（${n}）`);
+    const kids = [];
+    for (let k = 1; k <= n; k++) {
+      const f = `${id}_${String(k).padStart(2, '0')}.jpg`;
+      if (!fs.existsSync(path.join(MEDIA, f))) throw new Error(`${f} がない`);
+      const c = await ig('POST', `/${IG_USER_ID}/media`, { image_url: `${BASE_URL}/media/${f}`, is_carousel_item: true }, 2);
+      await igWait(c.id); kids.push(c.id);
+    }
+    const c = await ig('POST', `/${IG_USER_ID}/media`, { media_type: 'CAROUSEL', children: kids.join(','), caption }, 2);
+    await igWait(c.id);
+    let p = null;
+    for (let k = 0; k < 3 && !p; k++) {
+      try { p = await ig('POST', `/${IG_USER_ID}/media_publish`, { creation_id: c.id }); }
+      catch (e) {
+        if (!(e.status >= 500 || e.status === undefined)) throw e;
+        await sleep(20000);
+        const st = await ig('GET', `/${c.id}`, { fields: 'status_code' }).catch(() => ({}));
+        if (st.status_code === 'PUBLISHED') { const list = await ig('GET', `/${IG_USER_ID}/media`, { fields: 'id', limit: 1 }); p = { id: list.data && list.data[0] && list.data[0].id }; }
+        else if (k === 2) throw e;
+      }
+    }
+    const info = await ig('GET', `/${p.id}`, { fields: 'permalink' }).catch(() => ({}));
+    Object.assign(it, { status: 'published', mediaId: p.id, permalink: info.permalink || '', publishedAt: Date.now(), yt: { skipped: true } }); save();
+    log('published carousel', id, it.permalink);
+    await pushPosted(id, { ig: { ok: true, url: it.permalink }, yt: { skip: true } });
+  } catch (e) {
+    Object.assign(it, { status: 'error', error: String(e.message || e) }); save();
+    log('carousel publish error', id, e);
+    await pushPosted(id, { ig: { ok: false, error: it.error.slice(0, 200) }, yt: { skip: true } });
+  }
+}
+
 async function publish(id) {
+  if (isCarousel(id)) return publishCarousel(id);
   const it = state.items[id]; const m = meta(id);
   it.status = 'publishing'; save();
   try {
@@ -1372,7 +1423,7 @@ save();
 const TYPES = { '.mp4': 'video/mp4', '.json': 'application/json', '.jpg': 'image/jpeg' };
 function serveMedia(req, res, file) {
   const p = path.join(MEDIA, file);
-  if (!/^\d{4}(\.mp4|\.json|_cover\.jpg)$/.test(file) || !fs.existsSync(p)) return send(res, 404, { ok: false });
+  if (!/^\d{4}(\.mp4|\.json|_cover\.jpg|_\d{2}\.jpg)$/.test(file) || !fs.existsSync(p)) return send(res, 404, { ok: false });
   const size = fs.statSync(p).size; const type = TYPES[path.extname(file)];
   const m = /bytes=(\d*)-(\d*)/.exec(req.headers.range || '');
   if (m) {
@@ -1402,7 +1453,7 @@ http.createServer(async (req, res) => {
     if (req.method === 'PUT' && p.startsWith('/upload/')) {
       if (!authed(req)) return send(res, 401, { ok: false });
       const file = p.slice(8);
-      if (!/^\d{4}(\.mp4|\.json|_cover\.jpg)$/.test(file)) return send(res, 400, { ok: false, error: 'bad name' });
+      if (!/^\d{4}(\.mp4|\.json|_cover\.jpg|_\d{2}\.jpg)$/.test(file)) return send(res, 400, { ok: false, error: 'bad name' });
       const buf = await readBody(req, MAX_UPLOAD);
       fs.writeFileSync(path.join(MEDIA, file + '.part'), buf); fs.renameSync(path.join(MEDIA, file + '.part'), path.join(MEDIA, file));
       return send(res, 200, { ok: true, bytes: buf.length });
@@ -1410,7 +1461,7 @@ http.createServer(async (req, res) => {
     if (req.method === 'POST' && p === '/hook/new') {
       if (!authed(req)) return send(res, 401, { ok: false });
       const { id } = JSON.parse((await readBody(req)).toString('utf8'));
-      if (!validId(id) || !fs.existsSync(path.join(MEDIA, `${id}.mp4`))) return send(res, 400, { ok: false, error: 'missing video' });
+      if (!validId(id) || !hasMedia(id)) return send(res, 400, { ok: false, error: 'missing video' });
       const prev = state.items[id];
       if (prev && prev.status === 'published') return send(res, 409, { ok: false, error: 'already published' });
       state.items[id] = { status: 'pending', receivedAt: Date.now() }; save(); // 承認カードは、続けて届くのが止まったら1通で知らせる（readyTick）
@@ -1442,7 +1493,7 @@ http.createServer(async (req, res) => {
       // ---- SNS司令室から（同じ VPS の返事係が使う）----
       if (req.method === 'GET' && p === '/an/pending') {
         let slot = nextSlot(); const used = new Set(Object.values(state.items).filter(i => i.status === 'approved').map(i => i.publishAt));
-        const list = pendingIds().map(id => { const m = meta(id); return { id, title: m.title || `動画 ${id}`, len: m.len || (m.duration ? mmss(Math.max(0, Number(m.duration) - 5)) : ''), ask: m.ask || '', cover: `${BASE_URL}/media/${id}_cover.jpg`, video: `${BASE_URL}/media/${id}.mp4`, receivedAt: state.items[id].receivedAt || 0 }; });
+        const list = pendingIds().map(id => { const m = meta(id); return { id, title: m.title || `動画 ${id}`, len: m.type === 'carousel' ? `カルーセル ${m.slides || ''}枚` : m.len || (m.duration ? mmss(Math.max(0, Number(m.duration) - 5)) : ''), ask: m.ask || '', cover: `${BASE_URL}/media/${id}_cover.jpg`, video: isCarousel(id) ? `${BASE_URL}/media/${id}_01.jpg` : `${BASE_URL}/media/${id}.mp4`, carousel: isCarousel(id), slot: fmt(nextSlot(id)), receivedAt: state.items[id].receivedAt || 0 }; });
         return send(res, 200, { ok: true, brand: BRAND, nextSlot: slot, tt: !!(TT_UPLOAD && state.tt && state.tt.refresh), yt: !!(state.yt && state.yt.refresh), items: list, usedSlots: used.size });
       }
       if (req.method === 'GET' && p === '/an/caption') { const id = u.searchParams.get('id') || ''; return send(res, 200, { ok: !!state.items[id], tt: ttCaption(id), full: captionText(id), title: meta(id).title || id }); }

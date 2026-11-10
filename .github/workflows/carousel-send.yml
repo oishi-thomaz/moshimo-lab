@@ -1,0 +1,66 @@
+name: carousel-send
+
+# もしもラボ：人気回のカルーセル（plan/carousel/<動画番号>.json）を作って投稿サーバーに送り、SNS司令室で承認を待つ（2026/11/10〜）
+# サーバーでの番号は 8000＋動画の番号（0635 → 8635）。承認すると 12:00・21:00 のカルーセルの枠に入る。インスタだけに出す
+on:
+  workflow_dispatch:
+    inputs:
+      ids:
+        description: '動画の番号（スペース区切り。例 0635 0002）'
+        required: true
+      send:
+        description: '投稿サーバーに送る（false なら作って Artifacts に置くだけ）'
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+jobs:
+  carousel:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    env:
+      BASE: ${{ secrets.MOSHIMO_BASE_URL }}
+      SECRET: ${{ secrets.MOSHIMO_SECRET }}
+      CHROME_PATH: /usr/bin/google-chrome
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: System packages
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq fonts-noto-cjk fonts-noto-cjk-extra
+          pip install --quiet pillow
+      - run: npm ci --no-audit --no-fund
+      - name: Make
+        run: |
+          for V in ${{ github.event.inputs.ids }}; do
+            [ -f "plan/carousel/$V.json" ] || { echo "::error::plan/carousel/$V.json がない"; exit 1; }
+            node tools/render.mjs --video "$V" --meta "out/$V.json"
+            python3 tools/carousel.py "plan/carousel/$V.json"
+            python3 tools/carousel_meta.py "plan/carousel/$V.json" "out/$V.json" "out/carousel/$V"
+          done
+      - uses: actions/upload-artifact@v4
+        with:
+          name: carousel-${{ github.run_id }}
+          path: out/carousel/*/*.jpg
+          retention-days: 7
+      - name: Send
+        if: github.event.inputs.send == 'true'
+        run: |
+          [ -n "$BASE" ] && [ -n "$SECRET" ] || { echo "MOSHIMO_BASE_URL / MOSHIMO_SECRET が未設定"; exit 1; }
+          for V in ${{ github.event.inputs.ids }}; do
+            C=$(printf '%04d' $((8000 + 10#$V))); D="out/carousel/$V"
+            for f in "$D"/[0-9][0-9].jpg; do
+              n=$(basename "$f" .jpg)
+              curl -fsS --retry 3 -T "$f" -H "X-Moshimo-Secret: $SECRET" "$BASE/upload/${C}_${n}.jpg"; echo
+            done
+            curl -fsS --retry 3 -T "$D/01.jpg" -H "X-Moshimo-Secret: $SECRET" "$BASE/upload/${C}_cover.jpg"; echo
+            curl -fsS --retry 3 -T "$D/$C.json" -H "X-Moshimo-Secret: $SECRET" "$BASE/upload/$C.json"; echo
+            curl -fsS -X POST "$BASE/hook/new" -H "X-Moshimo-Secret: $SECRET" -H 'content-type: application/json' -d "{\"id\":\"$C\"}"; echo
+            echo "送った：$C（$V のカルーセル）"
+          done
