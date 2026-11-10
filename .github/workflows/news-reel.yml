@@ -1,0 +1,53 @@
+name: news-reel
+
+# なにこれ通信：投稿1本（queue/*.json の形）から、ナレーションつきのリール（1080x1920）を作って Artifacts に置く（2026/11/10〜 見本。投稿はしない）
+on:
+  workflow_dispatch:
+    inputs:
+      post:
+        description: 'main にある投稿の JSON（例 news/samples/n26110913303.json）'
+        required: true
+        default: news/samples/n26110913303.json
+      voice:
+        description: 'Gemini の声（落ち着いた女性：Kore／ほか Despina・Sulafat・Achernar など）'
+        required: false
+        default: Kore
+
+permissions:
+  contents: read
+
+jobs:
+  reel:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      NEWS_BRAND: ${{ vars.NEWS_BRAND || 'なにこれ通信' }}
+      NEWS_TAG: ${{ vars.NEWS_TAG || 'なにこれ通信' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Fonts, ffmpeg, Python
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq fonts-noto-cjk ffmpeg
+          python3 -m pip install --quiet --break-system-packages pillow numpy scipy
+      - name: Build slides
+        run: |
+          mkdir -p sample/queue
+          cp "${{ github.event.inputs.post }}" sample/queue/
+          node tools/news/build.mjs sample out/news
+          python3 tools/news/render.py out/news
+      - name: Reel
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          NEWS_VOICE: ${{ github.event.inputs.voice }}
+        run: for d in out/news/n*/; do node tools/news/reel.mjs "$d"; done
+      - uses: actions/upload-artifact@v4
+        with:
+          name: news-reel-${{ github.run_id }}
+          path: |
+            out/news/*/*_reel.mp4
+            out/news/*/*.jpg
+          retention-days: 7
