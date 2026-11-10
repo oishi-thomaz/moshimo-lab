@@ -1577,7 +1577,7 @@ LINE_OWNER_USER_ID=
 IG_USER_ID=
 IG_TOKEN=
 # 投稿時刻（日本時間）。1日1話
-POST_TIMES=20:00
+POST_TIMES=12:30,20:00
 # 動画が届いたらすぐ承認カードを送る
 APPROVAL_NOW=1
 # インスタに投稿するのと同時に TikTok の下書きへ送る
