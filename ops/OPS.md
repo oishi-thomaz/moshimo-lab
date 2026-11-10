@@ -26,8 +26,8 @@
 5. ■ render-fix（書き出しの失敗）：ops/render-fix.md を読んで自分で直す。
 6. ほかのモジュールはサブエージェントに任せる（Agent ツール、general-purpose、run_in_background）。自分では手順書を読まない。依頼文は下の形をそのまま使う：
    `<モジュール>：today.mjs の出力は次のとおり。<そのモジュールの行をそのまま貼る>。/home/claude/moshimo-lab/<手順書> を最後まで読んで、そのとおりにやって。作業フォルダは cp -r /home/claude/moshimo-lab /home/claude/w-<モジュール>-lab と cp -r /home/claude/moshimo-analytics /home/claude/w-<モジュール>-an で作ってそこで作業し、終わる前に全部 push してから消す（push の前に git pull --rebase）。/home/claude/moshimo-lab/ops/rules.md を読んで守る。最後に、やったこと（番号・タイトル）と、できなかったこととその理由を短く返す。`
-   - モデル：feedback・make-moshimo・make-quiz・make-itsuwa・make-news・report は model に opus。tiktok は sonnet（ゆうとの Mac の Chrome を使う。アカウントごとに別のプロフィールで、Claude からは別のブラウザに見える。手順書は /home/claude/moshimo-analytics/TIKTOK.md。もしもラボ・クイズ・いつわ劇場の行をまとめて1つのサブエージェントに渡す。ブラウザの選び直しがぶつかるので、tiktok は2つ立てない）。
-   - 順番：feedback・report・tiktok・make-moshimo を先に立て、make-quiz・make-itsuwa・make-news は空いたら立てる（同時に動かすのは4つまで。日報は 12:58 までに push すれば昼のまとめに載る）。
+   - モデル：feedback・make-moshimo・make-quiz・make-itsuwa・make-news・make-carousel・report は model に opus。make-carousel の手順書は ops/make-carousel.md（もしもラボの人気回のカルーセル。2026/11/10〜）。tiktok は sonnet（ゆうとの Mac の Chrome を使う。アカウントごとに別のプロフィールで、Claude からは別のブラウザに見える。手順書は /home/claude/moshimo-analytics/TIKTOK.md。もしもラボ・クイズ・いつわ劇場の行をまとめて1つのサブエージェントに渡す。ブラウザの選び直しがぶつかるので、tiktok は2つ立てない）。
+   - 順番：feedback・report・tiktok・make-moshimo を先に立て、make-quiz・make-itsuwa・make-news・make-carousel は空いたら立てる（同時に動かすのは4つまで。日報は 12:58 までに push すれば昼のまとめに載る）。
 7. 全部のサブエージェントが返ってきたら、両方のリポジトリで git pull --rebase してから `node tools/today.mjs` をもう一度だけ動かして、残りがあれば最後の返答に書く（やり直しはしない。次の回が拾う）。作業フォルダ（/home/claude/w-*）が残っていれば push 済みか確かめて消す。
 8. 最後の返答：関西弁のタメ口で短く。アカウントごとに1〜2行（作った番号・TikTok に予約した回・直したこと・日報の要点）と、ゆうとにやってほしいことがあればそれだけ。
 
