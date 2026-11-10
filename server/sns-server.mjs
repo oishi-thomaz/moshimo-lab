@@ -389,6 +389,7 @@ const HOWTO = [
   'ボタン',
   '・ストック：まだ投稿してない動画（予約済み・承認待ち・書き出し前）',
   '・承認待ち：3アカウントの承認待ちをここで承認・修正・却下（まとめて承認もできる）。Claude が書いた台本の候補もここに出る（この台本でOK・直してOK・見送り）',
+  '・サーバー更新（文字で送る）：投稿サーバーを GitHub の最新に入れ替える。パソコンなしでできる。1〜2分で結果が届く',
   '・今日の投稿：今日の予定と今の再生。クイズといつわ劇場は TikTok のキャプションもここから出せる',
   '・いま回ってる：直近3時間で伸びてる動画',
   '・いまの数字：フォロワーと24時間の再生',
@@ -435,6 +436,16 @@ async function onEvent(ev) {
     return;
   }
   if (/^(使い方|ヘルプ|help)$/i.test(msg)) { await reply(ev.replyToken, text(HOWTO)); return; }
+  // サーバー更新：GitHub の最新（main）にサーバー5つを入れ替える。持ち主（ゆうと）だけ。root の sns-selfupdate.path が依頼ファイルを見て update-servers.sh main を動かす（2026/11/10〜）
+  if (/^サーバー(を)?(更新|入れ替え)$/.test(msg)) {
+    if (!state.owner || uid !== state.owner) { await reply(ev.replyToken, text('これは持ち主だけが使える。')); return; }
+    try {
+      fs.writeFileSync(path.join(DATA, 'update-request'), String(Date.now()));
+      state.updAsked = Date.now(); save();
+      await reply(ev.replyToken, text('サーバーの入れ替えを始めた。1〜2分で終わったら、結果をここに送る。'));
+    } catch (e) { await reply(ev.replyToken, text(`始められへんかった（${String(e.message).slice(0, 80)}）`)); }
+    return;
+  }
   if (/^(ストック|すとっく|在庫|stock)/i.test(msg)) {
     try { const m = await stockMessage(); if (!(await reply(ev.replyToken, m))) await reply(ev.replyToken, text('カードが送れへんかった。もう一回 ストック と送ってみて。')); }
     catch (e) { log('stock error', e); await reply(ev.replyToken, text(`ストックが集められへんかった（${String(e.message).slice(0, 80)}）`)); }
@@ -472,6 +483,20 @@ async function watchFailures() {
   await pushOwner({ type: 'flex', altText: `投稿に失敗：${out.map(o => short(o.title, 14)).join('・')}`, contents: b });
 }
 if (!process.argv.some(a => a.startsWith('--'))) setInterval(() => watchFailures().catch(e => log('watch', e.message)), 5 * 60e3);
+// サーバー更新の結果を持ち主に送る（update-result.txt は root の sns-selfupdate.sh が書く）
+async function reportUpdate() {
+  const f = path.join(DATA, 'update-result.txt');
+  let st; try { st = fs.statSync(f); } catch { return; }
+  if (st.mtimeMs <= (state.updReported || 0)) return;
+  state.updReported = st.mtimeMs; save();
+  const out = fs.readFileSync(f, 'utf8');
+  const code = (out.match(/^code=(\d+)/m) || [])[1];
+  const lines = out.split('\n').filter(l => /^(○|×)|: (active|inactive|failed|activating)|がない|エラー|error/i.test(l)).slice(-10);
+  const vers = [];
+  for (const a of ACCOUNTS) { try { const j = await (await fetch(a.local + '/health')).json(); vers.push(`${a.name} ${j.v || '?'}`); } catch { vers.push(`${a.name} 応答なし`); } }
+  await pushOwner([text([code === '0' ? 'サーバーの入れ替えが終わった。' : `サーバーの入れ替えでうまくいかへんところがあった（code ${code ?? '?'}）。`, '', ...lines, '', ...vers].join('\n').slice(0, 4900))]);
+}
+if (!process.argv.some(a => a.startsWith('--'))) setInterval(() => reportUpdate().catch(e => log('update report', e.message)), 20e3);
 
 // ---- HTTP ----
 const send = (res, code, body) => { res.writeHead(code, { 'content-type': 'application/json; charset=utf-8' }); res.end(JSON.stringify(body)); };

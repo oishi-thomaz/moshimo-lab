@@ -34,4 +34,32 @@ put "$TMP/sns-server.mjs" /opt/sns/server.mjs sns
 sleep 2
 for s in moshimo quiz itsuwa sns news; do printf '%s: ' "$s"; systemctl is-active "$s"; done
 node "$TMP/setup-richmenu.mjs" "$REF"
+# 2026/11/10〜：SNS司令室の LINE で サーバー更新 と送ると、これ（main）を root で動かす仕組み（返事係が /var/lib/sns/update-request を置く → sns-selfupdate.path が見て動く）
+cat > /usr/local/sbin/sns-selfupdate.sh.new <<'SH'
+#!/usr/bin/env bash
+# SNS司令室の LINE の サーバー更新 で動く（update-servers.sh が入れる）。結果は /var/lib/sns/update-result.txt（返事係が LINE に送る）
+REQ=/var/lib/sns/update-request; RES=/var/lib/sns/update-result.txt
+[ -f "$REQ" ] || exit 0
+rm -f "$REQ"
+{ echo "at=$(date +%s)"; if curl -fsSL https://raw.githubusercontent.com/oishi-thomaz/moshimo-lab/main/server/update-servers.sh -o /root/update-servers.sh; then bash /root/update-servers.sh main 2>&1; echo "code=$?"; else echo "× update-servers.sh が取れなかった"; echo "code=9"; fi; } > "$RES.tmp" 2>&1
+mv "$RES.tmp" "$RES"; chown www-data: "$RES" 2>/dev/null || true
+SH
+chmod 755 /usr/local/sbin/sns-selfupdate.sh.new && mv /usr/local/sbin/sns-selfupdate.sh.new /usr/local/sbin/sns-selfupdate.sh
+cat > /etc/systemd/system/sns-selfupdate.service <<'U'
+[Unit]
+Description=SNS司令室の サーバー更新（update-servers.sh main）
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/sns-selfupdate.sh
+U
+cat > /etc/systemd/system/sns-selfupdate.path <<'U'
+[Unit]
+Description=SNS司令室の サーバー更新 の依頼を見張る
+[Path]
+PathExists=/var/lib/sns/update-request
+[Install]
+WantedBy=multi-user.target
+U
+systemctl daemon-reload
+systemctl enable --now sns-selfupdate.path >/dev/null 2>&1 && echo "○ LINE の サーバー更新 が使える" || echo "× sns-selfupdate.path を動かせなかった"
 echo "前のファイルは $BK にある"
