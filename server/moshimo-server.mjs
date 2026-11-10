@@ -20,7 +20,7 @@ import crypto from 'node:crypto';
 const env = process.env;
 const PORT = Number(env.PORT || 8787);
 const PREFIX = (env.PREFIX || '/moshimo').replace(/\/$/, '');
-const VERSION = '2026-11-10a';                                 // update-servers.sh で入れ替わったかの確かめ用（/health に出る）
+const VERSION = '2026-11-10b';                                 // update-servers.sh で入れ替わったかの確かめ用（/health に出る）
 const BRAND = env.BRAND || 'もしもラボ';                           // LINE の文言に出す名前
 const APPROVAL_NOW = env.APPROVAL_NOW === '1';                    // 1：動画が届いたらすぐ承認カードを送る（まとめを待たない）
 const TT_UPLOAD = env.TT_UPLOAD === '1';                          // 1：投稿と同時に TikTok の下書きへ送る
@@ -133,7 +133,7 @@ function card(id, head = '承認待ち') {
     type: 'flex', altText: `${head} ${id} ${title}`.slice(0, 380),
     contents: {
       type: 'bubble', size: 'mega',
-      hero: { type: 'image', url: `${BASE_URL}/media/${id}_cover.jpg`, size: 'full', aspectRatio: '4:5', aspectMode: 'cover', action: { type: 'uri', uri: car ? `${BASE_URL}/media/${id}_01.jpg` : `${BASE_URL}/media/${id}.mp4` } },
+      hero: { type: 'image', url: `${BASE_URL}/media/${id}_cover.jpg`, size: 'full', aspectRatio: '4:5', aspectMode: 'cover', action: { type: 'uri', uri: car ? `${BASE_URL}/view/${id}` : `${BASE_URL}/media/${id}.mp4` } },
       body: { type: 'box', layout: 'vertical', contents: body },
       footer: { type: 'box', layout: 'vertical', spacing: 'sm', contents: [
         { type: 'button', style: 'primary', color: '#1DB446', height: 'sm', action: { type: 'postback', label: '承認する', data: `approve:${id}`, displayText: `${id} を承認` } },
@@ -1450,6 +1450,18 @@ http.createServer(async (req, res) => {
     }
     if (p === '/health') return send(res, 200, { ok: true, v: VERSION, owner: !!state.owner, ig: !!state.igToken, yt: !!state.yt?.refresh, items: Object.keys(state.items).length });
     if ((req.method === 'GET' || req.method === 'HEAD') && p.startsWith('/media/')) return serveMedia(req, res, p.slice(7));
+    // カルーセルの確認ページ：承認の前に全部のページをスマホで縦に並べて見る（2026/11/10）
+    if (req.method === 'GET' && /^\/view\/\d{4}$/.test(p)) {
+      const id = p.slice(6); const m = meta(id);
+      if (!isCarousel(id)) return send(res, 404, { ok: false });
+      const n = Number(m.slides) || 0;
+      const esc = x => String(x || '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+      const imgs = Array.from({ length: n }, (_, k) => `<figure><img loading="lazy" src="${BASE_URL}/media/${id}_${String(k + 1).padStart(2, '0')}.jpg"><figcaption>${k + 1} / ${n}</figcaption></figure>`).join('');
+      const html = `<!doctype html><html lang="ja"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(m.title)}</title>
+<style>body{margin:0;background:#111;color:#eee;font-family:-apple-system,"Hiragino Sans",sans-serif}h1{font-size:17px;margin:14px 16px 4px}p{margin:0 16px 12px;color:#aaa;font-size:13px;white-space:pre-wrap}figure{margin:0 0 14px}img{display:block;width:100%;height:auto}figcaption{font-size:12px;color:#888;padding:4px 16px}</style>
+<h1>${esc(m.title)}（${n}枚）</h1><p>${esc(m.caption)}</p>${imgs}</html>`;
+      res.writeHead(200, { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store' }); return res.end(html);
+    }
     if (req.method === 'PUT' && p.startsWith('/upload/')) {
       if (!authed(req)) return send(res, 401, { ok: false });
       const file = p.slice(8);
@@ -1493,7 +1505,7 @@ http.createServer(async (req, res) => {
       // ---- SNS司令室から（同じ VPS の返事係が使う）----
       if (req.method === 'GET' && p === '/an/pending') {
         let slot = nextSlot(); const used = new Set(Object.values(state.items).filter(i => i.status === 'approved').map(i => i.publishAt));
-        const list = pendingIds().map(id => { const m = meta(id); return { id, title: m.title || `動画 ${id}`, len: m.type === 'carousel' ? `カルーセル ${m.slides || ''}枚` : m.len || (m.duration ? mmss(Math.max(0, Number(m.duration) - 5)) : ''), ask: m.ask || '', cover: `${BASE_URL}/media/${id}_cover.jpg`, video: isCarousel(id) ? `${BASE_URL}/media/${id}_01.jpg` : `${BASE_URL}/media/${id}.mp4`, carousel: isCarousel(id), slot: fmt(nextSlot(id)), receivedAt: state.items[id].receivedAt || 0 }; });
+        const list = pendingIds().map(id => { const m = meta(id); return { id, title: m.title || `動画 ${id}`, len: m.type === 'carousel' ? `カルーセル ${m.slides || ''}枚` : m.len || (m.duration ? mmss(Math.max(0, Number(m.duration) - 5)) : ''), ask: m.ask || '', cover: `${BASE_URL}/media/${id}_cover.jpg`, video: isCarousel(id) ? `${BASE_URL}/view/${id}` : `${BASE_URL}/media/${id}.mp4`, carousel: isCarousel(id), slot: fmt(nextSlot(id)), receivedAt: state.items[id].receivedAt || 0 }; });
         return send(res, 200, { ok: true, brand: BRAND, nextSlot: slot, tt: !!(TT_UPLOAD && state.tt && state.tt.refresh), yt: !!(state.yt && state.yt.refresh), items: list, usedSlots: used.size });
       }
       if (req.method === 'GET' && p === '/an/caption') { const id = u.searchParams.get('id') || ''; return send(res, 200, { ok: !!state.items[id], tt: ttCaption(id), full: captionText(id), title: meta(id).title || id }); }
