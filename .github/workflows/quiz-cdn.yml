@@ -12,7 +12,7 @@ on:
         description: '投稿サーバーの番号（スペース区切り。例 5001 5002）'
         required: true
       account:
-        description: 'quiz / itsuwa'
+        description: 'quiz / itsuwa / moshimo'
         required: false
         default: quiz
 
@@ -33,7 +33,7 @@ jobs:
       ACC: ${{ github.event.inputs.account || 'quiz' }}
     steps:
       - name: Check secrets
-        run: '[ "$ACC" = quiz ] || [ "$ACC" = itsuwa ] || { echo "account は quiz か itsuwa"; exit 1; }; [ -n "$CLD" ] && { [ "$ACC" = itsuwa ] || [ -n "$BASE" ]; } || { echo "QUIZ_BASE_URL / CLOUDINARY_URL が未設定"; exit 1; }'
+        run: '[ "$ACC" = quiz ] || [ "$ACC" = itsuwa ] || [ "$ACC" = moshimo ] || { echo "account は quiz か itsuwa か moshimo"; exit 1; }; [ -n "$CLD" ] && { [ "$ACC" != quiz ] || [ -n "$BASE" ]; } || { echo "QUIZ_BASE_URL / CLOUDINARY_URL が未設定"; exit 1; }'
 
       - name: Upload to Cloudinary
         run: |
@@ -47,7 +47,9 @@ jobs:
           FAIL=0
           for N in ${{ github.event.inputs.ids }}; do
             case "$N" in ''|*[!0-9]*) echo "番号が数字じゃない: $N"; FAIL=1; continue;; esac
-            if [ "$ACC" = itsuwa ]; then SRC="https://raw.githubusercontent.com/oishi-thomaz/moshimo-lab/drama-out/posts/$N/$N.mp4"; CSRC="https://raw.githubusercontent.com/oishi-thomaz/moshimo-lab/drama-out/posts/$N/${N}_cover.jpg"; else SRC="$BASE/media/$N.mp4"; CSRC="$BASE/media/${N}_cover.jpg"; fi
+            # もしもラボ（2026/11/11〜）：動画は投稿サーバーの公開の mediaとカバー（文字入りの表紙）
+            if [ "$ACC" = moshimo ]; then SRC="https://133-88-122-181.sslip.io/moshimo/media/$N.mp4"; CSRC="https://133-88-122-181.sslip.io/moshimo/media/${N}_cover.jpg"
+            elif [ "$ACC" = itsuwa ]; then SRC="https://raw.githubusercontent.com/oishi-thomaz/moshimo-lab/drama-out/posts/$N/$N.mp4"; CSRC="https://raw.githubusercontent.com/oishi-thomaz/moshimo-lab/drama-out/posts/$N/${N}_cover.jpg"; else SRC="$BASE/media/$N.mp4"; CSRC="$BASE/media/${N}_cover.jpg"; fi
             if ! curl -fsS --retry 3 -o "/tmp/$N.mp4" "$SRC"; then echo "QUIZ_CDN $N NG（元の動画がない：$SRC）"; FAIL=1; continue; fi
             TS=$(date +%s)
             SIG=$(printf 'overwrite=true&public_id=%s/%s&timestamp=%s%s' "$ACC" "$N" "$TS" "$SEC" | sha1sum | cut -d' ' -f1)
@@ -70,6 +72,6 @@ jobs:
           OLD=$(curl -sS -u "$KEY:$SEC" "https://api.cloudinary.com/v1_1/$CLOUD/resources/video/upload?prefix=$ACC/&max_results=500" \
             | jq -r --arg lim "$(date -u -d '14 days ago' +%Y-%m-%dT%H:%M:%SZ)" '.resources[]? | select(.created_at < $lim) | .public_id')
           for P in $OLD; do
-            case "$P" in quiz/*|itsuwa/*) curl -sS -u "$KEY:$SEC" -X DELETE "https://api.cloudinary.com/v1_1/$CLOUD/resources/video/upload?public_ids[]=$P" >/dev/null && echo "removed $P";; esac
+            case "$P" in quiz/*|itsuwa/*|moshimo/*) curl -sS -u "$KEY:$SEC" -X DELETE "https://api.cloudinary.com/v1_1/$CLOUD/resources/video/upload?public_ids[]=$P" >/dev/null && echo "removed $P";; esac
           done
           exit $FAIL
