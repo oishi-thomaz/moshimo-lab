@@ -110,7 +110,7 @@ function makeTub() {
   const W = 1.6, D = 0.85, H = 0.6, T = 0.08, m = mat('#f4f6f8');
   const fl = box(W, T, D, m); fl.position.y = T / 2; g.add(fl);
   for (const s of [-1, 1]) { const a = box(W, H, T, m); a.position.set(0, H / 2, s * (D / 2 - T / 2)); g.add(a); const b = box(T, H, D, m); b.position.set(s * (W / 2 - T / 2), H / 2, 0); g.add(b); }
-  const wm = new THREE.MeshLambertMaterial({ color: '#7fc8ee', transparent: true, opacity: 0.85, emissive: 0x1a5f8f, emissiveIntensity: 0.25 });
+  const wm = new THREE.MeshLambertMaterial({ color: '#7fc8ee', emissive: 0x1a5f8f, emissiveIntensity: 0.25 });
   const water = box(W - 2 * T, 1, D - 2 * T, wm); water.castShadow = false; g.add(water);
   g.userData = { water, H, setWater(k) { const h = Math.max(0.001, (H - 0.1) * clamp(k)); water.scale.y = h; water.position.y = T + h / 2; water.visible = k > 0.01; } };
   g.userData.setWater(0);
@@ -119,7 +119,7 @@ function makeTub() {
 function makeSteam(n = 18, { w = 1.4, d = 0.6, h = 1.4, color = '#ffffff' } = {}) {
   const g = new THREE.Group(); const P = [];
   for (let i = 0; i < n; i++) { const m = new THREE.Mesh(new THREE.SphereGeometry(0.12 + (i % 3) * 0.05, 8, 6), new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.5, depthWrite: false })); m.userData.o = [((i * 0.618) % 1 - 0.5) * w, ((i * 0.37) % 1 - 0.5) * d, (i * 0.13) % 1]; g.add(m); P.push(m); }
-  g.userData.set = (k, t = 0) => { g.visible = k > 0.01; P.forEach(p => { const [x, z, ph] = p.userData.o; const u = (t * 0.25 + ph) % 1; p.position.set(x + Math.sin(t + ph * 6) * 0.08, u * h, z); p.material.opacity = 0.45 * clamp(k) * (1 - u); p.scale.setScalar(1 + u * 1.5); }); };
+  g.userData.set = (k, t = 0) => { g.visible = k > 0.01; P.forEach(p => { const [x, z, ph] = p.userData.o; const u = (t * 0.25 + ph) % 1; p.position.set(x + Math.sin(t + ph * 6) * 0.08, u * h, z); p.material.opacity = 0.28 * clamp(k) * (1 - u); p.scale.setScalar(0.8 + u * 1.2); }); };
   g.userData.set(0);
   return g;
 }
