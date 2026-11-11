@@ -272,7 +272,7 @@ const P = planTimes([
   ['プロテインは<br>筋肉をくれなかった。', (t, d) => sKekka(t + d, 2 * d)],
   ['足りなかったのは、<br>たんぱく質ではなく運動だった。', sUndo],
   ['プロテイン、飲んでる？', sAsk],
-], { shot0, endCard, start: 2.8, end: 61.6, narr: NARR });
+], { shot0, endCard, start: 3.2, end: 61.6, narr: NARR });
 
 runStory({
   shots: P.shots, subs: P.subs, duration: 65.0, camera: cam,
