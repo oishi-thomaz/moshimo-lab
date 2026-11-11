@@ -69,6 +69,7 @@ const SHOTS = [
   { at: 'c3', finish: { vignette: 0.6 }, draw(g, lt, D) { monitor(g, lt, D, placing(1), { cx: 820, cy: 760, z0: 1.6, z1: 1.8 }); subBand(g); } },
   { at: 'c4', draw(g, lt, D, S) { togawa(g, lt, D, S, ['c4'], { mouth: 'line', eyes: 'normal', glint: 0.5, look: 0.5, back: g2 => bg(g2, '#2a3040', '#141820') }); } },
   { at: 'c5', draw(g, lt, D) { outside(g, lt, D, { x: 420, y: 1100, z0: 1.0, z1: 1.05, set: { box: 0, plate: '202', neighbor: false, doorC: '#6a7480' } }); subBand(g); } },
+  { at: 'c6', finish: { vignette: 0.65 }, draw(g, lt, D) { monitor(g, lt, D, placing(1), { cx: 760, cy: 720, z0: 1.4, z1: 1.55 }); mood(g, { red: 0.06 }); subBand(g); } },
 
   // ── 4. 隣の男
   { at: 'door', draw(g, lt, D) { outside(g, lt, D, { y: 1150, set: { box: 0, plate: '202', neighbor: false, doorC: '#6a7480', people: atNagaseDoor({ L: () => 0, Le: () => 0 }, lt, [], { look: 0 }) } }); sfxText(g, 'ガチャ', 820, 320, { size: 100, color: '#f4f1ea', alpha: inv(0, 0.15, lt), rot: 0.08 }); } },
@@ -78,8 +79,11 @@ const SHOTS = [
   { at: 'd4', draw(g, lt, D, S) { nagase(g, lt, D, S, ['d4'], { look: 0.2, eyes: 'normal', z0: 1.05, z1: 1.12 }); } },
   { at: 'd5', draw(g, lt, D, S) { mioFace(g, lt, D, S, ['d5'], { night: 0, eyes: 'wide', brow: 0.5, look: 0.6 }); } },
   { at: 'd6', finish: { vignette: 0.6 }, draw(g, lt, D, S) { nagase(g, lt, D, S, ['d6'], { look: lt < D * 0.5 ? 0.9 : 0.1, eyes: 'normal', brow: 0.6, z0: 1.1, z1: 1.2 }); mood(g, { red: 0.05 }); } },
+  { at: 'd6b', draw(g, lt, D, S) { mioFace(g, lt, D, S, ['d6b'], { night: 0, eyes: 'normal', brow: 0.6, look: 0.6 }); } },
   { at: 'shut', draw(g, lt, D) { outside(g, lt, D, { y: 1150, set: { box: 0, plate: '202', neighbor: false, doorC: '#6a7480' } }); sfxText(g, 'バタン', 540, 600, { size: 140, color: '#f4f1ea', alpha: inv(0, 0.1, lt), rot: -0.06 }); } },
   { at: 'd7', draw(g, lt, D, S) { mioFace(g, lt, D, S, [], { night: 0, eyes: 'narrow', brow: 0.4, mouth: 'line', look: 0.7 }); } },
+
+  { at: 'd8', finish: { vignette: 0.6 }, draw(g, lt, D) { outside(g, lt, D, { x: 540, y: 1000, z0: 1.05, z1: 1.15, set: { box: 0, plate: '202', neighbor: false, doorC: '#6a7480' } }); subBand(g); } },
 
   // ── 5. 引き
   { at: 'e1', draw(g, lt, D) { g.save(); cam(g, { x: 540, y: 960, z: slow(lt, D, 0.95, 1.0) }); mailboxes(g, { box: 1, t: lt }); g.restore(); subBand(g); } },
@@ -106,6 +110,7 @@ const SFX = [
   { at: 'c3', type: 'hit', vol: 0.8 },
   { at: 'door', type: 'unlock', vol: 0.6 },
   { at: 'd4', type: 'stab', vol: 0.6 },
+  { at: 'd6b', draw(g, lt, D, S) { mioFace(g, lt, D, S, ['d6b'], { night: 0, eyes: 'normal', brow: 0.6, look: 0.6 }); } },
   { at: 'shut', type: 'clunk', vol: 0.8 },
   { at: 'e1', type: 'steps', vol: 0.4 },
   { at: 'mail', type: 'riser', vol: 0.6 },
@@ -123,6 +128,7 @@ const MUSIC = [
   { at: 'c3', mood: 'tension' },
   { at: 'door', mood: 'silence' },
   { at: 'd1', mood: 'suspense' },
+  { at: 'd6b', draw(g, lt, D, S) { mioFace(g, lt, D, S, ['d6b'], { night: 0, eyes: 'normal', brow: 0.6, look: 0.6 }); } },
   { at: 'shut', mood: 'silence' },
   { at: 'e1', mood: 'uneasy' },
   { at: 'mail', mood: 'silence' },
