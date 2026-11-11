@@ -157,7 +157,7 @@ function sWarau(t, d) { // 隣の席で、値札が一番安いカップルだ�
 }
 function sNakami(t, d) { // 中身は、手書きの手紙と、二人で行く約束。
   reset(); lift(120); seatCouple(); C2W.userData.arms[1].rotation.set(-0.9, 0, 0.1);
-  say(nakami, t, 0.5, EX + 1.4, 1.02, -0.05, 0.7);
+  say(nakami, t, 0.5, EX + 1.4, 1.34, -0.35, 0.7);
   look(EX + 1.5, 1.95, 1.5, EX + 1.4, 0.95, -0.7, 50);
   return S;
 }
