@@ -20,19 +20,20 @@ if [ -n "$PART" ]; then
   else RANGE=(-ss "$CUT"); LEN=$(python3 -c "print($TOT-$CUT)"); AF="afade=t=in:st=0:d=0.08"; fi
   python3 -c "import sys;sys.exit(0 if $LEN>=61 else 1)" || { echo "61秒より短い（${LEN}秒）。CUT を見直す"; exit 1; }
   ffmpeg -v error -y -i "$SRC" "${RANGE[@]}" -c:v libx264 -preset medium -crf 18 -pix_fmt yuv420p -af "$AF" -c:a aac -b:a 192k -ar 48000 -movflags +faststart "$MP4"
-  # 表紙：1話の表紙の右上に 前編／後編 の札
+  # 表紙：1話の表紙に 前編／後編 の札（2026/11/13〜 上の真ん中・題名の上。インスタのプロフィールの一覧は縦3:4で上下240pxずつ切れるので、それより内側に置く）
   python3 - "$COV" "$PCOV" "$PART" <<'PY'
 import sys, glob
 from PIL import Image, ImageDraw, ImageFont
 src, dst, part = sys.argv[1], sys.argv[2], sys.argv[3]
 im = Image.open(src).convert('RGB'); d = ImageDraw.Draw(im)
 fs = [f for k in ('NotoSansCJK-Black', 'NotoSansCJK-Bold', 'SansCJK', 'CJK') for f in sorted(glob.glob('/usr/share/fonts/**/*' + k + '*', recursive=True))]
-font = ImageFont.truetype(fs[0], 92, index=0) if fs else ImageFont.load_default()
+font = ImageFont.truetype(fs[0], 118, index=0) if fs else ImageFont.load_default()
 t = '前編' if part == '1' else '後編'
-w, h = d.textbbox((0, 0), t, font=font)[2:]
-x, y = im.width - w - 110, 120
-d.rounded_rectangle((x - 34, y - 22, x + w + 34, y + h + 34), 18, fill=(200, 30, 40))
-d.text((x, y), t, font=font, fill=(255, 255, 255))
+l, tp, r, b = d.textbbox((0, 0), t, font=font)
+w, h = r - l, b - tp
+x, y = (im.width - w) // 2, 300
+d.rounded_rectangle((x - 48, y - 30, x + w + 48, y + h + 30), 22, fill=(200, 30, 40), outline=(255, 255, 255), width=6)
+d.text((x - l, y - tp), t, font=font, fill=(255, 255, 255))
 im.save(dst, quality=95)
 PY
   COV="$PCOV"
