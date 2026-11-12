@@ -1,0 +1,200 @@
+{
+ "k1": {
+  "dur": 4.012,
+  "voice": "Despina",
+  "text": "前の住人あての箱。中には、また私の寝顔。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "k2": {
+  "dur": 3.21,
+  "voice": "Despina",
+  "text": "時刻は、また、さんじ、じゅうにふん。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "k3": {
+  "dur": 4.166,
+  "voice": "Despina",
+  "text": "寝たふりをしていたはずの私は、本当に眠っていた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a1": {
+  "dur": 3.171,
+  "voice": "Despina",
+  "text": "管理会社の、とがわさんに、すぐ来てもらった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a2": {
+  "dur": 6.956,
+  "voice": "Sadaltager",
+  "text": "みずのさんは、前にこの部屋にいた方です。いちねんまえに、急に引っ越されて。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a3": {
+  "dur": 3.6,
+  "voice": "Despina",
+  "text": "この部屋の鍵、ほかに誰か持っていませんか。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a4": {
+  "dur": 4.32,
+  "voice": "Sadaltager",
+  "text": "あいかぎなら、事務所の金庫です。一緒に、確かめましょう。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b1": {
+  "dur": 5.604,
+  "voice": "Despina",
+  "text": "金庫には、部屋ごとに、にほんずつ、赤い札の合鍵が並んでいた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b2": {
+  "dur": 3.197,
+  "voice": "Despina",
+  "text": "にーまるさんの札だけが、いっぽんしかない。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b3": {
+  "dur": 5.998,
+  "voice": "Sadaltager",
+  "text": "…おかしいな。前の方が、返さなかったのかもしれません。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b4": {
+  "dur": 3.724,
+  "voice": "Sadaltager",
+  "text": "念のため、鍵を交換しましょう。今夜、伺います。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b5": {
+  "dur": 3.994,
+  "voice": "Despina",
+  "text": "この部屋の合鍵が、いっぽん、どこかにある。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c1": {
+  "dur": 2.312,
+  "voice": "Sadaltager",
+  "text": "廊下の防犯カメラも、見てみましょう。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c2": {
+  "dur": 3.802,
+  "voice": "Despina",
+  "text": "今朝の、ごじ、ごじゅうにふん。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c3": {
+  "dur": 4.389,
+  "voice": "Despina",
+  "text": "にーまるさんの前に、箱を置く男が映っていた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c4": {
+  "dur": 5.279,
+  "voice": "Sadaltager",
+  "text": "これは…お隣の、ながせさんですね。夜勤の方です。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c5": {
+  "dur": 6.715,
+  "voice": "Despina",
+  "text": "隣の、にーまるにごうしつ。あいさつしか、したことのない人。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c6": {
+  "dur": 4.53,
+  "voice": "Despina",
+  "text": "毎朝、私の部屋の前に、あの人が立っていた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d1": {
+  "dur": 3.888,
+  "voice": "Despina",
+  "text": "昼すぎ、隣のドアの前で、ながせさんを待った。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d2": {
+  "dur": 3.829,
+  "voice": "Despina",
+  "text": "ながせさん。あの箱、あなたですか？",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d3": {
+  "dur": 1.631,
+  "voice": "Enceladus",
+  "text": "…置いたのは、俺です。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d4": {
+  "dur": 2.763,
+  "voice": "Enceladus",
+  "text": "でも、送ったのは、俺じゃない。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d5": {
+  "dur": 1.571,
+  "voice": "Despina",
+  "text": "じゃあ、誰が——",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d6": {
+  "dur": 1.814,
+  "voice": "Enceladus",
+  "text": "管理人には、言わないでください。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d6b": {
+  "dur": 2.514,
+  "voice": "Despina",
+  "text": "どうして、かんりにんに——",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d7": {
+  "dur": 2.854,
+  "voice": "Despina",
+  "text": "ドアは、それきり開かなかった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d8": {
+  "dur": 4.854,
+  "voice": "Despina",
+  "text": "送り主は、ほかにいる。かんりにんに知られたくない、誰か。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e1": {
+  "dur": 3.704,
+  "voice": "Despina",
+  "text": "夕方、いっかいの郵便受けを見に行った。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e2": {
+  "dur": 6.668,
+  "voice": "Despina",
+  "text": "隣の、にーまるにの郵便受け。口から、小さな箱がはみ出している。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e3": {
+  "dur": 1.401,
+  "voice": "Despina",
+  "text": "伝票の名前は——",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e4": {
+  "dur": 1.559,
+  "voice": "Despina",
+  "text": "あいざわみおさま。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e5": {
+  "dur": 5.161,
+  "voice": "Despina",
+  "text": "隣の男の郵便受けに、私あての箱が入っていた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "x1": {
+  "dur": 2.262,
+  "voice": "Schedar",
+  "text": "次回。まえのじゅうにん。",
+  "model": "gemini-3.8-flash-tts"
+ }
+}
