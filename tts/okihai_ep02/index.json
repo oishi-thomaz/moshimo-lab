@@ -72,9 +72,9 @@
   "model": "gemini-3.8-flash-tts"
  },
  "c1": {
-  "dur": 2.312,
+  "dur": 4.451,
   "voice": "Sadaltager",
-  "text": "廊下の防犯カメラも、見てみましょう。",
+  "text": "ろうかにある、防犯カメラの映像も、見てみましょう。",
   "model": "gemini-3.8-flash-tts"
  },
  "c2": {
