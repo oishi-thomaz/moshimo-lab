@@ -14,8 +14,8 @@ const outside = (g, lt, D, o = {}) => { g.save(); cam(g, { x: o.x ?? 540, y: o.y
 function roomTwo(g, lt, D, S, ids = [], o = {}) {
   g.save(); cam(g, { x: o.x ?? 540, y: o.y ?? 960, z: slow(lt, D, o.z0 ?? 1.0, o.z1 ?? 1.05) });
   room203(g, { t: lt, night: 0, hatch: 0.07 });
-  figure(g, P.togawa, { x: 700, y: 1790, s: 1.32, eyes: 'normal', mouth: 'smile', talk: talking(lt, S, ids) * 0.6, turn: -0.3, arms: [10, 0, 40, -80], lightFrom: 'right' });
-  figure(g, P.mio, { x: 330, y: 1800, s: 1.3, eyes: 'normal', brow: 0.4, turn: 0.3, look: 0.6, arms: [10, 0, 10, 0], lightFrom: 'left' });
+  figure(g, P.togawa, { x: 700, y: 1560, s: 1.12, eyes: 'normal', mouth: 'smile', talk: talking(lt, S, ids) * 0.6, turn: -0.3, arms: [10, 0, 40, -80], lightFrom: 'right' });
+  figure(g, P.mio, { x: 340, y: 1570, s: 1.1, eyes: 'normal', brow: 0.4, turn: 0.3, look: 0.6, arms: [10, 0, 10, 0], lightFrom: 'left' });
   g.restore();
 }
 const togawa = (g, lt, D, S, ids = [], o = {}) => faceOf(g, lt, D, S, 'togawa', ids, { eyes: 'normal', mouth: 'smile', a: '#c9c6bd', b: '#8f8b82', ...o });
@@ -110,7 +110,6 @@ const SFX = [
   { at: 'c3', type: 'hit', vol: 0.8 },
   { at: 'door', type: 'unlock', vol: 0.6 },
   { at: 'd4', type: 'stab', vol: 0.6 },
-  { at: 'd6b', draw(g, lt, D, S) { mioFace(g, lt, D, S, ['d6b'], { night: 0, eyes: 'normal', brow: 0.6, look: 0.6 }); } },
   { at: 'shut', type: 'clunk', vol: 0.8 },
   { at: 'e1', type: 'steps', vol: 0.4 },
   { at: 'mail', type: 'riser', vol: 0.6 },
@@ -128,7 +127,6 @@ const MUSIC = [
   { at: 'c3', mood: 'tension' },
   { at: 'door', mood: 'silence' },
   { at: 'd1', mood: 'suspense' },
-  { at: 'd6b', draw(g, lt, D, S) { mioFace(g, lt, D, S, ['d6b'], { night: 0, eyes: 'normal', brow: 0.6, look: 0.6 }); } },
   { at: 'shut', mood: 'silence' },
   { at: 'e1', mood: 'uneasy' },
   { at: 'mail', mood: 'silence' },
