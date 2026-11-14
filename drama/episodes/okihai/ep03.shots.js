@@ -64,25 +64,25 @@ const SHOTS = [
   { at: 'b1', draw(g, lt, D) { boxShot(g, lt, D, { open: inv(0, D, lt), night: 1 }); subBand(g); } },
   { at: 'photo', finish: { vignette: 0.7 }, draw(g, lt, D) { const k = easeOut(inv(0, 0.6, lt)); bg(g, '#14110e', '#0a0908'); g.save(); cam(g, { x: 540, y: 960, z: lerp(0.6, 1.0, k), r: lerp(-0.3, 0, k) }); print(g, 540, 640, 960, 720, (q, w, h) => topPhoto(q, w, h, { ...SAKI, t: lt })); g.restore(); } },
   { at: 'b2', draw(g, lt, D) { photoShot(g, lt, D, SAKI, { z0: 1.0, z1: 1.05 }); subBand(g); } },
-  { at: 'b3', finish: { vignette: 0.7 }, draw(g, lt, D) { photoShot(g, lt, D, SAKI, { fx: 674, fy: 715, z0: 1.3, z1: 1.7 }); subBand(g); } },
+  { at: 'b3', finish: { vignette: 0.7 }, draw(g, lt, D) { photoShot(g, lt, D, SAKI, { fx: 674, fy: 715, z0: 1.6, z1: 1.8 }); subBand(g); } },
   { at: 'b4', finish: { vignette: 0.7 }, draw(g, lt, D) { photoShot(g, lt, D, SAKI, { fx: 950, fy: 1110, z0: 1.7, z1: 1.9 }); } },
   { at: 'b5', draw(g, lt, D) { bg(g, '#14110e', '#0a0908'); g.save(); cam(g, { x: 540, y: 960, z: slow(lt, D, 1.0, 1.08) }); print(g, 540, 640, 960, 720, null, { back: true, note: '水野サキ', rot: 0.02 }); g.restore(); subBand(g); } },
   { at: 'b6', draw(g, lt, D, S) { mioFace(g, lt, D, S, [], { night: 1, eyes: 'wide', brow: -0.4, mouth: 'line', look: 0.3 }); } },
 
   // ── 3. 引っ越していない
-  { at: 'c0', finish: { vignette: 0.7 }, draw(g, lt, D) { photoShot(g, lt, D, SAKI, { fx: 674, fy: 715, z0: 1.15, z1: 1.3 }); mood(g, { red: 0.05 }); subBand(g); } },
-  { at: 'c1', draw(g, lt, D) { phoneShot(g, lt, D, (p, w, h) => callView(p, w, h, { t: lt, name: '管理会社 本社', sub: '発信中', av: '管', col: '#9aa5bb' }), { y: 820 }); subBand(g); } },
-  { at: 'dial', draw(g, lt, D) { phoneShot(g, lt, D, (p, w, h) => callView(p, w, h, { t: lt, name: '管理会社 本社', sub: '呼び出し中', av: '管', col: '#9aa5bb' }), { y: 820, z0: 1.02, z1: 1.04 }); } },
-  { at: 'c2', draw(g, lt, D) { phoneShot(g, lt, D, (p, w, h) => callView(p, w, h, { t: lt, name: '管理会社 本社', sub: '通話中', av: '管' }), { y: 820, z0: 1.04, z1: 1.08 }); subBand(g); } },
+  { at: 'c0', finish: { vignette: 0.7 }, draw(g, lt, D) { photoShot(g, lt, D, SAKI, { fx: 674, fy: 715, z0: 1.65, z1: 1.8 }); mood(g, { red: 0.05 }); subBand(g); } },
+  { at: 'c1', draw(g, lt, D) { phoneShot(g, lt, D, (p, w, h) => callView(p, w, h, { t: lt, name: '管理会社 本社', sub: '発信中', av: '管', col: '#9aa5bb' }), { y: 960 }); subBand(g); } },
+  { at: 'dial', draw(g, lt, D) { phoneShot(g, lt, D, (p, w, h) => callView(p, w, h, { t: lt, name: '管理会社 本社', sub: '呼び出し中', av: '管', col: '#9aa5bb' }), { y: 960, z0: 1.02, z1: 1.04 }); } },
+  { at: 'c2', draw(g, lt, D) { phoneShot(g, lt, D, (p, w, h) => callView(p, w, h, { t: lt, name: '管理会社 本社', sub: '通話中', av: '管' }), { y: 960, z0: 1.04, z1: 1.08 }); subBand(g); } },
   { at: 'c3', draw(g, lt, D, S) { mioFace(g, lt, D, S, [], { night: 1, eyes: 'narrow', brow: 0.6, mouth: 'line', look: -0.3 }); } },
   { at: 'c4', draw(g, lt, D, S) { mioFace(g, lt, D, S, ['c4'], { night: 1, eyes: 'wide', brow: 0.6, look: 0.2 }); } },
-  { at: 'c5', draw(g, lt, D) { phoneShot(g, lt, D, (p, w, h) => callView(p, w, h, { t: lt + 40, name: '管理会社 本社', sub: '通話中', av: '管' }), { y: 820, z0: 1.08, z1: 1.15 }); subBand(g); } },
+  { at: 'c5', draw(g, lt, D) { phoneShot(g, lt, D, (p, w, h) => callView(p, w, h, { t: lt + 40, name: '管理会社 本社', sub: '通話中', av: '管' }), { y: 960, z0: 1.04, z1: 1.08 }); subBand(g); } },
   { at: 'c6', finish: { vignette: 0.7 }, draw(g, lt, D) { mioShock(g, lt, D, { night: 1 }); mood(g, { red: 0.08 }); } },
 
   // ── 4. 同じ角度
   { at: 'd1', draw(g, lt, D) { pair(g, lt, D); subBand(g); } },
   { at: 'd2', draw(g, lt, D) { pair(g, lt, D, { arrows: easeOut(inv(0.3, 1.0, lt)) }); subBand(g); } },
-  { at: 'd3', draw(g, lt, D) { g.save(); cam(g, { x: 640, y: 900, z: slow(lt, D, 1.1, 1.2) }); room203(g, { t: lt, night: 1, hatch: 0.07, bedMio: 2 }); g.restore(); subBand(g); } },
+  { at: 'd3', draw(g, lt, D) { g.save(); cam(g, { x: 640, y: 1010, z: slow(lt, D, 0.95, 1.0) }); room203(g, { t: lt, night: 1, hatch: 0.07, bedMio: 2 }); g.restore(); subBand(g); } },
   { at: 'd4', draw(g, lt, D) { lookUp(g, lt, D, { eyes: 'normal' }); subBand(g); } },
   { at: 'look', finish: { vignette: 0.7 }, draw(g, lt, D) { const k = ease(inv(0, D, lt)); g.save(); cam(g, { x: lerp(640, 720, k), y: lerp(900, 300, k), z: lerp(1.2, 2.2, k) }); room203(g, { t: lt, night: 1, hatch: 0.07 + 0.08 * k, bedMio: 2 }); g.restore(); } },
 
