@@ -1,0 +1,176 @@
+{
+ "k1": {
+  "dur": 3.029,
+  "voice": "Enceladus",
+  "text": "…それ、あなたに渡すよう、頼まれたんです。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "k2": {
+  "dur": 3.065,
+  "voice": "Despina",
+  "text": "振り返ると、ながせさんが立っていた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "k3": {
+  "dur": 4.71,
+  "voice": "Despina",
+  "text": "毎朝、私の部屋の前に、箱を置いていた男。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a1": {
+  "dur": 9.352,
+  "voice": "Enceladus",
+  "text": "毎朝、ごじごじゅっぷん。夜勤から帰ると、入口で、配達の人に箱を渡される。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a2": {
+  "dur": 5.153,
+  "voice": "Enceladus",
+  "text": "にーまるさんの前に置いてくれ。管理人には、言わないでくれって。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a3": {
+  "dur": 2.349,
+  "voice": "Despina",
+  "text": "配達の人って…ケンさん？",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a4": {
+  "dur": 4.297,
+  "voice": "Enceladus",
+  "text": "この箱だけは、ドアの前じゃなく、あなたに直接渡してくれって。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a5": {
+  "dur": 6.268,
+  "voice": "Enceladus",
+  "text": "それと…夜中のさんじごろ、この廊下で、あの管理人を見たことがあります。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b1": {
+  "dur": 3.053,
+  "voice": "Despina",
+  "text": "部屋に戻って、箱を開けた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b2": {
+  "dur": 4.159,
+  "voice": "Despina",
+  "text": "また、真上から撮った、寝顔の写真。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b3": {
+  "dur": 4.919,
+  "voice": "Despina",
+  "text": "でも、眠っているのは——私じゃない。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b4": {
+  "dur": 8.125,
+  "voice": "Despina",
+  "text": "日付は、いちねんまえの、じゅうがつ、じゅうよっか。時刻は、さんじ、じゅうにふん。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b5": {
+  "dur": 5.324,
+  "voice": "Despina",
+  "text": "写真の裏に、名前があった。みずのさき。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b6": {
+  "dur": 4.331,
+  "voice": "Despina",
+  "text": "前の住人も、この部屋で、同じように撮られていた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c0": {
+  "dur": 5.182,
+  "voice": "Despina",
+  "text": "いちねんまえ、この部屋から、急に引っ越したはずの人。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c1": {
+  "dur": 2.86,
+  "voice": "Despina",
+  "text": "管理会社の本社に、電話をかけた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c2": {
+  "dur": 4.223,
+  "voice": "Vindemiatrix",
+  "text": "みずのさまの退去は、担当のとがわが、ひとりで手続きをしております。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c3": {
+  "dur": 4.669,
+  "voice": "Vindemiatrix",
+  "text": "ご本人の立ち会いはなく、お荷物も、とがわが処分を。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c4": {
+  "dur": 1.367,
+  "voice": "Despina",
+  "text": "みずのさんは、今どこに？",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c5": {
+  "dur": 4.423,
+  "voice": "Vindemiatrix",
+  "text": "それが…それきり、ご連絡がつかないままでして。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c6": {
+  "dur": 3.204,
+  "voice": "Despina",
+  "text": "みずのさきは、引っ越してなんかいない。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d1": {
+  "dur": 4.857,
+  "voice": "Despina",
+  "text": "その夜。ベッドに横になって、にまいの写真を見比べた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d2": {
+  "dur": 5.519,
+  "voice": "Despina",
+  "text": "いちねんまえのサキさんも、今の私も、まったく同じ角度。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d3": {
+  "dur": 4.275,
+  "voice": "Despina",
+  "text": "真上から。人の背では、届かない高さから。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d4": {
+  "dur": 3.489,
+  "voice": "Despina",
+  "text": "私は、ゆっくり、天井を見上げた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e1": {
+  "dur": 5.787,
+  "voice": "Despina",
+  "text": "ベッドの真上の、点検口。そのふたが、少しずれている。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e2": {
+  "dur": 1.243,
+  "voice": "Despina",
+  "text": "すき間の奥で——",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e3": {
+  "dur": 3.514,
+  "voice": "Despina",
+  "text": "小さな赤い光が、点滅していた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "x1": {
+  "dur": 2.001,
+  "voice": "Schedar",
+  "text": "次回。おくりぬし。",
+  "model": "gemini-3.8-flash-tts"
+ }
+}
