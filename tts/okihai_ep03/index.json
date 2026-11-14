@@ -66,15 +66,15 @@
   "model": "gemini-3.8-flash-tts"
  },
  "b4": {
-  "dur": 8.125,
+  "dur": 8.91,
   "voice": "Despina",
-  "text": "日付は、いちねんまえの、じゅうがつ、じゅうよっか。時刻は、さんじ、じゅうにふん。",
+  "text": "日付は、一年前の、じゅうがつ、じゅうよっか。時刻は、さんじ、じゅうにふん。",
   "model": "gemini-3.8-flash-tts"
  },
  "b5": {
-  "dur": 5.324,
+  "dur": 4.764,
   "voice": "Despina",
-  "text": "写真の裏に、名前があった。みずのさき。",
+  "text": "写真の裏に、名前があった。みずの、さき。",
   "model": "gemini-3.8-flash-tts"
  },
  "b6": {
@@ -120,7 +120,7 @@
   "model": "gemini-3.8-flash-tts"
  },
  "c6": {
-  "dur": 3.204,
+  "dur": 2.137,
   "voice": "Despina",
   "text": "みずのさきは、引っ越してなんかいない。",
   "model": "gemini-3.8-flash-tts"
@@ -132,7 +132,7 @@
   "model": "gemini-3.8-flash-tts"
  },
  "d2": {
-  "dur": 5.519,
+  "dur": 5.378,
   "voice": "Despina",
   "text": "いちねんまえのサキさんも、今の私も、まったく同じ角度。",
   "model": "gemini-3.8-flash-tts"
