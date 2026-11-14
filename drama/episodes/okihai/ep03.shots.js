@@ -70,6 +70,7 @@ const SHOTS = [
   { at: 'b6', draw(g, lt, D, S) { mioFace(g, lt, D, S, [], { night: 1, eyes: 'wide', brow: -0.4, mouth: 'line', look: 0.3 }); } },
 
   // ── 3. 引っ越していない
+  { at: 'c0', finish: { vignette: 0.7 }, draw(g, lt, D) { photoShot(g, lt, D, SAKI, { fx: 674, fy: 715, z0: 1.15, z1: 1.3 }); mood(g, { red: 0.05 }); subBand(g); } },
   { at: 'c1', draw(g, lt, D) { phoneShot(g, lt, D, (p, w, h) => callView(p, w, h, { t: lt, name: '管理会社 本社', sub: '発信中', av: '管', col: '#9aa5bb' }), { y: 820 }); subBand(g); } },
   { at: 'dial', draw(g, lt, D) { phoneShot(g, lt, D, (p, w, h) => callView(p, w, h, { t: lt, name: '管理会社 本社', sub: '呼び出し中', av: '管', col: '#9aa5bb' }), { y: 820, z0: 1.02, z1: 1.04 }); } },
   { at: 'c2', draw(g, lt, D) { phoneShot(g, lt, D, (p, w, h) => callView(p, w, h, { t: lt, name: '管理会社 本社', sub: '通話中', av: '管' }), { y: 820, z0: 1.04, z1: 1.08 }); subBand(g); } },
