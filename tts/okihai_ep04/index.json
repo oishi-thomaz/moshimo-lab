@@ -114,9 +114,9 @@
   "model": "gemini-3.8-flash-tts"
  },
  "d2": {
-  "dur": 3.356,
+  "dur": 5.174,
   "voice": "Despina",
-  "text": "ベッドの横の暗がりに、男が立っていた。",
+  "text": "ベッドの、横の暗がりに、男が立っていた。",
   "model": "gemini-3.8-flash-tts"
  },
  "d3": {
@@ -126,9 +126,9 @@
   "model": "gemini-3.8-flash-tts"
  },
  "d4": {
-  "dur": 4.516,
+  "dur": 3.761,
   "voice": "Achernar",
-  "text": "わたしも、いちねんまえ、同じものを見た。",
+  "text": "わたしも、一年前、同じものを見た。",
   "model": "gemini-3.8-flash-tts"
  },
  "d5": {
@@ -150,9 +150,9 @@
   "model": "gemini-3.8-flash-tts"
  },
  "e2": {
-  "dur": 3.935,
+  "dur": 3.922,
   "voice": "Despina",
-  "text": "にじゅうさんじ、ごじゅっぷん。ドアスコープを、のぞく。",
+  "text": "にじゅうさんじ、ごじゅっぷん。ドア、スコープを、のぞく。",
   "model": "gemini-3.8-flash-tts"
  },
  "e3": {
