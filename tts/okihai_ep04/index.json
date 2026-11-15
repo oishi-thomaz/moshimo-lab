@@ -1,0 +1,176 @@
+{
+ "k1": {
+  "dur": 3.336,
+  "voice": "Despina",
+  "text": "椅子にのって、点検口のふたを、押し上げた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "k2": {
+  "dur": 2.677,
+  "voice": "Despina",
+  "text": "はりに、テープでとめたスマホ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "k3": {
+  "dur": 4.548,
+  "voice": "Despina",
+  "text": "そのレンズが、ずっと、私のベッドを見下ろしていた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a1": {
+  "dur": 3.576,
+  "voice": "Despina",
+  "text": "充電の線は、天井の照明につながっている。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a2": {
+  "dur": 6.49,
+  "voice": "Despina",
+  "text": "画面をつけると、待ち受けは、知らない女の人と、若い男の写真。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a3": {
+  "dur": 2.796,
+  "voice": "Despina",
+  "text": "この人が…みずのさき？",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a3b": {
+  "dur": 4.7,
+  "voice": "Despina",
+  "text": "いちねんまえに、この部屋から、消えた人。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a4": {
+  "dur": 3.725,
+  "voice": "Despina",
+  "text": "その時、手の中のスマホが、鳴った。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b1": {
+  "dur": 2.571,
+  "voice": "Achernar",
+  "text": "…やっと、見つけてくれた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b2": {
+  "dur": 4.345,
+  "voice": "Achernar",
+  "text": "みずのさきです。そのスマホは、わたしのものです。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b3": {
+  "dur": 2.992,
+  "voice": "Despina",
+  "text": "あなたが…あの写真を？",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b4": {
+  "dur": 4.703,
+  "voice": "Achernar",
+  "text": "箱を送っていたのは、私。でも、あなたを脅すためじゃない。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b5": {
+  "dur": 6.529,
+  "voice": "Achernar",
+  "text": "いちねんまえ、夜中に誰かが入ってくる気がして、そのスマホを、天井に隠したの。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c0": {
+  "dur": 5.444,
+  "voice": "Achernar",
+  "text": "あなたが越してきてから、そのスマホが、また夜の写真を送ってきた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c1": {
+  "dur": 5.168,
+  "voice": "Achernar",
+  "text": "そのスマホは、夜中に部屋で何かが動いた時だけ、写真を撮るの。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c2": {
+  "dur": 6.283,
+  "voice": "Achernar",
+  "text": "あいざわさん。さんじじゅうにふんに、その部屋で、動いていたのは、あなた？",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c3": {
+  "dur": 1.333,
+  "voice": "Despina",
+  "text": "私は、眠っていた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c4": {
+  "dur": 1.862,
+  "voice": "Achernar",
+  "text": "写真を、明るくしてみて。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d1": {
+  "dur": 5.842,
+  "voice": "Despina",
+  "text": "さんじじゅうにふんの写真の、明るさを上げていく。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d2": {
+  "dur": 3.356,
+  "voice": "Despina",
+  "text": "ベッドの横の暗がりに、男が立っていた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d3": {
+  "dur": 2.723,
+  "voice": "Despina",
+  "text": "その手には、赤い札の鍵。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d4": {
+  "dur": 4.516,
+  "voice": "Achernar",
+  "text": "わたしも、いちねんまえ、同じものを見た。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d5": {
+  "dur": 3.127,
+  "voice": "Achernar",
+  "text": "その部屋から、今すぐ出て。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d6": {
+  "dur": 3.39,
+  "voice": "Despina",
+  "text": "でも、この部屋の出口は、玄関ひとつだけ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e1": {
+  "dur": 2.683,
+  "voice": "Despina",
+  "text": "玄関で、鍵の回る音がした。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e2": {
+  "dur": 3.935,
+  "voice": "Despina",
+  "text": "にじゅうさんじ、ごじゅっぷん。ドアスコープを、のぞく。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e3": {
+  "dur": 2.544,
+  "voice": "Sadaltager",
+  "text": "あいざわさん。鍵の交換に、来ました。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e4": {
+  "dur": 5.116,
+  "voice": "Despina",
+  "text": "外に立っていたのは、合鍵を持った、とがわさんだった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "x1": {
+  "dur": 3.216,
+  "voice": "Schedar",
+  "text": "次回、最終話。おきはい。",
+  "model": "gemini-3.8-flash-tts"
+ }
+}
