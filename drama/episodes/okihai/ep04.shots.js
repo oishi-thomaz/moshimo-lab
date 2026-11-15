@@ -37,6 +37,7 @@ const SHOTS = [
   { at: 'a1', finish: { vignette: 0.7 }, draw(g, lt, D) { ceil(g, lt, D, { x: 640, y: 700, z0: 1.4, z1: 1.5, set: { blink: 1, open: 1, flash: 1 } }); subBand(g); } },
   { at: 'a2', draw(g, lt, D) { phoneShot(g, lt, D, (p, w, h) => sakiLock(p, w, h, { t: lt })); subBand(g); } },
   { at: 'a3', draw(g, lt, D) { phoneShot(g, lt, D, (p, w, h) => sakiLock(p, w, h, { t: lt }), { x: 420, y: 980, z0: 1.5, z1: 1.65 }); subBand(g); } },
+  { at: 'a3b', finish: { vignette: 0.7 }, draw(g, lt, D) { phoneShot(g, lt, D, (p, w, h) => sakiLock(p, w, h, { t: lt }), { x: 420, y: 980, z0: 1.65, z1: 1.8 }); mood(g, { desat: 0.4 }); subBand(g); } },
   { at: 'ring', finish: { vignette: 0.6 }, draw(g, lt, D) { phoneShot(g, lt, D, (p, w, h) => sakiLock(p, w, h, { t: lt, call: inv(0, 0.3, lt) }), { rot: noise1(lt * 40, 2) * 0.02 }); } },
   { at: 'a4', draw(g, lt, D) { phoneShot(g, lt, D, (p, w, h) => sakiLock(p, w, h, { t: lt, call: 1 }), { rot: noise1(lt * 40, 2) * 0.015 }); subBand(g); } },
 
@@ -48,6 +49,7 @@ const SHOTS = [
 
   { at: 'b5', finish: { vignette: 0.6 }, draw(g, lt, D) { g.save(); cam(g, { x: 640, y: 960, z: slow(lt, D, 1.0, 1.06) }); room203(g, { t: lt, night: 1, hatch: 0.07, mio: null }); figure(g, P.saki, { x: 360, y: 1780, s: 1.3, eyes: 'narrow', brow: 0.5, lookY: -1, look: 0.6, arms: [10, 0, 10, 0], lightFrom: 'right' }); g.restore(); mood(g, { desat: 0.6 }); tag(g, '1年前', 540, 180, { size: 44, bg: '#14161c', color: '#ffd451', alpha: inv(0.2, 0.5, lt) }); subBand(g); } },
   // ── 3. 動いたときだけ
+  { at: 'c0', draw(g, lt, D) { phoneShot(g, lt, D, (p, w, h) => callView(p, w, h, { t: lt + 30, name: '水野サキ', av: 'サ', sub: '通話中' }), { y: 820, z0: 1.04, z1: 1.08 }); subBand(g); tag(g, '前の住人　水野サキ（27）', 540, 140, { size: 42, bg: '#14161c', color: '#e9e4da', alpha: inv(0.2, 0.5, lt) }); } },
   { at: 'c1', finish: { vignette: 0.6 }, draw(g, lt, D) { g.save(); cam(g, { x: 700, y: 760, z: slow(lt, D, 1.2, 1.3) }); room203(g, { t: lt, night: 1, hatchOpen: 1, chair: 1 }); g.restore(); subBand(g); } },
   { at: 'c2', draw(g, lt, D) { photoShot(g, lt, D, { ...D4, bright: 0 }, { z0: 1.0, z1: 1.06 }); subBand(g); } },
   { at: 'c3', draw(g, lt, D) { photoShot(g, lt, D, { ...D4, bright: 0 }, { fx: 674, fy: 715, z0: 1.3, z1: 1.45 }); subBand(g); } },
