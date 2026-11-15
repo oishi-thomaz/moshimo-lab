@@ -47,19 +47,19 @@ const SHOTS = [
   { at: 'b3', draw(g, lt, D, S) { onCall(g, lt, D, S, { eyes: 'narrow', brow: 0.7, talk: talking(lt, S, ['b3']) * 0.5 }); } },
   { at: 'b4', draw(g, lt, D, S) { onCall(g, lt, D, S, { eyes: 'wide', brow: 0.4, z0: 1.05, z1: 1.1 }); } },
 
-  { at: 'b5', finish: { vignette: 0.6 }, draw(g, lt, D) { g.save(); cam(g, { x: 640, y: 960, z: slow(lt, D, 1.0, 1.06) }); room203(g, { t: lt, night: 1, hatch: 0.07, mio: null }); figure(g, P.saki, { x: 360, y: 1780, s: 1.3, eyes: 'narrow', brow: 0.5, lookY: -1, look: 0.6, arms: [10, 0, 10, 0], lightFrom: 'right' }); g.restore(); mood(g, { desat: 0.6 }); tag(g, '1年前', 540, 180, { size: 44, bg: '#14161c', color: '#ffd451', alpha: inv(0.2, 0.5, lt) }); subBand(g); } },
+  { at: 'b5', finish: { vignette: 0.6 }, draw(g, lt, D) { g.save(); cam(g, { x: 640, y: 960, z: slow(lt, D, 1.0, 1.06) }); room203(g, { t: lt, night: 1, hatch: 0.07, mio: null }); figure(g, P.saki, { x: 360, y: 1640, s: 1.3, eyes: 'narrow', brow: 0.5, lookY: -1, look: 0.6, arms: [10, 0, 10, 0], lightFrom: 'right' }); g.restore(); mood(g, { desat: 0.6 }); tag(g, '1年前', 540, 180, { size: 44, bg: '#14161c', color: '#ffd451', alpha: inv(0.2, 0.5, lt) }); subBand(g); } },
   // ── 3. 動いたときだけ
   { at: 'c0', draw(g, lt, D) { phoneShot(g, lt, D, (p, w, h) => callView(p, w, h, { t: lt + 30, name: '水野サキ', av: 'サ', sub: '通話中' }), { y: 820, z0: 1.04, z1: 1.08 }); subBand(g); tag(g, '前の住人　水野サキ（27）', 540, 140, { size: 42, bg: '#14161c', color: '#e9e4da', alpha: inv(0.2, 0.5, lt) }); } },
   { at: 'c1', finish: { vignette: 0.6 }, draw(g, lt, D) { g.save(); cam(g, { x: 700, y: 760, z: slow(lt, D, 1.2, 1.3) }); room203(g, { t: lt, night: 1, hatchOpen: 1, chair: 1 }); g.restore(); subBand(g); } },
   { at: 'c2', draw(g, lt, D) { photoShot(g, lt, D, { ...D4, bright: 0 }, { z0: 1.0, z1: 1.06 }); subBand(g); } },
-  { at: 'c3', draw(g, lt, D) { photoShot(g, lt, D, { ...D4, bright: 0 }, { fx: 674, fy: 715, z0: 1.3, z1: 1.45 }); subBand(g); } },
+  { at: 'c3', draw(g, lt, D) { photoShot(g, lt, D, { ...D4, bright: 0 }, { fx: 760, fy: 640, z0: 1.8, z1: 1.9 }); subBand(g); } },
   { at: 'c4', draw(g, lt, D, S) { onCall(g, lt, D, S, { eyes: 'narrow', brow: 0.4, look: -0.3 }); } },
 
   // ── 4. 暗がりの男
   { at: 'd1', draw(g, lt, D) { editShot(g, lt, D, 0.15 * inv(0, D, lt)); subBand(g); } },
   { at: 'bright', finish: { vignette: 0.6 }, draw(g, lt, D) { editShot(g, lt, D, lerp(0.15, 1, ease(inv(0, D * 0.9, lt))), { z0: 1.04, z1: 1.1 }); } },
   { at: 'd2', finish: { vignette: 0.7 }, draw(g, lt, D) { photoShot(g, lt, D, { ...D4, bright: 1 }, { fx: 300, fy: 900, z0: 1.4, z1: 1.7 }); subBand(g); mood(g, { red: 0.08 * inv(0, D, lt) }); } },
-  { at: 'd3', finish: { vignette: 0.7 }, draw(g, lt, D) { photoShot(g, lt, D, { ...D4, bright: 1 }, { fx: 480, fy: 780, z0: 2.4, z1: 2.8 }); subBand(g); } },
+  { at: 'd3', finish: { vignette: 0.7 }, draw(g, lt, D) { photoShot(g, lt, D, { ...D4, bright: 1 }, { fx: 440, fy: 780, z0: 2.4, z1: 2.8 }); subBand(g); } },
   { at: 'd4', draw(g, lt, D, S) { onCall(g, lt, D, S, { eyes: 'wide', brow: -0.4, mouth: 'line' }); } },
   { at: 'd5', finish: { vignette: 0.65 }, draw(g, lt, D) { phoneShot(g, lt, D, (p, w, h) => callView(p, w, h, { t: lt + 60, name: '水野サキ', av: 'サ', sub: '通話中', col: '#ff7a6a' }), { y: 820, z0: 1.1, z1: 1.2 }); subBand(g); } },
 
