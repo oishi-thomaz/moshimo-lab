@@ -150,9 +150,9 @@
   "model": "gemini-3.8-flash-tts"
  },
  "e2": {
-  "dur": 3.922,
+  "dur": 3.372,
   "voice": "Despina",
-  "text": "にじゅうさんじ、ごじゅっぷん。ドア、スコープを、のぞく。",
+  "text": "にじゅうさんじ、ごじゅっぷん。ドアスコープを、のぞく。",
   "model": "gemini-3.8-flash-tts"
  },
  "e3": {
