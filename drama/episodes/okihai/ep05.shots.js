@@ -89,6 +89,7 @@ const SHOTS = [
   { at: 'c2', finish: { vignette: 0.6 }, draw(g, lt, D, S) { hallNight(g, lt, D, S, { z0: 1.05, z1: 1.1 }); subBand(g); } },
   { at: 'c3', finish: { vignette: 0.6 }, draw(g, lt, D, S) { faceOf(g, lt, D, S, 'ken', ['c3'], { eyes: 'narrow', mouth: 'line', brow: 0.5, back: g2 => bg(g2, '#2a2e3a', '#14161c') }); } },
   { at: 'siren', finish: { vignette: 0.55 }, draw(g, lt, D, S) { hallNight(g, lt, D, S, { siren: inv(0, 0.6, lt), z0: 1.1, z1: 1.15 }); } },
+  { at: 'c3b', finish: { vignette: 0.6 }, draw(g, lt, D, S) { hallNight(g, lt, D, S, { siren: 1, teyes: 'wide', cy: 1250, z0: 1.15, z1: 1.25 }); subBand(g); } },
   { at: 'c4', finish: { vignette: 0.6 }, draw(g, lt, D, S) { faceOf(g, lt, D, S, 'togawa', ['c4'], { eyes: 'wide', mouth: 'grit', brow: -0.6, back: g2 => bg(g2, '#2a2e3a', '#14161c') }); const k = Math.sin(lt * 9) * 0.5 + 0.5; glow(g, 0, 800, 900, 'rgba(255,40,60,1)', 0.3 * k); glow(g, 1080, 800, 900, 'rgba(60,110,255,1)', 0.3 * (1 - k)); } },
   { at: 'c5', finish: { vignette: 0.6 }, draw(g, lt, D, S) { faceOf(g, lt, D, S, 'ken', ['c5'], { eyes: 'normal', mouth: 'line', brow: 0.6, z0: 1.05, z1: 1.15, back: g2 => bg(g2, '#2a2e3a', '#14161c') }); const k = Math.sin(lt * 9) * 0.5 + 0.5; glow(g, 0, 800, 900, 'rgba(255,40,60,1)', 0.25 * k); glow(g, 1080, 800, 900, 'rgba(60,110,255,1)', 0.25 * (1 - k)); } },
   { at: 'c6', draw(g, lt, D) { phoneShot(g, lt, D, (p, w, h) => sakiLock(p, w, h, { t: lt }), { x: lerp(540, 680, ease(inv(0, D, lt))), y: lerp(960, 1000, ease(inv(0, D, lt))), z0: 1.0, z1: 1.6 }); subBand(g); } },
