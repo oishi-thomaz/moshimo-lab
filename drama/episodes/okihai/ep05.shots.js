@@ -68,13 +68,13 @@ const SHOTS = [
   { at: 'title', noSubs: true, finish: { vignette: 0.55, grainA: 0.1 }, draw(g, lt) { bg(g, '#050608', '#0a0b0e'); cover(g, lt); } },
 
   // ── 1. 1年前の動画
-  { at: 'a1', draw(g, lt, D) { phoneShot(g, lt, D, (p, w, h) => callView(p, w, h, { t: lt + 70, name: '水野サキ', av: 'サ', sub: '通話中' }), { y: 820 }); subBand(g); } },
+  { at: 'a1', draw(g, lt, D) { phoneShot(g, lt, D, (p, w, h) => callView(p, w, h, { t: lt + 70, name: '水野サキ', av: 'サ', sub: '通話中' }), { y: 1000, z0: 0.92, z1: 0.95 }); subBand(g); } },
   { at: 'a2', draw(g, lt, D, S) { mioFace(g, lt, D, S, [], { night: 1, eyes: 'wide', brow: 0.5, lookY: 1 }); } },
   { at: 'play', finish: { vignette: 0.6 }, draw(g, lt, D) { phoneShot(g, lt, D, (p, w, h) => video(p, w, h, { t: lt }), { y: 760 }); } },
   { at: 'a3', finish: { vignette: 0.6 }, draw(g, lt, D) { phoneShot(g, lt, D, (p, w, h) => video(p, w, h, { t: 1 + lt }), { y: 760, x: 620, z0: 1.05, z1: 1.2 }); subBand(g); } },
   { at: 'a4', finish: { vignette: 0.7 }, draw(g, lt, D) { phoneShot(g, lt, D, (p, w, h) => video(p, w, h, { t: 4 + lt }), { x: 380, y: 760, z0: 1.8, z1: 2.1 }); subBand(g); mood(g, { red: 0.08 }); } },
   { at: 'a5', finish: { vignette: 0.75 }, draw(g, lt, D, S) { faceOf(g, lt, D, S, 'togawa', ['a5'], { eyes: 'narrow', mouth: 'line', lookY: -1, glint: 0.3, back: g2 => bg(g2, '#141c30', '#070b14') }); mood(g, { desat: 0.5 }); tag(g, '1年前　3時12分', 540, 180, { size: 42, bg: '#14161c', color: '#ffb36a', alpha: inv(0.2, 0.5, lt) }); } },
-  { at: 'a6', draw(g, lt, D) { phoneShot(g, lt, D, (p, w, h) => callView(p, w, h, { t: lt + 80, name: '水野サキ', av: 'サ', sub: '通話中' }), { y: 820, z0: 1.04, z1: 1.08 }); subBand(g); } },
+  { at: 'a6', draw(g, lt, D) { phoneShot(g, lt, D, (p, w, h) => callView(p, w, h, { t: lt + 80, name: '水野サキ', av: 'サ', sub: '通話中' }), { y: 1000, z0: 0.95, z1: 0.98 }); subBand(g); } },
   { at: 'a7', draw(g, lt, D, S) { mioFace(g, lt, D, S, [], { night: 1, eyes: 'normal', brow: 0.6, mouth: 'line' }); } },
 
   // ── 2. チェーン
