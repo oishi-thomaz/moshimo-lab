@@ -174,9 +174,9 @@
   "model": "gemini-3.8-flash-tts"
  },
  "e5": {
-  "dur": 2.654,
+  "dur": 2.996,
   "voice": "Despina",
-  "text": "差出人の欄には、こう書いてあった。",
+  "text": "さしだしにんの、らんには、こう書いてあった。",
   "model": "gemini-3.8-flash-tts"
  },
  "e6": {
