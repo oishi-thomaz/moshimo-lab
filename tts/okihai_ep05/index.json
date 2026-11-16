@@ -1,0 +1,194 @@
+{
+ "k1": {
+  "dur": 2.132,
+  "voice": "Despina",
+  "text": "ドアが、外から開いた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "k2": {
+  "dur": 2.601,
+  "voice": "Despina",
+  "text": "とっさにかけたチェーンが、ドアを止めた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "k3": {
+  "dur": 3.841,
+  "voice": "Sadaltager",
+  "text": "あいざわさん。チェーン、外してください。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a1": {
+  "dur": 3.139,
+  "voice": "Achernar",
+  "text": "そのスマホの中に、いちねんまえの動画が残ってる。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a2": {
+  "dur": 3.08,
+  "voice": "Despina",
+  "text": "震える指で、動画を開いた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a3": {
+  "dur": 6.158,
+  "voice": "Despina",
+  "text": "いちねんまえの、さんじじゅうにふん。眠っているサキさんの横に——",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a4": {
+  "dur": 2.441,
+  "voice": "Despina",
+  "text": "とがわさんが、立っていた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a5": {
+  "dur": 1.157,
+  "voice": "Sadaltager",
+  "text": "…騒がないで。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a6": {
+  "dur": 6.527,
+  "voice": "Achernar",
+  "text": "あの夜、私は逃げた。でも証拠は、天井に置いてきたままだった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a7": {
+  "dur": 5.289,
+  "voice": "Achernar",
+  "text": "だから箱で、写真を送ったの。あなたに、自分で見つけてほしくて。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b1": {
+  "dur": 5.263,
+  "voice": "Sadaltager",
+  "text": "前の人も、そうやって閉じこもってましたよ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b2": {
+  "dur": 3.025,
+  "voice": "Despina",
+  "text": "すき間から、チェーンに工具がかかる。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b3": {
+  "dur": 2.082,
+  "voice": "Despina",
+  "text": "逃げる場所は、どこにもない。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c1": {
+  "dur": 2.065,
+  "voice": "Puck",
+  "text": "とがわさん。お届け物です。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c2": {
+  "dur": 5.125,
+  "voice": "Despina",
+  "text": "廊下に、配達員のケンさんと、ながせさんが立っていた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c3": {
+  "dur": 7.601,
+  "voice": "Puck",
+  "text": "まいばん、さんじじゅうにふんの写真と、いちねんまえの動画。同じものを、警察にも届けました。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c3b": {
+  "dur": 6.088,
+  "voice": "Despina",
+  "text": "遠くから、サイレンが近づいてくる。とがわさんの手から、工具が落ちた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c4": {
+  "dur": 1.428,
+  "voice": "Sadaltager",
+  "text": "…どうして、おまえが。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c5": {
+  "dur": 2.084,
+  "voice": "Puck",
+  "text": "姉が、お世話になりました。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c6": {
+  "dur": 7.438,
+  "voice": "Despina",
+  "text": "待ち受けの写真の、若い男。ケンさんは、サキさんの弟だった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d1": {
+  "dur": 5.674,
+  "voice": "Despina",
+  "text": "夜が明けた。廊下に、はじめて見る人が立っていた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d2": {
+  "dur": 2.519,
+  "voice": "Achernar",
+  "text": "はじめまして。みずのさきです。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d3": {
+  "dur": 4.606,
+  "voice": "Achernar",
+  "text": "このいちねん、ずっと、誰かに見つけてほしかった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d4": {
+  "dur": 4.164,
+  "voice": "Despina",
+  "text": "見つけたのは、私じゃない。あなたの箱です。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d5": {
+  "dur": 3.897,
+  "voice": "Puck",
+  "text": "相沢さん。今夜は、ちゃんと眠れますよ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e1": {
+  "dur": 4.075,
+  "voice": "Despina",
+  "text": "いっかげつご。私は、新しい部屋に引っ越した。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e2": {
+  "dur": 2.105,
+  "voice": "Despina",
+  "text": "朝、ドアを開けると——",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e3": {
+  "dur": 2.969,
+  "voice": "Despina",
+  "text": "玄関の前に、段ボールが、ひとつ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e4": {
+  "dur": 6.483,
+  "voice": "Despina",
+  "text": "届け先は、あいざわみおさま。でも、その字に、見覚えはなかった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e5": {
+  "dur": 2.654,
+  "voice": "Despina",
+  "text": "差出人の欄には、こう書いてあった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e6": {
+  "dur": 2.618,
+  "voice": "Despina",
+  "text": "この部屋の、前の住人より。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "x1": {
+  "dur": 1.695,
+  "voice": "Schedar",
+  "text": "おきはい。かん。",
+  "model": "gemini-3.8-flash-tts"
+ }
+}
