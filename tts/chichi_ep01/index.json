@@ -138,9 +138,9 @@
   "model": "gemini-3.8-flash-tts"
  },
  "d4": {
-  "dur": 4.449,
+  "dur": 5.599,
   "voice": "Aoede",
-  "text": "うわぎを着てね。そのひとことが、引っかかった。",
+  "text": "うわぎを、着てね。……そのひとことが、引っかかった。",
   "model": "gemini-3.8-flash-tts"
  },
  "d5": {
@@ -186,9 +186,9 @@
   "model": "gemini-3.8-flash-tts"
  },
  "f2": {
-  "dur": 2.434,
+  "dur": 2.738,
   "voice": "Erinome",
-  "text": "うわぎのポケット、見てくれた？",
+  "text": "うわぎの、ポケット、見てくれた？",
   "model": "gemini-3.8-flash-tts"
  },
  "f3": {
