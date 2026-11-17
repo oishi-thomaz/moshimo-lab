@@ -138,9 +138,9 @@
   "model": "gemini-3.8-flash-tts"
  },
  "d4": {
-  "dur": 4.931,
+  "dur": 3.575,
   "voice": "Aoede",
-  "text": "うわぎを着てね。そのひとことが、引っかかった。",
+  "text": "うわぎを着てね、という、そのひとことが、引っかかった。",
   "model": "gemini-3.8-flash-tts"
  },
  "d5": {
