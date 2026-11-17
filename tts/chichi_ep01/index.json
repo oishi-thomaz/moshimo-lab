@@ -1,0 +1,212 @@
+{
+ "k1": {
+  "dur": 1.043,
+  "voice": "Erinome",
+  "text": "おはよう、あなた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "k2": {
+  "dur": 6.839,
+  "voice": "Aoede",
+  "text": "ちちの、そうしきの、次の朝。死んだ父のスマホに、女から届いた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "k3": {
+  "dur": 3.113,
+  "voice": "Erinome",
+  "text": "きょうは寒いから、ちゃんと、うわぎを着てね。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a1": {
+  "dur": 2.497,
+  "voice": "Aoede",
+  "text": "いのうえナツキ、さんじゅうよんさい。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a2": {
+  "dur": 6.003,
+  "voice": "Aoede",
+  "text": "ちちの、いひんを片づけに、ひとりで実家の、だんちに戻ってきた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a3": {
+  "dur": 3.383,
+  "voice": "Aoede",
+  "text": "ちちとは、ごねん、口をきいていなかった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a4": {
+  "dur": 4.542,
+  "voice": "Aoede",
+  "text": "ごねんまえ、ちちのスマホに、女からのメッセージを見たから。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a5": {
+  "dur": 3.269,
+  "voice": "Aoede",
+  "text": "問いつめても、父は何も言い訳しなかった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a6": {
+  "dur": 1.092,
+  "voice": "Aoede",
+  "text": "…あの女だ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b1": {
+  "dur": 2.677,
+  "voice": "Aoede",
+  "text": "ちちの、たんじょうびを入れた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b2": {
+  "dur": 0.832,
+  "voice": "Aoede",
+  "text": "ひらかない。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b3": {
+  "dur": 3.684,
+  "voice": "Aoede",
+  "text": "まさかと思って、別の、よっつの数字を入れた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b4": {
+  "dur": 6.141,
+  "voice": "Aoede",
+  "text": "ひらいた。ちちのパスコードは、わたしの、たんじょうびだった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c1": {
+  "dur": 4.395,
+  "voice": "Aoede",
+  "text": "カズミという女とのメッセージは、ごねんまえから続いていた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c2": {
+  "dur": 6.557,
+  "voice": "Aoede",
+  "text": "まいあさ、しちじちょうど。いちにちも、かかさず。おはよう、あなた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c3": {
+  "dur": 6.967,
+  "voice": "Aoede",
+  "text": "どのメッセージにも、ちちの名前はない。ただ、あなた、とだけ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c4": {
+  "dur": 4.2,
+  "voice": "Aoede",
+  "text": "ちちの返事は、いつも同じ、ひとことだった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c5": {
+  "dur": 3.447,
+  "voice": "Enceladus",
+  "text": "あしたも、まどを、あけておく。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c6": {
+  "dur": 3.305,
+  "voice": "Aoede",
+  "text": "最後の返事は、死ぬ前の夜だった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c7": {
+  "dur": 8.956,
+  "voice": "Aoede",
+  "text": "その次の朝、ちちは、帰ってこなかった。返事のない、おはようが、今も届く。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d1": {
+  "dur": 6.67,
+  "voice": "Aoede",
+  "text": "ちちは、よっかまえの朝、しちじ。だんちの前の、こうさてんで倒れた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d2": {
+  "dur": 4.401,
+  "voice": "Aoede",
+  "text": "心臓だった。手には、白い花を持っていた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d3": {
+  "dur": 3.393,
+  "voice": "Aoede",
+  "text": "だれに渡すつもりだったのか、わたしは知らない。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d4": {
+  "dur": 4.449,
+  "voice": "Aoede",
+  "text": "うわぎを着てね。そのひとことが、引っかかった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d5": {
+  "dur": 6.965,
+  "voice": "Aoede",
+  "text": "たおれた朝、ちちが着ていた、うわぎ。ポケットに、何か入っている。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e1": {
+  "dur": 0.864,
+  "voice": "Aoede",
+  "text": "写真だった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e2": {
+  "dur": 3.565,
+  "voice": "Aoede",
+  "text": "ちちの隣で笑う、知らない、おとこのこ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e3": {
+  "dur": 6.65,
+  "voice": "Aoede",
+  "text": "ばしょは、このだんちの入口。ちちの手は、おとこのこの、肩の上。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e4": {
+  "dur": 4.246,
+  "voice": "Aoede",
+  "text": "かべの、かぞくしゃしんと、まったく同じ、こうずだった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e5": {
+  "dur": 2.335,
+  "voice": "Aoede",
+  "text": "この子…だれ？",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "f1": {
+  "dur": 4.192,
+  "voice": "Aoede",
+  "text": "その時、ちちのスマホが、また光った。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "f2": {
+  "dur": 2.434,
+  "voice": "Erinome",
+  "text": "うわぎのポケット、見てくれた？",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "f3": {
+  "dur": 3.912,
+  "voice": "Aoede",
+  "text": "この女は、ちちが死んだことを、知っている。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "f4": {
+  "dur": 3.531,
+  "voice": "Aoede",
+  "text": "そして今、わたしを、見ている。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "x1": {
+  "dur": 2.707,
+  "voice": "Schedar",
+  "text": "次回。もうひとつの家。",
+  "model": "gemini-3.8-flash-tts"
+ }
+}
