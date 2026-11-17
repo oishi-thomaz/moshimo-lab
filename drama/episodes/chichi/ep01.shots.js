@@ -39,7 +39,7 @@ const SHOTS = [
   { at: 'a1', draw(g, lt, D, S) { nat(g, lt, D, S, [], { eyes: 'normal', mouth: 'line' }); const a = inv(0.2, 0.5, lt); g.save(); g.globalAlpha = a; fillRR(g, 290, 190, 500, 130, 20, 'rgba(10,12,18,.88)'); text(g, '井上ナツキ（34）', 540, 240, { size: 48, color: '#fff' }); text(g, '会社員', 540, 292, { size: 30, color: '#c9c2b0' }); g.restore(); } },
   { at: 'a2', draw(g, lt, D) { g.save(); cam(g, { x: 540, y: 960, z: slow(lt, D, 1.0, 1.06) }); danchiNight(g, { t: lt, dawn: 0.45, litA: 1, litB: 0.3 }); g.restore(); } },
   { at: 'a3', draw(g, lt, D) { bg(g, '#1c1a16', '#0e0d0b'); photo(g, 540, 660, 600, 700, famImg, { rot: -0.03 + 0.02 * ease(inv(0, D, lt)) }); text(g, '父と母と、10歳の私', 540, 1078, { size: 40, color: '#2a2a2a', alpha: inv(0.3, 0.7, lt) }); } },
-  { at: 'a4', finish: { vignette: 0.7 }, draw(g, lt, D) { lockS(g, lt, D, { date: '1月1日 金曜日', notifs: [{ t: -1, ...O1 }] }); mood(g, { desat: 0.7, dark: 0.15 }); tag(g, '5年前の正月', 540, 1120, { size: 40, bg: '#0b0d12', color: Y.amber2, alpha: inv(0.2, 0.5, lt) }); } },
+  { at: 'a4', finish: { vignette: 0.7 }, draw(g, lt, D) { lockS(g, lt, D, { date: '1月1日 土曜日', notifs: [{ t: -1, ...O1 }] }); mood(g, { desat: 0.7, dark: 0.15 }); tag(g, '5年前の正月', 540, 1120, { size: 40, bg: '#0b0d12', color: Y.amber2, alpha: inv(0.2, 0.5, lt) }); } },
   { at: 'a5', draw(g, lt, D, S) { nat(g, lt, D, S, [], { eyes: 'narrow', brow: 0.5, mouth: 'line', look: -0.4 }); } },
   { at: 'a6', finish: { vignette: 0.65 }, draw(g, lt, D, S) { nat(g, lt, D, S, ['a6'], { eyes: 'narrow', brow: 0.7, z0: 1.06, z1: 1.14 }); } },
 
