@@ -58,6 +58,7 @@ const SHOTS = [
   { at: 'c4', draw(g, lt, D) { phone(g, lt, D, (p, w, h) => msgList(p, w, h, { msgs: LAST, scroll: 0 })); } },
   { at: 'c5', draw(g, lt, D) { phone(g, lt, D, (p, w, h) => msgList(p, w, h, { t: lt + 9, msgs: LAST, scroll: 0, hi: 2 }), { x: 560, y: 530, z0: 1.6, z1: 1.75 }); subBand(g); } },
   { at: 'c6', draw(g, lt, D) { phone(g, lt, D, (p, w, h) => msgList(p, w, h, { t: lt + 9, msgs: LAST, scroll: lerp(0, 230, ease(inv(0, 1.2, lt))), hi: 5 })); } },
+  { at: 'c7', finish: { vignette: 0.6 }, draw(g, lt, D) { phone(g, lt, D, (p, w, h) => msgList(p, w, h, { t: lt + 9, msgs: LAST, scroll: lerp(230, 560, ease(inv(0, 1.6, lt))), hi: 11 }), { z0: 1.04, z1: 1.1 }); } },
 
   // ── 4. 交差点と上着
   { at: 'd1', draw(g, lt, D) { g.save(); cam(g, { x: 540, y: 1000, z: slow(lt, D, 1.0, 1.06) }); crossing(g, { t: lt, dawn: 0.3, signal: 'red', flowers: 1 }); g.restore(); } },
@@ -99,6 +100,7 @@ const SFX = [
   { at: 'c1', type: 'tap3', vol: 0.3 },
   { at: 'c5', type: 'ping', vol: 0.5 },
   { at: 'c6', type: 'heartbeat', dur: 2, vol: 0.4 },
+  { at: 'c7', type: 'stab', vol: 0.4 },
   { at: 'd1', type: 'wind', dur: 6, vol: 0.3 },
   { at: 'd2', type: 'stab', vol: 0.4 },
   { at: 'd5', type: 'rustle', vol: 0.6 },
