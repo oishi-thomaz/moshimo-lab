@@ -37,7 +37,7 @@ const SHOTS = [
   // ── 1. 窓の合図
   { at: 'a1', draw(g, lt, D) { opp(g, lt, D, { y: 700, z0: 1.5, z1: 1.9, set: { dawn: 0.75 } }); tag(g, '4号棟405', 540, 1110, { size: 40, bg: '#0b0d12', color: Y.amber2, alpha: inv(0.3, 0.6, lt) }); } },
   { at: 'a2', draw(g, lt, D) { phone(g, lt, D, (p, w, h) => msgList(p, w, h, { msgs: A3, scroll: lerp(200, 0, ease(inv(0, D, lt))) })); } },
-  { at: 'a3', draw(g, lt, D) { phone(g, lt, D, (p, w, h) => msgList(p, w, h, { t: lt + 9, msgs: A3, hi: 1 }), { x: 430, y: 420, z0: 1.6, z1: 1.75 }); subBand(g); } },
+  { at: 'a3', draw(g, lt, D) { phone(g, lt, D, (p, w, h) => msgList(p, w, h, { t: lt + 9, msgs: A3, hi: 1 }), { x: 430, y: 420, z0: 1.6, z1: 1.75 }); subBand(g); subBand(g); } },
   { at: 'a4', draw(g, lt, D) { room(g, lt, D, { x: 540, y: 900, z0: 1.0, z1: 1.05, set: { lamp: Math.sin(lt * 5) > 0 ? 1 : 0.15, curtain: 1, opp: { tLit: 0.3 } } }); tag(g, '毎晩 21:00', 540, 1110, { size: 40, bg: '#0b0d12', color: Y.amber2, alpha: inv(0.3, 0.6, lt) }); } },
   { at: 'a5', draw(g, lt, D, S) { nat(g, lt, D, S, [], { night: 1, eyes: 'narrow', brow: 0.2, mouth: 'line', look: 0.6 }); } },
   { at: 'blink', finish: { vignette: 0.6 }, draw(g, lt, D) {
@@ -62,7 +62,7 @@ const SHOTS = [
 
   // ── 3. 母
   { at: 'c1', draw(g, lt, D) { bg(g, '#1c1a16', '#0e0d0b'); photo(g, 540, 600, 560, 640, momPhoto, { rot: -0.03 + 0.02 * ease(inv(0, D, lt)) }); text(g, '母・タエコ（63）', 540, 990, { size: 42, color: '#2a2a2a', alpha: inv(0.3, 0.7, lt) }); } },
-  { at: 'c2', draw(g, lt, D) { bg(g, '#1c1a16', '#0e0d0b'); g.save(); cam(g, { x: 540, y: 560, z: slow(lt, D, 1.1, 1.3) }); photo(g, 540, 600, 560, 640, momPhoto, { rot: -0.01 }); g.restore(); } },
+  { at: 'c2', draw(g, lt, D) { bg(g, '#1c1a16', '#0e0d0b'); g.save(); cam(g, { x: 540, y: 560, z: slow(lt, D, 1.1, 1.3) }); photo(g, 540, 600, 560, 640, momPhoto, { rot: -0.01 }); g.restore(); subBand(g, 0.8); } },
   { at: 'c3', draw(g, lt, D) { phone(g, lt, D, (p, w, h) => msgList(p, w, h, { name: '母', av: '母', msgs: MOM.slice(0, 1) })); } },
   { at: 'c4', draw(g, lt, D) { phone(g, lt, D, (p, w, h) => msgList(p, w, h, { t: lt * 1.5, name: '母', av: '母', msgs: [MOM[0], { ...MOM[1], t: 0.3 }] }), { z0: 1.04, z1: 1.1 }); } },
 
@@ -70,7 +70,7 @@ const SHOTS = [
   { at: 'night', draw(g, lt, D) { room(g, lt, D, { x: 540, y: 900, z0: 1.0, z1: 1.03, set: { lamp: 0.15, curtain: 0, opp: { tLit: 0 } } }); tag(g, '23:40', 540, 1110, { size: 44, bg: '#0b0d12', color: Y.amber2, alpha: inv(0.1, 0.4, lt) }); } },
   { at: 'd1', finish: { vignette: 0.7 }, draw(g, lt, D) { g.save(); cam(g, { x: 540, y: 900, z: slow(lt, D, 1.0, 1.06) }); doorInside(g, { open: 0 }); g.restore(); } },
   { at: 'lock', finish: { vignette: 0.7 }, draw(g, lt, D) { g.save(); cam(g, { x: 540, y: 720, z: 1.15 }); doorLock(g, { t: lt, k: ease(inv(0.2, 1.2, lt)) }); g.restore(); } },
-  { at: 'd2', finish: { vignette: 0.7 }, draw(g, lt, D) { g.save(); cam(g, { x: 540, y: 720, z: slow(lt, D, 1.15, 1.3) }); doorLock(g, { t: lt, k: 1 }); g.restore(); } },
+  { at: 'd2', finish: { vignette: 0.7 }, draw(g, lt, D) { g.save(); cam(g, { x: 540, y: 720, z: slow(lt, D, 1.15, 1.3) }); doorLock(g, { t: lt, k: 1 }); g.restore(); subBand(g, 0.8); } },
   { at: 'd3', finish: { vignette: 0.7 }, draw(g, lt, D, S) { nat(g, lt, D, S, [], { night: 1, eyes: 'wide', brow: -0.5, mouth: 'line', look: -0.8 }); } },
   { at: 'door', finish: { vignette: 0.7 }, draw(g, lt, D) { g.save(); cam(g, { x: 540, y: 900, z: 1.0 }); ryoDoor(ease(inv(0.1, 1.2, lt)))(g); g.restore(); } },
   { at: 'd4', finish: { vignette: 0.65 }, draw(g, lt, D) { g.save(); cam(g, { x: 540, y: 860, z: slow(lt, D, 1.0, 1.12) }); ryoDoor(1)(g); g.restore(); } },
