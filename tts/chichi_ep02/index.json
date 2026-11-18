@@ -1,0 +1,212 @@
+{
+ "k2": {
+  "dur": 5.018,
+  "voice": "Aoede",
+  "text": "しんだ、ちちのスマホに、女から。みられている。どこから？",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "k3": {
+  "dur": 4.795,
+  "voice": "Aoede",
+  "text": "ちちの返事を、思い出した。あしたも、まどを、あけておく。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "k4": {
+  "dur": 6.249,
+  "voice": "Aoede",
+  "text": "なかにわの向こうの、よんごうとう。同じ、よんかいの窓で、カーテンが揺れた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a1": {
+  "dur": 2.672,
+  "voice": "Aoede",
+  "text": "ちちの窓から、まっすぐ見える部屋。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a2": {
+  "dur": 4.482,
+  "voice": "Aoede",
+  "text": "さかのぼると、ごねんまえの、約束があった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a3": {
+  "dur": 3.939,
+  "voice": "Erinome",
+  "text": "よる、くじ。まどの、あかりで、あいずして。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a4": {
+  "dur": 5.238,
+  "voice": "Aoede",
+  "text": "ちちは毎晩、部屋のあかりを、にかい、つけて消していた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a5": {
+  "dur": 5.551,
+  "voice": "Aoede",
+  "text": "その夜、くじ。わたしは、ちちと同じことをした。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a6": {
+  "dur": 2.77,
+  "voice": "Aoede",
+  "text": "むかいの窓が、にかい、またたいた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b1": {
+  "dur": 3.108,
+  "voice": "Aoede",
+  "text": "ちちのスマホから、カズミに電話をかけた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b2": {
+  "dur": 1.348,
+  "voice": "Puck",
+  "text": "…おとうさん？",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b3": {
+  "dur": 2.738,
+  "voice": "Aoede",
+  "text": "でたのは、わかい男だった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b4": {
+  "dur": 5.982,
+  "voice": "Puck",
+  "text": "おとうさんの、けいたいから…。あんた、だれ？",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b5": {
+  "dur": 2.787,
+  "voice": "Aoede",
+  "text": "いのうえタツオの、むすめです。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b6": {
+  "dur": 5.448,
+  "voice": "Aoede",
+  "text": "おとうさん。このひとは、わたしの父を、そう呼んだ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b7": {
+  "dur": 5.683,
+  "voice": "Puck",
+  "text": "そうしきに、ぼくは行けなかった。あんたたちの、せいで。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b8": {
+  "dur": 1.143,
+  "voice": "Aoede",
+  "text": "でんわは、きれた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c0": {
+  "dur": 7.007,
+  "voice": "Aoede",
+  "text": "ちちを、おとうさんと呼ぶ、知らない男。ちちには、もうひとつの、いえがあった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c1": {
+  "dur": 4.662,
+  "voice": "Aoede",
+  "text": "ははは、きょねんから、しせつにいる。足を悪くして、くるまいすだ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c2": {
+  "dur": 3.995,
+  "voice": "Aoede",
+  "text": "ちちのことは、そうしきでも、なにひとつ、話さなかった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c3": {
+  "dur": 2.643,
+  "voice": "Aoede",
+  "text": "わたしは、ははに、メッセージを送った。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c4": {
+  "dur": 3.451,
+  "voice": "Aoede",
+  "text": "カズミって人、知ってる？むかいの、よんごうとうの。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d1": {
+  "dur": 5.25,
+  "voice": "Aoede",
+  "text": "よる、じゅういちじ、よんじゅっぷん。げんかんで、かぎの音がした。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d2": {
+  "dur": 3.356,
+  "voice": "Aoede",
+  "text": "そとから、だれかが、かぎを、まわしている。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d3": {
+  "dur": 5.202,
+  "voice": "Aoede",
+  "text": "このかぎを持っているのは、ちちと、わたしだけのはず。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d4": {
+  "dur": 2.943,
+  "voice": "Aoede",
+  "text": "フードの、わかい男が、立っていた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d5": {
+  "dur": 4.318,
+  "voice": "Puck",
+  "text": "おとうさんに、せんこうを、あげに来ただけだ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d6": {
+  "dur": 2.835,
+  "voice": "Aoede",
+  "text": "さっきの電話の、あの声だった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d7": {
+  "dur": 2.929,
+  "voice": "Aoede",
+  "text": "どうして、このへやの、かぎを持ってるの？",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e1": {
+  "dur": 1.661,
+  "voice": "Puck",
+  "text": "…あんたが、ナツキさん？",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e2": {
+  "dur": 3.398,
+  "voice": "Aoede",
+  "text": "このおとこは、わたしの名前を、知っていた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e3": {
+  "dur": 3.294,
+  "voice": "Aoede",
+  "text": "その時、ははから、返事が来た。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e4": {
+  "dur": 1.868,
+  "voice": "Vindemiatrix",
+  "text": "そのこに、あわないで。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e5": {
+  "dur": 8.535,
+  "voice": "Aoede",
+  "text": "わたしが聞いたのは、カズミのこと。なのに、ははは、そのこ、と書いた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "x1": {
+  "dur": 2.036,
+  "voice": "Schedar",
+  "text": "次回。むかいのまど。",
+  "model": "gemini-3.8-flash-tts"
+ }
+}
