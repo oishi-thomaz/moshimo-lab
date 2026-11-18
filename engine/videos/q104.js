@@ -231,7 +231,7 @@ runStory({
     id: 'q104', v2: true, answer: 'ホーム・アローン',
     title: 'この映画のタイトルは？',
     titleHtml: 'この映画の<br>タイトルは？',
-    mood: 'light', seed: 10410,
+    mood: 'hopeful', seed: 10410,
     hits: [5.6, 13.2, 21.0, 29.0, 45.4, 56.4], risers: [37.4, 52.0],
     impacts: [0.3, 2.6, 5.6, 13.2, 17.4, 21.4, 25.6, 29.2, 37.6, 42.4, 45.6, 56.4],
     sfx: [[0.2, 'whoosh'], [9.0, 'whoosh'], [17.0, 'whoosh'], [25.0, 'whoosh'], [33.0, 'whoosh'], [42.0, 'whoosh'], [49.0, 'whoosh'], [49.4, 'meter', 0.5]],
