@@ -58,6 +58,8 @@ const SHOTS = [
   { at: 'hangup', draw(g, lt, D) { phone(g, lt, D, (p, w, h) => callUI(p, w, h, { t: lt, mode: 'end' })); } },
   { at: 'b8', draw(g, lt, D) { opp(g, lt, D, { y: 660, z0: 1.6, z1: 1.5, set: { tLit: 1 - inv(0.3, 0.5, lt), sil: 1 - inv(0.2, 0.5, lt), dawn: 0 } }); } },
 
+  { at: 'c0', finish: { vignette: 0.65 }, draw(g, lt, D) { opp(g, lt, D, { y: 680, z0: 1.3, z1: 1.6, set: { tLit: 0.6, sil: 0.4 * (1 - inv(0.5, 2.0, lt)), dawn: 0 } }); tag(g, '4号棟405', 540, 1110, { size: 40, bg: '#0b0d12', color: Y.amber2, alpha: inv(0.3, 0.6, lt) }); } },
+
   // ── 3. 母
   { at: 'c1', draw(g, lt, D) { bg(g, '#1c1a16', '#0e0d0b'); photo(g, 540, 600, 560, 640, momPhoto, { rot: -0.03 + 0.02 * ease(inv(0, D, lt)) }); text(g, '母・タエコ（63）', 540, 990, { size: 42, color: '#2a2a2a', alpha: inv(0.3, 0.7, lt) }); } },
   { at: 'c2', draw(g, lt, D) { bg(g, '#1c1a16', '#0e0d0b'); g.save(); cam(g, { x: 540, y: 560, z: slow(lt, D, 1.1, 1.3) }); photo(g, 540, 600, 560, 640, momPhoto, { rot: -0.01 }); g.restore(); } },
@@ -106,6 +108,7 @@ const SFX = [
   { at: 'b3', type: 'hit', vol: 0.6 },
   { at: 'b7', type: 'stab', vol: 0.6 },
   { at: 'hangup', type: 'zapoff', vol: 0.5 },
+  { at: 'c0', type: 'stab', vol: 0.4 },
   { at: 'c1', type: 'roomtone', dur: 10, vol: 0.35 },
   { at: 'c4', type: 'tap3', vol: 0.4 },
   { at: 'c4', off: 1.2, type: 'pop', vol: 0.4 },
