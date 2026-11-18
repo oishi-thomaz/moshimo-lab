@@ -66,9 +66,9 @@
   "model": "gemini-3.8-flash-tts"
  },
  "b3": {
-  "dur": 2.738,
+  "dur": 3.255,
   "voice": "Aoede",
-  "text": "でたのは、わかい男だった。",
+  "text": "でんわに、でたのは、わかい、おとこだった。",
   "model": "gemini-3.8-flash-tts"
  },
  "b4": {
@@ -198,9 +198,9 @@
   "model": "gemini-3.8-flash-tts"
  },
  "e5": {
-  "dur": 8.535,
+  "dur": 10.135,
   "voice": "Aoede",
-  "text": "わたしが聞いたのは、カズミのこと。なのに、ははは、そのこ、と書いた。",
+  "text": "わたしが聞いたのは、カズミのこと。なのに、母は、そのこ、と書いた。",
   "model": "gemini-3.8-flash-tts"
  },
  "x1": {
