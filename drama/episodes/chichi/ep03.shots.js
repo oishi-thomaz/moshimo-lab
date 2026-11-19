@@ -62,6 +62,8 @@ const SHOTS = [
   { at: 'c7', finish: { vignette: 0.7 }, draw(g, lt, D, S) { mom(g, lt, D, S, ['c7'], { eyes: 'closed', brow: -0.7, mouth: 'line', z0: 1.08, z1: 1.16 }); } },
   { at: 'hangup', draw(g, lt, D) { phone(g, lt, D, (p, w, h) => callUI(p, w, h, { t: lt, mode: 'end', ...MOMCALL })); } },
 
+  { at: 'd0', finish: { vignette: 0.65 }, draw(g, lt, D) { room(g, lt, D, { x: 260, y: 960, z0: 1.4, z1: 1.7, set: { ...NIGHT } }); } },
+
   // ── 4. 通帳
   { at: 'd1', draw(g, lt, D) { g.save(); cam(g, { x: 540, y: 880, z: slow(lt, D, 1.0, 1.1) }); passbookDrawer(g, { t: lt }); g.restore(); } },
   { at: 'd2', draw(g, lt, D) { g.save(); cam(g, { x: 540, y: 900, z: slow(lt, D, 1.0, 1.05) }); passbook(g, { t: lt, rows: ROWS, hi: ease(inv(0.3, D, lt)) }); g.restore(); tag(g, 'いちばん古い通帳', 540, 110, { size: 38, bg: '#0b0d12', color: Y.amber2, alpha: inv(0.2, 0.5, lt) }); } },
@@ -104,6 +106,7 @@ const SFX = [
   { at: 'c4', type: 'hit', vol: 0.7 },
   { at: 'c7', type: 'heartbeat', dur: 2, vol: 0.4 },
   { at: 'hangup', type: 'zapoff', vol: 0.5 },
+  { at: 'd0', type: 'stab', vol: 0.4 },
   { at: 'd1', type: 'scrape', vol: 0.5 },
   { at: 'd2', type: 'rustle', vol: 0.5 },
   { at: 'd3', off: 0.4, type: 'stab', vol: 0.7 },
@@ -129,7 +132,7 @@ const MUSIC = [
   { at: 'leave', mood: 'silence' },
   { at: 'c2', mood: 'uneasy' },
   { at: 'hangup', mood: 'silence' },
-  { at: 'd1', mood: 'suspense' },
+  { at: 'd0', mood: 'suspense' },
   { at: 'morning', mood: 'silence' },
   { at: 'e3', mood: 'tension' },
   { at: 'window', mood: 'thriller' },
