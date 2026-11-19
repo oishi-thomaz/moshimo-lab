@@ -180,9 +180,9 @@
   "model": "gemini-3.8-flash-tts"
  },
  "e5": {
-  "dur": 3.924,
+  "dur": 3.482,
   "voice": "Aoede",
-  "text": "ゆうべ、さいだんの前にいたのは、あの男だけ。",
+  "text": "よなかに、さいだんの前にいたのは、あの男だけ。",
   "model": "gemini-3.8-flash-tts"
  },
  "f1": {
