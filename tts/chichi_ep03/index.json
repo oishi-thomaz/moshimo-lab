@@ -1,0 +1,212 @@
+{
+ "k3": {
+  "dur": 4.769,
+  "voice": "Aoede",
+  "text": "しんだ、ちちの部屋に、あいかぎで、はいってきた男。ははは、あうな、と言った。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a1": {
+  "dur": 5,
+  "voice": "Aoede",
+  "text": "おとこは、さいだんの前に座り、せんこうに、火をつけた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a2": {
+  "dur": 3.299,
+  "voice": "Puck",
+  "text": "おとうさん。…おそくなって、ごめん。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a3": {
+  "dur": 1.824,
+  "voice": "Aoede",
+  "text": "あなた、ちちの、なんなの？",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a4": {
+  "dur": 0.926,
+  "voice": "Puck",
+  "text": "むすこだよ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a5": {
+  "dur": 3.318,
+  "voice": "Puck",
+  "text": "…ちは、つながってないけど。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b1": {
+  "dur": 4.614,
+  "voice": "Puck",
+  "text": "そうまリョウ。じゅうきゅう。むかいの、よんごうとうに、かあさんと住んでる。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b2": {
+  "dur": 5.332,
+  "voice": "Puck",
+  "text": "ほんとうの、とうさんは、ぼくが、うまれる前に死んだ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b3": {
+  "dur": 5.941,
+  "voice": "Puck",
+  "text": "それからずっと、おとうさんが、ぼくと、かあさんの、めんどうを見てくれた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b4": {
+  "dur": 4.749,
+  "voice": "Puck",
+  "text": "かぎも、おとうさんがくれた。ナツキさんの話ばかり、してたよ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b5": {
+  "dur": 2.914,
+  "voice": "Aoede",
+  "text": "ごねん、口をきかなかった、わたしの話を。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b6": {
+  "dur": 4.624,
+  "voice": "Puck",
+  "text": "そうしきに、よばれなかったのは、ぼくらを、かくしたかったからだろ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c1": {
+  "dur": 3.346,
+  "voice": "Aoede",
+  "text": "わたしは、しせつの、ははに、電話をかけた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c2": {
+  "dur": 4.307,
+  "voice": "Vindemiatrix",
+  "text": "…ナツキ。あのこに、あったのね。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c3": {
+  "dur": 3.124,
+  "voice": "Aoede",
+  "text": "おかあさん。ぜんぶ、知ってたの？",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c4": {
+  "dur": 4.4,
+  "voice": "Vindemiatrix",
+  "text": "しってたわ。にじゅうねんまえから、ぜんぶ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c5": {
+  "dur": 4.733,
+  "voice": "Vindemiatrix",
+  "text": "おとうさんは、あのひとたちに、まいつき、お金を送っていたの。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c6": {
+  "dur": 0.774,
+  "voice": "Aoede",
+  "text": "どうして？",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c7": {
+  "dur": 4.087,
+  "voice": "Vindemiatrix",
+  "text": "…ごめんね。それは、いえない。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d0": {
+  "dur": 6.315,
+  "voice": "Aoede",
+  "text": "ははにも、いえないこと。ちちは、にじゅうねん、なにを、かくしていたの？",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d1": {
+  "dur": 4.47,
+  "voice": "Aoede",
+  "text": "ちちの、たんすの奥に、ふるい、つうちょうの束があった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d2": {
+  "dur": 7.701,
+  "voice": "Aoede",
+  "text": "そうまカズミへ、まいつき、ごまんえん。はじまりは、にせんななねん、いちがつ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d3": {
+  "dur": 2.672,
+  "voice": "Aoede",
+  "text": "にじゅうねん。いちども、かかさず。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d4": {
+  "dur": 4.819,
+  "voice": "Aoede",
+  "text": "くちどめりょう？ちちは、おどされていたの？",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d5": {
+  "dur": 6.153,
+  "voice": "Aoede",
+  "text": "にせんななねん、いちがつ。わたしが、ちゅうがく、にねんの冬。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d6": {
+  "dur": 8.017,
+  "voice": "Aoede",
+  "text": "その冬、うちの車は、急に売られた。ははは、にどと、運転しなかった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e1": {
+  "dur": 1.735,
+  "voice": "Aoede",
+  "text": "つぎの朝、しちじ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e2": {
+  "dur": 3.124,
+  "voice": "Erinome",
+  "text": "おはよう、あなた。おせんこう、あげてくれた？",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e3": {
+  "dur": 3.508,
+  "voice": "Aoede",
+  "text": "さいだんを見て、いきが、とまった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e4": {
+  "dur": 3.798,
+  "voice": "Aoede",
+  "text": "ちちの、いはいが、ない。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e5": {
+  "dur": 3.91,
+  "voice": "Aoede",
+  "text": "ゆうべ、さいだんの前にいたのは、あの男だけ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "f1": {
+  "dur": 4.351,
+  "voice": "Aoede",
+  "text": "むかいの窓に、ろうそくの火が、ゆれていた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "f2": {
+  "dur": 5.229,
+  "voice": "Aoede",
+  "text": "その横に、ちちの、いはい。そして、おんなの、かげ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "f3": {
+  "dur": 0.684,
+  "voice": "Erinome",
+  "text": "ひとりで、きて。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "x1": {
+  "dur": 2.091,
+  "voice": "Schedar",
+  "text": "次回。こうさてん。",
+  "model": "gemini-3.8-flash-tts"
+ }
+}
