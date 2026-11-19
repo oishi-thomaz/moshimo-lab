@@ -60,9 +60,9 @@
   "model": "gemini-3.8-flash-tts"
  },
  "b5": {
-  "dur": 2.914,
+  "dur": 3.929,
   "voice": "Aoede",
-  "text": "ごねん、口をきかなかった、わたしの話を。",
+  "text": "ごねんも、口をきかなかった、わたしの話を。",
   "model": "gemini-3.8-flash-tts"
  },
  "b6": {
@@ -78,7 +78,7 @@
   "model": "gemini-3.8-flash-tts"
  },
  "c2": {
-  "dur": 4.307,
+  "dur": 2.694,
   "voice": "Vindemiatrix",
   "text": "…ナツキ。あのこに、あったのね。",
   "model": "gemini-3.8-flash-tts"
@@ -138,7 +138,7 @@
   "model": "gemini-3.8-flash-tts"
  },
  "d4": {
-  "dur": 4.819,
+  "dur": 3.81,
   "voice": "Aoede",
   "text": "くちどめりょう？ちちは、おどされていたの？",
   "model": "gemini-3.8-flash-tts"
@@ -150,9 +150,9 @@
   "model": "gemini-3.8-flash-tts"
  },
  "d6": {
-  "dur": 8.017,
+  "dur": 7.587,
   "voice": "Aoede",
-  "text": "その冬、うちの車は、急に売られた。ははは、にどと、運転しなかった。",
+  "text": "その冬、うちの車は、急に売られた。母は、にどと、運転しなかった。",
   "model": "gemini-3.8-flash-tts"
  },
  "e1": {
@@ -180,7 +180,7 @@
   "model": "gemini-3.8-flash-tts"
  },
  "e5": {
-  "dur": 3.91,
+  "dur": 3.924,
   "voice": "Aoede",
   "text": "ゆうべ、さいだんの前にいたのは、あの男だけ。",
   "model": "gemini-3.8-flash-tts"
@@ -192,7 +192,7 @@
   "model": "gemini-3.8-flash-tts"
  },
  "f2": {
-  "dur": 5.229,
+  "dur": 5.889,
   "voice": "Aoede",
   "text": "その横に、ちちの、いはい。そして、おんなの、かげ。",
   "model": "gemini-3.8-flash-tts"
