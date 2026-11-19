@@ -32,11 +32,11 @@ const SHOTS = [
   { at: 'cold', off: -0.3, finish: { vignette: 0.7 }, draw(g, lt, D) { g.save(); cam(g, { x: 540, y: 800, z: 1.3 }); doorInside(g, { open: 1, P: P.ryo, o: { eyes: 'normal', brow: 0.1 }, porch: 0.8 }); g.restore(); } },
   { at: 'k1', finish: { vignette: 0.7 }, draw(g, lt, D, S) { ryo(g, lt, D, S, ['k1'], { eyes: 'normal', brow: 0.1, mouth: 'line', back: g2 => { bg(g2, '#0e0d12', '#07070a'); glow(g2, 540, 380, 520, 'rgba(255,214,150,1)', 0.25); }, lightFrom: 'right' }); } },
   { at: 'k2', finish: { vignette: 0.6 }, draw(g, lt, D) { lockS(g, lt, D, { own: true, clock: '23:41', notifs: [{ t: -1, name: '母', av: '母', col: '#5a6a7a', body: 'その子に、会わないで。', time: '今' }] }); } },
-  { at: 'k3', finish: { vignette: 0.65 }, draw(g, lt, D) { ryoAltar(g, lt, D, { x: 420, y: 900, z0: 1.0, z1: 1.12, eyes: 'narrow' }); } },
+  { at: 'k3', finish: { vignette: 0.65 }, draw(g, lt, D) { ryoAltar(g, lt, D, { x: 420, y: 900, z0: 1.0, z1: 1.12, eyes: 'narrow' }); subBand(g, 0.8); } },
   { at: 'title', noSubs: true, finish: { vignette: 0.55, grainA: 0.1 }, draw(g, lt) { bg(g, '#030405', '#08090c'); cover(g, lt); } },
 
   // ── 1. 息子
-  { at: 'a1', finish: { vignette: 0.65 }, draw(g, lt, D) { room(g, lt, D, { x: 260, y: 980, z0: 1.7, z1: 1.9, set: { ...NIGHT } }); } },
+  { at: 'a1', finish: { vignette: 0.65 }, draw(g, lt, D) { room(g, lt, D, { x: 260, y: 980, z0: 1.7, z1: 1.9, set: { ...NIGHT } }); subBand(g); } },
   { at: 'a2', draw(g, lt, D, S) { ryo(g, lt, D, S, ['a2'], { eyes: 'closed', brow: -0.4, mouth: 'line', look: -0.6 }); } },
   { at: 'a3', draw(g, lt, D, S) { nat(g, lt, D, S, ['a3'], { eyes: 'narrow', brow: 0.6 }); } },
   { at: 'a4', finish: { vignette: 0.65 }, draw(g, lt, D, S) { ryo(g, lt, D, S, ['a4'], { eyes: 'narrow', brow: 0.3, mouth: 'line', z0: 1.04, z1: 1.12 }); } },
@@ -62,7 +62,7 @@ const SHOTS = [
   { at: 'c7', finish: { vignette: 0.7 }, draw(g, lt, D, S) { mom(g, lt, D, S, ['c7'], { eyes: 'closed', brow: -0.7, mouth: 'line', z0: 1.08, z1: 1.16 }); } },
   { at: 'hangup', draw(g, lt, D) { phone(g, lt, D, (p, w, h) => callUI(p, w, h, { t: lt, mode: 'end', ...MOMCALL })); } },
 
-  { at: 'd0', finish: { vignette: 0.65 }, draw(g, lt, D) { room(g, lt, D, { x: 260, y: 960, z0: 1.4, z1: 1.7, set: { ...NIGHT } }); } },
+  { at: 'd0', finish: { vignette: 0.65 }, draw(g, lt, D) { room(g, lt, D, { x: 260, y: 960, z0: 1.4, z1: 1.7, set: { ...NIGHT } }); subBand(g, 0.8); } },
 
   // ── 4. 通帳
   { at: 'd1', draw(g, lt, D) { g.save(); cam(g, { x: 540, y: 880, z: slow(lt, D, 1.0, 1.1) }); passbookDrawer(g, { t: lt }); g.restore(); } },
@@ -77,7 +77,7 @@ const SHOTS = [
   { at: 'e1', draw(g, lt, D) { lockS(g, lt, D, { date: '12月6日 日曜日', notifs: [{ t: -1, body: 'おはよう、あなた。\nお線香、あげてくれた？', time: '7:00' }] }); } },
   { at: 'e2', finish: { vignette: 0.55 }, draw(g, lt, D) { lockS(g, lt, D, { date: '12月6日 日曜日', notifs: [{ t: -1, body: 'おはよう、あなた。\nお線香、あげてくれた？', time: '7:00' }], z0: 1.04, z1: 1.12 }); } },
   { at: 'e3', draw(g, lt, D) { room(g, lt, D, { x: 300, y: 1000, z0: 1.2, z1: 1.5, set: { ...AM, ihai: 0 } }); } },
-  { at: 'e4', finish: { vignette: 0.7 }, draw(g, lt, D) { room(g, lt, D, { x: 200, y: 900, z0: 2.4, z1: 2.8, set: { ...AM, ihai: 0 } }); const a = inv(0.3, 0.6, lt); g.save(); cam(g, { x: 200, y: 900, z: slow(lt, D, 2.4, 2.8) }); g.globalAlpha = a * 0.85; g.setLineDash([8, 6]); g.lineWidth = 3; g.strokeStyle = Y.amber; g.strokeRect(132, 712, 86, 184); g.restore(); } },
+  { at: 'e4', finish: { vignette: 0.7 }, draw(g, lt, D) { room(g, lt, D, { x: 200, y: 900, z0: 2.4, z1: 2.8, set: { ...AM, ihai: 0 } }); const a = inv(0.3, 0.6, lt); g.save(); cam(g, { x: 200, y: 900, z: slow(lt, D, 2.4, 2.8) }); g.globalAlpha = a * 0.85; g.setLineDash([8, 6]); g.lineWidth = 3; g.strokeStyle = Y.amber; g.strokeRect(132, 712, 86, 184); g.restore(); subBand(g, 0.8); } },
   { at: 'e5', finish: { vignette: 0.7 }, draw(g, lt, D) { shock(g, lt, D, { brow: 0.3 }); } },
 
   // ── 6. 引き
