@@ -1,8 +1,8 @@
 {
  "k2": {
-  "dur": 6.445,
+  "dur": 5.81,
   "voice": "Aoede",
-  "text": "しんだ、ちちのスマホに、女から。むかいの、よんごうとう。よんまるご、ごうしつへ。",
+  "text": "しんだ、ちちのスマホに、女から。むかいの、よんごうとう。よんまるご、ごうしつ。",
   "model": "gemini-3.8-flash-tts"
  },
  "k3": {
@@ -24,9 +24,9 @@
   "model": "gemini-3.8-flash-tts"
  },
  "a2": {
-  "dur": 2.843,
+  "dur": 2.902,
   "voice": "Erinome",
-  "text": "しゅじんよ。そうま、シンイチ。",
+  "text": "主人よ。そうま、シンイチ。",
   "model": "gemini-3.8-flash-tts"
  },
  "a3": {
@@ -78,9 +78,9 @@
   "model": "gemini-3.8-flash-tts"
  },
  "c3": {
-  "dur": 3.337,
+  "dur": 4.666,
   "voice": "Aoede",
-  "text": "ちちが…人をはねて、にげた？",
+  "text": "ちちが？…人をはねて、にげた？",
   "model": "gemini-3.8-flash-tts"
  },
  "c4": {
@@ -156,9 +156,9 @@
   "model": "gemini-3.8-flash-tts"
  },
  "e4": {
-  "dur": 3.675,
+  "dur": 2.177,
   "voice": "Vindemiatrix",
-  "text": "…ちがう。あなたじゃない。",
+  "text": "ちがう…。あなたじゃない。",
   "model": "gemini-3.8-flash-tts"
  },
  "e5": {
@@ -174,9 +174,9 @@
   "model": "gemini-3.8-flash-tts"
  },
  "f2": {
-  "dur": 3.979,
+  "dur": 4.021,
   "voice": "Laomedeia",
-  "text": "いのうえさん、おかあさまが、おへやに、いらっしゃらないんです。",
+  "text": "井上さん、おかあさまが、おへやに、いらっしゃらないんです。",
   "model": "gemini-3.8-flash-tts"
  },
  "f3": {
