@@ -398,6 +398,7 @@ export function crossingDown(g, { t = 0, dawn = 0, man = 0, car = -1 } = {}) {
 // signal＝'red'|'green'、truck＝トラックの位置 0..1（-1 で出さない）、flowers＝ガードレールの白い花
 export function crossing(g, { t = 0, dawn = 0.5, signal = 'red', truck = -1, flowers = 1, blink = 0 } = {}) {
   vgrad(g, -300, -300, W + 600, 1200, [[0, mix('#101830', '#7a8cae', dawn)], [1, mix('#2a3048', '#e2c8b0', dawn)]]);
+  fillRR(g, -300, 899, W + 600, 170, 0, mix('#2a3048', '#e2c8b0', dawn)); // 棟と棟のすき間の空（グラデの下が黒く抜けないように）
   // 奥の団地（3号棟・4号棟）
   for (const [x0, lab] of [[-120, '3'], [600, '4']]) {
     fillRR(g, x0, 420, 600, 640, 0, mix('#1a1c24', '#8a8c92', dawn));

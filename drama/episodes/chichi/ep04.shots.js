@@ -27,7 +27,7 @@ const SHOTS = [
   // ── 冒頭：「ひとりで、来て。」→ 405のドアが開く
   { at: 'cold', off: -0.3, finish: { vignette: 0.6 }, draw(g, lt, D) { lockS(g, lt, D, { date: '12月6日 日曜日', clock: '7:04', notifs: [{ t: -1, body: 'ひとりで、来て。', time: '今' }], z0: 1.06, z1: 1.06 }); } },
   { at: 'k1', finish: { vignette: 0.6 }, draw(g, lt, D) { lockS(g, lt, D, { date: '12月6日 日曜日', clock: '7:04', notifs: [{ t: -1, body: 'ひとりで、来て。', time: '今' }], z0: 1.06, z1: 1.12 }); } },
-  { at: 'k2', finish: { vignette: 0.65 }, draw(g, lt, D) { g.save(); cam(g, { x: 540, y: 900, z: slow(lt, D, 1.0, 1.12) }); door405(g, { t: lt, open: 0, dawn: 0.3 }); g.restore(); } },
+  { at: 'k2', finish: { vignette: 0.65 }, draw(g, lt, D) { if (lt < 2.7) { lockS(g, lt, D, { date: '12月6日 日曜日', clock: '7:04', notifs: [{ t: -1, body: 'ひとりで、来て。', time: '今' }], z0: 1.12, z1: 1.2 }); return; } g.save(); cam(g, { x: 540, y: 900, z: slow(lt, D, 1.0, 1.12) }); door405(g, { t: lt, open: 0, dawn: 0.3 }); g.restore(); } },
   { at: 'door', finish: { vignette: 0.65 }, draw(g, lt, D) { g.save(); cam(g, { x: 540, y: 900, z: 1.12 }); door405(g, { t: lt, open: ease(inv(0.2, 1.2, lt)), dawn: 0.3, P: P.kazumi, o: { eyes: 'narrow', mouth: 'line' } }); g.restore(); } },
   { at: 'k3', draw(g, lt, D, S) { kaz(g, lt, D, S, ['k3'], { eyes: 'narrow', brow: -0.2, mouth: 'smile' }); const a = inv(0.4, 0.7, lt); g.save(); g.globalAlpha = a; fillRR(g, 290, 190, 500, 130, 20, 'rgba(10,12,18,.88)'); text(g, '相馬カズミ（52）', 540, 240, { size: 48, color: '#fff' }); text(g, '4号棟405', 540, 292, { size: 30, color: '#c9c2b0' }); g.restore(); } },
   { at: 'k4', finish: { vignette: 0.65 }, draw(g, lt, D, S) { nat(g, lt, D, S, [], { eyes: 'wide', brow: -0.3, mouth: 'line' }); } },
@@ -38,10 +38,10 @@ const SHOTS = [
   { at: 'a2', finish: { vignette: 0.6 }, draw(g, lt, D) { bg(g, '#1c1a16', '#0e0d0b'); photo(g, 540, 600, 480, 600, shinImg, { rot: -0.02 + 0.02 * ease(inv(0, D, lt)) }); text(g, '相馬シンイチ（当時31）', 540, 968, { size: 38, color: '#2a2a2a', alpha: inv(0.3, 0.7, lt) }); } },
   { at: 'a3', draw(g, lt, D, S) { kaz(g, lt, D, S, ['a3'], { eyes: 'narrow', brow: -0.4, mouth: 'line', look: 0.7 }); } },
   { at: 'a4', finish: { vignette: 0.65 }, draw(g, lt, D, S) { kaz(g, lt, D, S, ['a4'], { eyes: 'closed', brow: -0.5, mouth: 'line', z0: 1.05, z1: 1.12 }); } },
-  { at: 'a5', draw(g, lt, D) { g.save(); cam(g, { x: 540, y: 820, z: slow(lt, D, 1.0, 1.15) }); oldNews(g, { t: lt }); g.restore(); } },
+  { at: 'a5', draw(g, lt, D) { g.save(); cam(g, { x: 540, y: 820, z: slow(lt, D, 1.0, 1.15) }); oldNews(g, { t: lt }); g.restore(); subBand(g, 0.8); } },
 
   // ── 2. 毎朝7時の花
-  { at: 'b1', draw(g, lt, D) { kroom(g, lt, D, { x: 750, y: 600, z0: 1.4, z1: 1.9, set: { dawn: 0.35 } }); } },
+  { at: 'b1', draw(g, lt, D) { kroom(g, lt, D, { x: 750, y: 820, z0: 1.3, z1: 1.6, set: { dawn: 0.35 } }); } },
   { at: 'b2', finish: { vignette: 0.6 }, draw(g, lt, D) { g.save(); cam(g, { x: 400, y: 900, z: slow(lt, D, 1.2, 1.45) }); crossingDown(g, { t: lt, dawn: 0.35, man: 1 }); g.restore(); mood(g, { desat: 0.35 }); tag(g, '毎朝 7:00', 540, 1030, { size: 40, bg: '#0b0d12', color: Y.amber2, alpha: inv(0.3, 0.6, lt) }); } },
   { at: 'b4', finish: { vignette: 0.65 }, draw(g, lt, D) { g.save(); cam(g, { x: 260, y: 1420, z: slow(lt, D, 2.0, 2.3) }); crossing(g, { t: lt, dawn: 0.3, signal: 'red', flowers: 1 }); g.restore(); subBand(g); } },
 
@@ -78,7 +78,7 @@ const SHOTS = [
   { at: 'dawn', draw(g, lt, D) { g.save(); cam(g, { x: 540, y: 960, z: slow(lt, D, 1.0, 1.04) }); danchiNight(g, { t: lt, dawn: 0.3, litA: 1, litB: 1 }); g.restore(); } },
   { at: 'f2', draw(g, lt, D) { phone(g, lt, D, (p, w, h) => callUI(p, w, h, { t: lt, mode: 'talk', ...STAFF })); } },
   { at: 'f3', finish: { vignette: 0.65 }, draw(g, lt, D) { phone(g, lt, D, (p, w, h) => callUI(p, w, h, { t: lt + 6, mode: 'talk', ...STAFF }), { z0: 1.04, z1: 1.1 }); mood(g, { red: 0.05 }); } },
-  { at: 'f4', finish: { vignette: 0.7 }, draw(g, lt, D) { g.save(); cam(g, { x: 540, y: 1000, z: slow(lt, D, 1.0, 1.12) }); crossing(g, { t: lt, dawn: 0.3, signal: 'red', flowers: 0, blink: 1 }); g.restore(); const a = easeOut(inv(0.3, 0.7, lt)); g.save(); g.globalAlpha = a; fillRR(g, 300, 150, 480, 190, 30, 'rgba(10,12,18,.88)'); text(g, '6:52', 540, 250, { size: 130, color: Y.amber, weight: 900 }); g.restore(); mood(g, { dark: inv(D - 0.8, D, lt) }); } },
+  { at: 'f4', finish: { vignette: 0.7 }, draw(g, lt, D) { g.save(); cam(g, { x: 540, y: 1000, z: slow(lt, D, 1.0, 1.12) }); crossing(g, { t: lt, dawn: 0.3, signal: 'red', flowers: 0, blink: 1 }); g.restore(); const a = easeOut(inv(0.3, 0.7, lt)); g.save(); g.globalAlpha = a; fillRR(g, 300, 150, 480, 190, 30, 'rgba(10,12,18,.88)'); text(g, '6:52', 540, 250, { size: 130, color: Y.amber, weight: 900 }); g.restore(); subBand(g, 0.8); mood(g, { dark: inv(D - 0.8, D, lt) }); } },
   { at: 'end', noSubs: true, draw(g, lt) { endCard(g, lt, { SERIES, EPISODE }); } },
 ];
 
