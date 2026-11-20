@@ -1,0 +1,200 @@
+{
+ "k2": {
+  "dur": 6.445,
+  "voice": "Aoede",
+  "text": "しんだ、ちちのスマホに、女から。むかいの、よんごうとう。よんまるご、ごうしつへ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "k3": {
+  "dur": 3.691,
+  "voice": "Erinome",
+  "text": "いらっしゃい。…ナツキさん。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "k4": {
+  "dur": 5.248,
+  "voice": "Aoede",
+  "text": "おはよう、あなた、の女が、目の前に、立っていた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a1": {
+  "dur": 5.762,
+  "voice": "Aoede",
+  "text": "まどべに、ちちの、いはいと、わかい男の写真が、並んでいた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a2": {
+  "dur": 2.843,
+  "voice": "Erinome",
+  "text": "しゅじんよ。そうま、シンイチ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a3": {
+  "dur": 9.867,
+  "voice": "Erinome",
+  "text": "にじゅうねんまえの、じゅうにがつ、なのか。朝、しちじ。あの、こうさてんで、車に、はねられた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a4": {
+  "dur": 2.534,
+  "voice": "Erinome",
+  "text": "くるまは、そのまま、にげた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a5": {
+  "dur": 4.143,
+  "voice": "Aoede",
+  "text": "ひきにげ。はんにんは、みつからなかった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b1": {
+  "dur": 2.484,
+  "voice": "Erinome",
+  "text": "このまどから、ましたに、見えるの。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b2": {
+  "dur": 7.793,
+  "voice": "Erinome",
+  "text": "まいあさ、しちじ。あなたのおとうさんは、あそこに立って、しろい花を、置いていった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b4": {
+  "dur": 5.977,
+  "voice": "Aoede",
+  "text": "ちちが倒れていた、あの、こうさてん。手には、しろい花。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c1": {
+  "dur": 5.938,
+  "voice": "Erinome",
+  "text": "じこの、いっかげつご。あなたの、おとうさんが、ここに来たの。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c2": {
+  "dur": 3.039,
+  "voice": "Erinome",
+  "text": "はねたのは、わたしです、って。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c3": {
+  "dur": 3.337,
+  "voice": "Aoede",
+  "text": "ちちが…人をはねて、にげた？",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c4": {
+  "dur": 6.066,
+  "voice": "Erinome",
+  "text": "けいさつには、言わないでほしい。いっしょう、かけて、つぐなわせてください、って。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c5": {
+  "dur": 5.141,
+  "voice": "Aoede",
+  "text": "にじゅうねんの、そうきんは、くちどめりょうじゃない。つぐないだった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c6": {
+  "dur": 3.63,
+  "voice": "Aoede",
+  "text": "どうして、けいさつに、言わなかったんですか？",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c7": {
+  "dur": 2.523,
+  "voice": "Erinome",
+  "text": "おなかに、リョウが、いたの。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d0": {
+  "dur": 4.789,
+  "voice": "Aoede",
+  "text": "ちちがはねた人の、おなかにいた子。それが、リョウ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d1": {
+  "dur": 0.688,
+  "voice": "Puck",
+  "text": "…うそだろ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d2": {
+  "dur": 2.661,
+  "voice": "Aoede",
+  "text": "となりの部屋で、リョウが、きいていた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d3": {
+  "dur": 2.314,
+  "voice": "Puck",
+  "text": "おとうさんが…とうさんを？",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d5": {
+  "dur": 3.518,
+  "voice": "Puck",
+  "text": "ぜんぶ、そこに入ってるんだろ。かせよ！",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e1": {
+  "dur": 6.946,
+  "voice": "Aoede",
+  "text": "ちちのスマホの、ボイスメモ。ひづけは、しぬまえの、よる。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e2": {
+  "dur": 5.056,
+  "voice": "Enceladus",
+  "text": "カズミさん。…にじゅうねん、ありがとう。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e3": {
+  "dur": 4.528,
+  "voice": "Enceladus",
+  "text": "ナツキには、言わないでくれ。ぜんぶ、おれが、やったことだ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e4": {
+  "dur": 3.675,
+  "voice": "Vindemiatrix",
+  "text": "…ちがう。あなたじゃない。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e5": {
+  "dur": 4.223,
+  "voice": "Aoede",
+  "text": "ちちの後ろで、きこえたのは、ははの声だった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e6": {
+  "dur": 2.874,
+  "voice": "Puck",
+  "text": "あなたじゃないって、どういうことだよ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "f2": {
+  "dur": 3.979,
+  "voice": "Laomedeia",
+  "text": "いのうえさん、おかあさまが、おへやに、いらっしゃらないんです。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "f3": {
+  "dur": 5.616,
+  "voice": "Laomedeia",
+  "text": "あさ、ろくじすぎに、わかい男のかたが来られて…いっしょに、出ていかれた、と。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "f4": {
+  "dur": 8.53,
+  "voice": "Aoede",
+  "text": "じゅうにがつ、なのか。ろくじ、ごじゅうにふん。にじゅうねんめの、朝、しちじまで、あと、はっぷん。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "x1": {
+  "dur": 2.925,
+  "voice": "Schedar",
+  "text": "次回、最終話。おはよう。",
+  "model": "gemini-3.8-flash-tts"
+ }
+}
