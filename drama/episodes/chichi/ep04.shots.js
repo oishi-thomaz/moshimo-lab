@@ -54,6 +54,8 @@ const SHOTS = [
   { at: 'c6', draw(g, lt, D, S) { nat(g, lt, D, S, ['c6'], { eyes: 'normal', brow: 0.5 }); } },
   { at: 'c7', finish: { vignette: 0.65 }, draw(g, lt, D, S) { kaz(g, lt, D, S, ['c7'], { eyes: 'narrow', brow: -0.5, mouth: 'line', look: 0.9, z0: 1.04, z1: 1.1 }); } },
 
+  { at: 'd0', finish: { vignette: 0.65 }, draw(g, lt, D) { kroom(g, lt, D, { x: 380, y: 900, z0: 1.3, z1: 1.6, set: { dawn: 0.35 } }); subBand(g, 0.8); } },
+
   // ── 4. リョウ
   { at: 'creak', finish: { vignette: 0.65 }, draw(g, lt, D) { kroom(g, lt, D, { x: 540, y: 960, z0: 1.0, z1: 1.04, set: { dawn: 0.35 }, draw: g2 => figure(g2, P.ryo, { x: 220, y: 1700, s: 1.35, eyes: 'wide', mouth: 'open', lightFrom: 'right', alpha: inv(0.1, 0.6, lt) }) }); } },
   { at: 'd1', finish: { vignette: 0.65 }, draw(g, lt, D, S) { ryo(g, lt, D, S, ['d1'], { eyes: 'wide', brow: -0.5, mouth: 'open' }); } },
@@ -96,6 +98,7 @@ const SFX = [
   { at: 'c2', type: 'hit', vol: 0.9 },
   { at: 'c3', type: 'heartbeat', dur: 2.5, vol: 0.6 },
   { at: 'c5', type: 'rustle', vol: 0.4 },
+  { at: 'd0', type: 'stab', vol: 0.4 },
   { at: 'creak', type: 'creak', vol: 0.7 },
   { at: 'd1', type: 'stab', vol: 0.6 },
   { at: 'd5', type: 'hit', vol: 0.7 },
@@ -119,6 +122,7 @@ const MUSIC = [
   { at: 'a1', mood: 'uneasy' },
   { at: 'c1', mood: 'suspense' },
   { at: 'c2', mood: 'tension' },
+  { at: 'd0', mood: 'suspense' },
   { at: 'creak', mood: 'silence' },
   { at: 'd3', mood: 'tension' },
   { at: 'play', mood: 'silence' },
