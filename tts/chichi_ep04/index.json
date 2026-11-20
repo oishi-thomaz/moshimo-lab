@@ -156,9 +156,9 @@
   "model": "gemini-3.8-flash-tts"
  },
  "e4": {
-  "dur": 2.177,
+  "dur": 3.705,
   "voice": "Vindemiatrix",
-  "text": "ちがう…。あなたじゃない。",
+  "text": "ちがう。…あなたじゃ、ない。",
   "model": "gemini-3.8-flash-tts"
  },
  "e5": {
@@ -174,9 +174,9 @@
   "model": "gemini-3.8-flash-tts"
  },
  "f2": {
-  "dur": 4.021,
+  "dur": 2.997,
   "voice": "Laomedeia",
-  "text": "井上さん、おかあさまが、おへやに、いらっしゃらないんです。",
+  "text": "いのうえ、さん。おかあさまが、おへやに、いらっしゃらないんです。",
   "model": "gemini-3.8-flash-tts"
  },
  "f3": {
