@@ -57,6 +57,8 @@ const SHOTS = [
   { at: 'b4', draw(g, lt, D) { bg(g, '#1c1a16', '#0e0d0b'); photo(g, 540, 600, 640, 520, carPhoto2, { rot: 0.02 }); } },
   { at: 'b5', finish: { vignette: 0.65 }, draw(g, lt, D, S) { nat(g, lt, D, S, [], { eyes: 'normal', brow: -0.5, mouth: 'line', lookY: 0.5 }); } },
 
+  { at: 'b6', finish: { vignette: 0.65 }, draw(g, lt, D) { g.save(); cam(g, { x: 260, y: 1420, z: slow(lt, D, 1.8, 2.1) }); crossing(g, { t: lt, dawn: DAWN, signal: 'red', flowers: 1 }); g.restore(); mood(g, { desat: 0.3 }); subBand(g, 0.8); } },
+
   // ── 3. 7時
   { at: 'seven', finish: { vignette: 0.6 }, draw(g, lt, D) { const sh = noise1(lt * 40, 3) * 8; g.save(); g.translate(sh, 0); lockS(g, lt, D, { date: '12月7日 月曜日', notifs: [{ t: 0.1, body: 'おはよう、あなた。', time: '7:00' }] }); g.restore(); } },
   { at: 'c1', finish: { vignette: 0.6 }, draw(g, lt, D) { lockS(g, lt, D, { date: '12月7日 月曜日', notifs: [{ t: -1, body: 'おはよう、あなた。', time: '7:00' }], z0: 1.0, z1: 1.06 }); } },
@@ -99,6 +101,7 @@ const SFX = [
   { at: 'b1:end', type: 'hit', vol: 0.9 },
   { at: 'b2', type: 'carstop', vol: 0.5 },
   { at: 'b5', type: 'riser', vol: 0.4 },
+  { at: 'b6', type: 'stab', vol: 0.4 },
   { at: 'seven', type: 'vibrate', dur: 0.9, vol: 0.7 },
   { at: 'seven', off: 0.1, type: 'notif', vol: 0.8 },
   { at: 'c2', type: 'ticks', dur: 3, vol: 0.4 },
@@ -123,6 +126,7 @@ const MUSIC = [
   { at: 'a1', mood: 'tension' },
   { at: 'b1', mood: 'silence' },
   { at: 'b2', mood: 'uneasy' },
+  { at: 'b6', mood: 'suspense' },
   { at: 'seven', mood: 'silence' },
   { at: 'c3', mood: 'suspense' },
   { at: 'c7', mood: 'calm' },
