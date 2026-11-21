@@ -60,6 +60,7 @@ const SHOTS = [
   { at: 'b6', finish: { vignette: 0.65 }, draw(g, lt, D) { g.save(); cam(g, { x: 260, y: 1420, z: slow(lt, D, 1.8, 2.1) }); crossing(g, { t: lt, dawn: DAWN, signal: 'red', flowers: 1 }); g.restore(); mood(g, { desat: 0.3 }); subBand(g, 0.8); } },
 
   // ── 3. 7時
+  { at: 'b7', finish: { vignette: 0.6 }, draw(g, lt, D) { lockS(g, lt, D, { date: '12月7日 月曜日', clock: lt < D * 0.45 ? '6:59' : '7:00', notifs: [], z0: 1.0, z1: 1.05 }); } },
   { at: 'seven', finish: { vignette: 0.6 }, draw(g, lt, D) { const sh = noise1(lt * 40, 3) * 8; g.save(); g.translate(sh, 0); lockS(g, lt, D, { date: '12月7日 月曜日', notifs: [{ t: 0.1, body: 'おはよう、あなた。', time: '7:00' }] }); g.restore(); } },
   { at: 'c1', finish: { vignette: 0.6 }, draw(g, lt, D) { lockS(g, lt, D, { date: '12月7日 月曜日', notifs: [{ t: -1, body: 'おはよう、あなた。', time: '7:00' }], z0: 1.0, z1: 1.06 }); } },
   { at: 'c2', finish: { vignette: 0.55 }, draw(g, lt, D) { scene(g, lt, D, { x: 760, y: 1120, z0: 1.4, z1: 1.55, kaz: inv(0, 0.6, lt), signal: 'green' }); } },
@@ -102,6 +103,7 @@ const SFX = [
   { at: 'b2', type: 'carstop', vol: 0.5 },
   { at: 'b5', type: 'riser', vol: 0.4 },
   { at: 'b6', type: 'stab', vol: 0.4 },
+  { at: 'b7', type: 'clock', dur: 2, vol: 0.3 },
   { at: 'seven', type: 'vibrate', dur: 0.9, vol: 0.7 },
   { at: 'seven', off: 0.1, type: 'notif', vol: 0.8 },
   { at: 'c2', type: 'ticks', dur: 3, vol: 0.4 },
@@ -127,6 +129,7 @@ const MUSIC = [
   { at: 'b1', mood: 'silence' },
   { at: 'b2', mood: 'uneasy' },
   { at: 'b6', mood: 'suspense' },
+  { at: 'b7', mood: 'silence' },
   { at: 'seven', mood: 'silence' },
   { at: 'c3', mood: 'suspense' },
   { at: 'c7', mood: 'calm' },
