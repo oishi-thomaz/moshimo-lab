@@ -1,0 +1,194 @@
+{
+ "k1": {
+  "dur": 4.444,
+  "voice": "Aoede",
+  "text": "しんだ、ちちが、たおれた、こうさてん。あさ、ろくじ、ごじゅうはっぷん。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "k2": {
+  "dur": 4.079,
+  "voice": "Aoede",
+  "text": "くるまいすの、はは。そのうしろに、リョウ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "k3": {
+  "dur": 1.213,
+  "voice": "Aoede",
+  "text": "リョウくん、やめて！",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a1": {
+  "dur": 0.368,
+  "voice": "Puck",
+  "text": "くるな。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a3": {
+  "dur": 3.957,
+  "voice": "Vindemiatrix",
+  "text": "ナツキ、ちがうの。わたしが、このこに、たのんだの。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a4": {
+  "dur": 3.943,
+  "voice": "Puck",
+  "text": "しせつに行ったら、このひとが、げんかんで、まってた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a5": {
+  "dur": 6.591,
+  "voice": "Vindemiatrix",
+  "text": "にじゅうねんめの、きょうの、あさ、しちじに。ここで言うって、きめてたの。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b1": {
+  "dur": 5.094,
+  "voice": "Vindemiatrix",
+  "text": "あの朝、ハンドルを、にぎっていたのは、わたし。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b2": {
+  "dur": 5.412,
+  "voice": "Vindemiatrix",
+  "text": "あなたを、あされんに、送った、かえりだった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b3": {
+  "dur": 6.87,
+  "voice": "Vindemiatrix",
+  "text": "おとうさんは、おれがやったことにする、って。にじゅうねん、ひとりで。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b4": {
+  "dur": 4.24,
+  "voice": "Aoede",
+  "text": "くるまが、売られたのも。ははが、運転しなくなったのも。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b5": {
+  "dur": 3.966,
+  "voice": "Aoede",
+  "text": "そのこに、あわないで。ははは、しられるのが、こわかった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b6": {
+  "dur": 8.08,
+  "voice": "Aoede",
+  "text": "にじゅうねんまえ、このこうさてんで、ハンドルを、にぎっていた、はは。ちちは、その、みがわりだった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c2": {
+  "dur": 3.922,
+  "voice": "Aoede",
+  "text": "しちじ。おうだんほどうの、向こうに、カズミ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c3": {
+  "dur": 1.119,
+  "voice": "Erinome",
+  "text": "しってたわ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c4": {
+  "dur": 6.004,
+  "voice": "Erinome",
+  "text": "あの朝、まどから、見えたの。うんてんせきに、いたのは、おんなのひとだった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c5": {
+  "dur": 7.751,
+  "voice": "Erinome",
+  "text": "それでも、あのひとの、うそを、うけとって、おくさんが、来る日を、まってたの。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c6": {
+  "dur": 4.017,
+  "voice": "Aoede",
+  "text": "じゃあ…おはよう、あなた、って。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c7": {
+  "dur": 6.258,
+  "voice": "Erinome",
+  "text": "あの朝、わたしは、まどから、しゅじんに、おはようって、言うはずだった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c8": {
+  "dur": 5.515,
+  "voice": "Erinome",
+  "text": "あなたの、おとうさんは、それを、しゅじんの、かわりに、うけとる、って。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c9": {
+  "dur": 7.485,
+  "voice": "Aoede",
+  "text": "あなた、は、ちちじゃなかった。しんだ、シンイチさんだった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c10": {
+  "dur": 6.272,
+  "voice": "Aoede",
+  "text": "ちちは、にじゅうねん、まいあさ、ここで、その、おはようを、うけとっていた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c11": {
+  "dur": 6.285,
+  "voice": "Erinome",
+  "text": "しんだあとも、送ったのは、あなたたちを、ここへ、呼ぶためよ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d1": {
+  "dur": 3.931,
+  "voice": "Puck",
+  "text": "ゆるすかどうかは、まだ、わかんない。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d2": {
+  "dur": 9.158,
+  "voice": "Aoede",
+  "text": "ちちの、パスコードは、わたしの、たんじょうび。ちちは、さいごまで、わたしを、まもっていた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d3": {
+  "dur": 2.687,
+  "voice": "Aoede",
+  "text": "わたしは、はじめて、へんじを書いた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d4": {
+  "dur": 4.187,
+  "voice": "Aoede",
+  "text": "おはようございます。あしたも、まどを、あけておきます。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e1": {
+  "dur": 6.133,
+  "voice": "Aoede",
+  "text": "つぎの朝、しちじ。わたしの、スマホに、しらない、ばんごうから。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e2": {
+  "dur": 4.959,
+  "voice": "Aoede",
+  "text": "おはよう、ナツキ。あしたも、まどを、あけておいて。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e3": {
+  "dur": 4.057,
+  "voice": "Aoede",
+  "text": "むかいの窓で、だれかが、手をあげた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e4": {
+  "dur": 5.963,
+  "voice": "Aoede",
+  "text": "これは、ゆるし、なのか。それとも、ばつの、はじまりなのか。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "x1": {
+  "dur": 2.29,
+  "voice": "Schedar",
+  "text": "ちちのスマホ。かん。",
+  "model": "gemini-3.8-flash-tts"
+ }
+}
