@@ -18,7 +18,7 @@
   "model": "gemini-3.8-flash-tts"
  },
  "a1": {
-  "dur": 0.368,
+  "dur": 0.485,
   "voice": "Puck",
   "text": "くるな。",
   "model": "gemini-3.8-flash-tts"
@@ -66,9 +66,9 @@
   "model": "gemini-3.8-flash-tts"
  },
  "b5": {
-  "dur": 3.966,
+  "dur": 4.161,
   "voice": "Aoede",
-  "text": "そのこに、あわないで。ははは、しられるのが、こわかった。",
+  "text": "そのこに、あわないで。母は、しられるのが、こわかった。",
   "model": "gemini-3.8-flash-tts"
  },
  "b6": {
@@ -132,9 +132,9 @@
   "model": "gemini-3.8-flash-tts"
  },
  "c11": {
-  "dur": 6.285,
+  "dur": 5.573,
   "voice": "Erinome",
-  "text": "しんだあとも、送ったのは、あなたたちを、ここへ、呼ぶためよ。",
+  "text": "しんだあとも、おくったのは、あなたたちを、ここへ、呼ぶためよ。",
   "model": "gemini-3.8-flash-tts"
  },
  "d1": {
