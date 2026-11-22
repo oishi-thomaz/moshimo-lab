@@ -168,9 +168,9 @@
   "model": "gemini-3.8-flash-tts"
  },
  "e1": {
-  "dur": 6.35,
+  "dur": 7.457,
   "voice": "Alnilam",
-  "text": "ミラーのおくに、くろいワゴン。コンビニから、ずっと、うしろにいる。",
+  "text": "ミラーのおくに、くろい、ワゴン。コンビニから、ずっと、うしろにいる。",
   "model": "gemini-3.8-flash-tts"
  },
  "e2": {
@@ -186,9 +186,9 @@
   "model": "gemini-3.8-flash-tts"
  },
  "e4": {
-  "dur": 3.026,
+  "dur": 3.019,
   "voice": "Algenib",
-  "text": "うしろの女、どこで、おろす？",
+  "text": "うしろの、おんな。どこで、おろす？",
   "model": "gemini-3.8-flash-tts"
  },
  "e5": {
