@@ -1,0 +1,206 @@
+{
+ "k1": {
+  "dur": 5.719,
+  "voice": "Alnilam",
+  "text": "ドラレコの、しゃないカメラに、うしろの席の、女が、うつっている。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "k2": {
+  "dur": 1.886,
+  "voice": "Alnilam",
+  "text": "きゃくは、のせていない。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "k3": {
+  "dur": 5.36,
+  "voice": "Alnilam",
+  "text": "しんや、れいじ、よんじゅういっぷん。がめんの中にだけ、女がいる。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a1": {
+  "dur": 7.289,
+  "voice": "Alnilam",
+  "text": "おのでらショウジ、よんじゅうはっさい。よるだけ走る、タクシーの、うんてんしゅ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a2": {
+  "dur": 6.549,
+  "voice": "Alnilam",
+  "text": "じっぷんまえ、コンビニで、かんコーヒーを買った。くるまの鍵は、かけなかった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a3": {
+  "dur": 7.959,
+  "voice": "Alnilam",
+  "text": "カメラは、うしろの席を、ななめ上から、うつす。ふりかえっても、見えない場所がある。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a4": {
+  "dur": 2.607,
+  "voice": "Alnilam",
+  "text": "おんなは、あしもとに、ふせていた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a5": {
+  "dur": 2.54,
+  "voice": "Callirrhoe",
+  "text": "とまらないで。そのまま、まっすぐ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a6": {
+  "dur": 2.828,
+  "voice": "Alnilam",
+  "text": "おきゃくさん、こまります。おりてください。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a7": {
+  "dur": 5.64,
+  "voice": "Callirrhoe",
+  "text": "おのでら、ショウジさん。むすめさんは、マユちゃん。だいがく、にねん。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a8": {
+  "dur": 3.375,
+  "voice": "Alnilam",
+  "text": "じょうむいんしょうには、むすめの名前なんて、書いてない。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b1": {
+  "dur": 8.244,
+  "voice": "Callirrhoe",
+  "text": "いちねんまえの、こんや。れいじ、よんじゅういっぷん。このくるまに、わたしの、いもうとが乗った。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b2": {
+  "dur": 2.81,
+  "voice": "Callirrhoe",
+  "text": "しらいし、ハルナ。にじゅうろくさい。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b3": {
+  "dur": 3.466,
+  "voice": "Callirrhoe",
+  "text": "いもうとは、そのよるから、かえってこない。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b4": {
+  "dur": 3.752,
+  "voice": "Alnilam",
+  "text": "ミラーの中の目は、おれだけを、見ていた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b5": {
+  "dur": 4.527,
+  "voice": "Alnilam",
+  "text": "…おぼえてませんよ。まいばん、なんじゅうにんも、のせるんだ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b6": {
+  "dur": 4.218,
+  "voice": "Alnilam",
+  "text": "うそだった。おれは、ハルナを、おぼえている。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c0": {
+  "dur": 7.179,
+  "voice": "Alnilam",
+  "text": "まいしゅう、きんよう。れいじ、よんじゅういっぷん。はなやの前から乗る、じょうれんだった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c1": {
+  "dur": 3.902,
+  "voice": "Callirrhoe",
+  "text": "けいさつは、このくるまの、ドラレコを、見なかった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c2": {
+  "dur": 3.08,
+  "voice": "Callirrhoe",
+  "text": "かいしゃは、えいぞうは、もう消えたって。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c3": {
+  "dur": 3.014,
+  "voice": "Callirrhoe",
+  "text": "でも、あなたは、けしていない。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c4": {
+  "dur": 5.531,
+  "voice": "Alnilam",
+  "text": "みぎてが、サンバイザーの、うらに、のびかけて、とまった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c5": {
+  "dur": 4.177,
+  "voice": "Alnilam",
+  "text": "…なんの、はなしですか。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d1": {
+  "dur": 4.479,
+  "voice": "Orus",
+  "text": "ろくごうしゃ、ろくごうしゃ。うしろのおきゃくさん、そのまま、のせといて。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d2": {
+  "dur": 4.206,
+  "voice": "Alnilam",
+  "text": "メーターは、かいそうのまま。かいしゃは、きゃくがいることを、しらないはずだ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d3": {
+  "dur": 5.925,
+  "voice": "Alnilam",
+  "text": "みられている。このくるまの、なかが、どこかで。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d4": {
+  "dur": 2.503,
+  "voice": "Callirrhoe",
+  "text": "いもうとの、さいごの、ライン。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d5": {
+  "dur": 2.421,
+  "voice": "Callirrhoe",
+  "text": "むせんで、わたしのこと、はなしてる。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e1": {
+  "dur": 6.35,
+  "voice": "Alnilam",
+  "text": "ミラーのおくに、くろいワゴン。コンビニから、ずっと、うしろにいる。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e2": {
+  "dur": 3.217,
+  "voice": "Alnilam",
+  "text": "そのとき、おれのスマホが、ひかった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e3": {
+  "dur": 2.26,
+  "voice": "Algenib",
+  "text": "ひさしぶりだな、おのでらさん。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e4": {
+  "dur": 3.026,
+  "voice": "Algenib",
+  "text": "うしろの女、どこで、おろす？",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e5": {
+  "dur": 2.871,
+  "voice": "Alnilam",
+  "text": "いちねんまえと、おなじ、ばんごうだった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "x1": {
+  "dur": 1.817,
+  "voice": "Schedar",
+  "text": "じかい。かいそう。",
+  "model": "gemini-3.8-flash-tts"
+ }
+}
