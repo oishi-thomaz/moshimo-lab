@@ -24,7 +24,7 @@ const camSmall = (o = {}) => (g, w, h) => camView(g, 0, 0, w, h, { P, ...NOW, ..
 export function cover(g, lt = 9) {
   coverBase(g, lt, {
     no: 1, title: '後部座席',
-    back: g2 => { camView(g2, -333, 0, 1745, 1920, { t: 3, P, ...NOW, ...FLOOR, clock: '00:41:07' }); },
+    back: g2 => { camView(g2, -333, 0, 1745, 1920, { t: 3, P, ...FLOOR, date: '', clock: '', label: '', car: '' }); },
     face: g2 => { fillRR(g2, 70, 1290, 380, 70, 35, 'rgba(0,0,0,.6)'); circ(g2, 112, 1325, 14, D.rec); text(g2, 'REC  00:41', 140, 1327, { size: 40, color: '#fff', align: 'left', weight: 800 }); },
   });
 }
