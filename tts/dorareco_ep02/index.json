@@ -1,0 +1,224 @@
+{
+ "k1": {
+  "dur": 4.605,
+  "voice": "Alnilam",
+  "text": "かいそうの、タクシーに、のせていない、女が、のっている。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "k3": {
+  "dur": 2.887,
+  "voice": "Alnilam",
+  "text": "きゃくが、いることは、だれも、しらないはずだ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a2": {
+  "dur": 7.002,
+  "voice": "Alnilam",
+  "text": "うしろの女は、しらいし、ユキ。いちねんまえに、きえた、ハルナの、あね。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a3": {
+  "dur": 6.94,
+  "voice": "Alnilam",
+  "text": "れいじ、ごじゅうにふん。おれは、へんじを、しなかった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a4": {
+  "dur": 1.337,
+  "voice": "Callirrhoe",
+  "text": "いまの、だれから？",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a5": {
+  "dur": 0.74,
+  "voice": "Alnilam",
+  "text": "…かいしゃです。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a6": {
+  "dur": 3.939,
+  "voice": "Callirrhoe",
+  "text": "じゃあ、かいしゃに、きいて。いまの、むせんは、なにって。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b1": {
+  "dur": 5.035,
+  "voice": "Alnilam",
+  "text": "ろくごうしゃ、おのでらです。さっきの、むせん、なんですか。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b2": {
+  "dur": 4.939,
+  "voice": "Aoede",
+  "text": "むせん？　こんやは、ろくごうしゃに、いちども、いれてませんよ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b3": {
+  "dur": 4.486,
+  "voice": "Aoede",
+  "text": "おのでらさん、かいそうでしょう？　おきゃくさん、のってるんですか？",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b4": {
+  "dur": 4.093,
+  "voice": "Alnilam",
+  "text": "ミラーの中で、ユキが、くびを、よこに、ふった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b5": {
+  "dur": 1.135,
+  "voice": "Alnilam",
+  "text": "…いえ。だれも。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b6": {
+  "dur": 5.353,
+  "voice": "Alnilam",
+  "text": "かいしゃは、むせんを、いれていない。じゃあ、あのこえは、だれだ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b7": {
+  "dur": 4.304,
+  "voice": "Callirrhoe",
+  "text": "かいしゃの、むせんを、そとから、つかえるひとが、いる。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b8": {
+  "dur": 3.329,
+  "voice": "Callirrhoe",
+  "text": "いちねんまえの、よるも、いもうとは、おなじ、こえを、きいた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c1": {
+  "dur": 3.156,
+  "voice": "Callirrhoe",
+  "text": "あのよる、いもうとを、どこで、おろしたの？",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c2": {
+  "dur": 2.485,
+  "voice": "Alnilam",
+  "text": "…いつもの、いえの、まえです。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c3": {
+  "dur": 2.838,
+  "voice": "Callirrhoe",
+  "text": "さっき、みせたのは、さいごの、ラインじゃない。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c4": {
+  "dur": 3.215,
+  "voice": "Callirrhoe",
+  "text": "けいさつにも、みせてない、ほんとうの、さいご。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c5": {
+  "dur": 4.071,
+  "voice": "Callirrhoe",
+  "text": "うんてんしゅさんが、いつもと、ちがう、かどで、おろすって。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c6": {
+  "dur": 6.825,
+  "voice": "Alnilam",
+  "text": "ハルナは、しっていた。おれが、いつもの、かどで、おろさなかったことを。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c7": {
+  "dur": 5.918,
+  "voice": "Alnilam",
+  "text": "あのよる、おれは、いえの、てまえの、くらい、かどで、くるまを、とめた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c8": {
+  "dur": 0.796,
+  "voice": "Callirrhoe",
+  "text": "どうして？",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c9": {
+  "dur": 5.485,
+  "voice": "Alnilam",
+  "text": "…おきゃくさんが、そう、いったんです。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c10": {
+  "dur": 2.625,
+  "voice": "Alnilam",
+  "text": "それも、うそだった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d1": {
+  "dur": 4.235,
+  "voice": "Callirrhoe",
+  "text": "マユちゃんが、いま、どこにいるか、しってる？",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d2": {
+  "dur": 3.191,
+  "voice": "Leda",
+  "text": "もしもし、おとうさん？　どうしたの、こんなじかんに。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d3": {
+  "dur": 1.605,
+  "voice": "Alnilam",
+  "text": "マユ、いま、どこだ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d4": {
+  "dur": 5.462,
+  "voice": "Leda",
+  "text": "いえだよ。あ、そうだ。きょうね、おとうさんの、かいしゃのひとが、だいがくに、きたよ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d5": {
+  "dur": 3.891,
+  "voice": "Leda",
+  "text": "おとうさんの、よるのしごとのこと、よく、しってた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d7": {
+  "dur": 2.789,
+  "voice": "Leda",
+  "text": "くろい、くるまの、ひと。また、くるって。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d8": {
+  "dur": 3.434,
+  "voice": "Alnilam",
+  "text": "あのおとこは、もう、マユの、そばに、いる。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e1": {
+  "dur": 3.608,
+  "voice": "Alnilam",
+  "text": "みぎの、しゃせんに、くろい、ワゴンが、ならんだ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e2": {
+  "dur": 2.937,
+  "voice": "Alnilam",
+  "text": "ゆっくりと、まどが、おりる。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e3": {
+  "dur": 3.178,
+  "voice": "Alnilam",
+  "text": "おとこが、かざした、スマホに、うつっていたのは。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e4": {
+  "dur": 3.353,
+  "voice": "Alnilam",
+  "text": "いまの、このくるまの、うしろの、せきだった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "x1": {
+  "dur": 1.893,
+  "voice": "Schedar",
+  "text": "じかい。きんようび。",
+  "model": "gemini-3.8-flash-tts"
+ }
+}
