@@ -330,3 +330,49 @@ export function lockD(g, { t = 0, date = '12月12日 土曜日', clock = '0:44',
   }
   if (notifs.length) glow(g, 540, 720, 700, 'rgba(255,200,200,1)', 0.1);
 }
+
+// ---------- 第2話〜 ----------
+// 運転席の窓の外、右の車線に並んだ黒いワゴン（横から）。down 0..1＝ワゴンの窓が下りる、raise 0..1＝男がスマホをかざす、
+// screen(g,w,h)＝男のスマホの中身。男の顔は影だけ（スマホの光で、あごと手だけが見える）。全部 字幕（y=1262）より上
+export function wagonSide(g, { t = 0, down = 0, raise = 0, screen = null } = {}) {
+  vgrad(g, -300, -300, W + 600, H + 600, [[0, '#04060c'], [1, '#0b0d14']]);
+  // 外の夜（流れるナトリウム灯）
+  g.save(); rr(g, 60, 150, 960, 1000, 50); g.clip();
+  vgrad(g, 0, 150, W, 1000, [[0, '#070a14'], [1, '#141016']]);
+  for (let i = 0; i < 5; i++) { const p = ((t * 0.35 + i / 5) % 1); g.save(); g.globalCompositeOperation = 'lighter'; glow(g, lerp(1300, -250, p), 230 + (i % 2) * 40, 200, 'rgba(255,170,80,1)', 0.55); g.restore(); }
+  // ワゴンの車体（少しゆれる）
+  const by = 330 + noise1(t * 0.9, 7) * 6;
+  fillRR(g, -80, by, 1240, 900, 60, '#15171d');
+  vgrad(g, -80, by, 1240, 160, [[0, 'rgba(255,170,90,.32)'], [1, 'rgba(0,0,0,0)']]);
+  // 車体に流れる街灯の映りこみ
+  for (let i = 0; i < 3; i++) { const p = ((t * 0.35 + i / 3) % 1); g.save(); g.globalAlpha = 0.22 * Math.sin(p * Math.PI); g.globalCompositeOperation = 'lighter'; poly(g, [[lerp(1300, -300, p), by], [lerp(1400, -200, p), by], [lerp(1200, -400, p), by + 900], [lerp(1100, -500, p), by + 900]], 'rgba(255,170,90,1)'); g.restore(); }
+  line(g, -80, by + 640, 1160, by + 640, 6, '#2a2c34', 'butt');
+  fillRR(g, 820, by + 600, 110, 26, 12, '#3a3c44'); // ドアの取っ手
+  g.lineWidth = 5; g.strokeStyle = '#262830'; g.beginPath(); g.moveTo(80, by + 40); g.lineTo(80, by + 900); g.stroke();
+  // ワゴンの窓（スモーク）。下りると中の暗がり
+  const wx = 150, wy = by + 70, ww = 780, wh = 460;
+  fillRR(g, wx - 14, wy - 14, ww + 28, wh + 28, 36, '#25272e'); fillRR(g, wx, wy, ww, wh, 30, '#030305');
+  g.save(); rr(g, wx, wy, ww, wh, 30); g.clip();
+  // 中の男（影だけ）
+  const hx = wx + ww * 0.56, hy = wy + wh * 0.42;
+  ell(g, hx, hy + 330, 300, 220, '#07070a'); ell(g, hx, hy, 105, 125, '#09090c');
+  g.save(); g.lineWidth = 5; g.strokeStyle = 'rgba(255,170,90,.35)'; g.beginPath(); g.ellipse(hx, hy, 105, 125, 0, -2.6, -0.9); g.stroke(); g.beginPath(); g.ellipse(hx, hy + 330, 300, 220, 0, -2.4, -1.6); g.stroke(); g.restore();
+  // スマホ（かざす）
+  const k = easeOut(clamp(raise)), px = lerp(hx + 40, wx + ww * 0.3, k), py = lerp(wy + wh + 200, wy + wh * 0.18, k), pw = 250, ph = 440;
+  if (raise > 0) {
+    g.save(); g.globalCompositeOperation = 'lighter'; glow(g, px + pw / 2, py + ph / 2, 420, 'rgba(160,190,230,1)', 0.28 * k); g.restore();
+    // スマホの光があごと手に当たる
+    g.save(); g.globalAlpha = 0.5 * k; ell(g, hx - 20, hy + 90, 70, 34, 'rgba(120,140,170,.6)'); g.restore();
+    fillRR(g, px - 12, py - 12, pw + 24, ph + 24, 30, '#08090c');
+    g.save(); rr(g, px, py, pw, ph, 20); g.clip(); g.translate(px, py); if (screen) screen(g, pw, ph); else { g.fillStyle = '#9fb4d8'; g.fillRect(0, 0, pw, ph); } g.restore();
+  }
+  g.restore();
+  // スモークガラス（上から down の分だけ下がる）
+  const gh = wh * (1 - ease(clamp(down)));
+  if (gh > 0) { g.save(); rr(g, wx, wy, ww, wh, 30); g.clip(); vgrad(g, wx, wy + wh - gh, ww, gh, [[0, '#1c1f28'], [1, '#0e1016']]); for (let i = 0; i < 3; i++) { const p = ((t * 0.35 + i / 3) % 1); g.save(); g.globalCompositeOperation = 'lighter'; glow(g, lerp(1100, -100, p), wy + wh * 0.4, 160, 'rgba(255,170,80,1)', 0.3); g.restore(); } g.globalAlpha = 0.12; poly(g, [[wx + 60, wy + wh - gh], [wx + 240, wy + wh - gh], [wx + 120, wy + wh], [wx - 60, wy + wh]], '#fff'); g.restore(); line(g, wx + 10, wy + wh - gh, wx + ww - 10, wy + wh - gh, 6, '#2a2c34', 'butt'); }
+  g.restore();
+  // こちらの窓枠（運転席の内側）
+  g.lineWidth = 50; g.strokeStyle = D.cab; rr(g, 35, 125, 1010, 1050, 70); g.stroke();
+  fillRR(g, -300, 1170, W + 600, 1100, 0, '#08090c');
+  vgrad(g, -300, 1100, W + 600, 160, [[0, 'rgba(8,9,12,0)'], [1, 'rgba(8,9,12,1)']]);
+}

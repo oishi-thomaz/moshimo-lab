@@ -11,6 +11,7 @@ export const P = {
   shoji: { hair: 'parted', hairC: '#3a3632', top: '#26324a', top2: '#1e283c', bottom: '#2a2e38', shoes: '#111', tall: 1.0 },
   yuki: { hair: 'long2', hairC: '#1c1618', top: '#2e2a2e', top2: '#242026', bottom: '#2a2a30', shoes: '#ddd', tall: 0.95, female: true },
   haruna: { hair: 'bob2', hairC: '#4a3226', top: '#d9c8b4', top2: '#c4b29c', bottom: '#4a4a58', shoes: '#ddd', tall: 0.93, female: true },
+  mayu: { hair: 'pony', hairC: '#2e2220', top: '#c9a0ae', top2: '#b08896', bottom: '#3a3e4c', shoes: '#eee', tall: 0.92, female: true, cheek: 0.3 },
 };
 
 export const talking = (lt, S, ids) => { for (const id of ids) { const a = S.L(id), b = S.Le(id); if (lt >= a && lt <= b) return 0.3 + 0.7 * Math.abs(Math.sin((lt - a) * 13)); } return 0; };
