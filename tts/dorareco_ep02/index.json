@@ -1,6 +1,6 @@
 {
  "k1": {
-  "dur": 4.605,
+  "dur": 4.42,
   "voice": "Alnilam",
   "text": "かいそうの、タクシーに、のせていない、女が、のっている。",
   "model": "gemini-3.8-flash-tts"
@@ -66,9 +66,9 @@
   "model": "gemini-3.8-flash-tts"
  },
  "b5": {
-  "dur": 1.135,
+  "dur": 2.323,
   "voice": "Alnilam",
-  "text": "…いえ。だれも。",
+  "text": "いえ。だれも。",
   "model": "gemini-3.8-flash-tts"
  },
  "b6": {
@@ -114,7 +114,7 @@
   "model": "gemini-3.8-flash-tts"
  },
  "c5": {
-  "dur": 4.071,
+  "dur": 3.784,
   "voice": "Callirrhoe",
   "text": "うんてんしゅさんが、いつもと、ちがう、かどで、おろすって。",
   "model": "gemini-3.8-flash-tts"
@@ -186,7 +186,7 @@
   "model": "gemini-3.8-flash-tts"
  },
  "d8": {
-  "dur": 3.434,
+  "dur": 2.991,
   "voice": "Alnilam",
   "text": "あのおとこは、もう、マユの、そばに、いる。",
   "model": "gemini-3.8-flash-tts"
