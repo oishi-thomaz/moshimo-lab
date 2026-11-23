@@ -11,6 +11,7 @@ export const VOICES = {
   YU: { name: 'ユキ', voice: 'Callirrhoe', style: STD + '31歳の女性。タクシーの後ろの席から、運転手に静かに話す。落ち着いているが、何かを決めている声。' + PACE, model: m },
   HR: { name: 'ハルナ', voice: 'Kore', style: STD + '26歳の女性。やわらかく、少しおびえた声。' + PACE, model: m },
   MY: { name: 'マユ', voice: 'Leda', style: STD + '19歳の女性。大学生。父親に電話で話す、明るい声。' + PACE, model: m, fx: 'phone' },
+  TB: { name: '夜間当番', voice: 'Aoede', style: STD + '50代の女性。タクシー会社の夜間の当番。電話で、少し眠そうに、事務的に話す。' + PACE, model: m, fx: 'phone' },
   RD: { name: '無線', voice: 'Orus', style: STD + '50代の男性。タクシー会社の配車無線。事務的で、平坦で、感情のない話し方。' + PACE, model: m, fx: 'phone' },
   HB: { name: '灰原', voice: 'Algenib', style: STD + '40代の男性。低く、ゆっくり、親しげだが冷たい声。' + PACE, model: m, fx: 'msg' },
   X: { name: '', voice: 'Schedar', style: STD + '感情のない機械の読み上げ音声のように、平坦に、一定の速さで淡々と読む。', model: m, fx: 'robot' },
