@@ -1,0 +1,200 @@
+{
+ "k1": {
+  "dur": 4.612,
+  "voice": "Alnilam",
+  "text": "いちねんまえに、きえた、おんなが、ドラレコの、なかで、はなしている。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "k2": {
+  "dur": 3.282,
+  "voice": "Kore",
+  "text": "うんてんしゅさん。つけてくるひとが、いるんです。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "k3": {
+  "dur": 2.991,
+  "voice": "Alnilam",
+  "text": "おれが、いちねんかん、かくしていた、えいぞうだ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a3": {
+  "dur": 4.929,
+  "voice": "Alnilam",
+  "text": "いちじ、にじゅっぷん。くろい、ワゴンは、さきの、しんごうで、きえた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a4": {
+  "dur": 3.72,
+  "voice": "Callirrhoe",
+  "text": "あのおとこの、スマホに、いまの、わたしが、うつってた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a5": {
+  "dur": 3.988,
+  "voice": "Callirrhoe",
+  "text": "このくるまは、ずっと、みられてる。もう、かくしても、むだ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a6": {
+  "dur": 4.563,
+  "voice": "Alnilam",
+  "text": "みぎてが、サンバイザーの、うらに、のびた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a7": {
+  "dur": 3.167,
+  "voice": "Alnilam",
+  "text": "いちねんかん、すてられなかった、もの。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a8": {
+  "dur": 3.036,
+  "voice": "Alnilam",
+  "text": "あのよるの、ドラレコの、エスディーカード。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a9": {
+  "dur": 5.548,
+  "voice": "Callirrhoe",
+  "text": "かいしゃの、えいぞうは、きえた。でも、あなたが、ぬいて、もっていた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b1": {
+  "dur": 8.552,
+  "voice": "Alnilam",
+  "text": "にせんにじゅうごねん、じゅうにがつ、いつか。きんよう。れいじ、よんじゅういっぷんの、ファイル。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b2": {
+  "dur": 3.676,
+  "voice": "Kore",
+  "text": "こんばんは。きょうも、いつもの、いえの、まえまで。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b3": {
+  "dur": 2.814,
+  "voice": "Kore",
+  "text": "わたし、らいしゅう、ひっこすんです。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b4": {
+  "dur": 4.532,
+  "voice": "Kore",
+  "text": "きんようの、よるだけ、おなじ、くるまが、ついてくるんです。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b5": {
+  "dur": 3.126,
+  "voice": "Callirrhoe",
+  "text": "いもうとは、あなたにだけ、はなしてた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b6": {
+  "dur": 3.183,
+  "voice": "Alnilam",
+  "text": "がめんの、なかで、おれの、スマホが、なった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b7": {
+  "dur": 5.345,
+  "voice": "Alnilam",
+  "text": "ちゃくしんの、なまえを、おれは、おぼえている。はいばら。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b8": {
+  "dur": 2.676,
+  "voice": "Alnilam",
+  "text": "おれは、あのおとこを、しっていた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c1": {
+  "dur": 3.202,
+  "voice": "Alnilam",
+  "text": "しっていて、おれは、にかいめの、コールで、でた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c2": {
+  "dur": 2.328,
+  "voice": "Alnilam",
+  "text": "…はい。いつもの、かどで。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c3": {
+  "dur": 1.021,
+  "voice": "Callirrhoe",
+  "text": "いつもの、かど？",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c4": {
+  "dur": 3.957,
+  "voice": "Kore",
+  "text": "あれ？　うんてんしゅさん、ここ、まだ、いえの、てまえですよ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c5": {
+  "dur": 3.152,
+  "voice": "Alnilam",
+  "text": "…すみません。このさき、こうじで。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c6": {
+  "dur": 6.36,
+  "voice": "Alnilam",
+  "text": "ハルナが、おりた。かどの、くらがりで、ヘッドライトが、ついた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c7": {
+  "dur": 3.899,
+  "voice": "Alnilam",
+  "text": "とまっていたのは、くろい、ワゴンだった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c8": {
+  "dur": 6.17,
+  "voice": "Alnilam",
+  "text": "えいぞうは、そこで、おわる。おれが、とめたからだ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d1": {
+  "dur": 5.114,
+  "voice": "Callirrhoe",
+  "text": "どうして、あのおとこの、なまえが、あなたの、スマホに、はいってるの？",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d2": {
+  "dur": 5.255,
+  "voice": "Alnilam",
+  "text": "こたえられなかった。こたえれば、ぜんぶ、はなすことになる。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d3": {
+  "dur": 3.71,
+  "voice": "Algenib",
+  "text": "そのカード、まだ、もってたのか。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d4": {
+  "dur": 3.364,
+  "voice": "Alnilam",
+  "text": "カメラの、むこうで、あのおとこが、みている。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e1": {
+  "dur": 0.689,
+  "voice": "Callirrhoe",
+  "text": "おのでらさん。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e2": {
+  "dur": 5.535,
+  "voice": "Callirrhoe",
+  "text": "あなた、いもうとを、あのおとこに、うったの？",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "x1": {
+  "dur": 1.885,
+  "voice": "Schedar",
+  "text": "じかい。かいて。",
+  "model": "gemini-3.8-flash-tts"
+ }
+}
