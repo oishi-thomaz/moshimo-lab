@@ -6,7 +6,7 @@
   "model": "gemini-3.8-flash-tts"
  },
  "k2": {
-  "dur": 3.282,
+  "dur": 4.179,
   "voice": "Kore",
   "text": "うんてんしゅさん。つけてくるひとが、いるんです。",
   "model": "gemini-3.8-flash-tts"
@@ -114,15 +114,15 @@
   "model": "gemini-3.8-flash-tts"
  },
  "c2": {
-  "dur": 2.328,
+  "dur": 2.009,
   "voice": "Alnilam",
-  "text": "…はい。いつもの、かどで。",
+  "text": "…はい。いつもの、まがりかどで。",
   "model": "gemini-3.8-flash-tts"
  },
  "c3": {
-  "dur": 1.021,
+  "dur": 0.786,
   "voice": "Callirrhoe",
-  "text": "いつもの、かど？",
+  "text": "まがりかど？",
   "model": "gemini-3.8-flash-tts"
  },
  "c4": {
@@ -192,7 +192,7 @@
   "model": "gemini-3.8-flash-tts"
  },
  "x1": {
-  "dur": 1.885,
+  "dur": 1.812,
   "voice": "Schedar",
   "text": "じかい。かいて。",
   "model": "gemini-3.8-flash-tts"
