@@ -376,3 +376,75 @@ export function wagonSide(g, { t = 0, down = 0, raise = 0, screen = null } = {})
   fillRR(g, -300, 1170, W + 600, 1100, 0, '#08090c');
   vgrad(g, -300, 1100, W + 600, 160, [[0, 'rgba(8,9,12,0)'], [1, 'rgba(8,9,12,1)']]);
 }
+
+// ---------- 第3話〜 ----------
+// SDカード（指先でつまむ）。x,y＝カードの中心、s＝大きさ、label＝手書きのラベル
+export function sdCard(g, x, y, s = 1, { rot = -0.12, label = '12/5', hand = 1 } = {}) {
+  g.save(); g.translate(x, y); g.rotate(rot); g.scale(s, s);
+  g.save(); g.shadowColor = 'rgba(0,0,0,.7)'; g.shadowBlur = 40; g.shadowOffsetY = 18;
+  poly(g, [[-120, -160], [80, -160], [120, -120], [120, 160], [-120, 160]], '#1d2c58'); g.restore();
+  poly(g, [[-120, -160], [80, -160], [120, -120], [120, 160], [-120, 160]], '#1d2c58');
+  for (let i = 0; i < 8; i++) fillRR(g, -100 + i * 25, -150, 16, 46, 3, '#d9b860');
+  fillRR(g, -96, -70, 192, 120, 8, '#e9ecf2'); text(g, 'SD', -30, -14, { size: 70, color: '#1d2c58', weight: 900 }); text(g, '32GB', 52, 20, { size: 30, color: '#1d2c58', weight: 800 });
+  // 手書きのラベル（マスキングテープ）
+  fillRR(g, -104, 74, 208, 66, 4, '#e8dcb8'); text(g, label, 0, 108, { size: 44, color: '#2a2218', weight: 700, font: SERIF });
+  g.restore();
+  if (hand) {
+    g.save(); g.translate(x, y); g.rotate(rot);
+    ell(g, -40, 250 * s, 120 * s, 70 * s, C.skin, 0.2); ell(g, 60 * s, 200 * s, 60 * s, 40 * s, C.skin, -0.5);
+    line(g, -150 * s, 420 * s, -60 * s, 270 * s, 150 * s, '#1e2a40');
+    g.restore();
+  }
+}
+// ドラレコの前のカメラ（フロントガラスの向こうの道）。白黒の録画の画面
+// lights 0..1＝角の暗がりで黒いワゴンのヘッドライトがつく、walk 0..1＝降りた女が角のほうへ歩く（後ろ姿の影）、stop 0..1＝車が止まる
+export function frontCam(g, x, y, w, h, { t = 0, lights = 0, walk = 0, stop = 1, date = '2025/12/05', clock = '00:53:41', label = 'CAM1 前方', car = '6号車', rec = 1 } = {}) {
+  g.save(); rr(g, x, y, w, h, 6); g.clip(); g.translate(x, y);
+  const s = w / 1000; g.save(); g.scale(s, h / 1100);
+  vgrad(g, 0, 0, 1000, 1100, [[0, '#08090b'], [0.5, '#16181b'], [1, '#2a2c2e']]);
+  const hz = 470;
+  // 住宅の黒い影と、ぽつんと街灯
+  for (let i = 0; i < 6; i++) { const bx = i < 3 ? i * 120 - 40 : 640 + (i - 3) * 130, bh = 120 + ((i * 37) % 80); fillRR(g, bx, hz - bh, 140, bh, 2, '#0b0c0e'); if (i % 2) fillRR(g, bx + 40, hz - bh + 30, 24, 20, 2, 'rgba(255,220,160,.35)'); }
+  line(g, 300, 120, 300, hz + 20, 8, '#050506', 'butt'); g.save(); g.globalCompositeOperation = 'lighter'; glow(g, 300, 130, 220, 'rgba(255,240,220,1)', 0.35); g.restore();
+  // 道（奥で左に曲がる角）
+  poly(g, [[-100, 1100], [1100, 1100], [600, hz], [420, hz]], '#1c1d20');
+  poly(g, [[420, hz], [600, hz], [560, hz - 30], [180, hz - 30]], '#18191c');
+  for (let i = 0; i < 5; i++) { const k = (i / 5); const yy = lerp(hz + 10, 1100, k * k), wv = lerp(4, 40, k * k), hh = lerp(8, 120, k * k); fillRR(g, 510 - wv / 2, yy, wv, hh, 3, 'rgba(230,230,230,.5)'); }
+  // ヘッドライトが道を照らす
+  const lt = clamp(lights);
+  if (lt > 0) { g.save(); g.globalAlpha = lt * 0.5; poly(g, [[440, hz - 10], [640, hz - 10], [1000, 1100], [0, 1100]], 'rgba(255,250,230,.5)'); g.restore(); }
+  // 角の暗がりに黒いワゴン（こちら向き）
+  g.save(); g.globalAlpha = 0.35 + 0.65 * lt; wagonFront(g, 470, hz - 20, 0.42, { lights: lt, t }); g.restore();
+  // 降りた女の後ろ姿（ヘッドライトの中で影になる）
+  if (walk > 0) {
+    const k = ease(clamp(walk)), fx = lerp(560, 500, k), fy = lerp(900, 620, k), sc = lerp(1, 0.55, k);
+    g.save(); g.translate(fx, fy); g.scale(sc, sc);
+    fillRR(g, -50, -230, 100, 230, 40, '#050506'); circ(g, 0, -270, 46, '#050506'); fillRR(g, -40, -10, 30, 150, 12, '#050506'); fillRR(g, 10, -10, 30, 150, 12, '#050506');
+    if (lt > 0) { g.save(); g.globalAlpha = lt * 0.6; g.lineWidth = 6; g.strokeStyle = 'rgba(255,250,230,1)'; g.beginPath(); g.arc(0, -270, 48, -2.8, -0.3); g.stroke(); g.restore(); }
+    g.restore();
+  }
+  // ボンネットの先（手前）
+  vgrad(g, 0, 980, 1000, 120, [[0, 'rgba(10,11,13,0)'], [1, 'rgba(10,11,13,1)']]);
+  g.restore();
+  // 白黒・周辺減光・走査線・ノイズ（車内カメラと同じ）
+  g.save(); g.globalCompositeOperation = 'saturation'; g.fillStyle = '#808080'; g.fillRect(0, 0, w, h); g.restore();
+  g.save(); g.globalCompositeOperation = 'multiply'; g.fillStyle = '#b8c8d0'; g.fillRect(0, 0, w, h); g.restore();
+  g.save(); g.globalCompositeOperation = 'screen'; g.fillStyle = 'rgba(40,60,70,.35)'; g.fillRect(0, 0, w, h); g.restore();
+  const gr = g.createRadialGradient(w / 2, h / 2, Math.min(w, h) * 0.32, w / 2, h / 2, Math.max(w, h) * 0.72); gr.addColorStop(0, 'rgba(0,0,0,0)'); gr.addColorStop(1, 'rgba(0,0,0,.85)'); g.fillStyle = gr; g.fillRect(0, 0, w, h);
+  g.save(); g.globalAlpha = 0.12; for (let yy = 0; yy < h; yy += 6 * s + 2) { g.fillStyle = '#000'; g.fillRect(0, yy, w, 2); } g.restore();
+  const R = rng(3 + Math.floor(t * 24)); g.save(); g.globalAlpha = 0.18; for (let i = 0; i < 260; i++) { g.fillStyle = R() < 0.5 ? '#fff' : '#000'; g.fillRect(R() * w, R() * h, 3 * s + 1, 3 * s + 1); } g.restore();
+  const fs = Math.max(18, 40 * s);
+  if (rec && Math.sin(t * 5) > -0.3) { circ(g, 46 * s + 8, 50 * s + 6, 15 * s + 3, D.rec); g.save(); g.globalCompositeOperation = 'lighter'; glow(g, 46 * s + 8, 50 * s + 6, 60 * s + 10, 'rgba(255,60,60,1)', 0.6); g.restore(); }
+  text(g, 'REC', 80 * s + 14, 52 * s + 6, { size: fs, color: '#fff', align: 'left', weight: 800, stroke: '#000', sw: 4 });
+  text(g, `${date}  ${clock}`, w - 30 * s - 6, 52 * s + 6, { size: fs * 0.9, color: '#f4f6f8', align: 'right', weight: 700, stroke: '#000', sw: 4 });
+  text(g, label, 30 * s + 6, h - 40 * s - 6, { size: fs * 0.75, color: '#e4e8ea', align: 'left', weight: 700, stroke: '#000', sw: 4 });
+  text(g, `${car}  ${stop >= 1 ? '0' : Math.round(lerp(18, 0, clamp(stop)))} km/h`, w - 30 * s - 6, h - 40 * s - 6, { size: fs * 0.75, color: '#e4e8ea', align: 'right', weight: 700, stroke: '#000', sw: 4 });
+  g.restore();
+}
+// 再生中の印（▶ PLAY と、下の再生バー）。録画の画面の上に重ねる
+export function playMark(g, x, y, w, h, { p = 0.3, label = '▶ 再生中　20251205_004107.MP4' } = {}) {
+  const y0 = y + h - h * 0.13;
+  fillRR(g, x, y0, w, h * 0.065, 0, 'rgba(0,0,0,.55)');
+  text(g, label, x + 24, y0 + h * 0.022, { size: Math.max(18, w * 0.026), color: '#fff', align: 'left', weight: 700 });
+  fillRR(g, x + 24, y0 + h * 0.045, w - 48, 8, 4, 'rgba(255,255,255,.25)'); fillRR(g, x + 24, y0 + h * 0.045, (w - 48) * clamp(p), 8, 4, D.rec);
+}
