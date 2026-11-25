@@ -1,0 +1,236 @@
+{
+ "k2": {
+  "dur": 2.984,
+  "voice": "Alnilam",
+  "text": "…うったのは、いもうとさん、だけじゃない。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "k3": {
+  "dur": 4.854,
+  "voice": "Alnilam",
+  "text": "このくるまの、うしろの、せきを、おれは、いっぽん、さんまんえんで、うっていた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a3": {
+  "dur": 5.635,
+  "voice": "Alnilam",
+  "text": "いちじ、ごじゅっぷん。おれは、みなとの、あきちに、くるまを、とめた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a4": {
+  "dur": 4.524,
+  "voice": "Alnilam",
+  "text": "にねんまえ。むすめの、がくひで、しゃっきんが、かえせなくなった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a5": {
+  "dur": 4.894,
+  "voice": "Alnilam",
+  "text": "そこへ、うわきちょうさの、たんていを、なのる、おとこから、でんわが、きた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a6": {
+  "dur": 5.192,
+  "voice": "Algenib",
+  "text": "しゃないカメラの、えいぞうを、いっぽん、さんまんえんで、かいたい。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a7": {
+  "dur": 5.314,
+  "voice": "Alnilam",
+  "text": "きゃくが、どこで、のり、どこで、おり、でんわで、なにを、はなしたか。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a8": {
+  "dur": 3.655,
+  "voice": "Alnilam",
+  "text": "おれは、なんじゅっぽんも、うった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a9": {
+  "dur": 3.494,
+  "voice": "Callirrhoe",
+  "text": "いもうとの、きんようびも、さんまんえん、だったの？",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a10": {
+  "dur": 0.726,
+  "voice": "Alnilam",
+  "text": "…まいしゅう、だ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a11": {
+  "dur": 4.58,
+  "voice": "Callirrhoe",
+  "text": "あのこは、あなたを、いいひとだって、いってた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b1": {
+  "dur": 5.531,
+  "voice": "Callirrhoe",
+  "text": "でも、こんや、あのおとこは、このくるまの、なかを、みてた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b2": {
+  "dur": 4.054,
+  "voice": "Alnilam",
+  "text": "かいしゃの、しゃないカメラは、はいしゃセンターにしか、うつらない。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b3": {
+  "dur": 7.115,
+  "voice": "Alnilam",
+  "text": "それを、そとから、みられるように、した、おとこが、かいしゃの、なかに、いる。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b4": {
+  "dur": 4.575,
+  "voice": "Orus",
+  "text": "ろくごうしゃ。いちじ、ごじゅっぷん。とまってるけど、どうした？",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b5": {
+  "dur": 3.245,
+  "voice": "Alnilam",
+  "text": "にねんかん、まいばん、きいてきた、こえだ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b6": {
+  "dur": 3.971,
+  "voice": "Alnilam",
+  "text": "はいばらに、おれを、しょうかいしたのも、このこえだった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b7": {
+  "dur": 4.238,
+  "voice": "Alnilam",
+  "text": "はいしゃセンターの、よるの、かかり。くぼさん。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b8": {
+  "dur": 4.583,
+  "voice": "Alnilam",
+  "text": "かいしゃの、カメラを、はいばらに、みせていたのは、くぼだった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c1": {
+  "dur": 4.345,
+  "voice": "Alnilam",
+  "text": "くぼの、こえだと、わかって、おれは、むせんの、マイクを、つかんだ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c2": {
+  "dur": 1.741,
+  "voice": "Callirrhoe",
+  "text": "でないで。むこうに、きづかれる。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c3": {
+  "dur": 3.677,
+  "voice": "Alnilam",
+  "text": "むせんの、あかい、ランプが、さんかい、ついて、きえた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d1": {
+  "dur": 2.618,
+  "voice": "Alnilam",
+  "text": "そのとき、ユキの、スマホが、なった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d2": {
+  "dur": 2.265,
+  "voice": "Callirrhoe",
+  "text": "…うん。いま、いっしょに、いる。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d3": {
+  "dur": 3.238,
+  "voice": "Callirrhoe",
+  "text": "おのでらさん。あなたと、はなしたいって。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d4": {
+  "dur": 2.735,
+  "voice": "Kore",
+  "text": "おのでらさん。おひさしぶりです。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d5": {
+  "dur": 4.995,
+  "voice": "Alnilam",
+  "text": "いちねんまえ、あの、まがりかどで、おろした、ハルナの、こえだった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d6": {
+  "dur": 4.888,
+  "voice": "Kore",
+  "text": "あのよる、ワゴンから、はしって、にげきったんです。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d7": {
+  "dur": 4.902,
+  "voice": "Kore",
+  "text": "それから、いちねん、だれにも、いわずに、かくれてました。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d8": {
+  "dur": 2.933,
+  "voice": "Callirrhoe",
+  "text": "こんやの、ことは、いもうとと、ふたりで、きめた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d9": {
+  "dur": 4.04,
+  "voice": "Callirrhoe",
+  "text": "あなたに、カードを、ださせて、あの、ふたりを、ひきずりだす。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d10": {
+  "dur": 4.939,
+  "voice": "Kore",
+  "text": "でも、おのでらさん。あのひとは、もう、つぎの、ひとを、みてる。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e1": {
+  "dur": 2.615,
+  "voice": "Alnilam",
+  "text": "マユからの、ラインだった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e2": {
+  "dur": 3.124,
+  "voice": "Leda",
+  "text": "おとうさんの、かいしゃの、くるまが、むかえに、きてくれたよ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e3": {
+  "dur": 3.253,
+  "voice": "Leda",
+  "text": "むかえの、ひと、おとうさんの、しりあい、なんだって。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e4": {
+  "dur": 6.444,
+  "voice": "Alnilam",
+  "text": "しゃしんの、ルームミラーに、うんてんせきの、おとこの、めが、うつっていた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e5": {
+  "dur": 2.651,
+  "voice": "Algenib",
+  "text": "むすめさん、いいこだな。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e6": {
+  "dur": 4.117,
+  "voice": "Alnilam",
+  "text": "ななごうしゃの、うんてんせきに、いるのは、はいばらだ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "x1": {
+  "dur": 3.028,
+  "voice": "Schedar",
+  "text": "じかい。さいしゅうわ。ドラレコ。",
+  "model": "gemini-3.8-flash-tts"
+ }
+}
