@@ -1,0 +1,230 @@
+{
+ "k1": {
+  "dur": 5.028,
+  "voice": "Alnilam",
+  "text": "しんや、いちじ、ごじゅうはっぷん。むすめが、のった、タクシーの、しゃないカメラ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "k2": {
+  "dur": 2.957,
+  "voice": "Leda",
+  "text": "うんてんしゅさん、みち、ちがいませんか？",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "k3": {
+  "dur": 4.228,
+  "voice": "Alnilam",
+  "text": "うんてんせきに、いるのは、むすめを、つけまわしている、おとこだ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a2": {
+  "dur": 7.318,
+  "voice": "Alnilam",
+  "text": "おれは、にねんかん、きゃくの、しゃないカメラの、えいぞうを、あのおとこに、うっていた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a3": {
+  "dur": 3.395,
+  "voice": "Alnilam",
+  "text": "ハルナが、かいしゃの、くぼの、アイディーを、おくってきた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a4": {
+  "dur": 5.685,
+  "voice": "Alnilam",
+  "text": "はいばらが、まいばん、みていた、がめんを、こんやは、おれが、みている。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a5": {
+  "dur": 2.458,
+  "voice": "Alnilam",
+  "text": "マユ、つぎの、しんごうで、おりろ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a6": {
+  "dur": 2.131,
+  "voice": "Leda",
+  "text": "あ、おとうさんから、でんわ…",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "a7": {
+  "dur": 0.911,
+  "voice": "Algenib",
+  "text": "でなくて、いいよ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b1": {
+  "dur": 4.986,
+  "voice": "Alnilam",
+  "text": "はいばらが、ゆっくり、しゃないカメラを、みあげた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b2": {
+  "dur": 2.313,
+  "voice": "Algenib",
+  "text": "みてるんだろ、おのでらさん。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b3": {
+  "dur": 5.923,
+  "voice": "Algenib",
+  "text": "いっぽん、さんまんえん。こんやのは、いくらで、かう？",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "b4": {
+  "dur": 5.052,
+  "voice": "Alnilam",
+  "text": "はいばらは、おれが、みている、ことを、さいしょから、しっていた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c1": {
+  "dur": 2.455,
+  "voice": "Callirrhoe",
+  "text": "みせたいなら、みせてやれば、いい。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c2": {
+  "dur": 3.549,
+  "voice": "Callirrhoe",
+  "text": "くぼの、アイディーなら、ぜんぶの、くるまの、モニターに、ながせる。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c3": {
+  "dur": 5.892,
+  "voice": "Alnilam",
+  "text": "おれは、じぶんの、しゃないカメラを、ぜんぶの、くるまと、けいさつに、ながした。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c4": {
+  "dur": 4.228,
+  "voice": "Alnilam",
+  "text": "みなとだいこうつう、ろくごうしゃ、おのでらです。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c5": {
+  "dur": 5.803,
+  "voice": "Alnilam",
+  "text": "おきゃくさんの、しゃないの、えいぞうを、いっぽん、さんまんえんで、うっていました。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c6": {
+  "dur": 6.203,
+  "voice": "Alnilam",
+  "text": "かっていたのは、はいばら。ながしていたのは、はいしゃセンターの、くぼ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "c7": {
+  "dur": 2.197,
+  "voice": "Alnilam",
+  "text": "うったのは、おれだ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d1": {
+  "dur": 3.346,
+  "voice": "Alnilam",
+  "text": "おれの、こえは、ななごうしゃの、スピーカーからも、ながれていた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d2": {
+  "dur": 0.844,
+  "voice": "Leda",
+  "text": "…おとうさん？",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d3": {
+  "dur": 1.854,
+  "voice": "Orus",
+  "text": "ろくごうしゃ！　いますぐ、とめろ！",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d4": {
+  "dur": 4.621,
+  "voice": "Alnilam",
+  "text": "ぜんぶの、くるまの、モニターに、おれの、かおが、うつっていた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d5": {
+  "dur": 4.006,
+  "voice": "Alnilam",
+  "text": "はいばらは、ななごうしゃを、こくどうの、かどで、とめた。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d6": {
+  "dur": 0.493,
+  "voice": "Algenib",
+  "text": "…おりろ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d7": {
+  "dur": 3.312,
+  "voice": "Alnilam",
+  "text": "マユは、ドアを、あけて、くらい、かどへ、はしった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d8": {
+  "dur": 1.803,
+  "voice": "Kore",
+  "text": "だいじょうぶ。こっち。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d9": {
+  "dur": 9.704,
+  "voice": "Alnilam",
+  "text": "マユを、うけとめたのは、いちねんまえ、おれが、あの、かどで、おろした、ハルナだった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "d10": {
+  "dur": 5.632,
+  "voice": "Callirrhoe",
+  "text": "あのよる、いもうとを、うけとめた、ひとは、だれも、いなかった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e1": {
+  "dur": 4.382,
+  "voice": "Alnilam",
+  "text": "よあけ。おれは、じぶんで、けいさつに、いった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e2": {
+  "dur": 2.912,
+  "voice": "Alnilam",
+  "text": "ハルナさんに、すみませんでした、と。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e3": {
+  "dur": 1.747,
+  "voice": "Callirrhoe",
+  "text": "じぶんで、いって。いつか。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "e4": {
+  "dur": 7.09,
+  "voice": "Alnilam",
+  "text": "ろくごうしゃの、ドラレコの、さいごの、えいぞうは、おれ、じしんの、かおだった。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "f1": {
+  "dur": 4.194,
+  "voice": "Despina",
+  "text": "このドラレコって、だれが、みてるんですか？",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "f2": {
+  "dur": 2.175,
+  "voice": "Charon",
+  "text": "…だれも、みてませんよ。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "f3": {
+  "dur": 3.022,
+  "voice": "Iapetus",
+  "text": "うしろの、きゃく。いっぽん、さんまんえんで。",
+  "model": "gemini-3.8-flash-tts"
+ },
+ "x1": {
+  "dur": 1.591,
+  "voice": "Schedar",
+  "text": "ドラレコ。かん。",
+  "model": "gemini-3.8-flash-tts"
+ }
+}
