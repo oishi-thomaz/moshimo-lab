@@ -30,9 +30,9 @@
   "model": "gemini-3.8-flash-tts"
  },
  "a4": {
-  "dur": 5.685,
+  "dur": 4.851,
   "voice": "Alnilam",
-  "text": "はいばらが、まいばん、みていた、がめんを、こんやは、おれが、みている。",
+  "text": "はいばらが、まいばん、みていた、がめんを、こんや、は、おれが、みている。",
   "model": "gemini-3.8-flash-tts"
  },
  "a5": {
@@ -48,7 +48,7 @@
   "model": "gemini-3.8-flash-tts"
  },
  "a7": {
-  "dur": 0.911,
+  "dur": 1.016,
   "voice": "Algenib",
   "text": "でなくて、いいよ。",
   "model": "gemini-3.8-flash-tts"
@@ -66,7 +66,7 @@
   "model": "gemini-3.8-flash-tts"
  },
  "b3": {
-  "dur": 5.923,
+  "dur": 5.285,
   "voice": "Algenib",
   "text": "いっぽん、さんまんえん。こんやのは、いくらで、かう？",
   "model": "gemini-3.8-flash-tts"
@@ -168,9 +168,9 @@
   "model": "gemini-3.8-flash-tts"
  },
  "d9": {
-  "dur": 9.704,
+  "dur": 10.88,
   "voice": "Alnilam",
-  "text": "マユを、うけとめたのは、いちねんまえ、おれが、あの、かどで、おろした、ハルナだった。",
+  "text": "マユを、うけとめたのは、いちねんまえ、おれが、あの、まがりかどで、おろした、ハルナだった。",
   "model": "gemini-3.8-flash-tts"
  },
  "d10": {
